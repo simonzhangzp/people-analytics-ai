@@ -1,0 +1,11 @@
+Employee ID,Employee Type,Assignment Status,Hire Date,Term Date,Manager ID,Job,Org,Location,CLT,Overall Performance,Placement Code,Retention,Talent Review Comments,Objectives Summary,Competency Summary,Talent Review,Appraisal Summary,Completed Date,Main Appraiser
+E001,Employee,Active Assignment,2015-01-12,,M1,Engineer,Product,Raleigh,Leader A,A,High Potential,High,,Not Started,Not Started,Initiated,COMPLETED,2019-03-01,Manager One
+E002,Employee,Active Assignment,2016-04-02,,M1,Designer,Product,Raleigh,Leader A,B,Growth Potential,Medium,,Not Started,Not Started,Initiated,COMPLETED,2019-03-04,Manager One
+E003,Employee,Active Assignment,2017-08-19,,M2,PM,Product,Boston,Leader A,B,Well Placed,High,,Not Started,Not Started,Initiated,ONGOING,,Manager Two
+E004,Employee,Active Assignment,2018-02-11,,M2,Engineer,Product,Boston,Leader A,,,,Not Started,Not Started,Not Started,ONGOING,,
+E005,Employee,Active Assignment,2014-11-03,,M3,Sales,Go To Market,NYC,Leader B,C,Not Well Placed,Low,,Not Started,Not Started,Initiated,ONGOING,,Manager Three
+E006,Employee,Active Assignment,2019-01-07,,M3,Sales,Go To Market,NYC,Leader B,Too New to Rate,Too New to Rate,,,Not Started,Not Started,Initiated,ONGOING,,
+E007,Ex-employee,Terminate Assignment,2013-05-22,2019-02-01,M3,Sales,Go To Market,NYC,Leader B,,,,Not Started,Not Started,Not Started,ONGOING,,
+E008,Employee,Active Assignment,2012-09-14,,M4,Finance,Finance,Raleigh,Leader B,,,,Not Started,Not Started,Not Started,ONGOING,,
+E009,Employee,FMLA,2011-06-30,,M4,Finance,Finance,Raleigh,Leader B,,,,Not Started,Not Started,Not Started,ONGOING,,
+E010,Employee,Active Assignment,2010-03-18,,M1,Engineer,Product,Raleigh,Leader A,A,Growth Potential,Medium,,Not Started,Not Started,Initiated,COMPLETED,2019-03-08,Manager One

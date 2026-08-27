@@ -1,0 +1,18 @@
+---
+description: People Strategy Intelligence product and design rules
+alwaysApply: true
+---
+
+Before implementing any UI, determine which workflow stage the screen supports: Strategy, Measurement, Data, Analysis, or Action.
+
+The UI must prioritize the business decision and evidence over decoration.
+
+Use a three-column desktop pattern: workflow rail, main work area, optional AI Co-Designer panel.
+
+Do not introduce new colors, radii, font sizes, shadows, or visual patterns outside the design system without an explicit reason.
+
+Do not build generic dashboard pages. Every analytical view must have a clear business question, takeaway headline, evidence, and next action.
+
+AI recommendations must visibly distinguish proposals, assumptions, approved definitions, and missing evidence.
+
+Raw People data is local-first; privacy messaging must remain visible wherever files are added or analyzed.
