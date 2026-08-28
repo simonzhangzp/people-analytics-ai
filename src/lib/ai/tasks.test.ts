@@ -217,6 +217,43 @@ describe("typed Workbench AI tasks", () => {
     expect(result.warning?.code).toBe("unsafe_model_output");
   });
 
+  it("normalizes BOM and whitespace in DeepSeek environment values", async () => {
+    const expected = deterministicSemanticFallback(semanticInput);
+    let requestUrl = "";
+    let authorization = "";
+    let requestBody: Record<string, unknown> | undefined;
+    const fetchImplementation: typeof fetch = async (request, init) => {
+      requestUrl = String(request);
+      authorization = new Headers(init?.headers).get("authorization") ?? "";
+      requestBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      return new Response(
+        JSON.stringify({
+          choices: [{ message: { content: JSON.stringify(expected) } }],
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    };
+    const provider = new DeepSeekProvider({
+      apiKey: "\uFEFF  test-key \r\n",
+      baseUrl: "\uFEFF https://gateway.example.test/// \r\n",
+      model: "\uFEFF deepseek-chat \r\n",
+      fetchImplementation,
+    });
+
+    await provider.generateStructured({
+      schema: semanticInterpreterOutputSchema,
+      schemaName: "semantic_interpreter",
+      systemPrompt: "Return semantic proposals.",
+      input: semanticInput,
+    });
+
+    expect(requestUrl).toBe(
+      "https://gateway.example.test/chat/completions",
+    );
+    expect(authorization).toBe("Bearer test-key");
+    expect(requestBody?.model).toBe("deepseek-chat");
+  });
+
   it("requests low-temperature JSON-only generation", async () => {
     const expected = deterministicSemanticFallback(semanticInput);
     let requestBody: Record<string, unknown> | undefined;

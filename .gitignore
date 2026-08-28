@@ -39,3 +39,5 @@ pnpm-debug.log*
 # daily people-analytics job scan (local resume and sheet tooling)
 scripts/daily_job_scan/
 **/__pycache__/
+.vercel
+supabase/.temp/

@@ -512,3 +512,18 @@ grant execute on function public.knowledge_payload_is_safe(jsonb)
 to authenticated;
 revoke all on function public.set_workbench_updated_at()
 from public, anon, authenticated;
+
+-- Supabase provides pg_cron for database-owner maintenance jobs. The cleanup
+-- remains unreachable from application roles and runs once per UTC day.
+create extension if not exists pg_cron with schema extensions;
+
+select cron.schedule(
+  'cleanup-anonymous-workbench-data-daily',
+  '17 3 * * *',
+  $$select public.cleanup_anonymous_workbench_data(interval '30 days');$$
+)
+where not exists (
+  select 1
+  from cron.job
+  where jobname = 'cleanup-anonymous-workbench-data-daily'
+);

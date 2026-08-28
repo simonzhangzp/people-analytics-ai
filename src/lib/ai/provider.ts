@@ -120,9 +120,12 @@ export class DeepSeekProvider implements LLMProvider {
   private readonly fetchImplementation: typeof fetch;
 
   constructor(options: DeepSeekProviderOptions = {}) {
-    this.apiKey = options.apiKey;
-    this.baseUrl = (options.baseUrl || "https://api.deepseek.com").replace(/\/+$/, "");
-    this.model = options.model || "deepseek-chat";
+    this.apiKey = options.apiKey?.trim() || undefined;
+    this.baseUrl = (options.baseUrl?.trim() || "https://api.deepseek.com").replace(
+      /\/+$/,
+      "",
+    );
+    this.model = options.model?.trim() || "deepseek-chat";
     this.timeoutMs = options.timeoutMs ?? 12_000;
     this.fetchImplementation = options.fetchImplementation ?? fetch;
   }
