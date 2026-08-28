@@ -57,7 +57,7 @@ const TASK_PROMPTS: Record<WorkbenchAITaskName, string> = {
   metric_codesigner:
     "Return a reviewable semantic metric patch. Expressions must use the supplied structured metric expression objects only. Never return SQL, code, or mark a patch as already applied.",
   analysis_planner:
-    "Plan analysis using only these operations: validate_trend, segment, compare_periods, contribution, association, data_gap. Do not return SQL, executable code, or claim that an operation has run.",
+    "Plan analysis using only these operations: summary, distribution, validate_trend, segment, compare_periods, contribution, association, duration, funnel, rate, data_gap. Do not return SQL, executable code, or claim that an operation has run.",
   insight_interpreter:
     "Interpret only the supplied aggregate results. Cite aggregate result ids, do not invent values, and describe limitations or missing evidence explicitly.",
   executive_storyteller:

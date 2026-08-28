@@ -1,8 +1,11 @@
+import type { SemanticRole } from "@/types/semantics";
+
 export interface CanonicalFieldDefinition {
   label: string;
   aliases: string[];
   type: "id" | "string" | "number" | "boolean" | "date";
   pii?: boolean;
+  sensitive?: boolean;
 }
 
 export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
@@ -28,6 +31,7 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
     label: "Candidate ID",
     aliases: ["candidate_id", "cand_id", "cand_num", "applicant_id"],
     type: "id",
+    pii: true,
   },
   application_id: {
     label: "Application ID",
@@ -73,6 +77,7 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
       "latest_hire_dt",
       "latest_hire_date",
       "orig_hire_dt",
+      "tenure_date",
     ],
     type: "date",
   },
@@ -85,6 +90,8 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
       "calendar_month",
       "month_end",
       "snap_dt",
+      "report_effective_date",
+      "effective_as_of_date",
     ],
     type: "date",
   },
@@ -181,6 +188,10 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
     label: "Department",
     aliases: [
       "department",
+      "department_e",
+      "department_f",
+      "department_etext",
+      "department_ftext",
       "org",
       "business_unit",
       "org_unit",
@@ -215,6 +226,8 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
       "pers_num",
       "person_id",
       "worker_id",
+      "emp_id",
+      "staff_id",
     ],
     type: "id",
     pii: true,
@@ -236,7 +249,7 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   years_at_company: {
     label: "Years at Company",
-    aliases: ["years_at_company", "yearsatcompany", "tenure_years"],
+    aliases: ["years_at_company", "yearsatcompany", "tenure_years", "tenure"],
     type: "number",
   },
   employee_type: {
@@ -246,7 +259,13 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   term_date: {
     label: "Termination Date",
-    aliases: ["term_date", "termination_date", "term_dt", "termination_dt"],
+    aliases: [
+      "term_date",
+      "termination_date",
+      "term_dt",
+      "termination_dt",
+      "action_date",
+    ],
     type: "date",
   },
   termination_reason: {
@@ -256,7 +275,13 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   exit_classification: {
     label: "Exit Classification",
-    aliases: ["exit_classification", "termination_type", "exit_type", "voluntary_flag"],
+    aliases: [
+      "exit_classification",
+      "termination_type",
+      "exit_type",
+      "voluntary_flag",
+      "voluntary_involuntary",
+    ],
     type: "string",
   },
   compensation_effective_date: {
@@ -266,7 +291,13 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   annual_base_salary: {
     label: "Annual Base Salary",
-    aliases: ["annual_base_salary"],
+    aliases: [
+      "annual_base_salary",
+      "base_salary",
+      "base_comp",
+      "base_compensation",
+      "monthly_income",
+    ],
     type: "number",
     pii: true,
   },
@@ -284,6 +315,7 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
     label: "Manager ID",
     aliases: ["manager_id", "supervisor_id", "line_manager_id"],
     type: "id",
+    pii: true,
   },
   leadership_area: {
     label: "Leadership Area",
@@ -353,19 +385,289 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
     type: "string",
     pii: true,
   },
+  requisition_status: {
+    label: "Requisition Status",
+    aliases: ["requisition_status", "req_status", "advertisement_status", "job_status"],
+    type: "string",
+  },
+  applications_count: {
+    label: "Applications",
+    aliases: [
+      "applications",
+      "application_count",
+      "applications_count",
+      "number_of_applications",
+      "total_applications",
+      "appl_sumbitted_sum",
+      "qtr_appl_sumbitted_sum",
+      "applications_submitted_sum",
+    ],
+    type: "number",
+  },
+  advertisements_count: {
+    label: "Advertisements",
+    aliases: [
+      "advertisements",
+      "advertisement_count",
+      "staffing_advertisements",
+      "number_of_advertisements",
+      "postings",
+    ],
+    type: "number",
+  },
+  staffing_days: {
+    label: "Staffing Duration",
+    aliases: [
+      "days_to_staff",
+      "staffing_days",
+      "time_to_fill",
+      "average_days_to_staff",
+      "median_days_to_fill",
+    ],
+    type: "number",
+  },
+  report_period: {
+    label: "Report Period",
+    aliases: [
+      "period",
+      "report_period",
+      "reporting_period",
+      "month",
+      "year",
+      "fiscal_year",
+      "quarter",
+      "wave",
+    ],
+    type: "string",
+  },
+  employee_count: {
+    label: "Employee Count",
+    aliases: [
+      "employee_count",
+      "employees",
+      "headcount",
+      "staff_count",
+      "population_count",
+      "number_of_employees",
+    ],
+    type: "number",
+  },
+  record_count: {
+    label: "Reported Count",
+    aliases: ["count", "record_count", "reported_count", "qtr_count"],
+    type: "number",
+  },
+  salary_range_min: {
+    label: "Salary Range Minimum",
+    aliases: ["salary_range_min", "range_minimum", "salary_min", "minimum_salary"],
+    type: "number",
+  },
+  salary_range_max: {
+    label: "Salary Range Maximum",
+    aliases: ["salary_range_max", "range_maximum", "salary_max", "maximum_salary"],
+    type: "number",
+  },
+  pay_gap_mean_pct: {
+    label: "Mean Hourly Pay Gap",
+    aliases: ["diff_mean_hourly_percent", "mean_hourly_pay_gap", "mean_pay_gap_percent"],
+    type: "number",
+  },
+  pay_gap_median_pct: {
+    label: "Median Hourly Pay Gap",
+    aliases: [
+      "diff_median_hourly_percent",
+      "median_hourly_pay_gap",
+      "median_pay_gap_percent",
+    ],
+    type: "number",
+  },
+  gender: {
+    label: "Gender",
+    aliases: ["gender", "sex", "gender_identity"],
+    type: "string",
+    sensitive: true,
+  },
+  ethnicity: {
+    label: "Ethnicity",
+    aliases: ["ethnicity", "race", "ethnic_group", "racialized_group"],
+    type: "string",
+    sensitive: true,
+  },
+  demographic_category: {
+    label: "Demographic Category",
+    aliases: [
+      "demographic_category",
+      "designated_group",
+      "employment_equity_group",
+      "population_group",
+      "self_identification_group",
+      "ee_e",
+      "ee_f",
+      "ee_etext",
+      "ee_ftext",
+    ],
+    type: "string",
+    sensitive: true,
+  },
+  absence_date: {
+    label: "Absence Date",
+    aliases: ["absence_date", "absence_month", "sickness_date", "leave_date"],
+    type: "date",
+  },
+  absence_hours: {
+    label: "Absence Hours",
+    aliases: ["absence_hours", "hours_absent", "sickness_hours", "lost_hours"],
+    type: "number",
+  },
+  absence_rate: {
+    label: "Absence Rate",
+    aliases: [
+      "absence_rate",
+      "absence_fte_percent",
+      "absence_fte",
+      "sickness_absence_rate",
+      "sickness_rate",
+    ],
+    type: "number",
+  },
+  survey_wave: {
+    label: "Survey Wave",
+    aliases: ["survey_wave", "engagement_wave", "survey_period", "pulse"],
+    type: "string",
+  },
+  engagement_score: {
+    label: "Engagement Score",
+    aliases: [
+      "engagement_score",
+      "engagement_index",
+      "survey_score",
+      "favorable_score",
+      "favourable_score",
+    ],
+    type: "number",
+  },
+  course_id: {
+    label: "Course ID",
+    aliases: ["course_id", "training_id", "learning_id", "module_id"],
+    type: "id",
+  },
+  course_name: {
+    label: "Course Name",
+    aliases: ["course_name", "training_name", "learning_activity", "module_name", "course"],
+    type: "string",
+  },
+  learning_completed_at: {
+    label: "Learning Completion Date",
+    aliases: [
+      "learning_completed_at",
+      "completion_date",
+      "training_completion_date",
+      "date_completed",
+    ],
+    type: "date",
+  },
+  learning_status: {
+    label: "Learning Status",
+    aliases: ["learning_status", "completion_status", "training_status", "course_status"],
+    type: "string",
+  },
+  learning_score: {
+    label: "Learning Score",
+    aliases: ["learning_score", "training_score", "course_score", "assessment_score", "score"],
+    type: "number",
+  },
+  pass_flag: {
+    label: "Pass Flag",
+    aliases: ["pass_flag", "passed", "is_passed", "result"],
+    type: "boolean",
+  },
+  job_change_date: {
+    label: "Job Change Date",
+    aliases: [
+      "job_change_date",
+      "movement_date",
+      "mobility_date",
+      "promotion_effective_date",
+      "effective_date_of_change",
+    ],
+    type: "date",
+  },
+  move_type: {
+    label: "Movement Type",
+    aliases: [
+      "move_type",
+      "movement_type",
+      "mobility_type",
+      "job_change_type",
+      "appointment_type",
+      "mob_type_e",
+      "mob_type_f",
+      "mob_type_etext",
+      "mob_type_ftext",
+    ],
+    type: "string",
+  },
+  movement_count: {
+    label: "Movement Count",
+    aliases: [
+      "movement_count",
+      "mobility_count",
+      "promotions",
+      "appointments",
+      "number_of_movements",
+    ],
+    type: "number",
+  },
 };
 
-const directPiiTokens = [
-  "name",
+const strongPiiTokens = [
   "email",
   "phone",
-  "address",
+  "mobile",
   "socialsecurity",
-  "ssn",
   "governmentid",
+  "nationalid",
+  "passport",
   "dateofbirth",
   "birthdate",
 ];
+
+const exactPiiHeaders = new Set([
+  "name",
+  "first_name",
+  "last_name",
+  "full_name",
+  "employee_name",
+  "candidate_name",
+  "applicant_name",
+  "person_name",
+  "responsible_person",
+  "contact_name",
+  "address",
+  "street_address",
+  "home_address",
+  "mailing_address",
+  "ssn",
+  "dob",
+  "post_code",
+  "postcode",
+  "zip",
+  "zip_code",
+]);
+
+const personNameQualifiers = new Set([
+  "first",
+  "last",
+  "full",
+  "employee",
+  "candidate",
+  "applicant",
+  "person",
+  "manager",
+  "supervisor",
+  "contact",
+  "responsible",
+]);
 
 export function normalizeHeader(value: string) {
   return value
@@ -378,6 +680,78 @@ export function normalizeHeader(value: string) {
 }
 
 const compact = (value: string) => normalizeHeader(value).replaceAll("_", "");
+
+export function semanticRoleForCanonicalField(
+  canonicalField: string | undefined,
+  definition?: CanonicalFieldDefinition,
+): SemanticRole | undefined {
+  if (!canonicalField) return undefined;
+  if (definition?.pii) return "pii";
+  if (definition?.sensitive) return "sensitive_dimension";
+  if (canonicalField === "employee_id" || canonicalField === "candidate_id") {
+    return "person_id";
+  }
+  if (
+    canonicalField.endsWith("_id") ||
+    canonicalField === "appraisal_id"
+  ) {
+    return canonicalField.includes("application") ||
+      canonicalField.includes("requisition") ||
+      canonicalField.includes("course")
+      ? "entity_id"
+      : "event_id";
+  }
+  if (
+    canonicalField === "report_period" ||
+    canonicalField === "survey_wave"
+  ) {
+    return "period";
+  }
+  if (canonicalField === "snapshot_month") return "as_of_date";
+  if (
+    canonicalField.endsWith("_date") ||
+    canonicalField.endsWith("_at")
+  ) {
+    return "event_date";
+  }
+  if (
+    canonicalField.endsWith("_status") ||
+    canonicalField === "attrition" ||
+    canonicalField.endsWith("_flag")
+  ) {
+    return "status";
+  }
+  if (
+    canonicalField.includes("count") ||
+    canonicalField === "applications_count" ||
+    canonicalField === "advertisements_count" ||
+    canonicalField === "movement_count"
+  ) {
+    return "measure";
+  }
+  if (
+    canonicalField.includes("salary") ||
+    canonicalField.includes("compensation")
+  ) {
+    return "amount";
+  }
+  if (
+    canonicalField.includes("rating") ||
+    canonicalField.includes("score")
+  ) {
+    return "rating";
+  }
+  if (
+    canonicalField.includes("rate") ||
+    canonicalField.includes("ratio") ||
+    canonicalField.includes("gap") ||
+    canonicalField.includes("hours") ||
+    canonicalField.includes("days")
+  ) {
+    return "measure";
+  }
+  return "category";
+}
 
 export function findCanonicalField(sourceField: string) {
   const normalized = normalizeHeader(sourceField);
@@ -392,6 +766,8 @@ export function findCanonicalField(sourceField: string) {
         label: definition.label,
         confidence: normalizeHeader(canonicalField) === normalized ? 99 : 95,
         likelyPii: Boolean(definition.pii),
+        sensitive: Boolean(definition.sensitive),
+        semanticRole: semanticRoleForCanonicalField(canonicalField, definition),
         expectedType: definition.type,
       };
     }
@@ -403,6 +779,8 @@ export function findCanonicalField(sourceField: string) {
         label: definition.label,
         confidence: 92,
         likelyPii: Boolean(definition.pii),
+        sensitive: Boolean(definition.sensitive),
+        semanticRole: semanticRoleForCanonicalField(canonicalField, definition),
         expectedType: definition.type,
       };
     }
@@ -412,6 +790,14 @@ export function findCanonicalField(sourceField: string) {
 }
 
 export function isLikelyPii(sourceField: string) {
+  const normalized = normalizeHeader(sourceField);
+  if (exactPiiHeaders.has(normalized)) return true;
   const value = compact(sourceField);
-  return directPiiTokens.some((token) => value.includes(token));
+  if (strongPiiTokens.some((token) => value.includes(token))) return true;
+  const segments = normalized.split("_");
+  if (segments.includes("address")) return true;
+  return (
+    segments.includes("name") &&
+    segments.some((segment) => personNameQualifiers.has(segment))
+  );
 }

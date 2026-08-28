@@ -41,11 +41,16 @@ export const confidenceLevelSchema = z.enum([
 ]) satisfies z.ZodType<ConfidenceLevel>;
 
 export const peopleDomainSchema = z.enum([
+  "workforce",
   "retention",
   "recruiting",
   "mobility",
   "compensation",
   "performance",
+  "absence",
+  "engagement",
+  "learning",
+  "diversity",
   "other",
 ]) satisfies z.ZodType<PeopleDomain>;
 
@@ -57,6 +62,25 @@ const columnDataTypeSchema = z.enum([
   "unknown",
 ]);
 
+const semanticRoleSchema = z.enum([
+  "entity_id",
+  "person_id",
+  "event_id",
+  "period",
+  "event_date",
+  "as_of_date",
+  "status",
+  "category",
+  "measure",
+  "numerator",
+  "denominator",
+  "rating",
+  "amount",
+  "sensitive_dimension",
+  "pii",
+  "ignore",
+]);
+
 const safeColumnProfileSchema = z
   .object({
     sourceName: shortTextSchema,
@@ -64,7 +88,9 @@ const safeColumnProfileSchema = z
     nullPct: percentSchema,
     distinctPct: percentSchema,
     likelyPII: z.boolean(),
+    sensitive: z.boolean().optional(),
     canonicalField: shortTextSchema.optional(),
+    semanticRole: semanticRoleSchema.optional(),
     semanticMeaning: longTextSchema.optional(),
     confidence: confidenceScoreSchema.optional(),
   })
@@ -141,7 +167,19 @@ export const metricExpressionSchema: z.ZodType<MetricExpression> = z.lazy(() =>
     z
       .object({
         kind: z.literal("count"),
-        entity: z.enum(["employee", "exit", "hire", "application", "requisition"]),
+        entity: z.enum([
+          "employee",
+          "exit",
+          "hire",
+          "application",
+          "requisition",
+          "review",
+          "absence",
+          "survey_response",
+          "learning_record",
+          "mobility_event",
+          "aggregate_record",
+        ]),
         distinctField: shortTextSchema.optional(),
         rules: z.array(metricRuleSchema).max(100).optional(),
       })
@@ -266,6 +304,11 @@ const analysisStepSchema = z
       "compare_periods",
       "contribution",
       "association",
+      "summary",
+      "distribution",
+      "duration",
+      "funnel",
+      "rate",
       "data_gap",
     ]),
     metricId: idSchema.optional(),
@@ -287,7 +330,7 @@ export const analysisPlanSchema = z
 
 const suggestedFollowUpSchema = z
   .object({
-    key: z.enum(["trend", "tenure", "level", "compensation", "organization"]),
+    key: idSchema,
     label: shortTextSchema,
     available: z.boolean(),
     unavailableReason: longTextSchema.optional(),
@@ -328,7 +371,7 @@ export const insightSchema = z
   .object({
     id: idSchema,
     questionId: idSchema,
-    branchKey: z.enum(["trend", "tenure", "level", "compensation", "organization"]),
+    branchKey: idSchema,
     headline: longTextSchema,
     finding: longTextSchema,
     metricIds: z.array(idSchema).max(100),
@@ -378,7 +421,7 @@ const datasetProfileEnvelopeSchema = z
 
 export const semanticInterpreterInputSchema = z
   .object({
-    datasets: z.array(datasetProfileEnvelopeSchema).min(1).max(20),
+    datasets: z.array(datasetProfileEnvelopeSchema).min(1).max(100),
     businessContext: optionalLongTextSchema,
     knownMappings: z.array(fieldMappingSchema).max(2_000).default([]),
     knownRelationships: z.array(datasetRelationshipSchema).max(500).default([]),
@@ -399,7 +442,7 @@ export const semanticInterpreterOutputSchema = z
   .object({
     task: z.literal("semantic_interpreter"),
     summary: longTextSchema,
-    datasetSemantics: z.array(datasetSemanticSchema).max(20),
+    datasetSemantics: z.array(datasetSemanticSchema).max(100),
     mappingProposals: z.array(fieldMappingSchema).max(2_000),
     relationshipProposals: z.array(datasetRelationshipSchema).max(500),
     assumptions: z.array(longTextSchema).max(30),
@@ -411,7 +454,7 @@ export const metricCodesignerInputSchema = z
   .object({
     metric: metricDefinitionSchema,
     instruction: longTextSchema,
-    datasetProfiles: z.array(datasetProfileEnvelopeSchema).max(20).default([]),
+    datasetProfiles: z.array(datasetProfileEnvelopeSchema).max(100).default([]),
   })
   .strict();
 
@@ -429,7 +472,7 @@ export const analysisPlannerInputSchema = z
   .object({
     question: analysisQuestionSchema,
     metrics: z.array(metricDefinitionSchema).min(1).max(100),
-    datasetProfiles: z.array(datasetProfileEnvelopeSchema).max(20).default([]),
+    datasetProfiles: z.array(datasetProfileEnvelopeSchema).max(100).default([]),
     businessContext: optionalLongTextSchema,
   })
   .strict();

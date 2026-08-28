@@ -31,9 +31,8 @@ export function createAttritionAnalysisPlan(
 ): AnalysisPlan {
   const metricId =
     options.metricId ??
-    question.metricIds.find((id) => id.includes("voluntary")) ??
     question.metricIds[0] ??
-    "metric-voluntary-attrition";
+    "metric-unresolved";
   const availableFields = options.availableFields ?? [];
   const managerAvailable = hasField(
     availableFields,

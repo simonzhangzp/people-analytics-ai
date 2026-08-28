@@ -1,0 +1,218 @@
+{
+  "version": 1,
+  "cacheDirectory": "tests/external-data/cache",
+  "files": [
+    {
+      "id": "widgetcorp-roster",
+      "fileName": "widgetcorp_workforce_detail_roster_2019-12-31.csv",
+      "url": "https://raw.githubusercontent.com/bvoorhees/code_and_data_for_the_people_analytics_enthusiast/7e9b1781b3670032ed5064d76863aad9ee7aef77/hr_information_systems/data/widgetcorp_workforce_detail_roster_2019-12-31.csv",
+      "sourcePage": "https://github.com/bvoorhees/code_and_data_for_the_people_analytics_enthusiast",
+      "license": {
+        "name": "MIT",
+        "url": "https://raw.githubusercontent.com/bvoorhees/code_and_data_for_the_people_analytics_enthusiast/7e9b1781b3670032ed5064d76863aad9ee7aef77/LICENSE"
+      },
+      "format": "csv",
+      "domain": "workforce",
+      "expectedTableTypes": [
+        "employee_roster",
+        "employee_snapshot"
+      ],
+      "expectedCanonicalAny": [
+        "employee_id"
+      ],
+      "sha256": "edd2334ba1cd238eb37accfcfc6f44d53120db5f7fd756293e54cbdca6adb073"
+    },
+    {
+      "id": "widgetcorp-terminations",
+      "fileName": "widgetcorp_terms_2018-12-31_to_2019-12-31.csv",
+      "url": "https://raw.githubusercontent.com/bvoorhees/code_and_data_for_the_people_analytics_enthusiast/7e9b1781b3670032ed5064d76863aad9ee7aef77/hr_information_systems/data/widgetcorp_terms_2018-12-31_to_2019-12-31.csv",
+      "sourcePage": "https://github.com/bvoorhees/code_and_data_for_the_people_analytics_enthusiast",
+      "license": {
+        "name": "MIT",
+        "url": "https://raw.githubusercontent.com/bvoorhees/code_and_data_for_the_people_analytics_enthusiast/7e9b1781b3670032ed5064d76863aad9ee7aef77/LICENSE"
+      },
+      "format": "csv",
+      "domain": "retention",
+      "expectedTableTypes": [
+        "termination_event"
+      ],
+      "expectedCanonicalAny": [
+        "employee_id",
+        "term_date"
+      ],
+      "sha256": "fd2a7b51ded94f9eb3ab2c7fb2763b1e3f0f7cc73b1d3f43cb42ed3d0c2a5353"
+    },
+    {
+      "id": "canada-staffing-advertisements",
+      "fileName": "canada_staffing_advertisements.csv",
+      "url": "https://open.canada.ca/data/dataset/26ffad36-ca9b-431c-8f6d-a6df02665e2c/resource/e41a2a80-1af8-47d6-b993-c051686bc1fa/download/advs.csv",
+      "sourcePage": "https://open.canada.ca/data/en/dataset/26ffad36-ca9b-431c-8f6d-a6df02665e2c/resource/e41a2a80-1af8-47d6-b993-c051686bc1fa",
+      "license": {
+        "name": "Open Government Licence - Canada 2.0",
+        "url": "https://open.canada.ca/en/open-government-licence-canada"
+      },
+      "format": "csv",
+      "domain": "recruiting",
+      "expectedTableTypes": [
+        "aggregate_people_fact"
+      ],
+      "expectedCanonicalAny": [
+        "department",
+        "report_period",
+        "advertisements_count",
+        "applications_count"
+      ],
+      "sha256": "518e06daee7c4f243bfb518f7ca45a43c2452b51c05e4d31d2fa6b205eece9ef"
+    },
+    {
+      "id": "uk-gender-pay-gap",
+      "fileName": "uk_gender_pay_gap_2024.csv",
+      "url": "https://gender-pay-gap.service.gov.uk/Viewing/download-data?year=2024",
+      "sourcePage": "https://gender-pay-gap.service.gov.uk/viewing/download",
+      "license": {
+        "name": "Open Government Licence 3.0",
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+      },
+      "format": "csv",
+      "domain": "compensation",
+      "expectedTableTypes": [
+        "aggregate_people_fact"
+      ],
+      "expectedCanonicalAny": [
+        "pay_gap_mean_pct",
+        "pay_gap_median_pct"
+      ],
+      "sha256": "206760ce3987ebbf55b71a4fe214f89012488c89cdefe70f427eb78e6837ab42"
+    },
+    {
+      "id": "cc0-employee-performance-workbook",
+      "fileName": "employee_performance_workbook.xlsx",
+      "url": "https://www.kaggle.com/api/v1/datasets/download/aamnaraza/hr-analytics-employee-attrition-dataset",
+      "sourcePage": "https://www.kaggle.com/datasets/aamnaraza/hr-analytics-employee-attrition-dataset",
+      "license": {
+        "name": "CC0 1.0",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "format": "xlsx",
+      "archiveMember": "HR ATTRIATION.xlsx",
+      "domain": "performance",
+      "expectedTableTypes": [
+        "performance_review",
+        "employee_outcome"
+      ],
+      "expectedCanonicalAny": [
+        "employee_id",
+        "performance_rating"
+      ],
+      "sha256": "e5a4e0baae78acbde01c4fc3f049b76bb53d102d5d9710310bce845d3a309fe7"
+    },
+    {
+      "id": "nhs-absence",
+      "fileName": "nhs_absence.csv",
+      "url": "https://opendata.nhsbsa.net/dataset/76d82fba-273d-4b89-8ca4-bc49c683d85d/resource/93328870-0d81-4b95-a552-b054a7d71a89/download/foi03006.csv",
+      "sourcePage": "https://opendata.nhsbsa.net/dataset/76d82fba-273d-4b89-8ca4-bc49c683d85d",
+      "license": {
+        "name": "Open Government Licence 3.0",
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+      },
+      "format": "csv",
+      "domain": "absence",
+      "expectedTableTypes": [
+        "absence"
+      ],
+      "expectedCanonicalAny": [
+        "absence_rate",
+        "absence_date",
+        "report_period"
+      ],
+      "sha256": "b056636f66b6f57a500b6a91c79f06bfecd9b1a3c683d9ca9f624f04b7db199c"
+    },
+    {
+      "id": "widgetcorp-engagement",
+      "fileName": "widgetcorp_engagement_survey.csv",
+      "url": "https://raw.githubusercontent.com/bvoorhees/code_and_data_for_the_people_analytics_enthusiast/7e9b1781b3670032ed5064d76863aad9ee7aef77/employee_listening/data/survey.csv",
+      "sourcePage": "https://github.com/bvoorhees/code_and_data_for_the_people_analytics_enthusiast",
+      "license": {
+        "name": "MIT",
+        "url": "https://raw.githubusercontent.com/bvoorhees/code_and_data_for_the_people_analytics_enthusiast/7e9b1781b3670032ed5064d76863aad9ee7aef77/LICENSE"
+      },
+      "format": "csv",
+      "domain": "engagement",
+      "expectedTableTypes": [
+        "engagement_survey"
+      ],
+      "expectedCanonicalAny": [
+        "employee_id",
+        "survey_wave",
+        "engagement_score"
+      ],
+      "sha256": "d5ba5959b16c772b52dbb14fdfe60950cabec2fc8b0a27586ef0d95e364669b4"
+    },
+    {
+      "id": "mit-employee-training",
+      "fileName": "employee_training.csv",
+      "url": "https://huggingface.co/datasets/bharathraghavan/test/raw/93fc19f5002eadebcfdfc000696b940c4404fa85/employee_training.csv",
+      "sourcePage": "https://huggingface.co/datasets/bharathraghavan/test",
+      "license": {
+        "name": "MIT",
+        "url": "https://huggingface.co/datasets/bharathraghavan/test/raw/93fc19f5002eadebcfdfc000696b940c4404fa85/README.md"
+      },
+      "format": "csv",
+      "domain": "learning",
+      "expectedTableTypes": [
+        "learning_record"
+      ],
+      "expectedCanonicalAny": [
+        "employee_id",
+        "course_name",
+        "learning_score",
+        "pass_flag"
+      ],
+      "sha256": "d2453a940fba46a09bf601046b7a46ce3000bf8b9ec535e0f694e09835c78d42"
+    },
+    {
+      "id": "canada-internal-mobility",
+      "fileName": "canada_internal_mobility.csv",
+      "url": "https://open.canada.ca/data/dataset/26ffad36-ca9b-431c-8f6d-a6df02665e2c/resource/347ba6ff-7c58-4775-ba3a-3a4d9e23eb06/download/internal_mob.csv",
+      "sourcePage": "https://open.canada.ca/data/en/dataset/26ffad36-ca9b-431c-8f6d-a6df02665e2c",
+      "license": {
+        "name": "Open Government Licence - Canada 2.0",
+        "url": "https://open.canada.ca/en/open-government-licence-canada"
+      },
+      "format": "csv",
+      "domain": "mobility",
+      "expectedTableTypes": [
+        "mobility",
+        "aggregate_people_fact"
+      ],
+      "expectedCanonicalAny": [
+        "report_period",
+        "move_type",
+        "movement_count"
+      ],
+      "sha256": "03aa488bd30eee65e21472ceadfce3c6ba5c09ec56f118b1ccb0c824fa749ece"
+    },
+    {
+      "id": "canada-employment-equity",
+      "fileName": "canada_employment_equity_demographics.csv",
+      "url": "https://open.canada.ca/data/dataset/26ffad36-ca9b-431c-8f6d-a6df02665e2c/resource/bc1f4229-b228-4000-9233-86c763b012ec/download/demo_ee.csv",
+      "sourcePage": "https://open.canada.ca/data/en/dataset/26ffad36-ca9b-431c-8f6d-a6df02665e2c",
+      "license": {
+        "name": "Open Government Licence - Canada 2.0",
+        "url": "https://open.canada.ca/en/open-government-licence-canada"
+      },
+      "format": "csv",
+      "domain": "diversity",
+      "expectedTableTypes": [
+        "demographics",
+        "aggregate_people_fact"
+      ],
+      "expectedCanonicalAny": [
+        "report_period",
+        "demographic_category",
+        "employee_count"
+      ],
+      "sha256": "b7f91fcb6663a849251cbfa57a0fb3fd37e9e3ddd4a93db48f7cd7e611f64cbe"
+    }
+  ]
+}

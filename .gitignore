@@ -16,6 +16,8 @@
 /coverage
 /playwright-report
 /test-results
+/tests/external-data/cache/
+/tests/external-data/results.local.json
 
 # Local VDM extracts: large UTF-32 snapshots and roster PII stay on disk only
 sample_data/vdm_*.csv

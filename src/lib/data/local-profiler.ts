@@ -244,7 +244,7 @@ function parseCsvText(text: string): Promise<{
 function piiHeaders(headers: string[]) {
   return headers.filter((key) => {
     const match = findCanonicalField(key);
-    return Boolean(match?.likelyPii || isLikelyPii(key));
+    return Boolean(match?.likelyPii || match?.sensitive || isLikelyPii(key));
   });
 }
 

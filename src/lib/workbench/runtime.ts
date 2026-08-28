@@ -8,7 +8,16 @@ import {
   exportExecutiveStoryPptx,
 } from "@/lib/ppt";
 import { createKnowledgeRepository } from "@/lib/knowledge";
+import {
+  executeDomainAnalysis,
+  type DeterministicAnalysisOutput,
+} from "@/lib/analysis/registry";
+import {
+  buildCapabilityReports,
+  selectCapabilityForQuestion,
+} from "@/lib/semantics";
 import { executeLocalAttritionWorkbench } from "@/lib/workbench/attrition-runtime";
+import type { CapabilityReport } from "@/types/semantics";
 import type {
   AnalysisPlan,
   AnalysisQuestion,
@@ -19,6 +28,8 @@ import type {
   MetricDefinition,
   WorkbenchState,
 } from "@/types/workbench";
+
+export { isDuckDBInitializationError } from "@/lib/local-data/duckdb-client";
 
 function ratio(value: number | undefined) {
   if (value === undefined) return undefined;
@@ -38,10 +49,7 @@ function normalizeDataset(dataset: LocalWorkbenchDataset): LocalWorkbenchDataset
       ...dataset.metadata,
       typeConfidence: ratio(dataset.metadata.typeConfidence) ?? 0,
       grainConfidence: ratio(dataset.metadata.grainConfidence) ?? 0,
-      status:
-        (ratio(dataset.metadata.grainConfidence) ?? 0) >= 0.8
-          ? "Approved"
-          : "Needs Review",
+      status: dataset.metadata.tableContract?.status ?? "Needs Review",
       columns,
       safeProfile: {
         ...dataset.metadata.safeProfile,
@@ -126,17 +134,52 @@ export async function executeWorkbenchAnalysis({
   metric,
   datasets,
   plan,
+  capability,
 }: {
   question: AnalysisQuestion;
   metric: MetricDefinition;
   datasets: LocalWorkbenchDataset[];
   plan: AnalysisPlan;
-}) {
-  return executeLocalAttritionWorkbench({
+  capability?: CapabilityReport;
+}): Promise<DeterministicAnalysisOutput> {
+  const resolvedCapability =
+    capability ??
+    selectCapabilityForQuestion(
+      question.text,
+      buildCapabilityReports(
+        datasets.map(({ metadata }) => metadata),
+      ),
+    );
+  if (!resolvedCapability) {
+    throw new Error(
+      "No deterministic HR analysis capability matches the attached data.",
+    );
+  }
+  const supportsComparativeAttrition =
+    resolvedCapability.domain === "retention" &&
+    metric.key === "voluntary_attrition" &&
+    datasets.some(
+      (dataset) =>
+        dataset.metadata.tableContract?.tableType === "employee_snapshot",
+    ) &&
+    datasets.some(
+      (dataset) =>
+        dataset.metadata.tableContract?.tableType === "termination_event",
+    );
+  if (supportsComparativeAttrition) {
+    return executeLocalAttritionWorkbench({
+      question,
+      metric,
+      datasets,
+      plan,
+    });
+  }
+  return executeDomainAnalysis({
     question,
     metric,
     datasets,
     plan,
+    capability: resolvedCapability,
   });
 }
 

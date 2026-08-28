@@ -21,6 +21,8 @@ export interface MetricQueryOptions {
   alias?: string;
   groupBy?: readonly string[];
   rules?: readonly MetricRule[];
+  fieldBindings?: Readonly<Record<string, string>>;
+  includeDefinitionRules?: boolean;
 }
 
 const MAX_EXPRESSION_DEPTH = 16;
@@ -69,6 +71,81 @@ function requiredScalar(rule: MetricRule): SqlParameter {
     throw new Error(`Metric rule ${rule.label} requires a scalar value.`);
   }
   return asParameter(rule.value);
+}
+
+function bindField(
+  field: string,
+  bindings: Readonly<Record<string, string>>,
+) {
+  return bindings[field] ?? field;
+}
+
+function bindRule(
+  rule: MetricRule,
+  bindings: Readonly<Record<string, string>>,
+): MetricRule {
+  return {
+    ...rule,
+    field: bindField(rule.field, bindings),
+  };
+}
+
+function bindExpression(
+  expression: MetricExpression,
+  bindings: Readonly<Record<string, string>>,
+): MetricExpression {
+  switch (expression.kind) {
+    case "count":
+      return {
+        ...expression,
+        distinctField: expression.distinctField
+          ? bindField(expression.distinctField, bindings)
+          : undefined,
+        rules: expression.rules?.map((rule) => bindRule(rule, bindings)),
+      };
+    case "average":
+      return {
+        ...expression,
+        field: bindField(expression.field, bindings),
+        rules: expression.rules?.map((rule) => bindRule(rule, bindings)),
+      };
+    case "duration":
+      return {
+        ...expression,
+        startField: bindField(expression.startField, bindings),
+        endField: bindField(expression.endField, bindings),
+      };
+    case "ratio":
+      return {
+        ...expression,
+        numerator: bindExpression(expression.numerator, bindings),
+        denominator: bindExpression(expression.denominator, bindings),
+      };
+  }
+}
+
+export function bindMetricDefinition(
+  definition: MetricDefinition,
+  bindings: Readonly<Record<string, string>>,
+): MetricDefinition {
+  return {
+    ...definition,
+    numerator: definition.numerator
+      ? bindExpression(definition.numerator, bindings)
+      : undefined,
+    denominator: definition.denominator
+      ? bindExpression(definition.denominator, bindings)
+      : undefined,
+    formula: bindExpression(definition.formula, bindings),
+    inclusions: definition.inclusions.map((rule) => bindRule(rule, bindings)),
+    exclusions: definition.exclusions.map((rule) => bindRule(rule, bindings)),
+    sourceFields: definition.sourceFields.map((field) =>
+      bindField(field, bindings),
+    ),
+    dimensions: definition.dimensions.map((field) =>
+      bindField(field, bindings),
+    ),
+  };
 }
 
 export function compileMetricRule(rule: MetricRule): CompiledSqlFragment {
@@ -213,9 +290,32 @@ export function compileMetricQuery(
   definition: MetricDefinition,
   options: MetricQueryOptions,
 ): CompiledMetricQuery {
-  const expression = compileMetricExpression(definition.formula);
-  const rules = compileMetricRules(options.rules ?? []);
-  const groupBy = options.groupBy ?? [];
+  const bindings = options.fieldBindings ?? {};
+  const boundDefinition = bindMetricDefinition(definition, bindings);
+  const expression = compileMetricExpression(boundDefinition.formula);
+  const optionRules = (options.rules ?? []).map((rule) =>
+    bindRule(rule, bindings),
+  );
+  const rules = compileMetricRules(optionRules);
+  const includeDefinitionRules = options.includeDefinitionRules !== false;
+  const inclusions = compileMetricRules(
+    includeDefinitionRules ? boundDefinition.inclusions : [],
+  );
+  const exclusions = compileMetricRules(
+    includeDefinitionRules ? boundDefinition.exclusions : [],
+  );
+  const whereFragments = [
+    includeDefinitionRules && boundDefinition.inclusions.length
+      ? `(${inclusions.sql})`
+      : "",
+    includeDefinitionRules && boundDefinition.exclusions.length
+      ? `NOT (${exclusions.sql})`
+      : "",
+    optionRules.length ? `(${rules.sql})` : "",
+  ].filter(Boolean);
+  const groupBy = (options.groupBy ?? []).map((field) =>
+    bindField(field, bindings),
+  );
   const groupSql = groupBy.map(escapeSqlIdentifier);
   const valueAlias = escapeSqlIdentifier(options.alias ?? definition.key);
   const select = [
@@ -229,11 +329,16 @@ export function compileMetricQuery(
     sql: [
       `SELECT ${select}`,
       `FROM ${escapeSqlIdentifier(options.tableName)}`,
-      options.rules?.length ? `WHERE ${rules.sql}` : "",
+      whereFragments.length ? `WHERE ${whereFragments.join(" AND ")}` : "",
       groupSql.length ? `GROUP BY ${groupSql.join(", ")}` : "",
     ]
       .filter(Boolean)
       .join("\n"),
-    parameters: [...expression.parameters, ...rules.parameters],
+    parameters: [
+      ...expression.parameters,
+      ...(includeDefinitionRules ? inclusions.parameters : []),
+      ...(includeDefinitionRules ? exclusions.parameters : []),
+      ...rules.parameters,
+    ],
   };
 }

@@ -80,6 +80,8 @@ const state: WorkbenchState = {
   ],
   fieldMappings: [],
   relationships: [],
+  capabilities: [],
+  activeCapabilityId: null,
   question: null,
   metrics: [],
   activeMetricId: null,

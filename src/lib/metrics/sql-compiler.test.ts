@@ -26,7 +26,8 @@ describe("controlled metric SQL compiler", () => {
     });
 
     expect(compiled.sql).toContain('FROM "main"."workforce"');
-    expect(compiled.sql).toContain('WHERE ("department" = ?)');
+    expect(compiled.sql).toContain('("department" = ?)');
+    expect(compiled.sql).toContain("NOT");
     expect(compiled.sql).toContain("NULLIF");
     expect(compiled.sql).not.toContain(injectedValue);
     expect(compiled.parameters.at(-1)).toBe(injectedValue);

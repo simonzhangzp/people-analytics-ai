@@ -1,4 +1,10 @@
 import { parseAndProfileFiles } from "@/lib/data/local-profiler";
+import {
+  buildTableContract,
+  inferTableGrain,
+  resolveWorkbenchCanonicalField,
+} from "@/lib/semantics";
+import { omitPrivateExplorationColumns } from "@/lib/local-data/privacy";
 import type { LocalDataset } from "@/types/local-data";
 import type {
   DatasetRelationship,
@@ -52,18 +58,6 @@ function convertMappings(dataset: LocalDataset): FieldMapping[] {
   }));
 }
 
-function likelyDemoMatch(from: LocalDataset, to: LocalDataset) {
-  const names = `${from.name} ${to.name}`.toLowerCase();
-  if (names.includes("headcount") && names.includes("termination")) return 1;
-  if (
-    (names.includes("headcount") || names.includes("termination")) &&
-    names.includes("compensation")
-  ) {
-    return 0.98;
-  }
-  return 0;
-}
-
 function inferRelationships(
   datasets: LocalDataset[],
   mappings: FieldMapping[],
@@ -86,7 +80,6 @@ function inferRelationships(
           item.datasetId === to.id && item.canonicalField === "employee_id",
       );
       if (!fromEmployee || !toEmployee) continue;
-      const matchRate = likelyDemoMatch(from, to);
       relationships.push({
         id: `relationship-${from.id}-${to.id}`,
         fromDatasetId: from.id,
@@ -97,16 +90,15 @@ function inferRelationships(
           from.grain.includes("Month") || to.grain.includes("Month")
             ? "1:N"
             : "1:1",
-        matchRate,
-        confidence: matchRate ? 0.82 : 0.35,
-        status: matchRate ? "Approved" : "Needs Review",
-        evidence: matchRate
-          ? [
-              "Shared canonical employee identifier",
-              "Fallback profiler inferred compatible entity grains",
-            ]
-          : ["Shared identifier found; value overlap needs the local SQL engine"],
-        conflicts: matchRate ? [] : ["Join coverage not calculated in fallback mode"],
+        matchRate: 0,
+        confidence: 0.25,
+        status: "Needs Review",
+        evidence: [
+          "Shared canonical employee identifier; value overlap was not measured.",
+        ],
+        conflicts: [
+          "Compatibility mode cannot approve joins. Reattach in a browser with DuckDB-Wasm.",
+        ],
       });
     }
   }
@@ -118,26 +110,55 @@ export async function ingestWithLegacyProfiler(files: File[]) {
   const mappings = datasets.flatMap(convertMappings);
   const converted: LocalWorkbenchDataset[] = await Promise.all(
     datasets.map(async (dataset, index) => {
-      const columns = dataset.columns.map((column) => ({
-        sourceName: column.name,
-        inferredType:
-          column.inferredType === "mixed" ? ("unknown" as const) : column.inferredType,
-        rowCount: dataset.rowCount,
-        nullCount: Math.round(dataset.rowCount * (column.nullPercent / 100)),
-        nullPct: column.nullPercent / 100,
-        distinctCount: Math.round(
-          dataset.rowCount * (column.uniquePercent / 100),
-        ),
-        distinctPct: column.uniquePercent / 100,
-        likelyPII: column.likelyPii,
-        canonicalField: column.canonicalField,
-        semanticMeaning: dataset.mappings.find(
-          (mapping) => mapping.sourceField === column.name,
-        )?.proposedMeaning,
-        confidence:
-          column.confidence === undefined ? undefined : column.confidence / 100,
-      }));
+      const columns = dataset.columns.map((column) => {
+        const mapping = resolveWorkbenchCanonicalField(column.name);
+        const inferredType =
+          column.inferredType === "mixed"
+            ? ("unknown" as const)
+            : column.inferredType;
+        return {
+          sourceName: column.name,
+          inferredType,
+          rowCount: dataset.rowCount,
+          nullCount: Math.round(dataset.rowCount * (column.nullPercent / 100)),
+          nullPct: column.nullPercent,
+          distinctCount: Math.round(
+            dataset.rowCount * (column.uniquePercent / 100),
+          ),
+          distinctPct: column.uniquePercent,
+          likelyPII: column.likelyPii || Boolean(mapping?.likelyPii),
+          sensitive: mapping?.sensitive,
+          canonicalField: column.canonicalField ?? mapping?.canonicalField,
+          semanticRole:
+            mapping?.semanticRole ??
+            (column.likelyPii
+              ? ("pii" as const)
+              : inferredType === "date"
+                ? ("event_date" as const)
+                : inferredType === "number"
+                  ? ("measure" as const)
+                  : undefined),
+          semanticMeaning:
+            dataset.mappings.find(
+              (item) => item.sourceField === column.name,
+            )?.proposedMeaning ?? mapping?.semanticMeaning,
+          confidence: column.confidence,
+        };
+      });
       const fingerprint = await safeFingerprint(dataset);
+      const inference = inferTableGrain({ columns });
+      const tableContract = {
+        ...buildTableContract({
+          datasetId: dataset.id,
+          columns,
+          inference,
+        }),
+        status: "Needs Review" as const,
+        evidence: [
+          ...inference.evidence,
+          "Compatibility-parser contracts are unverified until DuckDB-Wasm profiles the source.",
+        ],
+      };
       return {
         metadata: {
           id: dataset.id,
@@ -146,36 +167,23 @@ export async function ingestWithLegacyProfiler(files: File[]) {
           localTableName: normalizeTableName(dataset.name, index),
           fileSize: dataset.size,
           rowCount: dataset.rowCount,
-          inferredType: dataset.entity,
-          typeConfidence: dataset.entity === "People Dataset" ? 0.45 : 0.8,
-          grain: {
-            label: dataset.grain,
-            keys: dataset.mappings
-              .filter((mapping) =>
-                ["employee_id", "snapshot_month", "term_date"].includes(
-                  mapping.canonicalField,
-                ),
-              )
-              .map((mapping) => mapping.sourceField),
-            evidence: [
-              `${dataset.columns.length} columns profiled locally`,
-              `${dataset.mappings.length} People fields proposed`,
-            ],
-          },
-          grainConfidence: dataset.entity === "People Dataset" ? 0.4 : 0.78,
+          inferredType: inference.inferredType,
+          typeConfidence: inference.typeConfidence,
+          grain: inference.grain,
+          grainConfidence: inference.grainConfidence,
           columns,
           timeRange: dataset.timeRange,
           healthScore: dataset.health,
           issues: dataset.issues,
-          status:
-            dataset.mappingStatus === "Mapped" ? "Approved" : "Needs Review",
+          status: "Needs Review",
+          tableContract,
           safeProfile: {
             fileName: dataset.name,
             rowCount: dataset.rowCount,
             columnCount: columns.length,
-            inferredType: dataset.entity,
-            grain: dataset.grain,
-            grainConfidence: dataset.entity === "People Dataset" ? 0.4 : 0.78,
+            inferredType: inference.inferredType,
+            grain: inference.grain.label,
+            grainConfidence: inference.grainConfidence / 100,
             timeRange: dataset.timeRange,
             columns: columns.map((column) => ({
               sourceName: column.sourceName,
@@ -183,13 +191,20 @@ export async function ingestWithLegacyProfiler(files: File[]) {
               nullPct: column.nullPct,
               distinctPct: column.distinctPct,
               likelyPII: column.likelyPII,
+              sensitive: column.sensitive,
               canonicalField: column.canonicalField,
+              semanticRole: column.semanticRole,
               semanticMeaning: column.semanticMeaning,
-              confidence: column.confidence,
+              confidence:
+                column.confidence === undefined
+                  ? undefined
+                  : column.confidence / 100,
             })),
           },
         },
-        explorationRows: dataset.rows.slice(0, 5_000),
+        explorationRows: dataset.rows
+          .slice(0, 5_000)
+          .map((row) => omitPrivateExplorationColumns(row, columns)),
       };
     }),
   );

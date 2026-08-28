@@ -2,6 +2,10 @@ import { z } from "zod";
 
 export type LLMProviderErrorCode =
   | "not_configured"
+  | "quota_unconfigured"
+  | "auth_required"
+  | "quota_exceeded"
+  | "quota_unverified"
   | "timeout"
   | "provider_error"
   | "invalid_json"

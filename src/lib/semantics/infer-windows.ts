@@ -1,0 +1,1 @@
+export { inferDateWindows } from "./contracts";

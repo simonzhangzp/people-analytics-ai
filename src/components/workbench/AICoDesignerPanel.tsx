@@ -147,7 +147,7 @@ export function AICoDesignerPanel({
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             rows={2}
-            placeholder="Treat retirement separately and use beginning headcount…"
+            placeholder="Add a business rule, population, or time-basis assumption…"
             className="min-h-10 flex-1 resize-none border-0 bg-transparent px-1 py-1 text-[12px] leading-5 text-[#24324a] outline-none placeholder:text-[#929aaa]"
           />
           <Button

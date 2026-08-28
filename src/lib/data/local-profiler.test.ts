@@ -44,7 +44,7 @@ describe("local profiler file parsing", () => {
     expect(dataset.timeRange).toMatch(/2022/);
   });
 
-  it("infers an employee roster and does not map sex as an action field", async () => {
+  it("infers an employee roster and redacts sex as a sensitive dimension", async () => {
     const csv = [
       "employee_number,email,tenure_band,region,cc_dept_by_cc,sex,level3_full_name",
       "1001,ada@example.com,7+ Years,EMEA,Research and Development,Female,\"Wright, Chris\"",
@@ -58,8 +58,14 @@ describe("local profiler file parsing", () => {
     expect(dataset.mappings.some((item) => item.canonicalField === "department")).toBe(
       true,
     );
-    expect(dataset.mappings.some((item) => item.sourceField === "sex")).toBe(false);
+    expect(
+      dataset.mappings.some(
+        (item) =>
+          item.sourceField === "sex" && item.canonicalField === "gender",
+      ),
+    ).toBe(true);
     expect(dataset.rows[0].email).toBe("[redacted]");
+    expect(dataset.rows[0].sex).toBe("[redacted]");
     expect(dataset.rows[0].level3_full_name).toBe("[redacted]");
   });
 

@@ -12,14 +12,22 @@ import {
 import { DEMO_QUESTION, loadWorkbenchDemoFiles } from "@/lib/demo/workbench-demo";
 import { ingestWithLegacyProfiler } from "@/lib/workbench/legacy-adapter";
 import {
-  createDemoInsight,
   createInitialInterventions,
   createRetirementAmbiguity,
   createRetirementMetricPatch,
   createVoluntaryAttritionMetric,
 } from "@/lib/workbench/fallbacks";
+import { assertSafeAIPayload } from "@/lib/ai/payload-guard";
 import { createAttritionAnalysisPlan } from "@/lib/analysis";
+import {
+  createCapabilityAnalysisPlan,
+  metricForCapability,
+} from "@/lib/analysis/registry";
 import { applyMetricDefinitionPatch } from "@/lib/metrics";
+import {
+  buildCapabilityReports,
+  selectCapabilityForQuestion,
+} from "@/lib/semantics";
 import type {
   AIIntervention,
   ExecutiveStory,
@@ -35,6 +43,8 @@ interface StoredWorkbenchState {
   datasetMetadata: WorkbenchState["datasets"][number]["metadata"][];
   fieldMappings: WorkbenchState["fieldMappings"];
   relationships: WorkbenchState["relationships"];
+  capabilities: WorkbenchState["capabilities"];
+  activeCapabilityId: string | null;
   question: WorkbenchState["question"];
   metrics: WorkbenchState["metrics"];
   activeMetricId: string | null;
@@ -54,6 +64,7 @@ interface WorkbenchContextValue {
   setDraftQuestion: (value: string) => void;
   setActiveDatasetId: (value: string) => void;
   setActiveView: (view: WorkbenchView) => void;
+  approveRelationship: (relationshipId: string) => void;
   addFiles: (files: File[]) => Promise<void>;
   askQuestion: () => Promise<void>;
   resolveAmbiguity: (optionId: string) => void;
@@ -70,6 +81,10 @@ interface WorkbenchContextValue {
   ) => Promise<void>;
   exportStory: () => Promise<void>;
   submitCoDesignerContext: (text: string) => Promise<void>;
+  handleInterventionAction: (
+    interventionId: string,
+    actionId: string,
+  ) => void;
 }
 
 const WorkbenchContext = createContext<WorkbenchContextValue | null>(null);
@@ -79,12 +94,14 @@ function initialState(workspaceId: string): WorkbenchState {
   return {
     workspaceId,
     workspaceName: demo
-      ? "Engineering Voluntary Attrition"
+      ? "Guided Voluntary Attrition Analysis"
       : "Untitled People Analytics Workspace",
     activeView: "data",
     datasets: [],
     fieldMappings: [],
     relationships: [],
+    capabilities: [],
+    activeCapabilityId: null,
     question: null,
     metrics: [],
     activeMetricId: null,
@@ -111,6 +128,8 @@ function safeStoredState(state: WorkbenchState): StoredWorkbenchState {
     datasetMetadata: state.datasets.map(({ metadata }) => metadata),
     fieldMappings: state.fieldMappings,
     relationships: state.relationships,
+    capabilities: state.capabilities,
+    activeCapabilityId: state.activeCapabilityId,
     question: state.question,
     metrics: state.metrics,
     activeMetricId: state.activeMetricId,
@@ -125,6 +144,7 @@ function intervention(
   title: string,
   body: string,
   rationale?: string,
+  actions?: AIIntervention["actions"],
 ): AIIntervention {
   return {
     id: `ai-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -132,6 +152,7 @@ function intervention(
     title,
     body,
     rationale,
+    actions,
     createdAt: new Date().toISOString(),
   };
 }
@@ -140,6 +161,8 @@ async function safeAIRequest(task: string, input: unknown) {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 12_000);
   try {
+    const requestBody = { task, input };
+    assertSafeAIPayload(requestBody);
     const headers: Record<string, string> = {
       "content-type": "application/json",
     };
@@ -159,15 +182,27 @@ async function safeAIRequest(task: string, input: unknown) {
     const response = await fetch("/api/workbench/ai", {
       method: "POST",
       headers,
-      body: JSON.stringify({ task, input }),
+      body: JSON.stringify(requestBody),
       signal: controller.signal,
     });
-    if (!response.ok) return null;
-    return (await response.json()) as {
+    const payload = (await response.json().catch(() => null)) as {
       source?: "deepseek" | "deterministic";
       data?: unknown;
       warning?: { code?: string; message?: string };
-    };
+      error?: { code?: string; message?: string };
+    } | null;
+    if (!response.ok) {
+      return {
+        source: "deterministic" as const,
+        warning: {
+          code: payload?.error?.code ?? "invalid_request",
+          message:
+            payload?.error?.message ??
+            "The AI request was rejected before any provider call.",
+        },
+      };
+    }
+    return payload;
   } catch {
     return null;
   } finally {
@@ -194,7 +229,10 @@ export function WorkbenchProvider({
   const hydrated = useRef(false);
   const calculatedInsights = useRef<Insight[]>([]);
   const stateRef = useRef(state);
-  stateRef.current = state;
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   const appendIntervention = useCallback((item: AIIntervention) => {
     setState((current) => ({
@@ -221,6 +259,10 @@ export function WorkbenchProvider({
           })),
           fieldMappings: parsed.fieldMappings,
           relationships: parsed.relationships,
+          capabilities:
+            parsed.capabilities ??
+            buildCapabilityReports(parsed.datasetMetadata),
+          activeCapabilityId: parsed.activeCapabilityId ?? null,
           question: parsed.question,
           metrics: parsed.metrics,
           activeMetricId: parsed.activeMetricId,
@@ -306,13 +348,22 @@ export function WorkbenchProvider({
         progress: { ...current.progress, data: "In progress" },
       }));
       try {
-        let result: Awaited<ReturnType<typeof ingestWithLegacyProfiler>>;
-        try {
-          const runtime = await import("@/lib/workbench/runtime");
-          result = await runtime.ingestWorkbenchFiles(files);
-        } catch {
-          // The fallback parser preserves the experience if WebAssembly cannot
-          // initialize. It is bounded and cannot be used to imply a full result.
+        let result:
+          | Awaited<ReturnType<typeof ingestWithLegacyProfiler>>
+          | undefined;
+        const runtime = await import("@/lib/workbench/runtime").catch(
+          () => null,
+        );
+        let useCompatibilityParser = !runtime;
+        if (runtime) {
+          try {
+            result = await runtime.ingestWorkbenchFiles(files);
+          } catch (cause) {
+            if (!runtime.isDuckDBInitializationError(cause)) throw cause;
+            useCompatibilityParser = true;
+          }
+        }
+        if (useCompatibilityParser) {
           result = await ingestWithLegacyProfiler(files);
           appendIntervention(
             intervention(
@@ -321,6 +372,9 @@ export function WorkbenchProvider({
               "DuckDB-Wasm was unavailable, so file understanding used the bounded compatibility profiler. Reattach the files in a modern browser before treating a calculation as complete.",
             ),
           );
+        }
+        if (!result) {
+          throw new Error("The local file profiler did not return a result.");
         }
 
         const idMap = new Map<string, string>();
@@ -342,6 +396,13 @@ export function WorkbenchProvider({
           metadata: {
             ...dataset.metadata,
             id: idMap.get(dataset.metadata.id) ?? dataset.metadata.id,
+            tableContract: dataset.metadata.tableContract
+              ? {
+                  ...dataset.metadata.tableContract,
+                  datasetId:
+                    idMap.get(dataset.metadata.id) ?? dataset.metadata.id,
+                }
+              : undefined,
           },
         }));
         const mappings = result.mappings.map((mapping) => ({
@@ -355,6 +416,10 @@ export function WorkbenchProvider({
           toDatasetId:
             idMap.get(relationship.toDatasetId) ?? relationship.toDatasetId,
         }));
+        const capabilities = buildCapabilityReports(
+          datasets.map(({ metadata }) => metadata),
+        );
+        const firstRunnable = capabilities.find((item) => item.runnable);
         setActiveDatasetId(datasets[0]?.metadata.id);
         setProcessingMessage("Confirming relationships and answerability…");
         setState((current) => ({
@@ -362,8 +427,23 @@ export function WorkbenchProvider({
           datasets,
           fieldMappings: mappings,
           relationships,
+          capabilities,
+          activeCapabilityId: firstRunnable?.id ?? null,
+          question: null,
+          metrics: [],
+          activeMetricId: null,
+          ambiguity: null,
+          pendingMetricPatch: null,
+          analysisPlan: null,
+          insights: [],
+          story: null,
           engineStatus: "ready",
-          progress: { ...current.progress, data: "Ready" },
+          progress: {
+            data: "Ready",
+            metrics: "Not started",
+            analysis: "Not started",
+            story: "Not started",
+          },
           interventions: [
             intervention(
               "Proposal",
@@ -373,22 +453,19 @@ export function WorkbenchProvider({
                   ({ metadata }) =>
                     `${metadata.inferredType} at ${metadata.grain.label} grain`,
                 )
-                .join("; ")}. ${relationships.length} relationship${
+                .join("; ")}. ${
+                capabilities.filter((item) => item.runnable).length
+              } deterministic domain path${
+                capabilities.filter((item) => item.runnable).length === 1
+                  ? ""
+                  : "s"
+              } and ${relationships.length} relationship${
                 relationships.length === 1 ? "" : "s"
               } can support the question.`,
             ),
             ...current.interventions,
           ],
         }));
-        void safeAIRequest("semantic_interpreter", {
-          datasets: datasets.map(({ metadata }) => ({
-            datasetId: metadata.id,
-            profile: metadata.safeProfile,
-          })),
-          businessContext: draftQuestion || undefined,
-          knownMappings: mappings,
-          knownRelationships: relationships,
-        });
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "Could not profile the files.");
         setState((current) => ({
@@ -401,7 +478,7 @@ export function WorkbenchProvider({
         setProcessingMessage(undefined);
       }
     },
-    [appendIntervention, draftQuestion, isDemo],
+    [appendIntervention, isDemo],
   );
 
   useEffect(() => {
@@ -414,61 +491,89 @@ export function WorkbenchProvider({
     const text = draftQuestion.trim();
     if (!text || state.datasets.length === 0) return;
     setBusy(true);
+    const capability = selectCapabilityForQuestion(text, state.capabilities);
+    if (!capability) {
+      appendIntervention(
+        intervention(
+          "Data gap",
+          "No supported HR question matches the attached contracts",
+          "Map an identity, period, category, or measure field before selecting a deterministic analysis path.",
+        ),
+      );
+      setBusy(false);
+      return;
+    }
+    const guidedAttrition =
+      isDemo && capability.domain === "retention";
+    const metric = guidedAttrition
+      ? createVoluntaryAttritionMetric()
+      : metricForCapability(capability);
+    const ambiguity = guidedAttrition
+      ? createRetirementAmbiguity(metric.id)
+      : null;
     const question = {
       id: `question-${Date.now()}`,
       text,
-      metricIds: ["metric-voluntary-attrition"],
+      metricIds: [metric.id],
       createdAt: new Date().toISOString(),
     };
-    const metric = createVoluntaryAttritionMetric();
-    const ambiguity = createRetirementAmbiguity(metric.id);
+    const analysisPlan = ambiguity
+      ? null
+      : createCapabilityAnalysisPlan(question, capability, metric);
     setState((current) => ({
       ...current,
       activeView: "metrics",
       question,
       metrics: [metric],
       activeMetricId: metric.id,
+      activeCapabilityId: capability.id,
       ambiguity,
       pendingMetricPatch: null,
-      analysisPlan: null,
+      analysisPlan,
       insights: [],
       story: null,
       progress: {
         ...current.progress,
-        metrics: "Needs input",
-        analysis: "Not started",
+        metrics: ambiguity ? "Needs input" : "Ready",
+        analysis: capability.runnable ? "In progress" : "Blocked",
         story: "Not started",
       },
       interventions: [
-        intervention(
-          "Needs confirmation",
-          "Retirement changes the meaning of voluntary attrition",
-          "I propose Voluntary Attrition Rate, but the source distinguishes retirement from resignation. Confirm this treatment before calculation.",
-          "Combining retirement with potentially preventable resignation can lead to a different leadership action.",
-        ),
+        guidedAttrition
+          ? intervention(
+              "Needs confirmation",
+              "One classification changes the selected metric",
+              "The guided source distinguishes retirement from resignation. Confirm its treatment before calculation.",
+              "Combining different separation types can lead to a different leadership action.",
+            )
+          : intervention(
+              capability.runnable ? "Proposal" : "Data gap",
+              capability.runnable
+                ? `${capability.metricName} selected`
+                : `${capability.metricName} is not answerable yet`,
+              capability.runnable
+                ? `${capability.datasetIds.length} compatible local dataset${capability.datasetIds.length === 1 ? "" : "s"} can run ${capability.supportedOperations.join(", ")}.`
+                : capability.missing.join(" "),
+              capability.assumptions.join(" "),
+              [
+                {
+                  id: capability.runnable ? "review-metric" : "review-data",
+                  label: capability.runnable ? "Review metric" : "Review data",
+                  intent: capability.runnable ? "metrics" : "data",
+                },
+              ],
+            ),
         ...current.interventions,
       ],
     }));
-    const aiResult = await safeAIRequest("metric_codesigner", {
-      metric,
-      instruction: `Propose the metric for this question and surface only material ambiguities: ${text}`,
-      datasetProfiles: state.datasets.map(({ metadata }) => ({
-        datasetId: metadata.id,
-        profile: metadata.safeProfile,
-      })),
-    });
-    if (aiResult?.source === "deterministic") {
-      appendIntervention(
-        intervention(
-          "Warning",
-          "Deterministic AI fallback is active",
-          aiResult.warning?.message ??
-            "DeepSeek is unavailable or not configured. The visible metric proposal comes from the typed local fallback.",
-        ),
-      );
-    }
     setBusy(false);
-  }, [appendIntervention, draftQuestion, state.datasets]);
+  }, [
+    appendIntervention,
+    draftQuestion,
+    isDemo,
+    state.capabilities,
+    state.datasets,
+  ]);
 
   const resolveAmbiguity = useCallback((optionId: string) => {
     setState((current) => {
@@ -494,12 +599,26 @@ export function WorkbenchProvider({
         version: metric.version + 1,
         approvedAt: new Date().toISOString(),
       };
+      const capability = current.capabilities.find(
+        (item) => item.id === current.activeCapabilityId,
+      );
       return {
         ...current,
         metrics: current.metrics.map((item) =>
           item.id === metric.id ? approved : item,
         ),
         ambiguity: null,
+        analysisPlan:
+          current.question && capability
+            ? createAttritionAnalysisPlan(current.question, {
+                metricId: approved.id,
+                availableFields: current.fieldMappings.flatMap((mapping) =>
+                  mapping.canonicalField
+                    ? [mapping.sourceColumn, mapping.canonicalField]
+                    : [mapping.sourceColumn],
+                ),
+              })
+            : current.analysisPlan,
         progress: { ...current.progress, metrics: "Ready" },
         interventions: [
           intervention(
@@ -533,31 +652,48 @@ export function WorkbenchProvider({
         "patch" in aiResult.data
           ? ((aiResult.data as { patch: MetricPatch }).patch)
           : null;
-      const nextPatch =
-        livePatch?.items.length
-          ? livePatch
-          : createRetirementMetricPatch(metric, instruction);
+      if (!livePatch?.items.length) {
+        appendIntervention(
+          intervention(
+            "Data gap",
+            "No safe metric patch was generated",
+            aiResult?.warning?.message ??
+              "The requested change could not be represented by the structured metric contract. The approved definition remains unchanged.",
+          ),
+        );
+        setBusy(false);
+        return;
+      }
+      const nextPatch = livePatch;
       setState((current) => ({
         ...current,
         pendingMetricPatch: nextPatch,
         interventions: [
           intervention(
             "Proposal",
-            "Two semantic changes are ready for review",
-            "Retirement moves to a separately reported exclusion and the denominator uses beginning headcount. Nothing changes until you apply the diff.",
+            `${nextPatch.items.length} semantic change${nextPatch.items.length === 1 ? "" : "s"} ready for review`,
+            `${nextPatch.summary} Nothing changes until you apply the visible diff.`,
           ),
           ...current.interventions,
         ],
       }));
       setBusy(false);
     },
-    [state.activeMetricId, state.datasets, state.metrics],
+    [
+      appendIntervention,
+      state.activeMetricId,
+      state.datasets,
+      state.metrics,
+    ],
   );
 
   const applyMetricPatch = useCallback(async () => {
     const patch = state.pendingMetricPatch;
     const question = state.question;
-    if (!patch || !question) return;
+    const capability = state.capabilities.find(
+      (item) => item.id === state.activeCapabilityId,
+    );
+    if (!patch || !question || !capability) return;
     const approvedDefinition = applyMetricDefinitionPatch(patch);
     const availableFields = state.fieldMappings.flatMap((mapping) =>
       mapping.canonicalField
@@ -571,10 +707,16 @@ export function WorkbenchProvider({
       ),
       ambiguity: null,
       pendingMetricPatch: null,
-      analysisPlan: createAttritionAnalysisPlan(question, {
-        metricId: patch.metricId,
-        availableFields,
-      }),
+      analysisPlan: isDemo
+        ? createAttritionAnalysisPlan(question, {
+            metricId: patch.metricId,
+            availableFields,
+          })
+        : createCapabilityAnalysisPlan(
+            question,
+            capability,
+            approvedDefinition,
+          ),
       progress: {
         ...current.progress,
         metrics: "Ready",
@@ -596,35 +738,74 @@ export function WorkbenchProvider({
         approvedDefinition,
       );
     }
-    void safeAIRequest("analysis_planner", {
-      question,
-      metrics: [approvedDefinition],
-      datasetProfiles: state.datasets.map(({ metadata }) => ({
-        datasetId: metadata.id,
-        profile: metadata.safeProfile,
-      })),
-      businessContext:
-        "Validate the Engineering attrition change before following tenure, level, compensation, and manager evidence.",
-    });
   }, [
-    state.datasets,
+    state.activeCapabilityId,
+    state.capabilities,
     state.fieldMappings,
     state.pendingMetricPatch,
     state.question,
     state.workspaceId,
+    isDemo,
   ]);
 
   const cancelMetricPatch = useCallback(() => {
     setState((current) => ({ ...current, pendingMetricPatch: null }));
   }, []);
 
+  const approveRelationship = useCallback((relationshipId: string) => {
+    setState((current) => {
+      const relationship = current.relationships.find(
+        (item) => item.id === relationshipId,
+      );
+      if (
+        !relationship ||
+        relationship.matchRate <= 0 ||
+        relationship.cardinality === "unknown" ||
+        relationship.cardinality === "N:N" ||
+        relationship.conflicts.length > 0
+      ) {
+        return {
+          ...current,
+          interventions: [
+            intervention(
+              "Data gap",
+              "This relationship cannot be approved",
+              "A join needs measured value overlap, known cardinality, and no material conflict before it can change an answer.",
+            ),
+            ...current.interventions,
+          ],
+        };
+      }
+      return {
+        ...current,
+        relationships: current.relationships.map((item) =>
+          item.id === relationshipId
+            ? { ...item, status: "Approved" as const }
+            : item,
+        ),
+        interventions: [
+          intervention(
+            "Applied",
+            "Measured relationship approved",
+            `${relationship.fromField} ↔ ${relationship.toField} is approved at ${(relationship.matchRate * 100).toFixed(0)}% measured overlap with ${relationship.cardinality} cardinality.`,
+          ),
+          ...current.interventions,
+        ],
+      };
+    });
+  }, []);
+
   const runAnalysis = useCallback(async () => {
     if (!state.question || !state.activeMetricId || !state.analysisPlan) return;
+    const capability = state.capabilities.find(
+      (item) => item.id === state.activeCapabilityId,
+    );
+    if (!capability) return;
     setBusy(true);
     try {
       const runtime = await import("@/lib/workbench/runtime").catch(() => null);
       if (!runtime) {
-        throw new Error("The local attrition runtime is unavailable.");
+        throw new Error("The local deterministic analysis runtime is unavailable.");
       }
       const result = await runtime.executeWorkbenchAnalysis({
         question: state.question,
@@ -633,135 +814,101 @@ export function WorkbenchProvider({
         )!,
         datasets: state.datasets,
         plan: state.analysisPlan,
+        capability,
       });
       calculatedInsights.current = result.insights;
-      const trend =
+      const primary =
         result.insights.find(
           (insight) => insight.branchKey === "trend" && insight.validated,
-        ) ?? result.insights.find((insight) => insight.validated);
-      if (!trend) {
-        throw new Error(
-          "The attached datasets did not produce a validated attrition trend.",
-        );
-      }
+        ) ??
+        result.insights.find((insight) => insight.validated) ??
+        result.insights[0];
+      if (!primary) throw new Error("No deterministic result was produced.");
       setState((current) => ({
         ...current,
-        insights: [trend],
-        analysisPlan: {
-          ...result.plan,
-          steps: result.plan.steps.map((step) =>
-            step.operation === "validate_trend"
-              ? { ...step, status: "complete" }
-              : step.operation === "data_gap"
-                ? step
-                : { ...step, status: "planned" },
-          ),
+        insights: [primary],
+        analysisPlan: result.plan,
+        progress: {
+          ...current.progress,
+          analysis: primary.validated ? "Ready" : "Blocked",
         },
-        progress: { ...current.progress, analysis: "Ready" },
         interventions: [
           intervention(
-            "Recommendation",
-            "The increase is validated; locate its concentration next",
-            `${trend.headline}. Segment contribution is the next defensible step before proposing a cause.`,
+            primary.validated ? "Recommendation" : "Data gap",
+            primary.headline,
+            primary.validated
+              ? `${primary.finding} Follow only the evidence branches shown in the result.`
+              : primary.limitations.join(" "),
           ),
           ...current.interventions,
         ],
       }));
-      const currentRate = Number.parseFloat(
-        trend.evidence.find((item) => /current/i.test(item.label))?.value ?? "",
-      );
-      const comparisonRate = Number.parseFloat(
-        trend.evidence.find((item) => /comparison/i.test(item.label))?.value ?? "",
-      );
-      if (Number.isFinite(currentRate)) {
-        void safeAIRequest("insight_interpreter", {
-          question: state.question,
-          metrics: state.metrics.filter(
-            (metric) => metric.id === state.activeMetricId,
-          ),
-          plan: result.plan,
-          aggregatedResults: [
-            {
-              id: "attrition-trend-rate",
-              label: "Engineering voluntary attrition",
-              metricId: state.activeMetricId,
-              value: currentRate,
-              unit: "percent",
-              period: trend.period,
-              comparisonValue: Number.isFinite(comparisonRate)
-                ? comparisonRate
-                : undefined,
-              comparisonPeriod: trend.comparisonPeriod,
-              population: trend.population,
-              dimensions: { department: "Engineering" },
-              sourceDatasetIds: state.datasets.map(
-                ({ metadata }) => metadata.id,
-              ),
-            },
-          ],
-        });
-      }
     } catch (cause) {
-      if (isDemo) {
-        const trend = createDemoInsight(
-          "trend",
-          state.question.id,
-          state.activeMetricId,
-        );
-        calculatedInsights.current = [
-          trend,
-          createDemoInsight("tenure", state.question.id, state.activeMetricId),
-          createDemoInsight("level", state.question.id, state.activeMetricId),
-          createDemoInsight(
-            "compensation",
-            state.question.id,
-            state.activeMetricId,
-          ),
-        ];
-        setState((current) => ({
-          ...current,
-          insights: [trend],
-          analysisPlan: current.analysisPlan
-            ? {
-                ...current.analysisPlan,
-                steps: current.analysisPlan.steps.map((step) =>
-                  step.operation === "validate_trend"
-                    ? { ...step, status: "complete" }
-                    : step,
-                ),
-              }
-            : current.analysisPlan,
-          progress: { ...current.progress, analysis: "Ready" },
-          interventions: [
-            intervention(
-              "Warning",
-              "Guided demo aggregate fallback used",
-              cause instanceof Error
-                ? `${cause.message} The displayed demo evidence comes from the versioned synthetic fixture aggregates.`
-                : "The displayed demo evidence comes from the versioned synthetic fixture aggregates.",
-            ),
-            ...current.interventions,
-          ],
-        }));
-      } else {
-        appendIntervention(
+      const reason =
+        cause instanceof Error
+          ? cause.message
+          : capability.missing.join(" ") ||
+            "Confirm the inferred identity, period, population, and measure roles before running.";
+      const dataGap: Insight = {
+        id: `${state.question.id}-${capability.domain}-runtime-data-gap`,
+        questionId: state.question.id,
+        branchKey: "data-gap",
+        headline: `${capability.metricName} is blocked by a data gap`,
+        finding: reason,
+        metricIds: [state.activeMetricId],
+        filters: {},
+        population: capability.population.label,
+        evidence: [
+          {
+            id: `${state.question.id}-runtime-missing-evidence`,
+            label: "Missing evidence",
+            value: "Analysis blocked",
+            detail: reason,
+            sourceDatasetIds: capability.datasetIds,
+          },
+        ],
+        confidence: "Low",
+        limitations: [
+          ...capability.missing,
+          reason,
+          "No substitute metric or demo result was used.",
+        ],
+        suggestedFollowUps: [],
+        selectedForExecutiveStory: false,
+        validated: false,
+      };
+      calculatedInsights.current = [dataGap];
+      setState((current) => ({
+        ...current,
+        insights: [dataGap],
+        analysisPlan: current.analysisPlan
+          ? {
+              ...current.analysisPlan,
+              steps: current.analysisPlan.steps.map((step) => ({
+                ...step,
+                status: "blocked",
+                blockedReason: reason,
+              })),
+            }
+          : current.analysisPlan,
+        progress: { ...current.progress, analysis: "Blocked" },
+        interventions: [
           intervention(
             "Data gap",
-            "No supported attrition execution path for these fields",
-            cause instanceof Error
-              ? cause.message
-              : "Confirm employee snapshot, termination classification, and comparable period fields before running.",
+            `No supported ${capability.domain} execution path for these fields`,
+            `${reason} No substitute metric or demo result was used.`,
           ),
-        );
-      }
+          ...current.interventions,
+        ],
+      }));
     } finally {
       setBusy(false);
     }
   }, [
-    appendIntervention,
-    isDemo,
     state.activeMetricId,
+    state.activeCapabilityId,
     state.analysisPlan,
+    state.capabilities,
     state.datasets,
     state.metrics,
     state.question,
@@ -770,7 +917,7 @@ export function WorkbenchProvider({
   const runBranch = useCallback(
     async (branch: Insight["branchKey"]) => {
       if (!state.question || !state.activeMetricId || branch === "trend") return;
-      if (branch === "organization") {
+      if (isDemo && branch === "organization") {
         appendIntervention(
           intervention(
             "Data gap",
@@ -782,13 +929,9 @@ export function WorkbenchProvider({
       }
       setBusy(true);
       await new Promise((resolve) => window.setTimeout(resolve, 280));
-      const next =
-        calculatedInsights.current.find(
-          (insight) => insight.branchKey === branch && insight.validated,
-        ) ??
-        (isDemo
-          ? createDemoInsight(branch, state.question.id, state.activeMetricId)
-          : undefined);
+      const next = calculatedInsights.current.find(
+        (insight) => insight.branchKey === branch && insight.validated,
+      );
       if (!next) {
         appendIntervention(
           intervention(
@@ -875,17 +1018,6 @@ export function WorkbenchProvider({
       slideCount: 3 | 5,
     ) => {
       setBusy(true);
-      await safeAIRequest("executive_storyteller", {
-        workspaceId: state.workspaceId,
-        audience,
-        purpose,
-        slideCount,
-        insights: state.insights
-          .filter(
-            (item) => item.validated && item.selectedForExecutiveStory,
-          )
-          .map((item) => item),
-      });
       const runtime = await import("@/lib/workbench/runtime").catch(() => null);
       const story = runtime
         ? runtime.buildWorkbenchStory(
@@ -936,7 +1068,12 @@ export function WorkbenchProvider({
 
   const submitCoDesignerContext = useCallback(
     async (text: string) => {
-      if (/retire|headcount|denominator|definition/i.test(text)) {
+      if (
+        /definition|metric|formula|denominator|include|exclude|口径|指标|分母/i.test(
+          text,
+        ) &&
+        stateRef.current.activeMetricId
+      ) {
         setState((current) => ({ ...current, activeView: "metrics" }));
         await requestMetricPatch(text);
         return;
@@ -953,6 +1090,31 @@ export function WorkbenchProvider({
     [appendIntervention, requestMetricPatch],
   );
 
+  const handleInterventionAction = useCallback(
+    (interventionId: string, actionId: string) => {
+      setState((current) => {
+        const item = current.interventions.find(
+          (candidate) => candidate.id === interventionId,
+        );
+        const action = item?.actions?.find(
+          (candidate) => candidate.id === actionId,
+        );
+        if (!action) return current;
+        const view = ["data", "metrics", "analysis", "story"].includes(
+          action.intent,
+        )
+          ? (action.intent as WorkbenchView)
+          : actionId === "review-data"
+            ? "data"
+            : actionId === "review-metric"
+              ? "metrics"
+              : current.activeView;
+        return { ...current, activeView: view };
+      });
+    },
+    [],
+  );
+
   const value = useMemo<WorkbenchContextValue>(
     () => ({
       state,
@@ -966,6 +1128,7 @@ export function WorkbenchProvider({
       setActiveDatasetId,
       setActiveView: (view) =>
         setState((current) => ({ ...current, activeView: view })),
+      approveRelationship,
       addFiles,
       askQuestion,
       resolveAmbiguity,
@@ -978,10 +1141,12 @@ export function WorkbenchProvider({
       buildStory,
       exportStory,
       submitCoDesignerContext,
+      handleInterventionAction,
     }),
     [
       activeDatasetId,
       addFiles,
+      approveRelationship,
       applyMetricPatch,
       askQuestion,
       buildStory,
@@ -998,6 +1163,7 @@ export function WorkbenchProvider({
       runBranch,
       state,
       submitCoDesignerContext,
+      handleInterventionAction,
       toggleInsightStory,
     ],
   );

@@ -149,18 +149,14 @@ export const HEADCOUNT_METRIC: MetricDefinition = {
   id: "metric-headcount",
   key: "headcount",
   name: "Headcount",
-  domain: "retention",
+  domain: "workforce",
   description:
-    "Distinct employees active at the approved as-of timestamp for the selected population.",
-  formula: count("employee", "employee_id", [
-    rule("active_as_of", "equals", true, "Employee is active at the as-of timestamp"),
-  ]),
-  inclusions: [
-    rule("active_as_of", "equals", true, "Employee is active at the as-of timestamp"),
-  ],
+    "Distinct observed employees at the selected as-of period, or a supplied aggregate employee count.",
+  formula: count("employee", "employee_id"),
+  inclusions: [],
   exclusions: [],
   timeBasis: "Point-in-time period-end snapshot",
-  sourceFields: ["employee_id", "snapshot_date", "active_as_of"],
+  sourceFields: ["employee_id", "employee_count", "snapshot_month"],
   dimensions: ["department", "location", "level", "employment_type"],
   status: "Approved",
   confidence: "High",
@@ -486,6 +482,181 @@ const totalCashCompensation: MetricDefinition = {
   approvedAt: BASELINE_APPROVED_AT,
 };
 
+function genericMetric(input: {
+  key: string;
+  name: string;
+  domain: MetricDefinition["domain"];
+  description: string;
+  formula: MetricExpression;
+  sourceFields: string[];
+  dimensions: string[];
+  timeBasis: string;
+}): MetricDefinition {
+  return {
+    id: `metric-${input.key.replaceAll("_", "-")}`,
+    key: input.key,
+    name: input.name,
+    domain: input.domain,
+    description: input.description,
+    formula: input.formula,
+    inclusions: [],
+    exclusions: [],
+    timeBasis: input.timeBasis,
+    sourceFields: input.sourceFields,
+    dimensions: input.dimensions,
+    status: "Approved",
+    confidence: "Medium",
+    version: 1,
+    approvedAt: BASELINE_APPROVED_AT,
+  };
+}
+
+const RETENTION_EVENTS_METRIC = genericMetric({
+  key: "retention_events",
+  name: "Observed Exit Evidence",
+  domain: "retention",
+  description:
+    "Distinct observed exits; a rate is calculated only when the same table contains a valid observed population.",
+  formula: count("exit", "employee_id"),
+  sourceFields: ["employee_id", "term_date", "attrition", "exit_classification"],
+  dimensions: ["termination_reason", "exit_classification", "department"],
+  timeBasis: "Observed termination event date or supplied report period",
+});
+
+const RECRUITING_ACTIVITY_METRIC = genericMetric({
+  key: "recruiting_activity",
+  name: "Recruiting Activity",
+  domain: "recruiting",
+  description:
+    "Observed application, requisition, or aggregate advertisement activity in a compatible cohort.",
+  formula: count("application", "application_id"),
+  sourceFields: [
+    "application_id",
+    "requisition_id",
+    "applications_count",
+    "advertisements_count",
+    "staffing_days",
+  ],
+  dimensions: ["report_period", "department", "source"],
+  timeBasis: "Observed application, requisition, or reported period",
+});
+
+const COMPENSATION_POSITION_METRIC = genericMetric({
+  key: "compensation_position",
+  name: "Observed Pay Position",
+  domain: "compensation",
+  description:
+    "Mean and median of the safest available pay amount, compa-ratio, or aggregate pay-gap measure.",
+  formula: {
+    kind: "average",
+    field: "compensation_amount",
+  },
+  sourceFields: [
+    "compensation_amount",
+    "annual_base_salary",
+    "compa_ratio",
+    "pay_gap_median_pct",
+    "pay_gap_mean_pct",
+  ],
+  dimensions: ["department", "job_role", "seniority_level", "location"],
+  timeBasis: "Observed compensation snapshot or reported period",
+});
+
+const PERFORMANCE_DISTRIBUTION_METRIC = genericMetric({
+  key: "performance_distribution",
+  name: "Performance Review Distribution",
+  domain: "performance",
+  description:
+    "Observed review completion or rating distribution without inferring potential.",
+  formula: count("review", "employee_id"),
+  sourceFields: [
+    "employee_id",
+    "performance_rating",
+    "overall_performance",
+    "appraisal_status",
+  ],
+  dimensions: ["overall_performance", "appraisal_status", "department"],
+  timeBasis: "Observed appraisal completion date or report period",
+});
+
+const ABSENCE_METRIC = genericMetric({
+  key: "absence",
+  name: "Observed Absence",
+  domain: "absence",
+  description:
+    "Mean supplied absence rate, or observed absence duration when a rate is unavailable.",
+  formula: {
+    kind: "average",
+    field: "absence_rate",
+  },
+  sourceFields: ["absence_rate", "absence_hours", "absence_date"],
+  dimensions: ["department", "location", "report_period"],
+  timeBasis: "Observed absence date or report period",
+});
+
+const ENGAGEMENT_METRIC = genericMetric({
+  key: "engagement",
+  name: "Observed Engagement",
+  domain: "engagement",
+  description:
+    "Mean supplied engagement score or mean across observed numeric survey items.",
+  formula: {
+    kind: "average",
+    field: "engagement_score",
+  },
+  sourceFields: ["engagement_score", "survey_wave"],
+  dimensions: ["department", "location", "survey_wave"],
+  timeBasis: "Observed survey wave; no trend is claimed without one",
+});
+
+const LEARNING_METRIC = genericMetric({
+  key: "learning",
+  name: "Learning Completion / Pass",
+  domain: "learning",
+  description:
+    "Observed completion or pass rate, with average assessment score when available.",
+  formula: count("learning_record", "course_id"),
+  sourceFields: [
+    "employee_id",
+    "course_id",
+    "learning_status",
+    "pass_flag",
+    "learning_score",
+  ],
+  dimensions: ["course_name", "learning_status", "department"],
+  timeBasis: "Observed learning completion date or report period",
+});
+
+const MOBILITY_METRIC = genericMetric({
+  key: "mobility",
+  name: "Observed Internal Mobility",
+  domain: "mobility",
+  description:
+    "Observed internal movement or promotion events; no rate is claimed without a workforce denominator.",
+  formula: count("mobility_event", "employee_id"),
+  sourceFields: ["employee_id", "move_type", "movement_count", "job_change_date"],
+  dimensions: ["move_type", "department", "job_role"],
+  timeBasis: "Observed movement effective date or report period",
+});
+
+const REPRESENTATION_METRIC = genericMetric({
+  key: "representation",
+  name: "Representation Mix",
+  domain: "diversity",
+  description:
+    "Compliance-oriented descriptive representation with small-sample suppression.",
+  formula: count("employee", "employee_id"),
+  sourceFields: [
+    "employee_id",
+    "employee_count",
+    "demographic_category",
+    "gender",
+    "ethnicity",
+  ],
+  dimensions: ["demographic_category", "gender", "ethnicity"],
+  timeBasis: "Observed snapshot or reported period",
+});
+
 export const INITIAL_PEOPLE_METRIC_LIBRARY: readonly MetricDefinition[] = [
   VOLUNTARY_ATTRITION_METRIC,
   TOTAL_ATTRITION_METRIC,
@@ -502,6 +673,15 @@ export const INITIAL_PEOPLE_METRIC_LIBRARY: readonly MetricDefinition[] = [
   rangePenetration,
   marketPositioning,
   totalCashCompensation,
+  RETENTION_EVENTS_METRIC,
+  RECRUITING_ACTIVITY_METRIC,
+  COMPENSATION_POSITION_METRIC,
+  PERFORMANCE_DISTRIBUTION_METRIC,
+  ABSENCE_METRIC,
+  ENGAGEMENT_METRIC,
+  LEARNING_METRIC,
+  MOBILITY_METRIC,
+  REPRESENTATION_METRIC,
 ];
 
 export type MetricOverrideChanges = Partial<

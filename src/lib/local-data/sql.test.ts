@@ -29,8 +29,10 @@ describe("DuckDB SQL safety helpers", () => {
   it("never lets exploration exceed 5,000 rows", () => {
     expect(boundedExplorationLimit(50_000)).toBe(EXPLORATION_ROW_LIMIT);
     expect(boundedExplorationLimit(-10)).toBe(0);
-    expect(buildExplorationQuery("people", 9_000)).toBe(
-      'SELECT * FROM "people" LIMIT 5000',
+    expect(
+      buildExplorationQuery("people", ["department", 'job"title'], 9_000),
+    ).toBe(
+      'SELECT "department", "job""title" FROM "people" LIMIT 5000',
     );
   });
 });

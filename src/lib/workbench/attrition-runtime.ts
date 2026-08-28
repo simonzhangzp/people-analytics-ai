@@ -27,14 +27,6 @@ function columnFor(
   )?.sourceName;
 }
 
-function sourceColumnFor(
-  dataset: LocalWorkbenchDataset | undefined,
-  pattern: RegExp,
-) {
-  return dataset?.metadata.columns.find((column) => pattern.test(column.sourceName))
-    ?.sourceName;
-}
-
 function table(dataset: LocalWorkbenchDataset) {
   return quoteIdentifier(dataset.metadata.localTableName);
 }
@@ -112,10 +104,6 @@ export async function queryAttritionRows(
   const termDate = columnFor(terminations, "term_date")!;
   const termClassification = columnFor(terminations, "exit_classification");
   const termReason = columnFor(terminations, "termination_reason");
-  const explicitPeriod = sourceColumnFor(
-    terminations,
-    /^(analysis_)?period$/i,
-  );
 
   const compensationEmployee = columnFor(compensation, "employee_id");
   const compensationRatio = columnFor(compensation, "compa_ratio");
@@ -137,18 +125,11 @@ export async function queryAttritionRows(
       ? `LOWER(CAST(t.${column(termReason)} AS VARCHAR)) LIKE '%voluntary%'
          OR LOWER(CAST(t.${column(termReason)} AS VARCHAR)) LIKE '%resign%'`
       : "FALSE";
-  const terminationPeriodExpression = explicitPeriod
-    ? `CASE
-        WHEN LOWER(CAST(${column(explicitPeriod)} AS VARCHAR)) LIKE '%current%' THEN 'current'
-        WHEN LOWER(CAST(${column(explicitPeriod)} AS VARCHAR)) LIKE '%previous%'
-          OR LOWER(CAST(${column(explicitPeriod)} AS VARCHAR)) LIKE '%comparison%' THEN 'previous'
-        ELSE NULL
-      END`
-    : `CASE
-        WHEN TRY_CAST(${column(termDate)} AS DATE) >= (SELECT current_date FROM period_bounds)
-          THEN 'current'
-        ELSE 'previous'
-      END`;
+  const terminationPeriodExpression = `CASE
+      WHEN TRY_CAST(${column(termDate)} AS DATE) >= (SELECT current_date FROM period_bounds)
+        THEN 'current'
+      ELSE 'previous'
+    END`;
 
   let compensationCte = `compensation AS (
     SELECT NULL::VARCHAR AS employee_id, NULL::DOUBLE AS compensation_positioning
@@ -272,51 +253,78 @@ export async function executeLocalAttritionWorkbench({
   plan: AnalysisPlan;
 }): Promise<{ plan: AnalysisPlan; insights: Insight[] }> {
   const rows = await queryAttritionRows(datasets);
+  const { headcount } = attritionSources(datasets);
+  const snapshotDate = columnFor(headcount, "snapshot_month")!;
+  const department = columnFor(headcount, "department");
+  const dates = await queryDuckDB(
+    `SELECT DISTINCT TRY_CAST(${column(snapshotDate)} AS DATE) AS snapshot_date
+     FROM ${table(headcount)}
+     WHERE TRY_CAST(${column(snapshotDate)} AS DATE) IS NOT NULL
+     ORDER BY snapshot_date DESC
+     LIMIT 2`,
+  );
+  if (dates.length < 2) {
+    throw new Error(
+      "Attrition-rate comparison requires at least two observed workforce snapshots.",
+    );
+  }
+  const formatObservedDate = (value: unknown) => {
+    const date = new Date(String(value));
+    return Number.isNaN(date.getTime())
+      ? String(value)
+      : new Intl.DateTimeFormat("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          timeZone: "UTC",
+        }).format(date);
+  };
+  const currentLabel = `${formatObservedDate(dates[0].snapshot_date)} snapshot`;
+  const comparisonLabel = `${formatObservedDate(dates[1].snapshot_date)} snapshot`;
+
+  let population = "All observed employees";
+  let selectedDepartment: string | undefined;
+  if (department) {
+    const populations = await queryDuckDB(
+      `SELECT
+        TRIM(CAST(${column(department)} AS VARCHAR)) AS population,
+        COUNT(*) AS frequency
+       FROM ${table(headcount)}
+       WHERE ${column(department)} IS NOT NULL
+       GROUP BY population
+       ORDER BY frequency DESC
+       LIMIT 50`,
+    );
+    selectedDepartment = populations
+      .map((item) => String(item.population))
+      .find((value) =>
+        question.text.toLocaleLowerCase().includes(value.toLocaleLowerCase()),
+      );
+    if (selectedDepartment) {
+      population = `Department: ${selectedDepartment}`;
+    }
+  }
   const result = executeAttritionAnalysis({
     rows,
     periods: {
       comparison: {
         id: "previous",
-        label: "Jul–Dec 2025",
+        label: comparisonLabel,
       },
       current: {
         id: "current",
-        label: "Jan–Jun 2026",
+        label: currentLabel,
       },
     },
-    population: "Engineering",
+    population,
     metricDefinition: metric,
-    denominatorBasis: "beginning",
-    retirementClassification: "excluded",
-    populationFilter: (row) =>
-      !row.department ||
-      row.department.trim().toLowerCase() === "engineering",
+    populationFilter: selectedDepartment
+      ? (row) =>
+          row.department?.trim().toLocaleLowerCase() ===
+          selectedDepartment.toLocaleLowerCase()
+      : undefined,
   });
-  const tenureCompensationResult = executeAttritionAnalysis({
-    rows,
-    periods: result.periods,
-    population: "Engineering employees with 2–4 years tenure",
-    metricDefinition: metric,
-    denominatorBasis: "beginning",
-    retirementClassification: "excluded",
-    populationFilter: (row) =>
-      (!row.department ||
-        row.department.trim().toLowerCase() === "engineering") &&
-      /2\s*[–-]\s*4/.test(String(row.tenureBand ?? "")),
-  });
-  const combinedResult = {
-    ...result,
-    compensationAssociation:
-      tenureCompensationResult.compensationAssociation,
-    limitations: [
-      ...result.limitations.filter(
-        (limitation) => !limitation.toLowerCase().includes("compensation"),
-      ),
-      "Compensation association is calculated within the 2–4 year Engineering cohort.",
-      tenureCompensationResult.compensationAssociation.limitation,
-    ],
-  };
-  const insights = buildAttritionInsights(combinedResult, {
+  const insights = buildAttritionInsights(result, {
     questionId: question.id,
     metricIds: [metric.id],
     sourceDatasetIds: datasets.map(({ metadata }) => metadata.id),
@@ -326,7 +334,7 @@ export async function executeLocalAttritionWorkbench({
         ...insight,
         chartSpec: {
           kind: "line",
-          title: "Engineering voluntary attrition rate",
+          title: `${population} ${metric.name.toLocaleLowerCase()}`,
           unit: "percent",
           data: [
             {
@@ -340,8 +348,22 @@ export async function executeLocalAttritionWorkbench({
           ],
         },
         suggestedFollowUps: [
-          { key: "tenure", label: "Break down by tenure", available: true },
-          { key: "level", label: "Break down by level", available: true },
+          {
+            key: "tenure",
+            label: "Break down by tenure",
+            available: result.tenureContribution.length > 0,
+            unavailableReason: result.tenureContribution.length
+              ? undefined
+              : "No tenure field is available.",
+          },
+          {
+            key: "level",
+            label: "Break down by level",
+            available: result.levelContribution.length > 0,
+            unavailableReason: result.levelContribution.length
+              ? undefined
+              : "No level field is available.",
+          },
         ],
       };
     }
@@ -364,14 +386,21 @@ export async function executeLocalAttritionWorkbench({
           })),
         },
         suggestedFollowUps: [
-          { key: "level", label: "Break down by level", available: true },
+          {
+            key: "level",
+            label: "Break down by level",
+            available: result.levelContribution.length > 0,
+            unavailableReason: result.levelContribution.length
+              ? undefined
+              : "No level field is available.",
+          },
           {
             key: "compensation",
             label: "Compare compensation",
             available:
-              combinedResult.compensationAssociation.status === "observed",
+              result.compensationAssociation.status === "observed",
             unavailableReason:
-              combinedResult.compensationAssociation.status === "observed"
+              result.compensationAssociation.status === "observed"
                 ? undefined
                 : "Compensation positioning is missing.",
           },
@@ -395,7 +424,7 @@ export async function executeLocalAttritionWorkbench({
             key: "compensation",
             label: "Compare compensation",
             available:
-              combinedResult.compensationAssociation.status === "observed",
+              result.compensationAssociation.status === "observed",
           },
         ],
       };
@@ -407,7 +436,7 @@ export async function executeLocalAttritionWorkbench({
           kind: "bar",
           title: "Observed exit incidence by compensation positioning",
           unit: "percent",
-          data: combinedResult.compensationAssociation.bands.map((band) => ({
+          data: result.compensationAssociation.bands.map((band) => ({
             label: band.band,
             value: band.exitRate ?? 0,
           })),
@@ -418,7 +447,7 @@ export async function executeLocalAttritionWorkbench({
             label: "Test manager effectiveness",
             available: false,
             unavailableReason:
-              combinedResult.managerAnalysis.reason ??
+              result.managerAnalysis.reason ??
               "Manager effectiveness data is absent.",
           },
         ],

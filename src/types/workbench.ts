@@ -1,4 +1,9 @@
 import type { DataRow } from "@/types/local-data";
+import type {
+  CapabilityReport,
+  SemanticRole,
+  TableContract,
+} from "@/types/semantics";
 
 export type WorkbenchView = "data" | "metrics" | "analysis" | "story";
 
@@ -11,11 +16,16 @@ export type KnowledgeStatus =
 export type ConfidenceLevel = "High" | "Medium" | "Low";
 
 export type PeopleDomain =
+  | "workforce"
   | "retention"
   | "recruiting"
   | "mobility"
   | "compensation"
   | "performance"
+  | "absence"
+  | "engagement"
+  | "learning"
+  | "diversity"
   | "other";
 
 export type ColumnDataType =
@@ -36,7 +46,9 @@ export interface ColumnProfile {
   min?: number | string;
   max?: number | string;
   likelyPII: boolean;
+  sensitive?: boolean;
   canonicalField?: string;
+  semanticRole?: SemanticRole;
   semanticMeaning?: string;
   confidence?: number;
 }
@@ -72,7 +84,9 @@ export interface SafeDatasetProfile {
       | "nullPct"
       | "distinctPct"
       | "likelyPII"
+      | "sensitive"
       | "canonicalField"
+      | "semanticRole"
       | "semanticMeaning"
       | "confidence"
     >
@@ -82,6 +96,8 @@ export interface SafeDatasetProfile {
 export interface DatasetMetadata {
   id: string;
   name: string;
+  sourceFileName?: string;
+  sheetName?: string;
   fingerprint: string;
   localTableName: string;
   fileSize: number;
@@ -95,6 +111,7 @@ export interface DatasetMetadata {
   healthScore: number;
   issues: DataQualityIssue[];
   status: KnowledgeStatus;
+  tableContract?: TableContract;
   safeProfile: SafeDatasetProfile;
 }
 
@@ -151,7 +168,18 @@ export interface MetricRule {
 export type MetricExpression =
   | {
       kind: "count";
-      entity: "employee" | "exit" | "hire" | "application" | "requisition";
+      entity:
+        | "employee"
+        | "exit"
+        | "hire"
+        | "application"
+        | "requisition"
+        | "review"
+        | "absence"
+        | "survey_response"
+        | "learning_record"
+        | "mobility_event"
+        | "aggregate_record";
       distinctField?: string;
       rules?: MetricRule[];
     }
@@ -244,6 +272,11 @@ export interface AnalysisStep {
     | "compare_periods"
     | "contribution"
     | "association"
+    | "summary"
+    | "distribution"
+    | "duration"
+    | "funnel"
+    | "rate"
     | "data_gap";
   metricId?: string;
   dimensions?: string[];
@@ -288,7 +321,7 @@ export interface EvidenceItem {
 export interface Insight {
   id: string;
   questionId: string;
-  branchKey: "trend" | "tenure" | "level" | "compensation" | "organization";
+  branchKey: string;
   headline: string;
   finding: string;
   metricIds: string[];
@@ -370,6 +403,8 @@ export interface WorkbenchState {
   datasets: LocalWorkbenchDataset[];
   fieldMappings: FieldMapping[];
   relationships: DatasetRelationship[];
+  capabilities: CapabilityReport[];
+  activeCapabilityId: string | null;
   question: AnalysisQuestion | null;
   metrics: MetricDefinition[];
   activeMetricId: string | null;

@@ -53,7 +53,12 @@ export function boundedExplorationLimit(requested = EXPLORATION_ROW_LIMIT) {
 
 export function buildExplorationQuery(
   tableName: string,
+  columnNames: readonly string[],
   requestedLimit = EXPLORATION_ROW_LIMIT,
 ) {
-  return `SELECT * FROM ${quoteIdentifier(tableName)} LIMIT ${boundedExplorationLimit(requestedLimit)}`;
+  if (columnNames.length === 0) {
+    throw new Error("Exploration requires at least one de-identified column.");
+  }
+  const projection = columnNames.map(quoteIdentifier).join(", ");
+  return `SELECT ${projection} FROM ${quoteIdentifier(tableName)} LIMIT ${boundedExplorationLimit(requestedLimit)}`;
 }

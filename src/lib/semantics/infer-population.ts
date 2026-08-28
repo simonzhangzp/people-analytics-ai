@@ -1,0 +1,1 @@
+export { inferPopulationSpecs } from "./contracts";

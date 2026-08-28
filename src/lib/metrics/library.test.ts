@@ -7,15 +7,26 @@ import {
 } from "./library";
 
 describe("initial People metric library", () => {
-  it("contains 15 structured definitions across the four required domains", () => {
-    expect(INITIAL_PEOPLE_METRIC_LIBRARY).toHaveLength(15);
+  it("contains structured definitions across all ten required domains", () => {
+    expect(INITIAL_PEOPLE_METRIC_LIBRARY.length).toBeGreaterThanOrEqual(24);
     expect(
       new Set(INITIAL_PEOPLE_METRIC_LIBRARY.map((metric) => metric.key)).size,
-    ).toBe(15);
+    ).toBe(INITIAL_PEOPLE_METRIC_LIBRARY.length);
     expect(
       new Set(INITIAL_PEOPLE_METRIC_LIBRARY.map((metric) => metric.domain)),
     ).toEqual(
-      new Set(["retention", "recruiting", "mobility", "compensation"]),
+      new Set([
+        "workforce",
+        "retention",
+        "recruiting",
+        "compensation",
+        "performance",
+        "absence",
+        "engagement",
+        "learning",
+        "mobility",
+        "diversity",
+      ]),
     );
 
     for (const metric of INITIAL_PEOPLE_METRIC_LIBRARY) {

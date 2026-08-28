@@ -10,7 +10,11 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "external:fetch": "node scripts/fetch-external-hr-files.mjs",
+    "external:update": "node scripts/fetch-external-hr-files.mjs --refresh --update-hashes",
+    "external:verify": "node scripts/fetch-external-hr-files.mjs --verify-only",
+    "external:test": "vitest run tests/external-data/external-schema.test.ts"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.33.1-dev57.0",
@@ -42,6 +46,7 @@
     "@types/react-dom": "^19.2.5",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.2",
+    "fflate": "^0.8.3",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.11"

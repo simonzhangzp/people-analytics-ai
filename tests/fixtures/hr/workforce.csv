@@ -1,0 +1,7 @@
+employee_id,snapshot_month,department,employment_status
+W001,2026-01-31,Operations,Active
+W002,2026-01-31,Operations,Active
+W003,2026-01-31,Finance,Active
+W004,2026-02-28,Operations,Active
+W005,2026-02-28,Finance,Active
+W006,2026-02-28,Finance,Leave

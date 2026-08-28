@@ -1,0 +1,7 @@
+employee_id,compensation_effective_date,annual_base_salary,salary_midpoint,department
+C001,2026-01-01,72000,75000,Operations
+C002,2026-01-01,81000,80000,Finance
+C003,2026-01-01,69000,70000,Operations
+C004,2026-01-01,94000,95000,Sales
+C005,2026-01-01,88000,90000,Finance
+C006,2026-01-01,76000,75000,Sales

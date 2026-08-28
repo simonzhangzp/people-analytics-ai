@@ -15,6 +15,7 @@ function jsonRequest(body: unknown, headers?: HeadersInit): Request {
 describe("Workbench AI route", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.restoreAllMocks();
   });
 
   it("rejects forbidden row keys before task parsing", async () => {
@@ -94,5 +95,53 @@ describe("Workbench AI route", () => {
     expect(response.status).toBe(200);
     expect(payload.source).toBe("deterministic");
     expect(payload.warning.code).toBe("not_configured");
+  });
+
+  it("does not call live AI without a quota-authenticated session", async () => {
+    vi.stubEnv("DEEPSEEK_API_KEY", "server-key");
+    vi.stubEnv(
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "https://example.supabase.co",
+    );
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "anon-key");
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    const response = await POST(
+      jsonRequest({
+        task: "semantic_interpreter",
+        input: {
+          datasets: [
+            {
+              datasetId: "dataset-1",
+              profile: {
+                fileName: "safe-profile.json",
+                rowCount: 10,
+                columnCount: 1,
+                inferredType: "employee_roster",
+                grain: "employee",
+                grainConfidence: 0.9,
+                columns: [
+                  {
+                    sourceName: "employee_id",
+                    inferredType: "string",
+                    nullPct: 0,
+                    distinctPct: 100,
+                    likelyPII: true,
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      }),
+    );
+    const payload = (await response.json()) as {
+      source: string;
+      warning: { code: string };
+    };
+
+    expect(response.status).toBe(200);
+    expect(payload.source).toBe("deterministic");
+    expect(payload.warning.code).toBe("auth_required");
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });

@@ -10,6 +10,29 @@ import type { DataRow } from "@/types/local-data";
 
 let databasePromise: Promise<AsyncDuckDB> | null = null;
 
+export class DuckDBInitializationError extends Error {
+  readonly cause: unknown;
+
+  constructor(cause: unknown) {
+    super(
+      cause instanceof Error
+        ? `DuckDB-Wasm could not initialize: ${cause.message}`
+        : "DuckDB-Wasm could not initialize in this browser.",
+    );
+    this.name = "DuckDBInitializationError";
+    this.cause = cause;
+  }
+}
+
+export function isDuckDBInitializationError(
+  error: unknown,
+): error is DuckDBInitializationError {
+  return (
+    error instanceof DuckDBInitializationError ||
+    (error instanceof Error && error.name === "DuckDBInitializationError")
+  );
+}
+
 function requireBrowserRuntime() {
   if (
     typeof window === "undefined" ||
@@ -69,7 +92,9 @@ export function getLocalDuckDB(): Promise<AsyncDuckDB> {
   if (!databasePromise) {
     databasePromise = initializeDatabase().catch((error) => {
       databasePromise = null;
-      throw error;
+      throw error instanceof DuckDBInitializationError
+        ? error
+        : new DuckDBInitializationError(error);
     });
   }
   return databasePromise;
@@ -138,6 +163,33 @@ export async function queryDuckDB(
     );
   };
 
+  return connection ? run(connection) : withDuckDBConnection(run);
+}
+
+export async function queryDuckDBPrepared(
+  sql: string,
+  params: readonly unknown[] = [],
+  connection?: AsyncDuckDBConnection,
+): Promise<DataRow[]> {
+  const run = async (activeConnection: AsyncDuckDBConnection) => {
+    const statement = await activeConnection.prepare(sql);
+    try {
+      const table = await statement.query(...params);
+      const fields = table.schema.fields.map((field) => field.name);
+      return table.toArray().map((row) =>
+        Object.fromEntries(
+          fields.map((field) => [
+            field,
+            normalizeQueryValue(
+              (row as unknown as Record<string, unknown>)[field],
+            ),
+          ]),
+        ),
+      );
+    } finally {
+      await statement.close();
+    }
+  };
   return connection ? run(connection) : withDuckDBConnection(run);
 }
 

@@ -1,0 +1,7 @@
+employee_id,appraisal_id,appraisal_completed_date,performance_rating,appraisal_status
+P001,REV001,2026-02-01,4,Completed
+P002,REV002,2026-02-02,3,Completed
+P003,REV003,2026-02-03,5,Completed
+P004,REV004,2026-02-04,2,Completed
+P005,REV005,2026-02-05,4,Completed
+P006,REV006,2026-02-06,3,Completed

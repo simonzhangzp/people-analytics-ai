@@ -1,0 +1,7 @@
+application_id,requisition_id,application_date,reviewed,interviewed,offer_extended,hired,source
+A001,Q100,2026-01-02,true,true,true,true,Referral
+A002,Q100,2026-01-03,true,true,false,false,Job board
+A003,Q101,2026-01-05,true,false,false,false,Agency
+A004,Q101,2026-01-06,true,true,true,false,Referral
+A005,Q102,2026-01-08,false,false,false,false,Job board
+A006,Q102,2026-01-09,true,true,true,true,Agency

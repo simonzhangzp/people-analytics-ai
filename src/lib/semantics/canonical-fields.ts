@@ -2,8 +2,10 @@ import {
   findCanonicalField,
   isLikelyPii,
   normalizeHeader,
+  semanticRoleForCanonicalField,
 } from "@/lib/data/canonical-schema";
 import type { ColumnDataType } from "@/types/workbench";
+import type { SemanticRole } from "@/types/semantics";
 
 export type SemanticExpectedType =
   | "id"
@@ -18,6 +20,8 @@ export interface WorkbenchCanonicalMatch {
   expectedType: SemanticExpectedType;
   confidence: number;
   likelyPii: boolean;
+  sensitive: boolean;
+  semanticRole: SemanticRole;
 }
 
 interface ExtensionFieldDefinition {
@@ -25,6 +29,7 @@ interface ExtensionFieldDefinition {
   aliases: string[];
   type: SemanticExpectedType;
   pii?: boolean;
+  sensitive?: boolean;
 }
 
 const workbenchExtensionFields: Record<string, ExtensionFieldDefinition> = {
@@ -42,6 +47,7 @@ const workbenchExtensionFields: Record<string, ExtensionFieldDefinition> = {
       "base_ann",
     ],
     type: "number",
+    pii: true,
   },
   compensation_effective_date: {
     label: "Compensation Effective Date",
@@ -105,6 +111,11 @@ export function resolveWorkbenchCanonicalField(
       expectedType: existing.expectedType as SemanticExpectedType,
       confidence: existing.confidence,
       likelyPii: existing.likelyPii || isLikelyPii(sourceField),
+      sensitive: existing.sensitive,
+      semanticRole:
+        existing.semanticRole ??
+        semanticRoleForCanonicalField(existing.canonicalField) ??
+        "category",
     };
   }
 
@@ -122,6 +133,9 @@ export function resolveWorkbenchCanonicalField(
         expectedType: definition.type,
         confidence: normalizeHeader(canonicalField) === normalized ? 99 : 95,
         likelyPii: Boolean(definition.pii) || isLikelyPii(sourceField),
+        sensitive: Boolean(definition.sensitive),
+        semanticRole:
+          semanticRoleForCanonicalField(canonicalField) ?? "category",
       };
     }
 
@@ -132,6 +146,9 @@ export function resolveWorkbenchCanonicalField(
         expectedType: definition.type,
         confidence: 92,
         likelyPii: Boolean(definition.pii) || isLikelyPii(sourceField),
+        sensitive: Boolean(definition.sensitive),
+        semanticRole:
+          semanticRoleForCanonicalField(canonicalField) ?? "category",
       };
     }
   }

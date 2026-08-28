@@ -11,6 +11,7 @@ import {
 import { analyzeLocalWorkforceData } from "@/lib/analytics/local-workforce-analysis";
 import { targetDaysFromBrief } from "@/lib/analytics/metric-dashboards";
 import { assessReadiness } from "@/lib/data/local-profiler";
+import { assertSafeAIPayload } from "@/lib/ai/payload-guard";
 import { analyzeStrategyBrief } from "@/lib/strategy/analyze-brief";
 import {
   emptyMeasurementBrief,
@@ -238,20 +239,42 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     setAnalyzingStrategy(true);
     setStrategyError(null);
     try {
+      const requestBody = {
+        kind: seed.intentKind,
+        title: seed.title,
+        statement: seed.statement,
+        catalogId: seed.catalogId,
+      };
+      assertSafeAIPayload(requestBody);
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      try {
+        const { ensureAnonymousSession, getSupabaseBrowserClient } =
+          await import("@/lib/supabase");
+        const client = getSupabaseBrowserClient();
+        if (client) {
+          const session = await ensureAnonymousSession(client);
+          headers.Authorization = `Bearer ${session.access_token}`;
+        }
+      } catch {
+        // The server returns the catalog result with a visible live-AI warning.
+      }
       const response = await fetch("/api/strategy/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          kind: seed.intentKind,
-          title: seed.title,
-          statement: seed.statement,
-          catalogId: seed.catalogId,
-        }),
+        headers,
+        body: JSON.stringify(requestBody),
       });
       if (!response.ok) {
         throw new Error("The strategy agent could not complete the proposal.");
       }
-      const payload = (await response.json()) as { brief: StrategyBrief };
+      const payload = (await response.json()) as {
+        brief: StrategyBrief;
+        warning?: { code?: string; message?: string };
+      };
+      if (payload.warning?.message) {
+        setStrategyError(payload.warning.message);
+      }
       setBrief((current) => {
         if (!current || current.title !== seed.title) return current;
         const targets = Object.fromEntries(

@@ -4,6 +4,7 @@ import "client-only";
 
 import type { AsyncDuckDBConnection } from "@duckdb/duckdb-wasm";
 import {
+  buildTableContract,
   expectedColumnType,
   inferTableGrain,
   isWorkbenchLikelyPii,
@@ -120,7 +121,7 @@ async function buildColumnProfiles(
       `COUNT(*) FILTER (WHERE ${identifier} IS NULL) AS ${quoteIdentifier(profileAlias(index, "null"))}`,
       `COUNT(DISTINCT ${identifier}) AS ${quoteIdentifier(profileAlias(index, "distinct"))}`,
     ];
-    if (!column.likelyPii) {
+    if (!column.likelyPii && !column.mapping?.sensitive) {
       expressions.push(
         `CAST(MIN(${identifier}) AS VARCHAR) AS ${quoteIdentifier(profileAlias(index, "min"))}`,
         `CAST(MAX(${identifier}) AS VARCHAR) AS ${quoteIdentifier(profileAlias(index, "max"))}`,
@@ -156,20 +157,30 @@ async function buildColumnProfiles(
       nullPct: roundPercent(nullCount, rowCount),
       distinctCount,
       distinctPct: roundPercent(distinctCount, rowCount),
-      min: likelyPII
+      min: likelyPII || column.mapping?.sensitive
         ? undefined
         : minMaxValue(
             statistics?.[profileAlias(index, "min")],
             inferredType,
           ),
-      max: likelyPII
+      max: likelyPII || column.mapping?.sensitive
         ? undefined
         : minMaxValue(
             statistics?.[profileAlias(index, "max")],
             inferredType,
           ),
       likelyPII,
+      sensitive: column.mapping?.sensitive,
       canonicalField: column.mapping?.canonicalField,
+      semanticRole:
+        column.mapping?.semanticRole ??
+        (likelyPII
+          ? "pii"
+          : inferredType === "date"
+            ? "event_date"
+            : inferredType === "number"
+              ? "measure"
+              : undefined),
       semanticMeaning: column.mapping?.semanticMeaning,
       confidence: column.mapping?.confidence,
     };
@@ -365,9 +376,15 @@ export async function profileDuckDBTable(
     timeRange: buildTimeRange(initialProfile.columns),
     columns: initialProfile.columns,
   });
+  const datasetId = `dataset:${tableName}`;
+  const tableContract = buildTableContract({
+    datasetId,
+    columns: initialProfile.columns,
+    inference,
+  });
 
   return {
-    id: `dataset:${tableName}`,
+    id: datasetId,
     name: file.name,
     fingerprint,
     localTableName: tableName,
@@ -382,6 +399,7 @@ export async function profileDuckDBTable(
     healthScore: quality.healthScore,
     issues: quality.issues,
     status: "Proposed",
+    tableContract,
     safeProfile,
   };
 }

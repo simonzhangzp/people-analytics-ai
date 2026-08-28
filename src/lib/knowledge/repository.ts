@@ -66,13 +66,6 @@ export interface PersistedWorkbenchKnowledge {
   stories: ExecutiveStory[];
 }
 
-export interface AIQuotaResult {
-  allowed: boolean;
-  used: number;
-  limit: number;
-  resetsAt: string;
-}
-
 export class KnowledgeRepositoryError extends Error {
   readonly operation: string;
 
@@ -334,19 +327,6 @@ export class SupabaseKnowledgeRepository {
     };
   }
 
-  async consumeAIQuota(): Promise<AIQuotaResult> {
-    await ensureAnonymousSession(this.client);
-    const result = await this.client.rpc("consume_ai_quota");
-    throwIfError(result.error, "consume AI quota");
-    const quota = result.data?.[0];
-    if (!quota) throw new KnowledgeRepositoryError("read AI quota");
-    return {
-      allowed: quota.allowed,
-      used: quota.used,
-      limit: quota.limit_count,
-      resetsAt: quota.resets_at,
-    };
-  }
 }
 
 export async function createKnowledgeRepository(): Promise<SupabaseKnowledgeRepository | null> {

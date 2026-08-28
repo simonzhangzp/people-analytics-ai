@@ -1,0 +1,7 @@
+employee_id,absence_date,absence_hours,department
+B001,2026-01-04,8,Operations
+B002,2026-01-11,4,Finance
+B003,2026-01-15,8,Operations
+B004,2026-02-02,16,Sales
+B005,2026-02-14,4,Finance
+B006,2026-03-01,8,Sales

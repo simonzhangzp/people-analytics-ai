@@ -29,6 +29,7 @@ function WorkbenchContent() {
     setDraftQuestion,
     setActiveDatasetId,
     setActiveView,
+    approveRelationship,
     addFiles,
     askQuestion,
     resolveAmbiguity,
@@ -41,6 +42,7 @@ function WorkbenchContent() {
     buildStory,
     exportStory,
     submitCoDesignerContext,
+    handleInterventionAction,
   } = useWorkbench();
 
   const activeMetric =
@@ -68,6 +70,7 @@ function WorkbenchContent() {
       interventions={state.interventions}
       busy={busy}
       onSubmitContext={submitCoDesignerContext}
+      onAction={handleInterventionAction}
     />
   );
 
@@ -86,6 +89,7 @@ function WorkbenchContent() {
           datasets={state.datasets}
           mappings={state.fieldMappings}
           relationships={state.relationships}
+          capabilities={state.capabilities}
           activeDatasetId={activeDataset?.metadata.id}
           processing={processing}
           processingMessage={processingMessage}
@@ -97,6 +101,7 @@ function WorkbenchContent() {
           onQuestionTextChange={setDraftQuestion}
           onAskQuestion={() => void askQuestion()}
           onContinue={() => setActiveView("metrics")}
+          onApproveRelationship={approveRelationship}
         />
       )}
 
@@ -121,7 +126,12 @@ function WorkbenchContent() {
           insights={state.insights}
           running={busy}
           explorationRows={activeDataset?.explorationRows ?? []}
+          explorationColumns={activeDataset?.metadata.columns ?? []}
           explorationSource={activeDataset?.metadata.name ?? "No local dataset"}
+          explorationSampled={
+            (activeDataset?.metadata.rowCount ?? 0) >
+            (activeDataset?.explorationRows.length ?? 0)
+          }
           onRunPlan={runAnalysis}
           onRunBranch={runBranch}
           onToggleStory={toggleInsightStory}

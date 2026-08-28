@@ -4,9 +4,27 @@ test.describe("People Analytics Workbench Phase 1", () => {
   test("completes the guided attrition vertical slice", async ({ page }) => {
     test.setTimeout(180_000);
     const aiBodies: string[] = [];
+    let explorerMonitoring = false;
+    const unsafeExplorerRequests = new Set<string>();
+    const externalExplorerUrls = new Set<string>();
     page.on("request", (request) => {
       if (request.url().includes("/api/workbench/ai") && request.method() === "POST") {
         aiBodies.push(request.postData() ?? "");
+      }
+      if (explorerMonitoring) {
+        const host = new URL(request.url()).hostname;
+        const unknownHost =
+          host !== "localhost" &&
+          host !== "127.0.0.1" &&
+          host !== "cdn.jsdelivr.net" &&
+          !host.endsWith(".supabase.co");
+        if (unknownHost) externalExplorerUrls.add(request.url());
+        if (
+          unknownHost &&
+          !["GET", "HEAD"].includes(request.method())
+        ) {
+          unsafeExplorerRequests.add(`${request.method()} ${host}`);
+        }
       }
     });
 
@@ -14,7 +32,7 @@ test.describe("People Analytics Workbench Phase 1", () => {
     await expect(page).toHaveURL(/\/workbench\/demo/);
     await expect(
       page.getByRole("heading", {
-        name: /can these files answer an attrition question credibly/i,
+        name: /what can these people files answer credibly/i,
       }),
     ).toBeVisible();
     await expect(page.getByText("monthly_headcount.xlsx").first()).toBeVisible({
@@ -32,11 +50,12 @@ test.describe("People Analytics Workbench Phase 1", () => {
     await page.getByTestId("ask-workbench-question").click();
 
     await expect(page.getByTestId("metric-ambiguity")).toBeVisible();
-    await expect(page.getByText(/whether retirement/i).first()).toBeVisible();
-    await page.getByLabel(/definition instruction/i).fill(
-      "Treat retirement separately and use beginning headcount.",
-    );
-    await page.getByTestId("propose-metric-change").click();
+    await expect(
+      page.getByText(/should retirement count as voluntary attrition/i),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: /treat retirement separately/i })
+      .click();
     await expect(page.getByTestId("metric-diff")).toBeVisible();
     await expect(page.getByTestId("metric-diff")).toContainText(/retirement/i);
     await page.getByTestId("apply-metric-change").click();
@@ -63,12 +82,23 @@ test.describe("People Analytics Workbench Phase 1", () => {
     );
     await expect(page.getByText(/manager effectiveness.*(absent|cannot|missing)/i).first()).toBeVisible();
 
+    explorerMonitoring = true;
     await page.getByRole("button", { name: /explore data/i }).click();
-    await expect(page.getByRole("heading", { name: /explore local aggregate data/i })).toBeVisible({
+    const explorer = page.getByRole("dialog");
+    await expect(page.getByRole("heading", { name: /explore de-identified local rows/i })).toBeVisible({
       timeout: 60_000,
     });
-    await expect(page.getByText(/exploration stays in this browser/i)).toBeVisible();
+    await expect(
+      page.getByText(/PII and sensitive demographics are removed/i),
+    ).toBeVisible();
+    await expect(explorer).not.toContainText(/E02001|employee_id|email_address/i);
+    await page.waitForTimeout(1_000);
     await page.getByRole("button", { name: "Close" }).click();
+    explorerMonitoring = false;
+    expect([...unsafeExplorerRequests]).toEqual([]);
+    expect([...externalExplorerUrls].join("\n")).not.toMatch(
+      /E02001|employee_id|email_address/i,
+    );
 
     for (const testId of [
       "insight-trend",

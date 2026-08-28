@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import type {
   MetricAmbiguity,
   MetricDefinition,
+  MetricExpression,
   MetricPatch,
 } from "@/types/workbench";
 
@@ -31,12 +32,24 @@ interface MetricStudioProps {
   onContinue: () => void;
 }
 
-function expressionSummary(metric?: MetricDefinition) {
-  if (!metric) return "No definition available";
-  if (metric.key.startsWith("voluntary_attrition")) {
-    return "Voluntary exits in period ÷ beginning headcount × 100";
+function expressionLabel(expression?: MetricExpression): string {
+  if (!expression) return "Not required for this metric";
+  if (expression.kind === "count") {
+    return expression.distinctField
+      ? `Distinct ${expression.entity} by ${expression.distinctField}`
+      : `Count ${expression.entity} records`;
   }
-  return metric.description;
+  if (expression.kind === "average") return `Average ${expression.field}`;
+  if (expression.kind === "duration") {
+    return `${expression.aggregation} days from ${expression.startField} to ${expression.endField}`;
+  }
+  return `${expressionLabel(expression.numerator)} ÷ ${expressionLabel(
+    expression.denominator,
+  )} × ${expression.multiplier}`;
+}
+
+function expressionSummary(metric?: MetricDefinition) {
+  return metric ? expressionLabel(metric.formula) : "No definition available";
 }
 
 export function MetricStudio({
@@ -51,7 +64,7 @@ export function MetricStudio({
   onContinue,
 }: MetricStudioProps) {
   const [instruction, setInstruction] = useState(
-    "Treat retirement separately and use beginning headcount.",
+    "Describe any inclusion, denominator, or time-basis change to review.",
   );
 
   return (
@@ -61,7 +74,7 @@ export function MetricStudio({
         <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h1 className="max-w-3xl text-[28px] font-semibold leading-[1.2] tracking-[-0.035em] text-[#14213b] sm:text-[32px]">
-              What exactly counts as voluntary attrition?
+              How should {metric?.name ?? "this People metric"} be defined?
             </h1>
             <p className="mt-3 max-w-2xl text-[14px] leading-6 text-[#5d697c]">
               Resolve only the choices that can change the answer. Every applied change
@@ -123,8 +136,7 @@ export function MetricStudio({
                     Numerator
                   </dt>
                   <dd className="mt-2 text-[12px] leading-5 text-[#48566d]">
-                    Distinct employee exits classified as voluntary within the selected
-                    period.
+                    {expressionLabel(metric.numerator)}
                   </dd>
                 </div>
                 <div className="rounded-[7px] border border-[#e4e7ec] p-4">
@@ -132,7 +144,7 @@ export function MetricStudio({
                     Denominator
                   </dt>
                   <dd className="mt-2 text-[12px] leading-5 text-[#48566d]">
-                    Active employees at the beginning of the selected period.
+                    {expressionLabel(metric.denominator)}
                   </dd>
                 </div>
                 <div className="rounded-[7px] border border-[#e4e7ec] p-4">
@@ -142,7 +154,7 @@ export function MetricStudio({
                   <dd className="mt-2 text-[12px] leading-5 text-[#48566d]">
                     {metric.inclusions.length
                       ? metric.inclusions.map((rule) => rule.label).join("; ")
-                      : "Voluntary resignation"}
+                      : "All records in the approved population"}
                   </dd>
                 </div>
                 <div className="rounded-[7px] border border-[#e4e7ec] p-4">
@@ -152,7 +164,7 @@ export function MetricStudio({
                   <dd className="mt-2 text-[12px] leading-5 text-[#48566d]">
                     {metric.exclusions.length
                       ? metric.exclusions.map((rule) => rule.label).join("; ")
-                      : "Involuntary exits; data corrections"}
+                      : "No explicit exclusions"}
                   </dd>
                 </div>
               </dl>
@@ -188,11 +200,10 @@ export function MetricStudio({
                   {ambiguity.question}
                 </h2>
                 <p className="mt-2 text-[11px] leading-5 text-[#745d3e]">
-                  Decide whether retirement belongs in the voluntary numerator.{" "}
                   {ambiguity.whyItMatters}
                 </p>
                 <fieldset className="mt-4 space-y-2">
-                  <legend className="sr-only">Choose retirement treatment</legend>
+                  <legend className="sr-only">Choose a metric definition option</legend>
                   {ambiguity.options.map((option) => (
                     <button
                       type="button"

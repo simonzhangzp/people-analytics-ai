@@ -1,0 +1,7 @@
+employee_id,term_date,exit_classification,termination_reason,department
+R001,2026-01-05,Voluntary,Career change,Operations
+R002,2026-01-18,Involuntary,Role eliminated,Finance
+R003,2026-02-03,Voluntary,Relocation,Operations
+R004,2026-02-20,Voluntary,Compensation,Sales
+R005,2026-03-02,Involuntary,Performance,Sales
+R006,2026-03-17,Voluntary,Career change,Finance

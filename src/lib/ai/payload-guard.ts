@@ -22,6 +22,7 @@ const FORBIDDEN_KEYS = new Set([
   "explorationrows",
   "samplevalues",
   "rawdata",
+  "rawrecords",
   "datarows",
 ]);
 
@@ -46,7 +47,6 @@ const SAFE_STRUCTURED_ARRAY_KEYS = new Set([
   "suggestedfollowups",
   "slides",
   "items",
-  "data",
 ]);
 
 const RAW_IDENTITY_KEYS = new Set([
@@ -69,6 +69,10 @@ const RAW_IDENTITY_KEYS = new Set([
   "ssn",
   "dateofbirth",
   "dob",
+  "managerid",
+  "nationalid",
+  "passportnumber",
+  "mobile",
 ]);
 
 const MAX_DEPTH = 14;
@@ -124,6 +128,18 @@ function looksLikeHomogeneousRows(records: Record<string, unknown>[]): boolean {
   });
 }
 
+function isAggregateChartData(records: Record<string, unknown>[]): boolean {
+  return records.every((record) => {
+    const keys = Object.keys(record).map(normalizeKey);
+    return (
+      keys.length > 0 &&
+      keys.every((key) => key === "label" || key === "value") &&
+      keys.includes("label") &&
+      keys.includes("value")
+    );
+  });
+}
+
 export function assertSafeAIPayload(payload: unknown): void {
   let visitedNodes = 0;
 
@@ -157,9 +173,17 @@ export function assertSafeAIPayload(payload: unknown): void {
         }
 
         const normalizedParentKey = normalizeKey(keyForValue);
+        const safeAggregateData =
+          normalizedParentKey === "data" &&
+          isAggregateChartData(records);
+        const unsafeDataArray =
+          normalizedParentKey === "data" &&
+          !safeAggregateData;
         if (
-          !SAFE_STRUCTURED_ARRAY_KEYS.has(normalizedParentKey) &&
-          looksLikeHomogeneousRows(records)
+          unsafeDataArray ||
+          (!SAFE_STRUCTURED_ARRAY_KEYS.has(normalizedParentKey) &&
+            !safeAggregateData &&
+            looksLikeHomogeneousRows(records))
         ) {
           throw new UnsafeAIPayloadError(
             "raw_row_array",

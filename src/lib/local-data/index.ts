@@ -7,5 +7,6 @@ export * from "./fingerprint";
 export * from "./infer-relationships";
 export * from "./ingest";
 export * from "./profile-table";
+export * from "./privacy";
 export * from "./safe-profile";
 export * from "./sql";

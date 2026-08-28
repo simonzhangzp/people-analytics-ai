@@ -15,6 +15,11 @@ export interface SafeWorkbenchPayload {
   relationships: DatasetRelationship[];
 }
 
+function confidenceScore(value: number | undefined) {
+  if (value === undefined) return undefined;
+  return Math.max(0, Math.min(1, value > 1 ? value / 100 : value));
+}
+
 type SafeProfileSource = Pick<
   DatasetMetadata,
   | "name"
@@ -35,7 +40,7 @@ export function buildSafeDatasetProfile(
     columnCount: metadata.columns.length,
     inferredType: metadata.inferredType,
     grain: metadata.grain.label,
-    grainConfidence: metadata.grainConfidence,
+    grainConfidence: confidenceScore(metadata.grainConfidence) ?? 0,
     timeRange: metadata.timeRange,
     columns: metadata.columns.map((column) => ({
       sourceName: column.sourceName,
@@ -43,9 +48,11 @@ export function buildSafeDatasetProfile(
       nullPct: column.nullPct,
       distinctPct: column.distinctPct,
       likelyPII: column.likelyPII,
+      sensitive: column.sensitive,
       canonicalField: column.canonicalField,
+      semanticRole: column.semanticRole,
       semanticMeaning: column.semanticMeaning,
-      confidence: column.confidence,
+      confidence: confidenceScore(column.confidence),
     })),
   };
 }

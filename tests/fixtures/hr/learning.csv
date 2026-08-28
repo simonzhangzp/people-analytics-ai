@@ -1,0 +1,7 @@
+employee_id,course_id,learning_completed_at,learning_status,learning_score,pass_flag
+L001,COURSE-A,2026-01-10,Completed,91,true
+L002,COURSE-A,2026-01-11,Completed,78,true
+L003,COURSE-B,2026-01-14,Completed,84,true
+L004,COURSE-B,2026-02-03,Incomplete,52,false
+L005,COURSE-C,2026-02-08,Completed,88,true
+L006,COURSE-C,2026-02-12,Completed,73,true

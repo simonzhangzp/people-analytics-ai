@@ -1,17 +1,26 @@
 import { analyzeStrategyBrief } from "@/lib/strategy/analyze-brief";
 import { metricTemplates } from "@/lib/strategy/metric-templates";
+import {
+  jsonResponse,
+  readGuardedAIJson,
+  resolveLiveAIAccess,
+} from "@/lib/ai/route-guard";
 import type { MetricProposal, StrategyAnalysis, StrategyIntent } from "@/types/strategy";
+import { z } from "zod";
 
-interface AnalyzeBody {
-  kind?: StrategyIntent;
-  title?: string;
-  statement?: string;
-  catalogId?: string;
-}
+export const runtime = "nodejs";
 
-function asIntent(value: unknown): StrategyIntent {
-  return value === "problem" ? "problem" : "strategy";
-}
+const strategyAnalyzeRequestSchema = z
+  .object({
+    kind: z.enum(["strategy", "problem"]).default("strategy"),
+    title: z.string().trim().max(500).default(""),
+    statement: z.string().trim().max(4_000).default(""),
+    catalogId: z.string().trim().max(200).optional(),
+  })
+  .strict()
+  .refine((value) => Boolean(value.statement || value.catalogId), {
+    message: "Select a catalog item or write a strategy or problem statement.",
+  });
 
 function parseModelJson(text: string) {
   const trimmed = text.trim();
@@ -148,29 +157,56 @@ async function callDeepSeek(kind: StrategyIntent, title: string, statement: stri
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json().catch(() => ({}))) as AnalyzeBody;
-  const kind = asIntent(body.kind);
-  const title = body.title?.trim() || "";
-  const statement = body.statement?.trim() || "";
-  if (!statement && !body.catalogId) {
-    return Response.json(
-      { error: "Select a catalog item or write a strategy or problem statement." },
+  const guarded = await readGuardedAIJson(request);
+  if (!guarded.ok) return guarded.response;
+  const parsed = strategyAnalyzeRequestSchema.safeParse(guarded.body);
+  if (!parsed.success) {
+    return jsonResponse(
+      {
+        error: {
+          code: "invalid_task_input",
+          message: "Request does not match the supported Strategy AI task.",
+          details: parsed.error.issues.slice(0, 12).map((issue) => ({
+            path: issue.path.join("."),
+            message: issue.message,
+          })),
+        },
+      },
       { status: 400 },
     );
   }
+  const { kind, title, statement, catalogId } = parsed.data;
 
   const fallback = analyzeStrategyBrief({
-    catalogId: body.catalogId,
+    catalogId,
     kind,
     title,
     statement,
   });
 
-  const remote = await callDeepSeek(kind, title || fallback.title, statement || fallback.statement);
-  if (!remote) {
-    return Response.json({
+  const access = await resolveLiveAIAccess(request);
+  if (access.status === "blocked") {
+    return jsonResponse({
       brief: fallback,
       source: "catalog",
+      warning: access.warning,
+    });
+  }
+
+  const remote = await callDeepSeek(
+    kind,
+    title || fallback.title,
+    statement || fallback.statement,
+  );
+  if (!remote) {
+    return jsonResponse({
+      brief: fallback,
+      source: "catalog",
+      warning: {
+        code: "provider_error",
+        message:
+          "DeepSeek could not complete the Strategy proposal; the catalog fallback was used.",
+      },
     });
   }
 
@@ -194,5 +230,5 @@ export async function POST(request: Request) {
     metrics: mergeAiMetrics(fallback.metrics, remote.metrics),
   };
 
-  return Response.json({ brief, source: "deepseek" });
+  return jsonResponse({ brief, source: "deepseek" });
 }

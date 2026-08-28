@@ -21,11 +21,13 @@ import type {
   FieldMapping,
   LocalWorkbenchDataset,
 } from "@/types/workbench";
+import type { CapabilityReport } from "@/types/semantics";
 
 interface DataCanvasProps {
   datasets: LocalWorkbenchDataset[];
   mappings: FieldMapping[];
   relationships: DatasetRelationship[];
+  capabilities: CapabilityReport[];
   activeDatasetId?: string;
   processing: boolean;
   processingMessage?: string;
@@ -37,12 +39,14 @@ interface DataCanvasProps {
   onQuestionTextChange: (value: string) => void;
   onAskQuestion: () => void;
   onContinue: () => void;
+  onApproveRelationship: (id: string) => void;
 }
 
 export function DataCanvas({
   datasets,
   mappings,
   relationships,
+  capabilities,
   activeDatasetId,
   processing,
   processingMessage,
@@ -54,6 +58,7 @@ export function DataCanvas({
   onQuestionTextChange,
   onAskQuestion,
   onContinue,
+  onApproveRelationship,
 }: DataCanvasProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -62,7 +67,7 @@ export function DataCanvas({
 
   const acceptFiles = (list: FileList | null) => {
     if (!list || list.length === 0) return;
-    void onAddFiles(Array.from(list).slice(0, 3));
+    void onAddFiles(Array.from(list).slice(0, 10));
   };
 
   return (
@@ -72,11 +77,11 @@ export function DataCanvas({
         <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h1 className="max-w-3xl text-[28px] font-semibold leading-[1.2] tracking-[-0.035em] text-[#14213b] sm:text-[32px]">
-              Can these files answer an attrition question credibly?
+              What can these People files answer credibly?
             </h1>
             <p className="mt-3 max-w-2xl text-[14px] leading-6 text-[#5d697c]">
-              Inspect grain, field meaning, relationship coverage, and material gaps
-              before agreeing on a metric.
+              Inspect table shape, field roles, quality, answerable domains, and
+              material gaps before agreeing on a metric.
             </p>
           </div>
           {datasets.length > 0 && (
@@ -99,7 +104,7 @@ export function DataCanvas({
               Local People data
             </h2>
             <p className="mt-1 text-[12px] text-[#717b8b]">
-              CSV or Excel · up to three related files
+              CSV or XLSX · up to 10 source files · every valid worksheet is separate
             </p>
           </div>
           <Badge variant="success">
@@ -136,7 +141,7 @@ export function DataCanvas({
             ref={inputRef}
             type="file"
             multiple
-            accept=".csv,.xlsx,.xls"
+            accept=".csv,.xlsx"
             className="sr-only"
             onChange={(event) => {
               acceptFiles(event.target.files);
@@ -166,7 +171,8 @@ export function DataCanvas({
                 Drop related People files here
               </p>
               <p className="mt-1 text-[11px] text-[#808999]">
-                Employee snapshots, terminations, and compensation work well together.
+                Workforce, recruiting, pay, performance, absence, survey, learning,
+                mobility, and demographic files are understood locally.
               </p>
               <Button
                 variant="secondary"
@@ -274,6 +280,55 @@ export function DataCanvas({
             </div>
           </section>
 
+          <section className="mt-6" aria-labelledby="capability-heading">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <h2
+                  id="capability-heading"
+                  className="text-[15px] font-semibold text-[#24324a]"
+                >
+                  Answerability by HR domain
+                </h2>
+                <p className="mt-1 text-[12px] text-[#717b8b]">
+                  Runnable means a deterministic path exists. A data gap is an
+                  explicit result, never a guessed substitute.
+                </p>
+              </div>
+              <Badge variant="info">
+                {capabilities.filter((item) => item.runnable).length}/
+                {capabilities.length} runnable
+              </Badge>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {capabilities.map((capability) => (
+                <article
+                  key={capability.id}
+                  className="rounded-[8px] border border-[#dfe3e9] bg-white p-4"
+                  data-testid={`capability-${capability.domain}`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[12px] font-semibold capitalize text-[#344158]">
+                      {capability.domain}
+                    </p>
+                    <Badge
+                      variant={capability.runnable ? "success" : "warning"}
+                    >
+                      {capability.runnable ? "Runnable" : "Data gap"}
+                    </Badge>
+                  </div>
+                  <p className="mt-2 text-[11px] font-medium text-[#536076]">
+                    {capability.metricName}
+                  </p>
+                  <p className="mt-2 text-[10px] leading-4 text-[#7a8494]">
+                    {capability.runnable
+                      ? `${capability.datasetIds.length} compatible dataset${capability.datasetIds.length === 1 ? "" : "s"} · ${capability.supportedOperations.join(", ")}`
+                      : capability.missing.join(" ")}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+
           {active && (
             <section
               className="mt-6 rounded-[9px] border border-[#dfe3e9] bg-white"
@@ -299,6 +354,50 @@ export function DataCanvas({
                   {active.metadata.status}
                 </Badge>
               </div>
+              {active.metadata.tableContract && (
+                <div className="grid gap-3 border-b border-[#e8ebef] bg-[#f8f9fb] px-5 py-4 sm:grid-cols-2 xl:grid-cols-4">
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-[#8a93a2]">
+                      Shape & contract
+                    </p>
+                    <p className="mt-1 text-[11px] font-semibold text-[#46536a]">
+                      {active.metadata.tableContract.dataShape} ·{" "}
+                      {active.metadata.tableContract.tableType.replaceAll("_", " ")}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-[#8a93a2]">
+                      Identity
+                    </p>
+                    <p className="mt-1 text-[11px] font-semibold text-[#46536a]">
+                      {active.metadata.tableContract.identity
+                        ? `${active.metadata.tableContract.identity.sourceName} · ${(
+                            active.metadata.tableContract.identity.coverage * 100
+                          ).toFixed(0)}% covered`
+                        : "Not required / not inferred"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-[#8a93a2]">
+                      Time role
+                    </p>
+                    <p className="mt-1 text-[11px] font-semibold text-[#46536a]">
+                      {active.metadata.tableContract.time
+                        ? `${active.metadata.tableContract.time.sourceName} · ${active.metadata.tableContract.time.role}`
+                        : "No trend available"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-[#8a93a2]">
+                      Domains
+                    </p>
+                    <p className="mt-1 text-[11px] font-semibold capitalize text-[#46536a]">
+                      {active.metadata.tableContract.domains.join(", ") ||
+                        "Needs mapping"}
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[680px] text-left">
                   <thead className="border-b border-[#e8ebef] bg-[#f8f9fb]">
@@ -306,6 +405,7 @@ export function DataCanvas({
                       <th className="px-5 py-3">Source field</th>
                       <th className="px-4 py-3">Meaning</th>
                       <th className="px-4 py-3">Type</th>
+                      <th className="px-4 py-3">Role</th>
                       <th className="px-4 py-3">Missing</th>
                       <th className="px-5 py-3">Evidence state</th>
                     </tr>
@@ -328,6 +428,9 @@ export function DataCanvas({
                               "Unmapped field"}
                           </td>
                           <td className="px-4 py-3">{column.inferredType}</td>
+                          <td className="px-4 py-3">
+                            {column.semanticRole?.replaceAll("_", " ") ?? "unassigned"}
+                          </td>
                           <td className="px-4 py-3 tabular-nums">
                             {(column.nullPct * 100).toFixed(0)}%
                           </td>
@@ -336,14 +439,16 @@ export function DataCanvas({
                               variant={
                                 mapping?.status === "Approved"
                                   ? "success"
-                                  : column.likelyPII
+                                  : column.likelyPII || column.sensitive
                                     ? "warning"
                                     : "info"
                               }
                             >
                               {column.likelyPII
                                 ? "Local-only PII"
-                                : mapping?.status ?? "Proposed"}
+                                : column.sensitive
+                                  ? "Sensitive · aggregate only"
+                                  : mapping?.status ?? "Proposed"}
                             </Badge>
                           </td>
                         </tr>
@@ -352,6 +457,28 @@ export function DataCanvas({
                   </tbody>
                 </table>
               </div>
+              {active.metadata.issues.length > 0 && (
+                <div className="border-t border-[#e6e9ee] px-5 py-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.07em] text-[#818a99]">
+                    Quality issues that can change an answer
+                  </p>
+                  <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {active.metadata.issues.slice(0, 6).map((issue) => (
+                      <li
+                        key={issue.id}
+                        className="rounded-[6px] border border-[#ead9bc] bg-[#fffaf2] px-3 py-2"
+                      >
+                        <p className="text-[11px] font-semibold text-[#5f4c33]">
+                          {issue.title}
+                        </p>
+                        <p className="mt-1 text-[10px] leading-4 text-[#745d3e]">
+                          {issue.impact}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </section>
           )}
 
@@ -407,14 +534,44 @@ export function DataCanvas({
                           >
                             {(relationship.matchRate * 100).toFixed(0)}% coverage
                           </Badge>
+                          <Badge
+                            variant={
+                              relationship.status === "Approved"
+                                ? "success"
+                                : "warning"
+                            }
+                          >
+                            {relationship.status}
+                          </Badge>
                           {relationship.conflicts.length === 0 && (
                             <CheckCircle2
                               aria-label="No material join conflict"
                               className="size-4 text-[#3f7d61]"
                             />
                           )}
+                          {relationship.status !== "Approved" &&
+                            relationship.conflicts.length === 0 &&
+                            relationship.matchRate > 0 && (
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() =>
+                                  onApproveRelationship(relationship.id)
+                                }
+                              >
+                                Approve join
+                              </Button>
+                            )}
                         </div>
                       </div>
+                      <p className="mt-3 text-[10px] leading-4 text-[#717b8b]">
+                        {relationship.evidence.join(" ")}
+                      </p>
+                      {relationship.conflicts.length > 0 && (
+                        <p className="mt-2 text-[10px] leading-4 text-[#8a5d25]">
+                          {relationship.conflicts.join(" ")}
+                        </p>
+                      )}
                     </article>
                   );
                 })
@@ -454,7 +611,7 @@ export function DataCanvas({
                   value={questionText}
                   onChange={(event) => onQuestionTextChange(event.target.value)}
                   rows={2}
-                  placeholder="Why has Engineering voluntary attrition increased?"
+                  placeholder="What changed in this workforce, recruiting, pay, or experience data?"
                   className="mt-3 w-full resize-none rounded-[7px] border border-[#cbd3df] px-4 py-3 text-[13px] leading-5 text-[#2f3d55] outline-none focus:border-[#8196d1] focus:ring-2 focus:ring-[#3157d5]/10"
                   data-testid="workbench-question"
                 />

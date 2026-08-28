@@ -25,6 +25,7 @@ import type { DataRow } from "@/types/local-data";
 import type {
   AnalysisPlan,
   AnalysisQuestion,
+  ColumnProfile,
   Insight,
 } from "@/types/workbench";
 
@@ -45,7 +46,9 @@ interface AnalysisCanvasProps {
   insights: Insight[];
   running: boolean;
   explorationRows: DataRow[];
+  explorationColumns: ColumnProfile[];
   explorationSource: string;
+  explorationSampled: boolean;
   onRunPlan: () => Promise<void> | void;
   onRunBranch: (branch: Insight["branchKey"]) => Promise<void> | void;
   onToggleStory: (insightId: string) => void;
@@ -58,7 +61,9 @@ export function AnalysisCanvas({
   insights,
   running,
   explorationRows,
+  explorationColumns,
   explorationSource,
+  explorationSampled,
   onRunPlan,
   onRunBranch,
   onToggleStory,
@@ -86,10 +91,12 @@ export function AnalysisCanvas({
                 <Search aria-hidden="true" className="size-4" />
                 Explore data
               </Button>
-              <Button onClick={onContinueToStory} data-testid="continue-to-story">
-                Build executive story
-                <ArrowRight aria-hidden="true" className="size-4" />
-              </Button>
+              {insights.some((insight) => insight.validated) && (
+                <Button onClick={onContinueToStory} data-testid="continue-to-story">
+                  Build executive story
+                  <ArrowRight aria-hidden="true" className="size-4" />
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -195,7 +202,16 @@ export function AnalysisCanvas({
                 Conclusions first, then exact evidence, limits, and the next branch.
               </p>
             </div>
-            <Badge variant="success">{insights.length} validated findings</Badge>
+            <Badge
+              variant={
+                insights.some((insight) => insight.validated)
+                  ? "success"
+                  : "warning"
+              }
+            >
+              {insights.filter((insight) => insight.validated).length} validated ·{" "}
+              {insights.filter((insight) => !insight.validated).length} data gaps
+            </Badge>
           </div>
 
           <div className="relative mt-5 space-y-5 before:absolute before:bottom-6 before:left-[17px] before:top-6 before:w-px before:bg-[#ccd5e6]">
@@ -238,6 +254,7 @@ export function AnalysisCanvas({
                       size="sm"
                       variant={insight.selectedForExecutiveStory ? "primary" : "secondary"}
                       onClick={() => onToggleStory(insight.id)}
+                      disabled={!insight.validated}
                       aria-pressed={insight.selectedForExecutiveStory}
                     >
                       {insight.selectedForExecutiveStory ? (
@@ -346,8 +363,9 @@ export function AnalysisCanvas({
           open={explorerOpen}
           onOpenChange={setExplorerOpen}
           rows={explorationRows}
+          columns={explorationColumns}
           sourceLabel={explorationSource}
-          sampled={explorationRows.length >= 5_000}
+          sampled={explorationSampled}
         />
       )}
     </div>

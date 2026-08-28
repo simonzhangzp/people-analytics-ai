@@ -5,7 +5,13 @@ import {
 } from "./payload-guard";
 
 describe("AI safe payload guard", () => {
-  it.each(["rows", "rawRows", "sampleValues", "explorationRows"])(
+  it.each([
+    "rows",
+    "rawRows",
+    "rawRecords",
+    "sampleValues",
+    "explorationRows",
+  ])(
     "recursively rejects %s",
     (key) => {
       expect(() =>
@@ -78,6 +84,29 @@ describe("AI safe payload guard", () => {
               dimensions: { region: "NA" },
               sourceDatasetIds: ["dataset-1"],
             },
+          ],
+        },
+      }),
+    ).not.toThrow();
+  });
+
+  it("rejects row-shaped data while allowing label-value chart aggregates", () => {
+    expect(() =>
+      assertSafeAIPayload({
+        chartSpec: {
+          data: [
+            { department: "Sales", salary: 100_000, gender: "Female" },
+          ],
+        },
+      }),
+    ).toThrow(/array of raw records/i);
+
+    expect(() =>
+      assertSafeAIPayload({
+        chartSpec: {
+          data: [
+            { label: "Q1", value: 18 },
+            { label: "Q2", value: 21 },
           ],
         },
       }),

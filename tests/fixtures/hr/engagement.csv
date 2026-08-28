@@ -1,0 +1,7 @@
+employee_id,survey_wave,engagement_score,department
+E001,2026-Q1,4.2,Operations
+E002,2026-Q1,3.8,Finance
+E003,2026-Q1,4.5,Operations
+E004,2026-Q2,3.9,Sales
+E005,2026-Q2,4.1,Finance
+E006,2026-Q2,4.6,Sales
