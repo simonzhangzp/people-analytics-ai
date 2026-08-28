@@ -2,29 +2,29 @@
 
 Public site for [peopleanalyticsai.net](https://peopleanalyticsai.net).
 
-Phase 1 is a polished Talent Acquisition vertical slice:
+Phase 1 is a persistent People Analytics Workbench with an Engineering
+voluntary-attrition vertical slice:
 
-**Strategy → Measurement → Data Readiness → Analysis → Executive Story → Action**
+**Data → Metric Definition → Analysis Thread → Executive Story**
 
-The public `/demo` path works without sign-in. Strategy starts with a classified
-library of 100+ People strategies and problems. Users can also write their own.
-The site proposes metrics immediately from the catalog and optionally enriches
-the summary with DeepSeek when `DEEPSEEK_API_KEY` is set. Measurement has a
-separate library of 100+ People metrics; users can add catalog metrics or write
-their own definitions. Targets can be confirmed or skipped.
+The public `/demo` path opens three synthetic, related attrition datasets. The
+older Strategy Mode remains available at `/strategy` as a secondary workflow.
+`/workbench` opens an empty local-first workspace.
 
 The browser-local pipeline now performs:
 
 - UTF-8 / UTF-16 / UTF-32 decode for HR extracts;
-- table and grain inference for recruiting, snapshots, hire extracts, and rosters;
-- canonical People field mapping and PII redaction in the in-memory sample;
-- completeness, duplicate, date-order, and privacy checks;
-- strategy answerability assessment;
-- deterministic recruiting or headcount / workforce-mix analysis;
-- evidence-linked Executive Story and Action generation.
+- CSV and Excel normalization followed by DuckDB-Wasm registration;
+- table/grain inference, safe column profiling, and multi-file join coverage;
+- canonical People field mapping without sending raw values to a server;
+- versioned metric definitions with visible natural-language diffs;
+- deterministic attrition trend, tenure, level, and compensation analysis;
+- bounded on-demand visual exploration;
+- evidence-linked 3/5-slide stories and editable PPTX export.
 
 Raw People rows stay in browser memory and are not sent to the application
-server. Numbers are calculated in code; AI only explains.
+server or Supabase. Numbers are calculated in code; five typed AI tasks only
+propose semantics, plans, interpretations, and story structure.
 
 ## Test data
 
@@ -33,14 +33,9 @@ datasets, plus optional local VDM headcount extracts. Source notes and
 encoding/PII warnings are in `sample_data/README.md`. Large VDM snapshots are
 gitignored.
 
-End-to-end tests upload files through the same file input a user sees, then
-complete:
+End-to-end tests use the same workbench controls a user sees, then complete:
 
-**Strategy → Measurement → Upload → Mapping → Analysis → Story → Action**
-
-Recruiting files produce Time to Hire. Snapshot / roster extracts produce
-Headcount or Workforce mix and explicitly do not treat those numbers as Time
-to Fill.
+**Demo files → Question → Metric approval → Analysis branch → Story → PPTX**
 
 ## Local run
 
@@ -56,4 +51,6 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Optional environment
 
-Copy `.env.example` to `.env.local` only if you want later DeepSeek or Supabase wiring. The demo does not require either key.
+Copy `.env.example` to `.env.local` to enable DeepSeek and Supabase knowledge
+sync. The guided demo remains usable with explicit deterministic/local-only
+fallbacks when either service is unavailable.

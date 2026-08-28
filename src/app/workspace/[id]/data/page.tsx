@@ -325,9 +325,9 @@ export default function DataPage() {
         <div className="surface p-6">
           <p className="eyebrow">Inferred column mapping</p>
           <div className="mt-4 space-y-3">
-            {mappings.map((mapping) => (
+            {mappings.map((mapping, index) => (
               <div
-                key={mapping.id}
+                key={`${mapping.id}-${index}`}
                 className="flex items-center justify-between gap-4 border-b border-[#eef1f4] pb-3 last:border-0 last:pb-0"
               >
                 <div className="min-w-0">

@@ -91,19 +91,27 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [strategyError, setStrategyError] = useState<string | null>(null);
 
   useEffect(() => {
+    let timer: number | undefined;
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setState({ ...initialProgress, ...JSON.parse(saved) });
-      }
       const savedBrief = window.localStorage.getItem(BRIEF_KEY);
-      if (savedBrief) {
-        setBrief(JSON.parse(savedBrief) as StrategyBrief);
+      if (saved || savedBrief) {
+        timer = window.setTimeout(() => {
+          if (saved) {
+            setState({ ...initialProgress, ...JSON.parse(saved) });
+          }
+          if (savedBrief) {
+            setBrief(JSON.parse(savedBrief) as StrategyBrief);
+          }
+        }, 0);
       }
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
       window.localStorage.removeItem(BRIEF_KEY);
     }
+    return () => {
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {

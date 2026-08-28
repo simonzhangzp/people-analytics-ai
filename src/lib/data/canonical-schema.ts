@@ -78,7 +78,14 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   snapshot_month: {
     label: "Snapshot Month",
-    aliases: ["snapshot_month", "record_month", "as_of_month", "calendar_month", "month_end"],
+    aliases: [
+      "snapshot_month",
+      "record_month",
+      "as_of_month",
+      "calendar_month",
+      "month_end",
+      "snap_dt",
+    ],
     type: "date",
   },
   workforce_status: {
@@ -180,6 +187,7 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
       "function",
       "cc_dept_by_cc",
       "cost_center_dept",
+      "org_nm",
     ],
     type: "string",
   },
@@ -190,7 +198,7 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   seniority_level: {
     label: "Seniority Level",
-    aliases: ["seniority_level", "job_level", "level", "grade"],
+    aliases: ["seniority_level", "job_level", "level", "grade", "job_lvl"],
     type: "string",
   },
   target_hires: {
@@ -200,7 +208,14 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   employee_id: {
     label: "Employee ID",
-    aliases: ["employee_id", "employee_number", "employeenumber", "pers_num", "person_id"],
+    aliases: [
+      "employee_id",
+      "employee_number",
+      "employeenumber",
+      "pers_num",
+      "person_id",
+      "worker_id",
+    ],
     type: "id",
     pii: true,
   },
@@ -233,6 +248,37 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
     label: "Termination Date",
     aliases: ["term_date", "termination_date", "term_dt", "termination_dt"],
     type: "date",
+  },
+  termination_reason: {
+    label: "Termination Reason",
+    aliases: ["termination_reason", "term_reason", "term_rsn", "exit_reason"],
+    type: "string",
+  },
+  exit_classification: {
+    label: "Exit Classification",
+    aliases: ["exit_classification", "termination_type", "exit_type", "voluntary_flag"],
+    type: "string",
+  },
+  compensation_effective_date: {
+    label: "Compensation Effective Date",
+    aliases: ["compensation_effective_date", "effective_date", "eff_dt"],
+    type: "date",
+  },
+  annual_base_salary: {
+    label: "Annual Base Salary",
+    aliases: ["annual_base_salary"],
+    type: "number",
+    pii: true,
+  },
+  salary_midpoint: {
+    label: "Salary Range Midpoint",
+    aliases: ["salary_midpoint", "range_midpoint", "grade_midpoint"],
+    type: "number",
+  },
+  compa_ratio: {
+    label: "Compa Ratio",
+    aliases: ["compa_ratio", "compa_ratio_value", "salary_positioning"],
+    type: "number",
   },
   manager_id: {
     label: "Manager ID",

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { BrandMark, PrimaryLink, SecondaryLink } from "@/components/ui";
 
 const principles = [
-  ["Strategy-first", "Start from the business outcome, not a file upload."],
+  ["Question-led", "Connect local files, then frame the People decision to answer."],
   ["Human + AI co-design", "AI proposes frameworks; people confirm definitions."],
   ["Deterministic analytics", "Code calculates. AI explains."],
   ["Local-first privacy", "Raw HR rows stay in the browser by default."],
@@ -29,12 +29,12 @@ export default function ArchitecturePage() {
         <section className="max-w-3xl">
           <p className="eyebrow">Architecture</p>
           <h1 className="mt-4 text-[36px] font-[700] leading-[1.1] tracking-[-0.04em] text-[#13203a]">
-            How the measurement system works
+            How the local-first workbench works
           </h1>
           <p className="mt-5 text-[16px] leading-7 text-[#536177]">
             People Analytics does not lack dashboards. It lacks a reliable bridge from
-            strategy to definitions, data, evidence, and action. This product is designed
-            around that chain.
+            local source data to agreed definitions, auditable evidence, and leadership
+            action. This product is designed around that chain.
           </p>
         </section>
 
@@ -61,11 +61,36 @@ export default function ArchitecturePage() {
             <div>
               <h2 className="text-[15px] font-semibold text-[#1c2b44]">Code calculates</h2>
               <ul className="mt-3 space-y-2 text-[13px] leading-6 text-[#546277]">
-                <li>Stage contribution and readiness scores</li>
-                <li>Joinability and data-health checks</li>
+                <li>DuckDB-Wasm joins, filters, aggregations, and segment comparisons</li>
+                <li>Grain, joinability, and data-health checks</li>
                 <li>Chart data, PPTX export, and audit objects</li>
               </ul>
             </div>
+          </div>
+        </section>
+
+        <section className="surface p-6">
+          <p className="eyebrow">Execution boundary</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {[
+              [
+                "Browser",
+                "Parses CSV/Excel, profiles columns, runs DuckDB-Wasm, holds raw rows, and renders exploration.",
+              ],
+              [
+                "AI service",
+                "Receives safe metadata or aggregates for five typed tasks. It never receives uploaded rows or writes executable SQL.",
+              ],
+              [
+                "Knowledge store",
+                "Supabase persists anonymous workspace ownership, mappings, approved definitions, findings, and stories under RLS.",
+              ],
+            ].map(([title, description]) => (
+              <article key={title} className="rounded-[8px] border border-[#e3e7ed] p-4">
+                <h2 className="text-[13px] font-semibold text-[#1c2b44]">{title}</h2>
+                <p className="mt-2 text-[12px] leading-5 text-[#5a677b]">{description}</p>
+              </article>
+            ))}
           </div>
         </section>
 

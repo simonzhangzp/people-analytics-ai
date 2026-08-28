@@ -11,36 +11,30 @@ import {
   LockKeyhole,
   ShieldCheck,
   Sparkles,
-  Target,
   Workflow,
 } from "lucide-react";
 import { BrandMark, PrimaryLink, SecondaryLink } from "@/components/ui";
 
 const workflow = [
   {
-    icon: Target,
-    label: "Strategy",
-    description: "Clarify the outcome and decisions that matter.",
+    icon: Database,
+    label: "Data",
+    description: "Understand grain, meaning, relationships, and gaps locally.",
   },
   {
     icon: Gauge,
     label: "Metrics",
-    description: "Agree on definitions, drivers, and guardrails.",
-  },
-  {
-    icon: Database,
-    label: "Data",
-    description: "Assess what exists, what links, and what is missing.",
+    description: "Agree on definitions before calculating an answer.",
   },
   {
     icon: BarChart3,
-    label: "Insights",
-    description: "Calculate evidence and make uncertainty visible.",
+    label: "Analysis",
+    description: "Follow a plan and branch through deterministic evidence.",
   },
   {
     icon: FileCheck2,
-    label: "Action",
-    description: "Turn evidence into decisions, pilots, and stories.",
+    label: "Story",
+    description: "Turn validated findings into an editable executive brief.",
   },
 ];
 
@@ -73,22 +67,22 @@ function ProductPreview() {
               <div className="size-5 rounded-[4px] bg-[#3157c9]" />
               <div className="h-2 w-14 rounded bg-[#dbe0e8]" />
             </div>
-            {["Strategy", "Measurement", "Data", "Analysis", "Action"].map(
+            {["Data", "Metrics", "Analysis", "Story"].map(
               (item, index) => (
                 <div
                   key={item}
                   className={`mb-1 flex h-8 items-center gap-2 rounded-[4px] px-2 ${
-                    index === 3 ? "bg-[#ebf0fb]" : ""
+                    index === 2 ? "bg-[#ebf0fb]" : ""
                   }`}
                 >
                   <span
                     className={`size-1.5 rounded-full ${
-                      index < 3 ? "bg-[#4b8b6d]" : index === 3 ? "bg-[#4164c6]" : "bg-[#c6ccd5]"
+                      index < 2 ? "bg-[#4b8b6d]" : index === 2 ? "bg-[#4164c6]" : "bg-[#c6ccd5]"
                     }`}
                   />
                   <span
                     className={`text-[7px] font-semibold ${
-                      index === 3 ? "text-[#3152a9]" : "text-[#687385]"
+                      index === 2 ? "text-[#3152a9]" : "text-[#687385]"
                     }`}
                   >
                     {item}
@@ -99,16 +93,16 @@ function ProductPreview() {
           </div>
           <div className="min-w-0 p-5">
             <div className="text-[6px] font-bold uppercase tracking-[0.12em] text-[#738097]">
-              Executive answer
+              Validated finding
             </div>
             <h3 className="mt-2 max-w-[330px] text-[14px] font-bold leading-[1.3] tracking-[-0.02em] text-[#17243f]">
-              Interview scheduling accounts for 44% of the Time to Fill gap
+              Engineering voluntary attrition increased 4.5 percentage points
             </h3>
             <div className="mt-4 grid grid-cols-3 gap-2">
               {[
-                ["59", "days current"],
-                ["45", "days target"],
-                ["14", "day gap"],
+                ["13.7%", "current period"],
+                ["9.2%", "comparison"],
+                ["+4.5pp", "validated change"],
               ].map(([value, label]) => (
                 <div key={label} className="rounded-[5px] border border-[#e3e7ed] p-2.5">
                   <div className="text-[13px] font-bold text-[#203150]">{value}</div>
@@ -118,11 +112,11 @@ function ProductPreview() {
             </div>
             <div className="mt-4 rounded-[5px] border border-[#e3e7ed] p-3">
               <div className="flex items-end gap-2">
-                {[35, 31, 68, 46, 42, 28].map((height, index) => (
+                {[31, 36, 42, 49, 58, 68].map((height, index) => (
                   <div key={index} className="flex flex-1 flex-col items-center gap-1">
                     <div
                       className={`w-full rounded-t-[2px] ${
-                        index === 2 ? "bg-[#4667c8]" : "bg-[#cfd6e3]"
+                        index === 5 ? "bg-[#4667c8]" : "bg-[#cfd6e3]"
                       }`}
                       style={{ height }}
                     />
@@ -132,7 +126,7 @@ function ProductPreview() {
               </div>
               <div className="mt-2 flex items-center gap-1 text-[6px] font-medium text-[#4f5d73]">
                 <span className="size-1.5 rounded-full bg-[#4667c8]" />
-                Interview scheduling is the largest contributor
+                68% of the increase is concentrated in 2–4 year tenure
               </div>
             </div>
           </div>
@@ -143,10 +137,10 @@ function ProductPreview() {
             </div>
             <div className="mt-4 border-l-2 border-[#6f85ca] pl-2">
               <div className="text-[6px] font-bold uppercase tracking-[0.08em] text-[#566eb3]">
-                Suggestion
+                Needs confirmation
               </div>
               <p className="mt-1 text-[7px] leading-3 text-[#687386]">
-                Lead with the 14-day gap, then show the two largest contributors.
+                Should retirement remain separate from voluntary resignation?
               </p>
             </div>
             <div className="mt-4 rounded-[5px] border border-[#dfe5f2] bg-[#f4f7fd] p-2">
@@ -187,8 +181,8 @@ export default function HomePage() {
               Architecture
             </Link>
           </nav>
-          <PrimaryLink href="/ask" className="ml-5 min-h-10 px-4" testId="header-ask">
-            Ask a file
+          <PrimaryLink href="/workbench" className="ml-5 min-h-10 px-4" testId="header-workbench">
+            Analyze my data
           </PrimaryLink>
         </div>
       </header>
@@ -200,22 +194,23 @@ export default function HomePage() {
             <div className="max-w-[620px]">
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#dce3f3] bg-white px-3 py-1.5 text-[11px] font-semibold text-[#425caa]">
                 <span className="size-1.5 rounded-full bg-[#4a69c8]" />
-                AI-native workforce intelligence
+                Local-first People analytics workbench
               </div>
               <h1 className="balanced text-[42px] font-[700] leading-[1.07] tracking-[-0.05em] text-[#13203a] sm:text-[56px]">
-                Turn People Strategy Into a{" "}
-                <span className="text-[#3157c9]">Measurement System</span>
+                Analyze My People Data{" "}
+                <span className="text-[#3157c9]">With Trusted Definitions</span>
               </h1>
               <p className="mt-6 max-w-[570px] text-[17px] leading-7 text-[#536177]">
-                Define what matters, connect the right data, generate trusted insights,
-                and move from strategy to action—with AI as your co-designer.
+                Connect local workforce files, agree on metric meaning, calculate
+                auditable evidence, and create an editable executive story—with AI as a
+                structured co-designer.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <PrimaryLink href="/ask" testId="hero-ask">
-                  Ask a People file
+                <PrimaryLink href="/workbench" testId="hero-workbench">
+                  Analyze my People data
                 </PrimaryLink>
-                <SecondaryLink href="/demo" testId="hero-demo">
-                  Try the full strategy loop
+                <SecondaryLink href="/strategy" testId="hero-strategy">
+                  Start with People strategy
                 </SecondaryLink>
               </div>
               <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 border-t border-[#dfe4eb] pt-6">
@@ -241,16 +236,16 @@ export default function HomePage() {
         <section id="how-it-works" className="border-b border-[#e6e9ee] bg-white py-20 sm:py-24">
           <div className="mx-auto max-w-[1180px] px-5 sm:px-8">
             <div className="max-w-2xl">
-              <p className="eyebrow">One connected decision system</p>
+              <p className="eyebrow">A persistent analysis workbench</p>
               <h2 className="balanced mt-4 text-[32px] font-[680] tracking-[-0.04em] text-[#14213b] sm:text-[40px]">
-                Start with the decision—not the dashboard
+                Start with meaning—not a dashboard
               </h2>
               <p className="mt-4 text-[15px] leading-7 text-[#5c697e]">
-                The platform creates a traceable path from business intent to approved
-                metrics, usable data, evidence, and accountable action.
+                The workbench creates a traceable path from local data to approved
+                definitions, defensible findings, and an executive-ready next action.
               </p>
             </div>
-            <div className="mt-12 grid overflow-hidden rounded-[10px] border border-[#dfe4ea] bg-white md:grid-cols-5">
+            <div className="mt-12 grid overflow-hidden rounded-[10px] border border-[#dfe4ea] bg-white md:grid-cols-4">
               {workflow.map((step, index) => {
                 const Icon = step.icon;
                 return (
@@ -333,15 +328,15 @@ export default function HomePage() {
                 <div>
                   <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.11em] text-[#b5c5fa]">
                     <Workflow className="size-4" />
-                    Live synthetic portfolio demo
+                    Guided synthetic attrition demo
                   </div>
                   <h2 className="balanced mt-5 max-w-2xl text-[30px] font-[680] leading-[1.15] tracking-[-0.035em] sm:text-[38px]">
-                    Diagnose why priority AI roles are missing their Time to Fill target
+                    Diagnose why Engineering voluntary attrition increased
                   </h2>
                   <p className="mt-5 max-w-2xl text-[14px] leading-6 text-[#c2cada]">
-                    Inspect the strategy, approve a metric definition, review local data
-                    readiness, run deterministic analysis, and generate a five-slide
-                    CHRO story.
+                    Inspect three related People files, separate retirement from
+                    resignation, validate a 4.5pp increase, follow tenure and compensation
+                    evidence, then export an editable leadership story.
                   </p>
                   <PrimaryLink
                     href="/demo"

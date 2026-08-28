@@ -7,7 +7,7 @@ async function walkToData(page: import("@playwright/test").Page) {
   await page.addInitScript(() => {
     window.localStorage.clear();
   });
-  await page.goto("/demo");
+  await page.goto("/strategy");
   await completeStrategyStep(page);
   await page.getByTestId("continue-measurement").click();
   await page.getByTestId("review-metric").click();

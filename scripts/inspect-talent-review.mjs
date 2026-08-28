@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import readXlsxFile, { readSheet } from "read-excel-file/node";
+import readXlsxFile from "read-excel-file/node";
 
 const path = "d:/Work Material/Red Hat/RH_PM_Talent_Review_Report_040419_FY19.xlsx";
 const bytes = readFileSync(path);

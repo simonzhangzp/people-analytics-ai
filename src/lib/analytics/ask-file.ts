@@ -212,7 +212,6 @@ function analyzeTalentReview(
   const retentionSource = source(dataset, "retention_risk");
   const appraisalSource = source(dataset, "appraisal_status");
   const objectivesSource = source(dataset, "objectives_summary");
-  const competencySource = source(dataset, "competency_summary");
   const leadershipSource = source(dataset, "leadership_area");
 
   const populationRows = dataset.rows.filter((row) =>
