@@ -19,6 +19,9 @@
 /tests/external-data/cache/
 /tests/external-data/results.local.json
 
+# Upstream Data Formulator clone (bootstrap locally; image builds from GitHub)
+/vendor/data-formulator/
+
 # Local VDM extracts: large UTF-32 snapshots and roster PII stay on disk only
 sample_data/vdm_*.csv
 
@@ -43,3 +46,18 @@ scripts/daily_job_scan/
 **/__pycache__/
 .vercel
 supabase/.temp/
+
+# People Analytics lake files stay off git
+data-platform/lake/**
+!data-platform/lake/people_bronze/
+!data-platform/lake/people_bronze/.gitkeep
+!data-platform/lake/people_silver/
+!data-platform/lake/people_silver/.gitkeep
+!data-platform/lake/people_gold/
+!data-platform/lake/people_gold/.gitkeep
+!data-platform/lake/people_metadata/
+!data-platform/lake/people_metadata/.gitkeep
+!data-platform/lake/people_archive/
+!data-platform/lake/people_archive/.gitkeep
+!data-platform/lake/people_logs/
+!data-platform/lake/people_logs/.gitkeep
