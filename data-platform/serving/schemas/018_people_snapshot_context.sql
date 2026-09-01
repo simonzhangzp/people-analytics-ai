@@ -160,11 +160,23 @@ begin
     'checked_at', t.checked_at
   ) order by t.checked_at desc), '[]'::jsonb)
   into tests
-  from public.people_quality_test_results t
-  where case
-    when snapshot_key = 'current' then t.test_name is distinct from 'apac_hris_volume'
-    else true
-  end;
+  from (
+    select distinct on (t.test_name)
+      t.test_name,
+      t.test_group,
+      t.status,
+      t.observed_value,
+      t.expected_value,
+      t.details,
+      t.source_name,
+      t.checked_at
+    from public.people_quality_test_results t
+    where case
+      when snapshot_key = 'current' then t.test_name is distinct from 'apac_hris_volume'
+      else true
+    end
+    order by t.test_name, t.checked_at desc
+  ) t;
 
   return jsonb_build_object('tests', tests, 'snapshot_id', snapshot_key);
 end;
