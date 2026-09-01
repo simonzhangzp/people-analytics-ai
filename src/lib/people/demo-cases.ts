@@ -5,7 +5,7 @@ export const CASES = [
     question: "Can I trust this number?",
     subtitle: "Governed People Data",
     description:
-      "See how a Headcount metric moves from source systems through data quality, metric definitions and lineage into trusted reporting.",
+      "See how a workforce metric moves from source systems through data quality, definitions and lineage into trusted reporting.",
   },
   {
     id: "incident" as const,
@@ -13,7 +13,7 @@ export const CASES = [
     question: "Why did Headcount suddenly drop?",
     subtitle: "Data Quality & Lineage",
     description:
-      "Investigate an apparent APAC workforce decline and discover that it is a failed HRIS feed rather than a business change.",
+      "Investigate an apparent workforce decline and distinguish a data-pipeline failure from a real business event.",
   },
   {
     id: "attrition" as const,
@@ -21,7 +21,7 @@ export const CASES = [
     question: "Why is Engineering attrition increasing?",
     subtitle: "Workforce Intelligence + AI",
     description:
-      "Move from a governed attrition definition through segmentation, evidence and potential workforce actions.",
+      "Move from a governed attrition definition through segmentation, evidence, skill context and leadership actions.",
   },
 ];
 

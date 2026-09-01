@@ -119,6 +119,7 @@ def main() -> None:
         SCHEMA_DIR / "015_people_serving.sql",
         SCHEMA_DIR / "016_people_rpcs.sql",
         SCHEMA_DIR / "017_people_serving_snapshot.sql",
+        SCHEMA_DIR / "018_people_snapshot_context.sql",
     ]
     with connect() as conn:
         assert_people_project(conn)

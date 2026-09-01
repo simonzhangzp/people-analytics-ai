@@ -1,24 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { BrandMark, SecondaryLink } from "@/components/ui";
+import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { CASES } from "@/lib/people/demo-cases";
-
-export function DemoHeader() {
-  return (
-    <header className="border-b border-[#e3e7ed] bg-white">
-      <div className="mx-auto flex h-16 max-w-[980px] items-center gap-3 px-5 sm:px-8">
-        <Link href="/" aria-label="People Analytics home">
-          <BrandMark />
-        </Link>
-        <div className="ml-auto flex items-center gap-3">
-          <SecondaryLink href="/architecture">Architecture</SecondaryLink>
-          <SecondaryLink href="/">Home</SecondaryLink>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 export function CaseSelector({ active }: { active?: "trust" | "incident" | "attrition" }) {
   return (
@@ -46,45 +30,19 @@ export function CaseSelector({ active }: { active?: "trust" | "incident" | "attr
 export function WhyIBuiltThis() {
   return (
     <section className="mt-16 border-t border-[#e3e7ed] pt-10" data-testid="why-i-built-this">
-      <p className="eyebrow">Portfolio</p>
-      <h2 className="mt-3 text-[22px] font-bold tracking-[-0.03em] text-[#13203a]">Why I Built This</h2>
+      <p className="eyebrow">Why this matters</p>
+      <h2 className="mt-3 text-[22px] font-bold tracking-[-0.03em] text-[#13203a]">Why I built this</h2>
       <p className="mt-4 max-w-3xl text-[15px] leading-7 text-[#546277]">
         Building enterprise People Analytics taught me that trusted decisions start long
-        before the dashboard. Metrics need consistent definitions, data needs clear
-        ownership and quality controls, and complex workforce data needs a reliable
-        foundation before AI can reason over it.
+        before the dashboard. Strong models do not fix inconsistent metrics, broken source
+        data, unclear ownership or missing lineage. AI makes this foundation more important,
+        not less.
       </p>
       <p className="mt-3 max-w-3xl text-[15px] leading-7 text-[#546277]">
-        This demo brings those layers together: governed People data, advanced workforce
-        analytics, and AI-assisted decision support.
+        PeopleAnalyticsAI explores what an AI-ready People Analytics stack looks like when
+        governed data, advanced analytics and AI are designed together.
       </p>
-      <ol className="mt-6 flex flex-wrap items-center gap-2 text-[12px] font-semibold text-[#1c2b44]">
-        {["HR Domain", "Data Science / ML", "Data Foundation & Governance", "People AI"].map(
-          (step, index) => (
-            <li key={step} className="flex items-center gap-2">
-              {index > 0 ? <span className="text-[#9aa7b8]">→</span> : null}
-              <span className="rounded-[6px] border border-[#e3e7ed] bg-white px-3 py-2">{step}</span>
-            </li>
-          ),
-        )}
-      </ol>
     </section>
-  );
-}
-
-export function DemoFooter() {
-  return (
-    <footer className="mt-12 border-t border-[#e3e7ed] py-6 text-[12px] text-[#667085]">
-      <div className="flex flex-wrap gap-4">
-        <Link href="/enterprise-demo" className="hover:text-[#2f4fa9]">
-          Case studies
-        </Link>
-        <Link href="/architecture" className="hover:text-[#2f4fa9]">
-          Architecture
-        </Link>
-        <span>GlobalTech is a synthetic enterprise dataset, not a real company.</span>
-      </div>
-    </footer>
   );
 }
 
@@ -97,13 +55,12 @@ export function DemoShell({
 }) {
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-[#111827]">
-      <DemoHeader />
+      <SiteHeader active="/enterprise-demo" />
       <div className="mx-auto max-w-[980px] px-5 py-8 sm:px-8">
         <CaseSelector active={active} />
         <div className="mt-8">{children}</div>
-        <WhyIBuiltThis />
-        <DemoFooter />
       </div>
+      <SiteFooter />
     </div>
   );
 }
@@ -111,7 +68,7 @@ export function DemoShell({
 export function ServingUnavailable() {
   return (
     <div className="min-h-screen bg-[#f7f8fa]">
-      <DemoHeader />
+      <SiteHeader active="/enterprise-demo" />
       <main className="mx-auto max-w-3xl px-5 py-16">
         <p className="eyebrow">Enterprise demo</p>
         <h1 className="mt-3 text-[32px] font-bold tracking-[-0.04em] text-[#13203a]">
@@ -122,6 +79,7 @@ export function ServingUnavailable() {
           staging project to load certified marts.
         </p>
       </main>
+      <SiteFooter />
     </div>
   );
 }

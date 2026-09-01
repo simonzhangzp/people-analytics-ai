@@ -62,9 +62,9 @@ const PLAYBOOKS: Array<{ match: RegExp; tools: PeopleToolCall[] }> = [
   {
     match: /apac headcount|workforce change|metrics were affected|lineage show/i,
     tools: [
-      { name: "get_quality_incidents" },
-      { name: "get_source_health" },
-      { name: "trace_lineage", args: { metric_id: "headcount" } },
+      { name: "get_quality_incidents", args: { snapshot_id: "incident_replay" } },
+      { name: "get_source_health", args: { snapshot_id: "incident_replay" } },
+      { name: "trace_lineage", args: { metric_id: "headcount", snapshot_id: "incident_replay" } },
     ],
   },
   {

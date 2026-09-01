@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { DemoShell, ServingUnavailable } from "@/components/enterprise-demo/DemoShell";
 import { FollowUpAsk } from "@/components/enterprise-demo/FollowUpAsk";
 import { MetricDefinitionButton } from "@/components/enterprise-demo/MetricDefinitionButton";
@@ -15,6 +16,8 @@ export default async function TrustCasePage() {
   const freshness = data.metric.freshness as Record<string, unknown> | undefined;
   const fresh = String(freshness?.freshness_status ?? "healthy") !== "failed";
   const lineageSteps = headcountLineageSteps(data.lineage);
+  const lineageQuality = String(data.lineage.quality_status ?? "healthy");
+  const publishStatus = String(data.lineage.publish_status ?? "published");
 
   return (
     <DemoShell active="trust">
@@ -54,11 +57,20 @@ export default async function TrustCasePage() {
           <div className="mt-4">
             <MetricDefinitionButton definition={data.definition} />
           </div>
+          <p className="mt-4">
+            <Link
+              href="/enterprise-demo/incident"
+              className="text-[12px] font-semibold text-[#667085] hover:text-[#3157c9]"
+              data-testid="historical-incidents"
+            >
+              View historical incidents
+            </Link>
+          </p>
         </div>
 
         <div className="mt-8">
-          <p className="eyebrow">How the number is produced</p>
-          <ol className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+          <p className="eyebrow">Lineage</p>
+          <ol className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center" data-testid="trust-lineage">
             {lineageSteps.map((step, index) => (
               <li key={step.label} className="flex items-center gap-2 text-[13px] font-semibold text-[#1c2b44]">
                 {index > 0 ? <span className="hidden text-[#9aa7b8] sm:inline">→</span> : null}
@@ -69,72 +81,53 @@ export default async function TrustCasePage() {
               </li>
             ))}
           </ol>
+          <p className="mt-3 text-[12px] text-[#667085]">
+            Quality {lineageQuality} · Publish {publishStatus.replaceAll("_", " ")}
+          </p>
         </div>
 
-        <div className="mt-8 space-y-3">
-          <details className="surface p-4">
-            <summary className="cursor-pointer text-[14px] font-semibold text-[#1c2b44]">
-              Metric Definition
-            </summary>
-            <dl className="mt-3 space-y-3 text-[13px] leading-6 text-[#546277]">
-              <div>
-                <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
-                  Business definition
-                </dt>
-                <dd className="mt-1">{String(data.definition.business_definition)}</dd>
-              </div>
-              <div>
-                <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Formula</dt>
-                <dd className="mt-1 font-mono text-[12px] text-[#3e4c61]">
-                  {String(data.definition.formula ?? data.definition.formula_sql)}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Population</dt>
-                <dd className="mt-1">{String(data.definition.population_rules ?? "—")}</dd>
-              </div>
-              <div>
-                <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Exclusions</dt>
-                <dd className="mt-1">{String(data.definition.exclusions ?? "—")}</dd>
-              </div>
-              <div>
-                <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Time logic</dt>
-                <dd className="mt-1">{String(data.definition.time_logic ?? "—")}</dd>
-              </div>
-              <div>
-                <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Owner</dt>
-                <dd className="mt-1">{String(data.definition.owner ?? "People Analytics")}</dd>
-              </div>
-              <div>
-                <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Version</dt>
-                <dd className="mt-1">{String(data.definition.version ?? 1)}</dd>
-              </div>
-            </dl>
-          </details>
-          <details className="surface p-4">
-            <summary className="cursor-pointer text-[14px] font-semibold text-[#1c2b44]">
-              Data Lineage
-            </summary>
-            <pre className="mt-3 overflow-auto text-[11px] leading-5 text-[#546277]">
-              {JSON.stringify(data.lineage, null, 2)}
-            </pre>
-          </details>
-          <details className="surface p-4">
-            <summary className="cursor-pointer text-[14px] font-semibold text-[#1c2b44]">
-              Quality Tests
-            </summary>
-            <ul className="mt-3 space-y-1 text-[13px] text-[#546277]">
-              {data.tests.slice(0, 12).map((row) => (
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <section className="surface p-4">
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Definition</p>
+            <p className="mt-2 text-[13px] leading-6 text-[#546277]">
+              {String(data.definition.business_definition)}
+            </p>
+            <p className="mt-2 font-mono text-[11px] text-[#3e4c61]">
+              {String(data.definition.formula ?? data.definition.formula_sql)}
+            </p>
+          </section>
+          <section className="surface p-4" data-testid="quality-tests">
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Quality</p>
+            <ul className="mt-2 space-y-1 text-[13px] text-[#546277]">
+              {data.tests.slice(0, 10).map((row) => (
                 <li key={`${row.test_name}-${row.checked_at ?? ""}`}>
                   {row.status === "passed" ? "Pass" : "Fail"} · {row.test_name}
                 </li>
               ))}
             </ul>
-            <p className="mt-2 text-[12px] text-[#667085]">
-              The APAC volume failure belongs to incident replay, not this published snapshot.
-            </p>
-          </details>
+            {data.tests.some((row) => row.status !== "passed") ? null : (
+              <p className="mt-2 text-[12px] text-[#2f7659]">All tests in this trusted snapshot passed.</p>
+            )}
+          </section>
         </div>
+
+        <details className="surface mt-8 p-4">
+          <summary className="cursor-pointer text-[14px] font-semibold text-[#1c2b44]">
+            Technical details
+          </summary>
+          <pre className="mt-3 overflow-auto text-[11px] leading-5 text-[#546277]">
+            {JSON.stringify(
+              {
+                snapshot: data.snapshot,
+                lineage: data.lineage,
+                sourceHealth: data.sourceHealth,
+                tests: data.tests,
+              },
+              null,
+              2,
+            )}
+          </pre>
+        </details>
         <FollowUpAsk demoCase="trust" />
       </article>
     </DemoShell>

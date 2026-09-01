@@ -100,22 +100,23 @@ export default async function AttritionCasePage() {
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           <section className="surface p-4" data-testid="observed-evidence">
             <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
-              Observed evidence
+              What we know
             </p>
             <ul className="mt-2 space-y-2 text-[13px] leading-6 text-[#3e4c61]">
-              <li>Attrition is not uniform across Engineering locations, levels, or tenure.</li>
-              <li>The same slices can be compared to mobility and pay position from certified marts.</li>
+              <li>The voluntary attrition definition, period, and grain are certified.</li>
+              <li>Rates are not uniform across Engineering locations, levels, or tenure.</li>
+              <li>Mobility, pay position, and skill coverage are available as related signals, not causes.</li>
             </ul>
           </section>
-          <section className="surface p-4">
+          <section className="surface p-4" data-testid="unknown-evidence">
             <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
-              Possible explanations
+              What we do not know
             </p>
             <p className="mt-2 text-[12px] text-[#8a571c]">Hypotheses, not proven causes.</p>
             <ul className="mt-2 space-y-2 text-[13px] leading-6 text-[#546277]">
-              <li>Local labor-market pressure may concentrate exits in a few sites.</li>
-              <li>Low internal mobility can coincide with higher attrition without proving substitution.</li>
-              <li>Pay vs midpoint may matter in high-cost locations; the mart shows association only.</li>
+              <li>Why a specific employee left — the mart does not contain exit-interview text.</li>
+              <li>Whether pay, mobility, or skill gaps caused the pattern. They can only be compared.</li>
+              <li>Whether a local labor-market shock is operating outside this dataset.</li>
             </ul>
           </section>
         </div>
@@ -142,7 +143,7 @@ export default async function AttritionCasePage() {
           <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
             Relevant learning (Microsoft Learn)
           </p>
-          <ul className="mt-2 space-y-2 text-[13px]">
+          <ul className="mt-2 space-y-2 text-[13px]" data-testid="learning-recs">
             {recs.slice(0, 5).map((row) => (
               <li key={String(row.content_id)}>
                 <a

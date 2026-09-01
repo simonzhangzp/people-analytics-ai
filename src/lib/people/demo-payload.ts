@@ -31,9 +31,9 @@ export async function loadTrustCase() {
     peopleServing.getServingSnapshot("current"),
     peopleServing.getMetric("headcount", { jobFamily: "Engineering" }),
     peopleServing.getMetricDefinition("headcount"),
-    peopleServing.traceLineage("headcount"),
-    peopleServing.getSourceHealth(),
-    peopleServing.listQualityTests(),
+    peopleServing.traceLineage("headcount", "current"),
+    peopleServing.getSourceHealth("current"),
+    peopleServing.listQualityTests("current"),
   ]);
   return {
     snapshot: asRecord(snapshot),
@@ -49,10 +49,10 @@ export async function loadIncidentCase() {
   const [snapshot, current, incidents, sourceHealth, lineage, tests] = await Promise.all([
     peopleServing.getServingSnapshot("incident_replay"),
     peopleServing.getServingSnapshot("current"),
-    peopleServing.getQualityIncidents(),
-    peopleServing.getSourceHealth(),
-    peopleServing.traceLineage("headcount"),
-    peopleServing.listQualityTests(),
+    peopleServing.getQualityIncidents("incident_replay"),
+    peopleServing.getSourceHealth("incident_replay"),
+    peopleServing.traceLineage("headcount", "incident_replay"),
+    peopleServing.listQualityTests("incident_replay"),
   ]);
   const incidentList = asList(asRecord(incidents).incidents);
   const apac =
@@ -72,13 +72,20 @@ export function attritionHeadline(retention: Record<string, unknown>) {
   const trend = asList(asRecord(retention.trend).points);
   const current = Number(metric.value);
   const previous = trend.length >= 2 ? Number(trend[trend.length - 2]?.value) : NaN;
-  const deltaPp = Number.isFinite(current) && Number.isFinite(previous) ? (current - previous) * 100 : null;
+  const deltaPp =
+    Number.isFinite(current) && Number.isFinite(previous) ? (current - previous) * 100 : null;
   const byLocation = asList(retention.by_location);
   const top = byLocation[0];
-  const deltaLabel =
-    deltaPp == null ? "changed" : `${deltaPp >= 0 ? "+" : ""}${deltaPp.toFixed(1)} pp`;
   const where = top?.location_id ? String(top.location_id) : "a small set of locations";
-  return `Engineering voluntary attrition ${deltaLabel}, concentrated primarily in ${where}.`;
+  const rateLabel = Number.isFinite(current) ? `${(current * 100).toFixed(1)}%` : "n/a";
+  if (deltaPp == null) {
+    return `Engineering monthly voluntary attrition is ${rateLabel}, concentrated primarily in ${where}.`;
+  }
+  if (Math.abs(deltaPp) < 0.25) {
+    return `Engineering monthly voluntary attrition is ${rateLabel} and roughly unchanged versus last month, concentrated primarily in ${where}.`;
+  }
+  const deltaLabel = `${deltaPp >= 0 ? "+" : ""}${deltaPp.toFixed(1)} pp`;
+  return `Engineering voluntary attrition ${deltaLabel} month-over-month, concentrated primarily in ${where}.`;
 }
 
 export async function loadAttritionCase() {
@@ -102,12 +109,18 @@ export async function loadAttritionCase() {
     peopleServing.getMetricDefinition("voluntary_attrition"),
   ]);
   const retentionRecord = asRecord(retention);
+  const recPayload = asRecord(recommendations);
   return {
     snapshot: asRecord(snapshot),
     retention: retentionRecord,
     mobility: asRecord(mobility),
     skills: asRecord(skills),
-    recommendations: asRecord(recommendations),
+    recommendations: {
+      ...recPayload,
+      recommendations: asList(recPayload.recommendations).filter(
+        (row) => !/minecraft|makecode|k-?12|for kids|minigame|hour of code/i.test(String(row.title ?? "")),
+      ),
+    },
     span: asRecord(span),
     engagement: asRecord(engagement),
     definition: asRecord(definition),

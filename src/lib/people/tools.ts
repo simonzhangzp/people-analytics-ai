@@ -19,6 +19,8 @@ export interface PeopleToolCall {
 
 export async function runPeopleTool(call: PeopleToolCall): Promise<unknown> {
   const args = call.args ?? {};
+  const snapshot =
+    args.snapshot_id === "incident_replay" ? "incident_replay" : "current";
   const jobFamily = typeof args.job_family === "string" ? args.job_family : undefined;
   const metricId = typeof args.metric_id === "string" ? args.metric_id : undefined;
   const skillId = typeof args.skill_id === "string" ? args.skill_id : undefined;
@@ -38,12 +40,12 @@ export async function runPeopleTool(call: PeopleToolCall): Promise<unknown> {
       if (!metricId) throw new Error("metric_id is required");
       return peopleServing.getMetricBreakdown(metricId, dimension, { jobFamily });
     case "get_source_health":
-      return peopleServing.getSourceHealth();
+      return peopleServing.getSourceHealth(snapshot);
     case "get_quality_incidents":
-      return peopleServing.getQualityIncidents();
+      return peopleServing.getQualityIncidents(snapshot);
     case "trace_lineage":
       if (!metricId) throw new Error("metric_id is required");
-      return peopleServing.traceLineage(metricId);
+      return peopleServing.traceLineage(metricId, snapshot);
     case "get_workforce_analysis":
       return peopleServing.getRetentionAnalysis(jobFamily ?? "Engineering");
     case "get_skill_gap":

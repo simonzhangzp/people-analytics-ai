@@ -88,25 +88,24 @@ export const peopleServing = {
       p_job_family: jobFamily,
       p_skill_id: skillId ?? null,
     }),
-  getSourceHealth: () => peopleRpc(PEOPLE_RPC.getSourceHealth),
-  getQualityIncidents: () => peopleRpc(PEOPLE_RPC.getQualityIncidents),
-  traceLineage: (metricId: string) =>
-    peopleRpc(PEOPLE_RPC.traceMetricLineage, { p_metric_id: metricId }),
+  getQualityIncidents: (snapshotId: "current" | "incident_replay" = "current") =>
+    peopleRpc(PEOPLE_RPC.getQualityIncidents, { p_snapshot_id: snapshotId }),
+  getSourceHealth: (snapshotId: "current" | "incident_replay" = "current") =>
+    peopleRpc(PEOPLE_RPC.getSourceHealth, { p_snapshot_id: snapshotId }),
+  traceLineage: (metricId: string, snapshotId: "current" | "incident_replay" = "current") =>
+    peopleRpc(PEOPLE_RPC.traceMetricLineage, {
+      p_metric_id: metricId,
+      p_snapshot_id: snapshotId,
+    }),
   getDataFoundation: () => peopleRpc(PEOPLE_RPC.getDataFoundation),
   getPlatformFacts: () => peopleRpc(PEOPLE_RPC.getPlatformFacts),
   getServingSnapshot: (snapshotId: "current" | "incident_replay" = "current") =>
     peopleRpc(PEOPLE_RPC.getServingSnapshot, { p_snapshot_id: snapshotId }),
-  listQualityTests: async (): Promise<QualityTestRow[]> => {
-    const client = servingClient();
-    const { data, error } = await client
-      .from("people_quality_test_results")
-      .select(
-        "test_name, test_group, status, observed_value, expected_value, details, source_name, checked_at",
-      )
-      .order("checked_at", { ascending: false })
-      .limit(40);
-    if (error) throw new PeopleServingError(error.message);
-    return (data ?? []) as QualityTestRow[];
+  listQualityTests: async (snapshotId: "current" | "incident_replay" = "current") => {
+    const payload = await peopleRpc<{ tests?: QualityTestRow[] }>(PEOPLE_RPC.getQualityTests, {
+      p_snapshot_id: snapshotId,
+    });
+    return payload.tests ?? [];
   },
 };
 

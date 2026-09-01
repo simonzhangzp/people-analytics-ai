@@ -38,12 +38,22 @@ def main() -> int:
     engineering = _rpc("select public.people_get_metric('headcount', null, 'Engineering')")
     assert engineering["value"] >= 0
 
-    incidents = _rpc("select public.people_get_quality_incidents()")
+    incidents = _rpc("select public.people_get_quality_incidents('current')")
     apac = next(
         (item for item in incidents["incidents"] if item["incident_id"] == "people-incident-apac-hris-incomplete"),
         None,
     )
-    assert apac is not None, incidents
+    assert apac is None, incidents
+    replay_incidents = _rpc("select public.people_get_quality_incidents('incident_replay')")
+    apac = next(
+        (
+            item
+            for item in replay_incidents["incidents"]
+            if item["incident_id"] == "people-incident-apac-hris-incomplete"
+        ),
+        None,
+    )
+    assert apac is not None, replay_incidents
     assert apac["business_change"] is False
     assert headcount["quality_status"] == "healthy", headcount
     assert headcount["trusted"] is True
@@ -56,8 +66,37 @@ def main() -> int:
     assert current_snapshot["quality_mode"] == "trusted", current_snapshot
     assert current_snapshot["headcount_quality"] == "healthy", current_snapshot
 
-    lineage = _rpc("select public.people_trace_metric_lineage('headcount')")
+    current_tests = _rpc("select public.people_get_quality_tests('current')")
+    assert all(item["test_name"] != "apac_hris_volume" for item in current_tests["tests"]), current_tests
+    replay_tests = _rpc("select public.people_get_quality_tests('incident_replay')")
+    assert any(
+        item["test_name"] == "apac_hris_volume" and item["status"] == "failed"
+        for item in replay_tests["tests"]
+    ), replay_tests
+
+    current_health = _rpc("select public.people_get_source_health('current')")
+    assert all(item["quality_status"] == "healthy" for item in current_health["sources"]), current_health
+    replay_health = _rpc("select public.people_get_source_health('incident_replay')")
+    synthetic = next(
+        item
+        for item in replay_health["sources"]
+        if item["source_name"] == "people_synthetic_globaltech"
+    )
+    assert synthetic["quality_status"] == "unhealthy", synthetic
+
+    lineage = _rpc("select public.people_trace_metric_lineage('headcount', 'current')")
     assert "people_mart_workforce_overview" in lineage["downstream_marts"]
+    assert lineage["quality_status"] == "healthy", lineage
+    assert lineage["publish_status"] == "published", lineage
+    replay_lineage = _rpc("select public.people_trace_metric_lineage('headcount', 'incident_replay')")
+    assert replay_lineage["quality_status"] == "unhealthy", replay_lineage
+    assert replay_lineage["publish_status"] == "not_published", replay_lineage
+    assert replay_lineage["freshness"]["freshness_status"] == "failed", replay_lineage
+
+    recs = _rpc("select public.people_get_learning_recommendations('Engineering', 'skill_python')")
+    titles = [str(item.get("title", "")).lower() for item in recs["recommendations"]]
+    assert titles, recs
+    assert not any("minecraft" in title or "makecode" in title or "k-12" in title for title in titles), titles
 
     validation = _rpc("select public.people_validate_certified_metrics()")
     assert int(validation["failed"]) == 0, validation

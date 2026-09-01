@@ -20,10 +20,10 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
       {!compact && (
         <div>
           <div className="text-[14px] font-[680] leading-none tracking-[-0.01em] text-[#15213b]">
-            People Strategy
+            PeopleAnalyticsAI
           </div>
           <div className="mt-1 text-[10px] font-semibold uppercase leading-none tracking-[0.14em] text-[#718096]">
-            Intelligence
+            Enterprise People Data & AI
           </div>
         </div>
       )}

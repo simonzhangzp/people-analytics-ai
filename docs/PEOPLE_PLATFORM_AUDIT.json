@@ -1,0 +1,3738 @@
+{
+  "generated_at": "2026-08-31",
+  "quantreview_untouched": true,
+  "lake": {
+    "exists": true,
+    "path": "D:\\Job_Application\\data-platform\\lake",
+    "files": 85,
+    "by_layer": {
+      "people_metadata": 2,
+      "people_silver": 20,
+      "people_gold": 21,
+      "people_bronze": 33,
+      "people_archive": 6,
+      "people_logs": 3
+    },
+    "latest_partition": {
+      "people_silver": "2026-08-30",
+      "people_gold": "2026-08-30",
+      "people_bronze": "2026-08-30",
+      "people_archive": "2026-08-30"
+    },
+    "directories": [
+      "D:/Job_Application/data-platform/lake/people_archive/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_bronze/people_ats/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_bronze/people_bls/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_bronze/people_compensation/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_bronze/people_engagement/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_bronze/people_hris/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_bronze/people_lms/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_bronze/people_microsoft_learn/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_bronze/people_onet/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_bronze/people_performance/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_gold/people_bls/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_gold/people_globaltech/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_gold/people_microsoft_learn/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_logs",
+      "D:/Job_Application/data-platform/lake/people_metadata",
+      "D:/Job_Application/data-platform/lake/people_silver/people_ats/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_silver/people_bls/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_silver/people_compensation/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_silver/people_engagement/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_silver/people_hris/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_silver/people_lms/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_silver/people_microsoft_learn/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_silver/people_onet/year=2026/month=08/day=30",
+      "D:/Job_Application/data-platform/lake/people_silver/people_performance/year=2026/month=08/day=30"
+    ]
+  },
+  "pass_fail": {
+    "pipeline": "PASS",
+    "data_freshness": "PASS",
+    "data_quality": "PASS",
+    "metric_definitions": "PASS",
+    "metric_calculations": "PASS",
+    "snapshot_context": "PASS",
+    "lineage": "PASS",
+    "skills": "PASS",
+    "learning_recommendations": "PASS",
+    "serving_apis": "PASS",
+    "ai_tools": "PASS",
+    "attrition_realism": "PASS"
+  },
+  "metrics": [
+    {
+      "metric": "average_headcount",
+      "name": "Average Headcount",
+      "formula": "avg(monthly_sum_headcount) from people_mart_workforce_overview over last 12 months",
+      "grain": "org \u00d7 job_family \u00d7 location \u00d7 trailing 12 months",
+      "time_logic": "Trailing 12 month-end snapshots",
+      "expected": 53893.5,
+      "actual": 53893.5,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "count",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "compa_ratio",
+      "name": "Compa-Ratio",
+      "formula": "avg(mean_compa_ratio) from people_mart_compensation",
+      "grain": "job_family \u00d7 location \u00d7 month",
+      "time_logic": "Month-end snapshot",
+      "expected": 0.9409238807368545,
+      "actual": 0.9409238807368545,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "ratio",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "critical_skill_gap",
+      "name": "Critical Skill Gap",
+      "formula": "avg(gap_rate) from people_mart_skills where is_critical",
+      "grain": "job_family \u00d7 skill \u00d7 month",
+      "time_logic": "Month-end snapshot",
+      "expected": 0.7668384104234073,
+      "actual": 0.7668384104234073,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "engagement_score",
+      "name": "Engagement Score",
+      "formula": "avg(engagement_score) from people_mart_manager_effectiveness",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "time_logic": "Survey cycle date rolled to month",
+      "expected": null,
+      "actual": null,
+      "difference": null,
+      "status": "WARN",
+      "quality": "healthy",
+      "unit": "score",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "headcount",
+      "name": "Headcount",
+      "formula": "sum(headcount) from people_mart_workforce_overview where as_of_month = :as_of",
+      "grain": "org \u00d7 job_family \u00d7 location \u00d7 month",
+      "time_logic": "Month-end snapshot",
+      "expected": 51232.0,
+      "actual": 51232.0,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "count",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "hires",
+      "name": "Hires",
+      "formula": "sum(hires) from people_mart_workforce_overview where as_of_month = :as_of",
+      "grain": "org \u00d7 job_family \u00d7 location \u00d7 month",
+      "time_logic": "Calendar month of hire_date",
+      "expected": 71.0,
+      "actual": 71.0,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "count",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "internal_mobility_rate",
+      "name": "Internal Mobility Rate",
+      "formula": "sum(promotions + lateral_moves)/nullif(population,0) from people_mart_internal_mobility",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "time_logic": "Calendar month",
+      "expected": 0.007998400319936013,
+      "actual": 0.007998400319936013,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "learning_completion_rate",
+      "name": "Learning Completion Rate",
+      "formula": "avg(completion_rate) from people_mart_learning",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "time_logic": "Calendar month of completed_on",
+      "expected": 0.15322056351959804,
+      "actual": 0.15322056351959804,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "learning_hours_per_employee",
+      "name": "Learning Hours per Employee",
+      "formula": "avg(learning_hours_per_employee) from people_mart_learning",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "time_logic": "Calendar month",
+      "expected": 0.6407704288440668,
+      "actual": 0.6407704288440668,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "hours",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "learning_participation",
+      "name": "Learning Participation",
+      "formula": "avg(participation_rate) from people_mart_learning",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "time_logic": "Calendar month of enrolled_on",
+      "expected": 0.12411694687160059,
+      "actual": 0.12411694687160059,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "manager_turnover_rate",
+      "name": "Manager Turnover Rate",
+      "formula": "avg(manager_turnover_rate) from people_mart_manager_effectiveness",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "time_logic": "Calendar month",
+      "expected": 0.0004658883454389253,
+      "actual": 0.0004658883454389253,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "offer_acceptance_rate",
+      "name": "Offer Acceptance Rate",
+      "formula": "avg(offer_acceptance_rate) from people_mart_recruiting",
+      "grain": "job_family \u00d7 location \u00d7 week",
+      "time_logic": "Week ending as_of_week",
+      "expected": 0.5027173913043478,
+      "actual": 0.5027173913043478,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "promotion_rate",
+      "name": "Promotion Rate",
+      "formula": "sum(promotions)/nullif(sum(headcount_like),0) from people_mart_internal_mobility",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "time_logic": "Calendar month of event_date",
+      "expected": 0.0038392321535692863,
+      "actual": 0.0038392321535692863,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "quality_of_hire",
+      "name": "Quality of Hire",
+      "formula": "avg(quality_of_hire_index) from people_mart_recruiting",
+      "grain": "job_family \u00d7 location \u00d7 week",
+      "time_logic": "As-of week vs hire_date + 12 months",
+      "expected": 0.6272198648436272,
+      "actual": 0.6272198648436272,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "regrettable_attrition",
+      "name": "Regrettable Attrition Rate",
+      "formula": "sum(regrettable_exits)/nullif(sum(beginning_headcount),0) from people_mart_retention",
+      "grain": "org \u00d7 job_family \u00d7 location \u00d7 month",
+      "time_logic": "Calendar month",
+      "expected": 0.006931427678850359,
+      "actual": 0.006931427678850359,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "skill_coverage",
+      "name": "Skill Coverage",
+      "formula": "avg(internal_coverage_rate) from people_mart_skills",
+      "grain": "job_family \u00d7 skill \u00d7 month",
+      "time_logic": "Month-end snapshot",
+      "expected": 0.23404141513244656,
+      "actual": 0.23404141513244656,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "span_of_control",
+      "name": "Span of Control",
+      "formula": "avg(span_of_control) from people_mart_manager_effectiveness",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "time_logic": "Month-end snapshot",
+      "expected": 9.039954876086515,
+      "actual": 9.039954876086515,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "count",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "time_in_stage",
+      "name": "Time in Stage",
+      "formula": "avg(time_in_stage_days) from people_mart_recruiting",
+      "grain": "job_family \u00d7 location \u00d7 week",
+      "time_logic": "Week ending as_of_week",
+      "expected": 9.324301958758124,
+      "actual": 9.324301958758124,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "days",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "time_to_fill",
+      "name": "Time to Fill",
+      "formula": "avg(time_to_fill_days) from people_mart_recruiting",
+      "grain": "job_family \u00d7 location \u00d7 week",
+      "time_logic": "Week ending as_of_week",
+      "expected": 21.0,
+      "actual": 21.0,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "days",
+      "as_of": "2026-08-01"
+    },
+    {
+      "metric": "voluntary_attrition",
+      "name": "Voluntary Attrition Rate",
+      "formula": "sum(voluntary_exits)/nullif(sum(beginning_headcount),0) from people_mart_retention",
+      "grain": "org \u00d7 job_family \u00d7 location \u00d7 month",
+      "time_logic": "Calendar month",
+      "expected": 0.018275538894095594,
+      "actual": 0.018275538894095594,
+      "difference": 0.0,
+      "status": "PASS",
+      "quality": "healthy",
+      "unit": "rate",
+      "as_of": "2026-08-01"
+    }
+  ],
+  "attrition": {
+    "latest_month": "2026-08-01",
+    "engineering_metric": {
+      "unit": "rate",
+      "as_of": "2026-08-01",
+      "value": 0.019324853228962817,
+      "org_id": null,
+      "trusted": true,
+      "freshness": {
+        "source_period": "2026-08-01",
+        "source_tables": [
+          "people_hris"
+        ],
+        "last_success_at": "2026-08-31T02:15:52.796966+00:00",
+        "freshness_status": "healthy"
+      },
+      "metric_id": "voluntary_attrition",
+      "job_family": "Engineering",
+      "provenance": "synthetic_internal",
+      "location_id": null,
+      "source_period": "2026-08-01",
+      "quality_status": "healthy"
+    },
+    "monthly_trend": [
+      {
+        "as_of": "2021-08-01",
+        "exits": 219.0,
+        "beginning": 48475.0,
+        "rate": 0.004517792676637442
+      },
+      {
+        "as_of": "2021-09-01",
+        "exits": 182.0,
+        "beginning": 48716.0,
+        "rate": 0.00373593891124066
+      },
+      {
+        "as_of": "2021-10-01",
+        "exits": 207.0,
+        "beginning": 48928.0,
+        "rate": 0.004230706344015697
+      },
+      {
+        "as_of": "2021-11-01",
+        "exits": 216.0,
+        "beginning": 49160.0,
+        "rate": 0.004393816110659072
+      },
+      {
+        "as_of": "2021-12-01",
+        "exits": 237.0,
+        "beginning": 49358.0,
+        "rate": 0.004801653227440334
+      },
+      {
+        "as_of": "2022-01-01",
+        "exits": 258.0,
+        "beginning": 49566.0,
+        "rate": 0.005205180970826777
+      },
+      {
+        "as_of": "2022-02-01",
+        "exits": 201.0,
+        "beginning": 49788.0,
+        "rate": 0.004037117377681369
+      },
+      {
+        "as_of": "2022-03-01",
+        "exits": 227.0,
+        "beginning": 50007.0,
+        "rate": 0.004539364488971544
+      },
+      {
+        "as_of": "2022-04-01",
+        "exits": 212.0,
+        "beginning": 50211.0,
+        "rate": 0.00422218239031288
+      },
+      {
+        "as_of": "2022-05-01",
+        "exits": 221.0,
+        "beginning": 50432.0,
+        "rate": 0.004382138324873096
+      },
+      {
+        "as_of": "2022-06-01",
+        "exits": 247.0,
+        "beginning": 50615.0,
+        "rate": 0.004879976291613158
+      },
+      {
+        "as_of": "2022-07-01",
+        "exits": 255.0,
+        "beginning": 50810.0,
+        "rate": 0.0050186971068687265
+      },
+      {
+        "as_of": "2022-08-01",
+        "exits": 249.0,
+        "beginning": 50959.0,
+        "rate": 0.004886281127965619
+      },
+      {
+        "as_of": "2022-09-01",
+        "exits": 239.0,
+        "beginning": 51152.0,
+        "rate": 0.004672349077259931
+      },
+      {
+        "as_of": "2022-10-01",
+        "exits": 241.0,
+        "beginning": 51321.0,
+        "rate": 0.004695933438553419
+      },
+      {
+        "as_of": "2022-11-01",
+        "exits": 242.0,
+        "beginning": 51502.0,
+        "rate": 0.004698846646732166
+      },
+      {
+        "as_of": "2022-12-01",
+        "exits": 248.0,
+        "beginning": 51663.0,
+        "rate": 0.004800340669337824
+      },
+      {
+        "as_of": "2023-01-01",
+        "exits": 264.0,
+        "beginning": 51795.0,
+        "rate": 0.00509701708659137
+      },
+      {
+        "as_of": "2023-02-01",
+        "exits": 247.0,
+        "beginning": 51965.0,
+        "rate": 0.004753199268738574
+      },
+      {
+        "as_of": "2023-03-01",
+        "exits": 290.0,
+        "beginning": 52076.0,
+        "rate": 0.005568784084799139
+      },
+      {
+        "as_of": "2023-04-01",
+        "exits": 270.0,
+        "beginning": 52304.0,
+        "rate": 0.0051621290914652795
+      },
+      {
+        "as_of": "2023-05-01",
+        "exits": 274.0,
+        "beginning": 52488.0,
+        "rate": 0.005220240816948636
+      },
+      {
+        "as_of": "2023-06-01",
+        "exits": 293.0,
+        "beginning": 52618.0,
+        "rate": 0.005568436656657417
+      },
+      {
+        "as_of": "2023-07-01",
+        "exits": 303.0,
+        "beginning": 52773.0,
+        "rate": 0.005741572394974703
+      },
+      {
+        "as_of": "2023-08-01",
+        "exits": 285.0,
+        "beginning": 52962.0,
+        "rate": 0.005381216721422907
+      },
+      {
+        "as_of": "2023-09-01",
+        "exits": 324.0,
+        "beginning": 53017.0,
+        "rate": 0.006111247335760228
+      },
+      {
+        "as_of": "2023-10-01",
+        "exits": 271.0,
+        "beginning": 53155.0,
+        "rate": 0.005098297432038378
+      },
+      {
+        "as_of": "2023-11-01",
+        "exits": 291.0,
+        "beginning": 53276.0,
+        "rate": 0.005462121780914483
+      },
+      {
+        "as_of": "2023-12-01",
+        "exits": 309.0,
+        "beginning": 53443.0,
+        "rate": 0.005781861048219599
+      },
+      {
+        "as_of": "2024-01-01",
+        "exits": 316.0,
+        "beginning": 53552.0,
+        "rate": 0.005900806692560502
+      },
+      {
+        "as_of": "2024-02-01",
+        "exits": 295.0,
+        "beginning": 53656.0,
+        "rate": 0.005497987177575667
+      },
+      {
+        "as_of": "2024-03-01",
+        "exits": 323.0,
+        "beginning": 53745.0,
+        "rate": 0.006009861382454182
+      },
+      {
+        "as_of": "2024-04-01",
+        "exits": 316.0,
+        "beginning": 53797.0,
+        "rate": 0.005873933490715096
+      },
+      {
+        "as_of": "2024-05-01",
+        "exits": 337.0,
+        "beginning": 53881.0,
+        "rate": 0.006254523858131809
+      },
+      {
+        "as_of": "2024-06-01",
+        "exits": 296.0,
+        "beginning": 53965.0,
+        "rate": 0.005485036597794867
+      },
+      {
+        "as_of": "2024-07-01",
+        "exits": 322.0,
+        "beginning": 54052.0,
+        "rate": 0.005957226374602235
+      },
+      {
+        "as_of": "2024-08-01",
+        "exits": 338.0,
+        "beginning": 54149.0,
+        "rate": 0.006242035864004875
+      },
+      {
+        "as_of": "2024-09-01",
+        "exits": 362.0,
+        "beginning": 54167.0,
+        "rate": 0.006683035796702789
+      },
+      {
+        "as_of": "2024-10-01",
+        "exits": 344.0,
+        "beginning": 54198.0,
+        "rate": 0.006347097678881139
+      },
+      {
+        "as_of": "2024-11-01",
+        "exits": 349.0,
+        "beginning": 54268.0,
+        "rate": 0.00643104592024766
+      },
+      {
+        "as_of": "2024-12-01",
+        "exits": 384.0,
+        "beginning": 54240.0,
+        "rate": 0.007079646017699115
+      },
+      {
+        "as_of": "2025-01-01",
+        "exits": 394.0,
+        "beginning": 54268.0,
+        "rate": 0.007260263875580452
+      },
+      {
+        "as_of": "2025-02-01",
+        "exits": 356.0,
+        "beginning": 54284.0,
+        "rate": 0.006558101834794783
+      },
+      {
+        "as_of": "2025-03-01",
+        "exits": 409.0,
+        "beginning": 54246.0,
+        "rate": 0.00753972643144195
+      },
+      {
+        "as_of": "2025-04-01",
+        "exits": 370.0,
+        "beginning": 54241.0,
+        "rate": 0.006821408159879058
+      },
+      {
+        "as_of": "2025-05-01",
+        "exits": 395.0,
+        "beginning": 54218.0,
+        "rate": 0.007285403371574016
+      },
+      {
+        "as_of": "2025-06-01",
+        "exits": 414.0,
+        "beginning": 54139.0,
+        "rate": 0.007646982766582316
+      },
+      {
+        "as_of": "2025-07-01",
+        "exits": 437.0,
+        "beginning": 54116.0,
+        "rate": 0.00807524576834947
+      },
+      {
+        "as_of": "2025-08-01",
+        "exits": 455.0,
+        "beginning": 54029.0,
+        "rate": 0.008421403320439023
+      },
+      {
+        "as_of": "2025-09-01",
+        "exits": 465.0,
+        "beginning": 55121.0,
+        "rate": 0.008435986284719072
+      },
+      {
+        "as_of": "2025-10-01",
+        "exits": 494.0,
+        "beginning": 54936.0,
+        "rate": 0.008992281928061745
+      },
+      {
+        "as_of": "2025-11-01",
+        "exits": 514.0,
+        "beginning": 54816.0,
+        "rate": 0.009376824284880327
+      },
+      {
+        "as_of": "2025-12-01",
+        "exits": 502.0,
+        "beginning": 54701.0,
+        "rate": 0.009177163123160454
+      },
+      {
+        "as_of": "2026-01-01",
+        "exits": 500.0,
+        "beginning": 54575.0,
+        "rate": 0.009161704076958314
+      },
+      {
+        "as_of": "2026-02-01",
+        "exits": 493.0,
+        "beginning": 54396.0,
+        "rate": 0.0090631664092948
+      },
+      {
+        "as_of": "2026-03-01",
+        "exits": 613.0,
+        "beginning": 54124.0,
+        "rate": 0.011325844357401523
+      },
+      {
+        "as_of": "2026-04-01",
+        "exits": 632.0,
+        "beginning": 53753.0,
+        "rate": 0.011757483303257493
+      },
+      {
+        "as_of": "2026-05-01",
+        "exits": 660.0,
+        "beginning": 53421.0,
+        "rate": 0.012354691975065986
+      },
+      {
+        "as_of": "2026-06-01",
+        "exits": 707.0,
+        "beginning": 53006.0,
+        "rate": 0.013338112666490586
+      },
+      {
+        "as_of": "2026-07-01",
+        "exits": 806.0,
+        "beginning": 52441.0,
+        "rate": 0.015369653515379188
+      },
+      {
+        "as_of": "2026-08-01",
+        "exits": 936.0,
+        "beginning": 51216.0,
+        "rate": 0.018275538894095594
+      }
+    ],
+    "engineering_tenure": [
+      {
+        "tenure_band": "0-1 years",
+        "exits": 151.0,
+        "beginning": 1133.0,
+        "rate": 0.13327449249779347
+      },
+      {
+        "tenure_band": "1-3 years",
+        "exits": 52.0,
+        "beginning": 2523.0,
+        "rate": 0.020610384462940945
+      },
+      {
+        "tenure_band": "3-5 years",
+        "exits": 37.0,
+        "beginning": 2577.0,
+        "rate": 0.01435778036476523
+      },
+      {
+        "tenure_band": "5+ years",
+        "exits": 69.0,
+        "beginning": 9721.0,
+        "rate": 0.0070980351815656826
+      }
+    ],
+    "workers": [
+      {
+        "status": "active",
+        "n": 50010,
+        "with_term": 0,
+        "min_term": "None",
+        "max_term": "None"
+      },
+      {
+        "status": "terminated",
+        "n": 30025,
+        "with_term": 30025,
+        "min_term": "2021-08-01",
+        "max_term": "2026-08-30"
+      }
+    ],
+    "termination_date_pileup": [
+      {
+        "date": "2026-08-25",
+        "n": 62
+      },
+      {
+        "date": "2026-08-22",
+        "n": 60
+      },
+      {
+        "date": "2026-08-04",
+        "n": 54
+      },
+      {
+        "date": "2026-08-23",
+        "n": 53
+      },
+      {
+        "date": "2026-08-21",
+        "n": 51
+      },
+      {
+        "date": "2026-08-20",
+        "n": 50
+      },
+      {
+        "date": "2026-08-28",
+        "n": 50
+      },
+      {
+        "date": "2026-08-29",
+        "n": 50
+      }
+    ]
+  },
+  "learning": {
+    "catalog_rows": 4587,
+    "python_sample": [
+      {
+        "title": "Begin Python coding in Minecraft with MakeCode",
+        "type": "module",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/modules/begin-python-coding-minecraft-makecode-azure-notebooks/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Begin Python coding in Minecraft with MakeCode",
+        "type": "course",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/courses/begin-python-coding-minecraft-makecode-azure-notebooks/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Build programs using Python coding in Minecraft",
+        "type": "course",
+        "level": "advanced",
+        "url": "https://learn.microsoft.com/en-us/training/courses/build-programs-use-python-coding-minecraft-azure-notebooks/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Build programs using Python coding in Minecraft",
+        "type": "module",
+        "level": "advanced",
+        "url": "https://learn.microsoft.com/en-us/training/modules/build-programs-use-python-coding-minecraft-azure-notebooks/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Challenge project - Build a minigame with GitHub Copilot and Python",
+        "type": "module",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/modules/challenge-project-create-mini-game-with-copilot/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Explore and analyze data with Python",
+        "type": "module",
+        "level": "intermediate",
+        "url": "https://learn.microsoft.com/en-us/training/modules/explore-analyze-data-with-python/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Get Started with Python Programming: Part 1 - Fundamentals",
+        "type": "learning_path",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/paths/get-started-with-python-fundamentals/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Get started with Python programming: Part 2 - building programs",
+        "type": "learning_path",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/paths/get-started-with-python-programs/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Introduction to Azure OpenAI managed identity authentication with Python",
+        "type": "module",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/modules/intro-azure-openai-managed-identity-auth-python/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Minecraft Python coding academy",
+        "type": "learning_path",
+        "level": "advanced",
+        "url": "https://learn.microsoft.com/en-us/training/paths/minecraft-python-coding-academy/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "MTA: Introduction to Programming Using Python",
+        "type": "certification",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/credentials/certifications/mta-introduction-to-programming-using-python/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Track model training in Jupyter notebooks with MLflow",
+        "type": "module",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/modules/track-model-training-jupyter-notebooks-mlflow/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Transition to Python in Minecraft Education",
+        "type": "module",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/modules/transition-python-minecraft-education-edition/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Transition to Python in Minecraft Education",
+        "type": "course",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/courses/transition-python-minecraft-education-edition/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Using GitHub Copilot with Python",
+        "type": "module",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/modules/introduction-copilot-python/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Work with data in Python",
+        "type": "module",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/modules/work-with-data-python/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Write your first Python code",
+        "type": "module",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/modules/write-first-python-code/?WT.mc_id=api_CatalogApi"
+      }
+    ],
+    "minecraft_in_python_sample": [
+      {
+        "title": "Begin Python coding in Minecraft with MakeCode",
+        "type": "module",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/modules/begin-python-coding-minecraft-makecode-azure-notebooks/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Begin Python coding in Minecraft with MakeCode",
+        "type": "course",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/courses/begin-python-coding-minecraft-makecode-azure-notebooks/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Build programs using Python coding in Minecraft",
+        "type": "course",
+        "level": "advanced",
+        "url": "https://learn.microsoft.com/en-us/training/courses/build-programs-use-python-coding-minecraft-azure-notebooks/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Build programs using Python coding in Minecraft",
+        "type": "module",
+        "level": "advanced",
+        "url": "https://learn.microsoft.com/en-us/training/modules/build-programs-use-python-coding-minecraft-azure-notebooks/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Minecraft Python coding academy",
+        "type": "learning_path",
+        "level": "advanced",
+        "url": "https://learn.microsoft.com/en-us/training/paths/minecraft-python-coding-academy/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Transition to Python in Minecraft Education",
+        "type": "module",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/modules/transition-python-minecraft-education-edition/?WT.mc_id=api_CatalogApi"
+      },
+      {
+        "title": "Transition to Python in Minecraft Education",
+        "type": "course",
+        "level": "beginner",
+        "url": "https://learn.microsoft.com/en-us/training/courses/transition-python-minecraft-education-edition/?WT.mc_id=api_CatalogApi"
+      }
+    ],
+    "rpc_recommendations": {
+      "labels": {
+        "microsoft_learn": "external public data",
+        "internal_workforce": "synthetic"
+      },
+      "skill_id": "skill_python",
+      "job_family": "Engineering",
+      "recommendations": [
+        {
+          "url": "https://learn.microsoft.com/en-us/training/modules/intro-azure-openai-managed-identity-auth-python/?WT.mc_id=api_CatalogApi",
+          "level": "beginner",
+          "title": "Introduction to Azure OpenAI managed identity authentication with Python",
+          "provider": "microsoft_learn",
+          "content_id": "learn.intro-azure-openai-managed-identity-auth-python",
+          "provenance": "live_public",
+          "content_type": "module",
+          "relevance_score": 17
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/training/paths/get-started-with-python-fundamentals/?WT.mc_id=api_CatalogApi",
+          "level": "beginner",
+          "title": "Get Started with Python Programming: Part 1 - Fundamentals",
+          "provider": "microsoft_learn",
+          "content_id": "learn.wwl.get-started-with-python-fundamentals",
+          "provenance": "live_public",
+          "content_type": "learning_path",
+          "relevance_score": 14
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/training/paths/get-started-with-python-programs/?WT.mc_id=api_CatalogApi",
+          "level": "beginner",
+          "title": "Get started with Python programming: Part 2 - building programs",
+          "provider": "microsoft_learn",
+          "content_id": "learn.wwl.get-started-with-python-programs",
+          "provenance": "live_public",
+          "content_type": "learning_path",
+          "relevance_score": 14
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/credentials/certifications/mta-introduction-to-programming-using-python/?WT.mc_id=api_CatalogApi",
+          "level": "beginner",
+          "title": "MTA: Introduction to Programming Using Python",
+          "provider": "microsoft_learn",
+          "content_id": "certification.mta-introduction-to-programming-using-python",
+          "provenance": "live_public",
+          "content_type": "certification",
+          "relevance_score": 14
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/training/modules/explore-analyze-data-with-python/?WT.mc_id=api_CatalogApi",
+          "level": "intermediate",
+          "title": "Explore and analyze data with Python",
+          "provider": "microsoft_learn",
+          "content_id": "learn.wwl.explore-analyze-data-with-python",
+          "provenance": "live_public",
+          "content_type": "module",
+          "relevance_score": 13
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/training/modules/track-model-training-jupyter-notebooks-mlflow/?WT.mc_id=api_CatalogApi",
+          "level": "beginner",
+          "title": "Track model training in Jupyter notebooks with MLflow",
+          "provider": "microsoft_learn",
+          "content_id": "learn.wwl.track-model-training-jupyter-notebooks-mlflow",
+          "provenance": "live_public",
+          "content_type": "module",
+          "relevance_score": 9
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/training/modules/introduction-copilot-python/?WT.mc_id=api_CatalogApi",
+          "level": "beginner",
+          "title": "Using GitHub Copilot with Python",
+          "provider": "microsoft_learn",
+          "content_id": "learn.github-copilot-with-python",
+          "provenance": "live_public",
+          "content_type": "module",
+          "relevance_score": 9
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/training/modules/work-with-data-python/?WT.mc_id=api_CatalogApi",
+          "level": "beginner",
+          "title": "Work with data in Python",
+          "provider": "microsoft_learn",
+          "content_id": "learn.wwl.work-with-data-python",
+          "provenance": "live_public",
+          "content_type": "module",
+          "relevance_score": 9
+        }
+      ]
+    }
+  },
+  "snapshot": {
+    "current_headcount_quality": "healthy",
+    "replay_headcount_quality": "unhealthy",
+    "current_snapshot": {
+      "label": "Current trusted GlobalTech snapshot",
+      "notes": "Latest certified marts. The incomplete APAC extract was not published as a workforce change.",
+      "as_of_date": "2026-08-01",
+      "incident_id": null,
+      "snapshot_id": "current",
+      "quality_mode": "trusted",
+      "headcount_quality": "healthy",
+      "trusted_as_of_date": "2026-08-01",
+      "incident_replay_date": "2026-08-01"
+    },
+    "lineage_quality": "healthy",
+    "lineage_freshness": {
+      "source_period": "2026-08-01",
+      "source_tables": [
+        "people_hris"
+      ],
+      "last_success_at": "2026-08-31T02:15:52.796966+00:00",
+      "freshness_status": "healthy"
+    },
+    "current_lineage": {
+      "lineage": [
+        {
+          "grain": "org \u00d7 job_family \u00d7 location \u00d7 month",
+          "dataset_name": "people_mart_workforce_overview",
+          "serving_table": "people_mart_workforce_overview",
+          "publish_status": "published",
+          "quality_status": "healthy",
+          "upstream_source": "people_hris"
+        }
+      ],
+      "freshness": {
+        "source_period": "2026-08-01",
+        "source_tables": [
+          "people_hris"
+        ],
+        "last_success_at": "2026-08-31T02:15:52.796966+00:00",
+        "freshness_status": "healthy"
+      },
+      "metric_id": "headcount",
+      "snapshot_id": "current",
+      "source_tables": [
+        "people_hris"
+      ],
+      "publish_status": "published",
+      "quality_status": "healthy",
+      "downstream_marts": [
+        "people_mart_workforce_overview"
+      ]
+    },
+    "replay_lineage": {
+      "lineage": [
+        {
+          "grain": "org \u00d7 job_family \u00d7 location \u00d7 month",
+          "dataset_name": "people_mart_workforce_overview",
+          "serving_table": "people_mart_workforce_overview",
+          "publish_status": "blocked",
+          "quality_status": "unhealthy",
+          "upstream_source": "people_hris"
+        }
+      ],
+      "freshness": {
+        "reason": "APAC HRIS incomplete extract",
+        "blocked": true,
+        "source_period": "2026-08-01",
+        "source_tables": [
+          "people_hris"
+        ],
+        "last_success_at": "2026-08-31T02:15:52.796966+00:00",
+        "freshness_status": "failed"
+      },
+      "metric_id": "headcount",
+      "snapshot_id": "incident_replay",
+      "source_tables": [
+        "people_hris"
+      ],
+      "publish_status": "not_published",
+      "quality_status": "unhealthy",
+      "downstream_marts": [
+        "people_mart_workforce_overview"
+      ]
+    },
+    "current_source_health": {
+      "sources": [
+        {
+          "provenance": "live_public",
+          "snapshot_id": "current",
+          "source_name": "people_bls",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:12:24.271929+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 267
+        },
+        {
+          "provenance": "live_public",
+          "snapshot_id": "current",
+          "source_name": "people_microsoft_learn",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:12:28.60602+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 4587
+        },
+        {
+          "provenance": "live_public",
+          "snapshot_id": "current",
+          "source_name": "people_onet",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:12:22.759542+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 1026
+        },
+        {
+          "provenance": "synthetic_internal",
+          "snapshot_id": "current",
+          "source_name": "people_synthetic_globaltech",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:15:52.796966+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 80035
+        }
+      ],
+      "snapshot_id": "current"
+    },
+    "replay_source_health": {
+      "sources": [
+        {
+          "provenance": "live_public",
+          "snapshot_id": "incident_replay",
+          "source_name": "people_bls",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:12:24.271929+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 267
+        },
+        {
+          "provenance": "live_public",
+          "snapshot_id": "incident_replay",
+          "source_name": "people_microsoft_learn",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:12:28.60602+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 4587
+        },
+        {
+          "provenance": "live_public",
+          "snapshot_id": "incident_replay",
+          "source_name": "people_onet",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:12:22.759542+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 1026
+        },
+        {
+          "provenance": "synthetic_internal",
+          "snapshot_id": "incident_replay",
+          "source_name": "people_synthetic_globaltech",
+          "error_message": "APAC HRIS volume drop detected",
+          "quality_status": "unhealthy",
+          "last_success_at": "2026-08-31T02:15:52.796966+00:00",
+          "freshness_status": "failed",
+          "records_last_run": 80035
+        }
+      ],
+      "snapshot_id": "incident_replay"
+    },
+    "current_quality_tests": {
+      "tests": [
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "overview_rows_present",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "freshness",
+          "source_name": "people_hris",
+          "expected_value": ">0",
+          "observed_value": "46848"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_worker_id",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "unique",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_assignment_id",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "unique",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_requisition_id",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "unique",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_id_not_null",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "org_id_not_null",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "location_id_not_null",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "candidate_requisition_not_null",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "not_null",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_manager_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_job_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_org_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "candidate_requisition_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "learning_worker_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_lms",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "performance_worker_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_performance",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "compensation_worker_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_compensation",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "hire_before_termination",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "promotion_after_hire",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "application_before_hire",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "temporal",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "assignment_effective_window",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "headcount_non_negative",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "salary_positive",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_compensation",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "attrition_rate_bounds",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "fte_valid",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_workers_unterminated",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_has_org",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "location_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_headcount_scale",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": ">=1000",
+          "observed_value": "50010"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "hire_events_present",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": ">0",
+          "observed_value": "80000"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "one_assignment_per_worker_min",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_worker_id",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "unique",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_assignment_id",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "unique",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_requisition_id",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "unique",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_id_not_null",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "org_id_not_null",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "location_id_not_null",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "candidate_requisition_not_null",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "not_null",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_manager_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_job_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_org_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "candidate_requisition_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "learning_worker_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_lms",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "performance_worker_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_performance",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "compensation_worker_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_compensation",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "hire_before_termination",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "promotion_after_hire",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "application_before_hire",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "temporal",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "assignment_effective_window",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "headcount_non_negative",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "salary_positive",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_compensation",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "attrition_rate_bounds",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "fte_valid",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_workers_unterminated",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_has_org",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "location_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_headcount_scale",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": ">=1000",
+          "observed_value": "50010"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "hire_events_present",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": ">0",
+          "observed_value": "80000"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "one_assignment_per_worker_min",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "overview_rows_present",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "freshness",
+          "source_name": "people_hris",
+          "expected_value": ">0",
+          "observed_value": "46848"
+        }
+      ],
+      "snapshot_id": "current"
+    },
+    "replay_quality_tests": {
+      "tests": [
+        {
+          "status": "failed",
+          "details": "Deliberate APAC HRIS incomplete feed for demo incident.",
+          "test_name": "apac_hris_volume",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "freshness",
+          "source_name": "people_hris",
+          "expected_value": ">= 23760 (baseline 29700)",
+          "observed_value": "10395"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_worker_id",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "unique",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_assignment_id",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "unique",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_requisition_id",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "unique",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_id_not_null",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "org_id_not_null",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "location_id_not_null",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "candidate_requisition_not_null",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "not_null",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_manager_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_job_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_org_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "candidate_requisition_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "learning_worker_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_lms",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "performance_worker_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_performance",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "compensation_worker_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_compensation",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "hire_before_termination",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "promotion_after_hire",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "application_before_hire",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "temporal",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "assignment_effective_window",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "headcount_non_negative",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "salary_positive",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_compensation",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "attrition_rate_bounds",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "fte_valid",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_workers_unterminated",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_has_org",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "location_fk",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_headcount_scale",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": ">=1000",
+          "observed_value": "50010"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "hire_events_present",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": ">0",
+          "observed_value": "80000"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "one_assignment_per_worker_min",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "overview_rows_present",
+          "checked_at": "2026-08-31T02:12:17.652758+00:00",
+          "test_group": "freshness",
+          "source_name": "people_hris",
+          "expected_value": ">0",
+          "observed_value": "46848"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_worker_id",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "unique",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_assignment_id",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "unique",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "unique_requisition_id",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "unique",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_id_not_null",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "org_id_not_null",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "location_id_not_null",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "not_null",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "candidate_requisition_not_null",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "not_null",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_manager_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_job_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "worker_org_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "candidate_requisition_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "learning_worker_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_lms",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "performance_worker_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_performance",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "compensation_worker_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_compensation",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "hire_before_termination",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "promotion_after_hire",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "application_before_hire",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "temporal",
+          "source_name": "people_ats",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "assignment_effective_window",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "temporal",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "headcount_non_negative",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "salary_positive",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_compensation",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "attrition_rate_bounds",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "fte_valid",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_workers_unterminated",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_has_org",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "location_fk",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "referential",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "active_headcount_scale",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": ">=1000",
+          "observed_value": "50010"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "hire_events_present",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": ">0",
+          "observed_value": "80000"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "one_assignment_per_worker_min",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "business",
+          "source_name": "people_hris",
+          "expected_value": "0",
+          "observed_value": "0"
+        },
+        {
+          "status": "passed",
+          "details": "",
+          "test_name": "overview_rows_present",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "freshness",
+          "source_name": "people_hris",
+          "expected_value": ">0",
+          "observed_value": "46848"
+        },
+        {
+          "status": "failed",
+          "details": "Deliberate APAC HRIS incomplete feed for demo incident.",
+          "test_name": "apac_hris_volume",
+          "checked_at": "2026-08-31T02:07:59.231888+00:00",
+          "test_group": "freshness",
+          "source_name": "people_hris",
+          "expected_value": ">= 23760 (baseline 29700)",
+          "observed_value": "10395"
+        }
+      ],
+      "snapshot_id": "incident_replay"
+    },
+    "current_incidents": {
+      "incidents": [],
+      "snapshot_id": "current"
+    },
+    "replay_incidents": {
+      "incidents": [
+        {
+          "title": "APAC HRIS feed incomplete for daily load",
+          "status": "open",
+          "summary": "APAC worker rows dropped from 29700 to 10395. Certified headcount was not republished as a business change. This is a data issue, not a workforce change. Upstream source: people_hris via people_dataset_lineage.",
+          "severity": "high",
+          "detected_at": "2026-09-01T01:34:54.08536+00:00",
+          "incident_id": "people-incident-apac-hris-incomplete",
+          "source_name": "people_hris",
+          "actual_records": 10395,
+          "business_change": false,
+          "affected_metrics": [
+            "headcount",
+            "voluntary_attrition",
+            "average_headcount",
+            "hires"
+          ],
+          "expected_records": 29700
+        }
+      ],
+      "snapshot_id": "incident_replay"
+    },
+    "source_health": {
+      "sources": [
+        {
+          "provenance": "live_public",
+          "snapshot_id": "current",
+          "source_name": "people_bls",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:12:24.271929+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 267
+        },
+        {
+          "provenance": "live_public",
+          "snapshot_id": "current",
+          "source_name": "people_microsoft_learn",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:12:28.60602+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 4587
+        },
+        {
+          "provenance": "live_public",
+          "snapshot_id": "current",
+          "source_name": "people_onet",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:12:22.759542+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 1026
+        },
+        {
+          "provenance": "synthetic_internal",
+          "snapshot_id": "current",
+          "source_name": "people_synthetic_globaltech",
+          "error_message": null,
+          "quality_status": "healthy",
+          "last_success_at": "2026-08-31T02:15:52.796966+00:00",
+          "freshness_status": "healthy",
+          "records_last_run": 80035
+        }
+      ],
+      "snapshot_id": "current"
+    }
+  },
+  "sources": [
+    {
+      "source_name": "people_bls",
+      "freshness_status": "healthy",
+      "quality_status": "healthy",
+      "records_last_run": "267",
+      "last_success_at": "2026-08-31 02:12:24.271929+00:00",
+      "error_message": null,
+      "provenance": "live_public"
+    },
+    {
+      "source_name": "people_microsoft_learn",
+      "freshness_status": "healthy",
+      "quality_status": "healthy",
+      "records_last_run": "4587",
+      "last_success_at": "2026-08-31 02:12:28.606020+00:00",
+      "error_message": null,
+      "provenance": "live_public"
+    },
+    {
+      "source_name": "people_onet",
+      "freshness_status": "healthy",
+      "quality_status": "healthy",
+      "records_last_run": "1026",
+      "last_success_at": "2026-08-31 02:12:22.759542+00:00",
+      "error_message": null,
+      "provenance": "live_public"
+    },
+    {
+      "source_name": "people_synthetic_globaltech",
+      "freshness_status": "healthy",
+      "quality_status": "unhealthy",
+      "records_last_run": "80035",
+      "last_success_at": "2026-08-31 02:15:52.796966+00:00",
+      "error_message": "APAC HRIS volume drop detected",
+      "provenance": "synthetic_internal"
+    }
+  ],
+  "issues": [],
+  "panorama_daily_rows": 351660,
+  "people_tables": [
+    "people_ai_usage",
+    "people_analysis_questions",
+    "people_api_usage",
+    "people_data_quality_incident",
+    "people_dataset_lineage",
+    "people_dataset_relationships",
+    "people_datasets",
+    "people_dim_company",
+    "people_dim_job",
+    "people_dim_location",
+    "people_dim_occupation",
+    "people_dim_org",
+    "people_dim_skill",
+    "people_dim_worker",
+    "people_executive_stories",
+    "people_external_learning_content",
+    "people_field_mappings",
+    "people_insights",
+    "people_mart_attrition_segment",
+    "people_mart_compensation_equity",
+    "people_mart_external_talent_market",
+    "people_mart_internal_mobility",
+    "people_mart_learning_adoption",
+    "people_mart_manager_effectiveness",
+    "people_mart_recruiting",
+    "people_mart_retention",
+    "people_mart_skill_supply_demand",
+    "people_mart_skills",
+    "people_mart_workforce_overview",
+    "people_metric_definition",
+    "people_pipeline_runs",
+    "people_quality_test_results",
+    "people_serving_snapshot",
+    "people_source_freshness",
+    "people_source_health",
+    "people_workbench_metrics",
+    "people_workspaces"
+  ],
+  "people_get_rpcs": [
+    "people_get_data_foundation",
+    "people_get_learning_analysis",
+    "people_get_learning_recommendations",
+    "people_get_metric",
+    "people_get_metric_breakdown",
+    "people_get_metric_definition",
+    "people_get_metric_trend",
+    "people_get_mobility_analysis",
+    "people_get_platform_facts",
+    "people_get_quality_incidents",
+    "people_get_quality_tests",
+    "people_get_recruiting_analysis",
+    "people_get_retention_analysis",
+    "people_get_serving_snapshot",
+    "people_get_skill_gap",
+    "people_get_source_health",
+    "people_get_workforce_overview"
+  ],
+  "row_counts": {
+    "people_ai_usage": 0,
+    "people_analysis_questions": 0,
+    "people_api_usage": 3,
+    "people_data_quality_incident": 1,
+    "people_dataset_lineage": 14,
+    "people_dataset_relationships": 0,
+    "people_datasets": 0,
+    "people_dim_company": 2,
+    "people_dim_job": 92,
+    "people_dim_location": 12,
+    "people_dim_occupation": 1016,
+    "people_dim_org": 249,
+    "people_dim_skill": 18,
+    "people_dim_worker": 80035,
+    "people_executive_stories": 0,
+    "people_external_learning_content": 4587,
+    "people_field_mappings": 0,
+    "people_insights": 0,
+    "people_mart_attrition_segment": 54367,
+    "people_mart_compensation_equity": 5856,
+    "people_mart_external_talent_market": 0,
+    "people_mart_internal_mobility": 3904,
+    "people_mart_learning_adoption": 3904,
+    "people_mart_manager_effectiveness": 1600,
+    "people_mart_recruiting": 96,
+    "people_mart_retention": 46992,
+    "people_mart_skill_supply_demand": 0,
+    "people_mart_skills": 64,
+    "people_mart_workforce_overview": 46992,
+    "people_metric_definition": 20,
+    "people_pipeline_runs": 9,
+    "people_quality_test_results": 60,
+    "people_serving_snapshot": 2,
+    "people_source_freshness": 5,
+    "people_source_health": 4,
+    "people_workbench_metrics": 0,
+    "people_workspaces": 0
+  },
+  "pipeline_runs": [
+    {
+      "run_id": "65fa043a-431b-48d4-9d35-8e6abaaae9f3",
+      "source": "people_microsoft_learn",
+      "status": "success",
+      "started_at": "2026-08-31 02:12:24.882487+00:00",
+      "completed_at": "2026-08-31 02:12:28.391331+00:00"
+    },
+    {
+      "run_id": "813f2afb-822f-4753-abef-1a375de295d4",
+      "source": "people_bls",
+      "status": "success",
+      "started_at": "2026-08-31 02:12:23.356089+00:00",
+      "completed_at": "2026-08-31 02:12:24.089574+00:00"
+    },
+    {
+      "run_id": "8d6eda67-d536-4231-9ef0-51dff0b7a96c",
+      "source": "people_onet",
+      "status": "success",
+      "started_at": "2026-08-31 02:12:17.715984+00:00",
+      "completed_at": "2026-08-31 02:12:22.569808+00:00"
+    },
+    {
+      "run_id": "fa0f40ff-e96f-4a04-a5fd-457415d0be82",
+      "source": "people_daily_pipeline",
+      "status": "success",
+      "started_at": "2026-08-31 02:10:34.298603+00:00",
+      "completed_at": "2026-08-31 02:14:09.341944+00:00"
+    },
+    {
+      "run_id": "9c640be9-27a2-4728-9e57-6af8e3cba8e3",
+      "source": "people_microsoft_learn",
+      "status": "success",
+      "started_at": "2026-08-31 02:08:04.812555+00:00",
+      "completed_at": "2026-08-31 02:08:08.486592+00:00"
+    },
+    {
+      "run_id": "31d054f4-0559-4499-a22b-dcf76a8e9267",
+      "source": "people_bls",
+      "status": "success",
+      "started_at": "2026-08-31 02:08:03.249997+00:00",
+      "completed_at": "2026-08-31 02:08:04.006466+00:00"
+    },
+    {
+      "run_id": "12ebd54c-5f5b-4e95-ae80-f2ee9fd1770e",
+      "source": "people_onet",
+      "status": "failed",
+      "started_at": "2026-08-31 02:07:59.316745+00:00",
+      "completed_at": "2026-08-31 02:08:02.439130+00:00"
+    },
+    {
+      "run_id": "74703c7e-0214-4825-be15-08ba6acad7b0",
+      "source": "people_daily_pipeline",
+      "status": "partial",
+      "started_at": "2026-08-31 02:06:14.864011+00:00",
+      "completed_at": "2026-08-31 02:09:29.964009+00:00"
+    }
+  ],
+  "freshness": [
+    {
+      "source_name": "people_bls",
+      "provenance": "live_public",
+      "last_successful_ingestion": "2026-08-31 02:12:24.271929+00:00",
+      "expected_frequency": "30 days, 0:00:00",
+      "row_count": "267",
+      "previous_row_count": "267",
+      "freshness_status": "healthy",
+      "updated_at": "2026-08-31 02:12:24.643150+00:00",
+      "last_attempt_at": "2026-08-31 02:12:24.271929+00:00",
+      "quality_status": "healthy",
+      "error_message": null
+    },
+    {
+      "source_name": "people_microsoft_learn",
+      "provenance": "live_public",
+      "last_successful_ingestion": "2026-08-31 02:12:28.606020+00:00",
+      "expected_frequency": "1 day, 0:00:00",
+      "row_count": "4587",
+      "previous_row_count": "4587",
+      "freshness_status": "healthy",
+      "updated_at": "2026-08-31 02:12:28.923870+00:00",
+      "last_attempt_at": "2026-08-31 02:12:28.606020+00:00",
+      "quality_status": "healthy",
+      "error_message": null
+    },
+    {
+      "source_name": "people_onet",
+      "provenance": "live_public",
+      "last_successful_ingestion": "2026-08-31 02:12:22.759542+00:00",
+      "expected_frequency": "90 days, 0:00:00",
+      "row_count": "1026",
+      "previous_row_count": "0",
+      "freshness_status": "healthy",
+      "updated_at": "2026-08-31 02:12:23.085446+00:00",
+      "last_attempt_at": "2026-08-31 02:12:22.759542+00:00",
+      "quality_status": "healthy",
+      "error_message": null
+    },
+    {
+      "source_name": "people_synthetic_globaltech",
+      "provenance": "synthetic_internal",
+      "last_successful_ingestion": "2026-08-31 02:15:52.796966+00:00",
+      "expected_frequency": "1 day, 0:00:00",
+      "row_count": "80035",
+      "previous_row_count": "0",
+      "freshness_status": "healthy",
+      "updated_at": "2026-09-01 01:34:55.504589+00:00",
+      "last_attempt_at": "2026-08-31 02:15:52.796966+00:00",
+      "quality_status": "unhealthy",
+      "error_message": "APAC HRIS volume drop detected"
+    },
+    {
+      "source_name": "synthetic_internal",
+      "provenance": "synthetic_internal",
+      "last_successful_ingestion": "2026-08-31 01:34:59.086782+00:00",
+      "expected_frequency": "30 days, 0:00:00",
+      "row_count": "144",
+      "previous_row_count": "0",
+      "freshness_status": "healthy",
+      "updated_at": "2026-08-31 01:34:59.086782+00:00",
+      "last_attempt_at": null,
+      "quality_status": "healthy",
+      "error_message": null
+    }
+  ],
+  "quality_tests": [
+    {
+      "test_name": "apac_hris_volume",
+      "status": "failed",
+      "observed_value": "10395",
+      "expected_value": ">= 23760 (baseline 29700)",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "unique_worker_id",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "unique_assignment_id",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "unique_requisition_id",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_ats"
+    },
+    {
+      "test_name": "worker_id_not_null",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "org_id_not_null",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "location_id_not_null",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "candidate_requisition_not_null",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_ats"
+    },
+    {
+      "test_name": "worker_manager_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "worker_job_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "worker_org_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "candidate_requisition_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_ats"
+    },
+    {
+      "test_name": "learning_worker_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_lms"
+    },
+    {
+      "test_name": "performance_worker_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_performance"
+    },
+    {
+      "test_name": "compensation_worker_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_compensation"
+    },
+    {
+      "test_name": "hire_before_termination",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "promotion_after_hire",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "application_before_hire",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_ats"
+    },
+    {
+      "test_name": "assignment_effective_window",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "headcount_non_negative",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "salary_positive",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_compensation"
+    },
+    {
+      "test_name": "attrition_rate_bounds",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "fte_valid",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "active_workers_unterminated",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "active_has_org",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "location_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "active_headcount_scale",
+      "status": "passed",
+      "observed_value": "50010",
+      "expected_value": ">=1000",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "hire_events_present",
+      "status": "passed",
+      "observed_value": "80000",
+      "expected_value": ">0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "one_assignment_per_worker_min",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "overview_rows_present",
+      "status": "passed",
+      "observed_value": "46848",
+      "expected_value": ">0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "unique_worker_id",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "unique_assignment_id",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "unique_requisition_id",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_ats"
+    },
+    {
+      "test_name": "worker_id_not_null",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "org_id_not_null",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "location_id_not_null",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "candidate_requisition_not_null",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_ats"
+    },
+    {
+      "test_name": "worker_manager_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "worker_job_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "worker_org_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "candidate_requisition_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_ats"
+    },
+    {
+      "test_name": "learning_worker_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_lms"
+    },
+    {
+      "test_name": "performance_worker_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_performance"
+    },
+    {
+      "test_name": "compensation_worker_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_compensation"
+    },
+    {
+      "test_name": "hire_before_termination",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "promotion_after_hire",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "application_before_hire",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_ats"
+    },
+    {
+      "test_name": "assignment_effective_window",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "headcount_non_negative",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "salary_positive",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_compensation"
+    },
+    {
+      "test_name": "attrition_rate_bounds",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "fte_valid",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "active_workers_unterminated",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "active_has_org",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "location_fk",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "active_headcount_scale",
+      "status": "passed",
+      "observed_value": "50010",
+      "expected_value": ">=1000",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "hire_events_present",
+      "status": "passed",
+      "observed_value": "80000",
+      "expected_value": ">0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "one_assignment_per_worker_min",
+      "status": "passed",
+      "observed_value": "0",
+      "expected_value": "0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "overview_rows_present",
+      "status": "passed",
+      "observed_value": "46848",
+      "expected_value": ">0",
+      "source_name": "people_hris"
+    },
+    {
+      "test_name": "apac_hris_volume",
+      "status": "failed",
+      "observed_value": "10395",
+      "expected_value": ">= 23760 (baseline 29700)",
+      "source_name": "people_hris"
+    }
+  ],
+  "incidents": [
+    {
+      "incident_id": "people-incident-apac-hris-incomplete",
+      "title": "APAC HRIS feed incomplete for daily load",
+      "severity": "high",
+      "status": "open",
+      "affected_metrics": [
+        "headcount",
+        "voluntary_attrition",
+        "average_headcount",
+        "hires"
+      ],
+      "source_name": "people_hris",
+      "detected_at": "2026-09-01T01:34:54.085360+00:00",
+      "resolved_at": null,
+      "business_change": "False",
+      "summary": "APAC worker rows dropped from 29700 to 10395. Certified headcount was not republished as a business change. This is a data issue, not a workforce change. Upstream source: people_hris via people_dataset_lineage.",
+      "expected_records": "29700",
+      "actual_records": "10395"
+    }
+  ],
+  "snapshots": [
+    {
+      "snapshot_id": "current",
+      "label": "Current trusted GlobalTech snapshot",
+      "as_of_date": "2026-08-01",
+      "quality_mode": "trusted",
+      "incident_id": null,
+      "notes": "Latest certified marts. The incomplete APAC extract was not published as a workforce change."
+    },
+    {
+      "snapshot_id": "incident_replay",
+      "label": "APAC HRIS incomplete feed replay",
+      "as_of_date": "2026-08-01",
+      "quality_mode": "replay",
+      "incident_id": "people-incident-apac-hris-incomplete",
+      "notes": "Historical quality incident. Downstream reporting is blocked in this replay only."
+    }
+  ],
+  "api_usage": [
+    {
+      "provider": "bls",
+      "period_month": "2026-08-01",
+      "requests": "2",
+      "records": "534",
+      "estimated_cost": "0.00"
+    },
+    {
+      "provider": "microsoft_learn",
+      "period_month": "2026-08-01",
+      "requests": "2",
+      "records": "9174",
+      "estimated_cost": "0.00"
+    },
+    {
+      "provider": "onet",
+      "period_month": "2026-08-01",
+      "requests": "2",
+      "records": "1026",
+      "estimated_cost": "0.00"
+    }
+  ],
+  "onet_occupations": 1016,
+  "onet_skills": 18,
+  "bls_tables": {},
+  "platform_facts": {
+    "company_label": "GlobalTech",
+    "dataset_label": "Synthetic Enterprise People Dataset",
+    "hr_data_domains": 6,
+    "pipeline_status": "success",
+    "active_employees": 50010,
+    "historical_years": 5,
+    "certified_metrics": 20,
+    "data_quality_tests": 30,
+    "learning_resources": 4587
+  },
+  "certified_validation": {
+    "tests": [
+      {
+        "status": "passed",
+        "test_name": "compa_ratio_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "compa_ratio_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "compa_ratio_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "compa_ratio_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.9409238807368545,
+        "test_name": "compa_ratio_reasonable_range"
+      },
+      {
+        "status": "passed",
+        "test_name": "engagement_score_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "engagement_score_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "engagement_score_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "engagement_score_quality_present"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_participation_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_participation_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_participation_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_participation_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.12411694687160059,
+        "test_name": "learning_participation_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_completion_rate_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_completion_rate_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_completion_rate_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_completion_rate_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.15322056351959804,
+        "test_name": "learning_completion_rate_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_hours_per_employee_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_hours_per_employee_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_hours_per_employee_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "learning_hours_per_employee_quality_present"
+      },
+      {
+        "status": "passed",
+        "test_name": "promotion_rate_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "promotion_rate_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "promotion_rate_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "promotion_rate_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.0038392321535692863,
+        "test_name": "promotion_rate_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "internal_mobility_rate_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "internal_mobility_rate_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "internal_mobility_rate_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "internal_mobility_rate_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.007998400319936013,
+        "test_name": "internal_mobility_rate_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "span_of_control_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "span_of_control_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "span_of_control_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "span_of_control_quality_present"
+      },
+      {
+        "status": "passed",
+        "test_name": "manager_turnover_rate_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "manager_turnover_rate_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "manager_turnover_rate_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "manager_turnover_rate_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.0004658883454389253,
+        "test_name": "manager_turnover_rate_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "time_to_fill_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "time_to_fill_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "time_to_fill_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "time_to_fill_quality_present"
+      },
+      {
+        "status": "passed",
+        "test_name": "time_in_stage_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "time_in_stage_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "time_in_stage_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "time_in_stage_quality_present"
+      },
+      {
+        "status": "passed",
+        "test_name": "offer_acceptance_rate_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "offer_acceptance_rate_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "offer_acceptance_rate_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "offer_acceptance_rate_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.5027173913043478,
+        "test_name": "offer_acceptance_rate_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "quality_of_hire_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "quality_of_hire_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "quality_of_hire_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "quality_of_hire_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.6272198648436272,
+        "test_name": "quality_of_hire_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "regrettable_attrition_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "regrettable_attrition_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "regrettable_attrition_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "regrettable_attrition_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.006931427678850359,
+        "test_name": "regrettable_attrition_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "voluntary_attrition_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "voluntary_attrition_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "voluntary_attrition_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "voluntary_attrition_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.018275538894095594,
+        "test_name": "voluntary_attrition_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "skill_coverage_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "skill_coverage_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "skill_coverage_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "skill_coverage_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.23404141513244656,
+        "test_name": "skill_coverage_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "critical_skill_gap_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "critical_skill_gap_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "critical_skill_gap_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "critical_skill_gap_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 0.7668384104234073,
+        "test_name": "critical_skill_gap_rate_bounds"
+      },
+      {
+        "status": "passed",
+        "test_name": "headcount_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "headcount_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "headcount_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "headcount_quality_present"
+      },
+      {
+        "status": "passed",
+        "observed": 51232.0,
+        "test_name": "headcount_non_negative"
+      },
+      {
+        "status": "passed",
+        "observed": "healthy",
+        "test_name": "current_headcount_trusted"
+      },
+      {
+        "status": "passed",
+        "test_name": "average_headcount_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "average_headcount_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "average_headcount_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "average_headcount_quality_present"
+      },
+      {
+        "status": "passed",
+        "test_name": "hires_has_definition"
+      },
+      {
+        "status": "passed",
+        "test_name": "hires_has_owner"
+      },
+      {
+        "status": "passed",
+        "test_name": "hires_has_lineage"
+      },
+      {
+        "status": "passed",
+        "test_name": "hires_quality_present"
+      },
+      {
+        "status": "passed",
+        "test_name": "replay_incident_not_displayed_healthy"
+      }
+    ],
+    "failed": 0
+  },
+  "mart_as_of": "2026-08-01",
+  "lineage_rows": [
+    {
+      "dataset": "people_dim_occupation",
+      "upstream": "people_onet",
+      "grain": "occupation",
+      "serving": "people_dim_occupation"
+    },
+    {
+      "dataset": "people_dim_skill",
+      "upstream": "people_onet",
+      "grain": "skill",
+      "serving": "people_dim_skill"
+    },
+    {
+      "dataset": "people_external_learning_content",
+      "upstream": "people_microsoft_learn",
+      "grain": "content",
+      "serving": "people_external_learning_content"
+    },
+    {
+      "dataset": "people_mart_attrition_segment",
+      "upstream": "people_hris",
+      "grain": "family \u00d7 location \u00d7 level \u00d7 tenure \u00d7 month",
+      "serving": "people_mart_attrition_segment"
+    },
+    {
+      "dataset": "people_mart_compensation",
+      "upstream": "people_compensation",
+      "grain": "job_family \u00d7 location \u00d7 month",
+      "serving": "people_mart_compensation"
+    },
+    {
+      "dataset": "people_mart_compensation_equity",
+      "upstream": "people_compensation",
+      "grain": "job_family \u00d7 location \u00d7 month",
+      "serving": "people_mart_compensation_equity"
+    },
+    {
+      "dataset": "people_mart_internal_mobility",
+      "upstream": "people_hris",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "serving": "people_mart_internal_mobility"
+    },
+    {
+      "dataset": "people_mart_learning",
+      "upstream": "people_lms",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "serving": "people_mart_learning"
+    },
+    {
+      "dataset": "people_mart_learning_adoption",
+      "upstream": "people_lms",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "serving": "people_mart_learning_adoption"
+    },
+    {
+      "dataset": "people_mart_manager_effectiveness",
+      "upstream": "people_hris",
+      "grain": "org \u00d7 job_family \u00d7 month",
+      "serving": "people_mart_manager_effectiveness"
+    },
+    {
+      "dataset": "people_mart_recruiting",
+      "upstream": "people_ats",
+      "grain": "job_family \u00d7 location \u00d7 week",
+      "serving": "people_mart_recruiting"
+    },
+    {
+      "dataset": "people_mart_retention",
+      "upstream": "people_hris",
+      "grain": "org \u00d7 job_family \u00d7 location \u00d7 month",
+      "serving": "people_mart_retention"
+    },
+    {
+      "dataset": "people_mart_skills",
+      "upstream": "people_hris",
+      "grain": "job_family \u00d7 skill \u00d7 month",
+      "serving": "people_mart_skills"
+    },
+    {
+      "dataset": "people_mart_workforce_overview",
+      "upstream": "people_hris",
+      "grain": "org \u00d7 job_family \u00d7 location \u00d7 month",
+      "serving": "people_mart_workforce_overview"
+    }
+  ]
+}

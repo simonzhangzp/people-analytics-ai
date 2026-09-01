@@ -10,16 +10,16 @@ const geist = Geist({
 
 export const metadata: Metadata = {
   title: {
-    default: "People Strategy Intelligence",
-    template: "%s · People Strategy Intelligence",
+    default: "PeopleAnalyticsAI",
+    template: "%s · PeopleAnalyticsAI",
   },
   description:
-    "Turn people strategy into a trusted measurement system with AI-assisted design and deterministic analytics.",
+    "Trusted People data. Governed metrics. AI-ready workforce intelligence. A working enterprise People Data & AI environment.",
   metadataBase: new URL("https://peopleanalyticsai.net"),
   openGraph: {
-    title: "People Strategy Intelligence",
+    title: "PeopleAnalyticsAI · Enterprise People Data & AI",
     description:
-      "Strategy → Metrics → Data → Insights → Action, with AI as your co-designer.",
+      "A working enterprise People Data & AI environment showing how data foundations, governance, workforce analytics, and AI support trusted workforce decisions.",
     type: "website",
   },
 };

@@ -31,4 +31,5 @@ export const PEOPLE_RPC = {
   getDataFoundation: "people_get_data_foundation",
   getPlatformFacts: "people_get_platform_facts",
   getServingSnapshot: "people_get_serving_snapshot",
+  getQualityTests: "people_get_quality_tests",
 } as const;
