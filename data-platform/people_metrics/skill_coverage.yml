@@ -1,9 +1,9 @@
-metric_id: offer_acceptance_rate
+metric_id: skill_coverage
 status: certified
-grain: people_fact_offer
+grain: people_fact_worker_skill
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
 numerator:
-  expression: accepted / resolved
+  expression: workers with skills / workers
 min_cell: 5
 sensitivity: internal
 sandbox:

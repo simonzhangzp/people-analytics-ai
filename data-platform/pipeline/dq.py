@@ -206,4 +206,66 @@ def run_gold_dq(con: duckdb.DuckDBPyConnection, *, backfill: bool = True) -> lis
             "backfill residual must be 0" if backfill else "daily run may relax late registration",
         )
     )
+
+    attr_map = [
+        ("org_id", "department"),
+        ("job_id", "designation"),
+        ("grade_id", "grade"),
+        ("location_id", "branch"),
+        ("manager_worker_id", "reports_to"),
+    ]
+    hist_union = " UNION ALL ".join(
+        f"""
+        SELECT worker_id, switch_date, property FROM (
+          SELECT worker_id, valid_from AS switch_date, '{prop}' AS property,
+                 {col} AS cur_val,
+                 lag({col}) OVER (PARTITION BY worker_id ORDER BY valid_from, coalesce(valid_to, DATE '9999-12-31')) AS prev_val,
+                 row_number() OVER (PARTITION BY worker_id ORDER BY valid_from, coalesce(valid_to, DATE '9999-12-31')) AS rn
+          FROM people_hist_worker_attr
+        ) WHERE rn > 1 AND prev_val IS DISTINCT FROM cur_val
+        """
+        for col, prop in attr_map
+    )
+    missing_change = con.execute(
+        f"""
+        SELECT count(*) FROM (
+          SELECT worker_id, switch_date, property FROM ({hist_union})
+          EXCEPT
+          SELECT worker_id, event_date, property
+          FROM people_evt_worker_change
+          WHERE property IN ('department','designation','grade','branch','reports_to')
+        )
+        """
+    ).fetchone()[0]
+    extra_change = con.execute(
+        f"""
+        SELECT count(*) FROM (
+          SELECT worker_id, event_date, property
+          FROM people_evt_worker_change
+          WHERE property IN ('department','designation','grade','branch','reports_to')
+          EXCEPT
+          SELECT worker_id, switch_date, property FROM ({hist_union})
+        )
+        """
+    ).fetchone()[0]
+    tests.append(
+        _row(
+            "hist_attr_switch_has_evt_worker_change",
+            "gold",
+            missing_change == 0,
+            missing_change,
+            0,
+            "every hist switch on org/job/grade/location/manager must have same-day evt_worker_change",
+        )
+    )
+    tests.append(
+        _row(
+            "evt_worker_change_has_hist_attr_switch",
+            "gold",
+            extra_change == 0,
+            extra_change,
+            0,
+            "every evt_worker_change on the five attributes must match a hist value switch",
+        )
+    )
     return tests

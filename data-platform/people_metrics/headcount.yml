@@ -1,11 +1,11 @@
 metric_id: headcount
 status: certified
 grain: people_snap_worker_month
-population:
-  rule: BR-WF-001
-  param: certified_population
-measure:
-  op: count
+architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+numerator:
+  expression: count(is_certified)
+min_cell: 5
+sensitivity: internal
 sandbox:
   rule_kind: parametric
-  rpc: people_get_metric_sandbox
+  rpc: people_v2.people_get_metric

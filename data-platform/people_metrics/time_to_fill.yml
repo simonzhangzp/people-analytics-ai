@@ -1,9 +1,9 @@
-metric_id: offer_acceptance_rate
+metric_id: time_to_fill_days
 status: certified
-grain: people_fact_offer
+grain: people_dim_requisition
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
 numerator:
-  expression: accepted / resolved
+  expression: median(closed-opened) filled
 min_cell: 5
 sensitivity: internal
 sandbox:

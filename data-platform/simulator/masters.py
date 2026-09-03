@@ -32,7 +32,7 @@ def bronze_masters(state: dict) -> dict[str, list[dict]]:
     applications = state.get("applications") or []
     promotions = state.get("promotions") or []
     transfers = state.get("transfers") or []
-    manager_changes = state.get("manager_changes") or []
+    property_history = list(state["property_history"]) if "property_history" in state else []
     training_events = state.get("training_events") or []
     emp_types = baseline.get("employment_type_master") or []
     cities = {
@@ -150,7 +150,7 @@ def bronze_masters(state: dict) -> dict[str, list[dict]]:
     hiring_managers = []
     seen_hm: set[tuple[int, int]] = set()
     hm_ids: set[int] = set()
-    recruiter_ids: set[int] = {204}
+    recruiter_ids: set[int] = set(range(201, 225))
     for opening in openings:
         hm = int(opening.get("hiring_manager_id") or 0)
         job_id = int(opening["job_id"])
@@ -178,51 +178,39 @@ def bronze_masters(state: dict) -> dict[str, list[dict]]:
             }
         )
 
-    property_history = []
-    idx = 1
-    for row in promotions:
-        property_history.append(
-            {
-                "parent": row["name"],
-                "parenttype": "Employee Promotion",
-                "idx": 1,
-                "property": "grade",
-                "fieldname": "grade",
-                "current": None,
-                "new": row.get("grade"),
-                "employee": row["employee"],
-                "event_date": row["promotion_date"],
-            }
-        )
-        idx += 1
-    for row in transfers:
-        property_history.append(
-            {
-                "parent": row["name"],
-                "parenttype": "Employee Transfer",
-                "idx": 1,
-                "property": "department",
-                "fieldname": "department",
-                "current": None,
-                "new": None,
-                "employee": row["employee"],
-                "event_date": row["transfer_date"],
-            }
-        )
-    for row in manager_changes:
-        property_history.append(
-            {
-                "parent": f"HR-EMP-MGR-{row['employee']}-{row['change_date']}",
-                "parenttype": "Employee",
-                "idx": 1,
-                "property": "reports_to",
-                "fieldname": "reports_to",
-                "current": row.get("current"),
-                "new": row.get("new"),
-                "employee": row["employee"],
-                "event_date": row["change_date"],
-            }
-        )
+    if "property_history" not in state:
+        for row in promotions:
+            property_history.append(
+                {
+                    "parent": row["name"],
+                    "parenttype": "Employee Promotion",
+                    "idx": 1,
+                    "property": "grade",
+                    "fieldname": "grade",
+                    "current": row.get("old_grade"),
+                    "new": row.get("grade"),
+                    "employee": row["employee"],
+                    "event_date": row["promotion_date"],
+                }
+            )
+        for row in transfers:
+            details = row.get("transfer_details") or []
+            for detail in details:
+                if detail.get("current") is None and detail.get("new") is None:
+                    continue
+                property_history.append(
+                    {
+                        "parent": row["name"],
+                        "parenttype": "Employee Transfer",
+                        "idx": int(detail.get("idx") or 1),
+                        "property": detail.get("property") or detail.get("fieldname"),
+                        "fieldname": detail.get("fieldname"),
+                        "current": detail.get("current"),
+                        "new": detail.get("new"),
+                        "employee": row["employee"],
+                        "event_date": row["transfer_date"],
+                    }
+                )
 
     salary_structure = [
         {"name": "GT-PROF-USD", "company": "GlobalTech", "currency": "USD", "docstatus": 1, "modified": START.isoformat()}

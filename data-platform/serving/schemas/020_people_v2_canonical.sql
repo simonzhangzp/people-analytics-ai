@@ -198,11 +198,14 @@ create table if not exists people_v2.people_evt_worker (
 
 create table if not exists people_v2.people_evt_worker_change (
   event_id text,
+  worker_id text,
+  event_date date,
   property text,
   old_value text,
   new_value text,
   old_canonical_id text,
-  new_canonical_id text
+  new_canonical_id text,
+  source_object text
 );
 
 create table if not exists people_v2.people_hist_worker_attr (
@@ -246,9 +249,9 @@ create table if not exists people_v2.people_fact_appraisal (
   appraisal_id text,
   worker_id text,
   cycle_id text,
-  final_score text,
-  total_score text,
-  self_score text,
+  final_score double precision,
+  total_score double precision,
+  self_score double precision,
   status text,
   submitted_at timestamptz
 );
@@ -374,23 +377,6 @@ create table if not exists people_v2.people_fact_survey_score_restricted (
   items_answered text
 );
 
-create table if not exists people_v2.people_fact_candidate_demographic_restricted (
-  application_id text,
-  question_id text,
-  answer_option_id text,
-  free_form_text text,
-  submitted_at timestamptz
-);
-
-create table if not exists people_v2.people_fact_candidate_eeoc_restricted (
-  application_id text,
-  race text,
-  gender text,
-  veteran_status text,
-  disability_status text,
-  submitted_at timestamptz
-);
-
 create table if not exists people_v2.people_ref_city (
   city text,
   country text,
@@ -412,7 +398,9 @@ create table if not exists people_v2.people_snap_worker_month (
   job_id text,
   job_family text,
   grade_id text,
+  level_rank bigint,
   location_id text,
+  country text,
   region text,
   manager_worker_id text,
   employment_type text,
@@ -420,11 +408,19 @@ create table if not exists people_v2.people_snap_worker_month (
   is_certified boolean,
   hire_date date,
   tenure_band text,
-  hired_in_month text,
-  terminated_in_month text,
+  tenure_months text,
+  hired_in_month boolean,
+  terminated_in_month boolean,
   termination_category text,
-  via_t1 text,
-  is_rehire boolean
+  via_t1 boolean,
+  is_rehire boolean,
+  promoted_in_month boolean,
+  transferred_in_month boolean,
+  manager_changed_in_month boolean,
+  comp_changed_in_month boolean,
+  is_manager boolean,
+  direct_report_count bigint,
+  is_regrettable boolean
 );
 
 create table if not exists people_v2.people_snap_requisition_month (
@@ -442,7 +438,7 @@ create table if not exists people_v2.people_snap_recruiter_month (
   month_end date,
   recruiter_user_id text,
   person_id text,
-  open_requisitions text,
+  open_requisitions bigint,
   active_applications text,
   interviews_scheduled text,
   offers_sent text,
@@ -453,6 +449,8 @@ create table if not exists people_v2.people_snap_recruiter_month (
 
 create table if not exists people_v2.people_mart_workforce_monthly (
   month_end date,
+  org_id text,
+  org_path ltree,
   region text,
   tenure_band text,
   job_family text,
@@ -464,8 +462,12 @@ create table if not exists people_v2.people_mart_workforce_monthly (
 
 create table if not exists people_v2.people_mart_workforce_monthly_2d (
   month_end date,
-  location text,
-  job_family text,
+  org_id text,
+  org_path ltree,
+  location_id text,
+  region text,
+  tenure_band text,
+  grain text,
   headcount bigint,
   hires bigint,
   terms_vol text
@@ -473,9 +475,12 @@ create table if not exists people_v2.people_mart_workforce_monthly_2d (
 
 create table if not exists people_v2.people_mart_mobility_monthly (
   month_start date,
+  org_id text,
+  org_path ltree,
   promotions text,
   transfers text,
-  internal_mobility text
+  internal_mobility text,
+  manager_changes text
 );
 
 create table if not exists people_v2.people_mart_recruiting_monthly (
@@ -488,6 +493,8 @@ create table if not exists people_v2.people_mart_recruiting_monthly (
 create table if not exists people_v2.people_mart_stage_aging_monthly (
   month_start date,
   canonical_stage text,
+  org_id text,
+  org_path ltree,
   aging_p50_days double precision
 );
 
@@ -495,7 +502,7 @@ create table if not exists people_v2.people_mart_recruiter_load_monthly (
   month_end date,
   recruiter_user_id text,
   person_id text,
-  open_requisitions text,
+  open_requisitions bigint,
   active_applications text,
   interviews_scheduled text,
   offers_sent text,
@@ -506,6 +513,8 @@ create table if not exists people_v2.people_mart_recruiter_load_monthly (
 
 create table if not exists people_v2.people_mart_comp_monthly (
   month_end date,
+  org_id text,
+  org_path ltree,
   job_family text,
   region text,
   grade_id text,
@@ -524,6 +533,8 @@ create table if not exists people_v2.people_mart_learning_monthly (
 
 create table if not exists people_v2.people_mart_skill_coverage_monthly (
   month_end date,
+  org_id text,
+  org_path ltree,
   job_family text,
   coverage_ratio double precision
 );
@@ -531,6 +542,8 @@ create table if not exists people_v2.people_mart_skill_coverage_monthly (
 create table if not exists people_v2.people_mart_engagement_wave (
   wave_id text,
   dimension text,
+  org_id text,
+  org_path ltree,
   n bigint,
   mean double precision,
   favorable_pct double precision
@@ -589,6 +602,7 @@ create index if not exists people_dim_worker_worker_id_idx on people_v2.people_d
 create index if not exists people_evt_worker_event_id_idx on people_v2.people_evt_worker (event_id);
 create index if not exists people_evt_worker_worker_id_idx on people_v2.people_evt_worker (worker_id);
 create index if not exists people_evt_worker_change_event_id_idx on people_v2.people_evt_worker_change (event_id);
+create index if not exists people_evt_worker_change_worker_id_idx on people_v2.people_evt_worker_change (worker_id);
 create index if not exists people_hist_worker_attr_worker_id_idx on people_v2.people_hist_worker_attr (worker_id);
 create index if not exists people_hist_worker_attr_worker_id_idx on people_v2.people_hist_worker_attr (worker_id);
 create index if not exists people_fact_comp_assignment_restricted_comp_assignment_id_idx on people_v2.people_fact_comp_assignment_restricted (comp_assignment_id);
@@ -616,10 +630,6 @@ create index if not exists people_fact_offer_application_id_idx on people_v2.peo
 create index if not exists people_dim_recruiter_person_id_idx on people_v2.people_dim_recruiter (person_id);
 create index if not exists people_fact_survey_score_restricted_worker_id_idx on people_v2.people_fact_survey_score_restricted (worker_id);
 create index if not exists people_fact_survey_score_restricted_worker_id_idx on people_v2.people_fact_survey_score_restricted (worker_id);
-create index if not exists people_fact_candidate_demographic_restricted_application_id_idx on people_v2.people_fact_candidate_demographic_restricted (application_id);
-create index if not exists people_fact_candidate_demographic_restricted_application_id_idx on people_v2.people_fact_candidate_demographic_restricted (application_id);
-create index if not exists people_fact_candidate_eeoc_restricted_application_id_idx on people_v2.people_fact_candidate_eeoc_restricted (application_id);
-create index if not exists people_fact_candidate_eeoc_restricted_application_id_idx on people_v2.people_fact_candidate_eeoc_restricted (application_id);
 create index if not exists people_ref_city_city_idx on people_v2.people_ref_city (city);
 create index if not exists people_ref_separation_reason_map_raw_reason_idx on people_v2.people_ref_separation_reason_map (raw_reason);
 create index if not exists people_snap_worker_month_worker_id_idx on people_v2.people_snap_worker_month (worker_id);
@@ -632,19 +642,26 @@ create index if not exists people_snap_recruiter_month_recruiter_user_id_idx on 
 create index if not exists people_snap_recruiter_month_month_end_idx on people_v2.people_snap_recruiter_month (month_end);
 create index if not exists people_mart_workforce_monthly_month_end_idx on people_v2.people_mart_workforce_monthly (month_end);
 create index if not exists people_mart_workforce_monthly_month_end_idx on people_v2.people_mart_workforce_monthly (month_end);
+create index if not exists people_mart_workforce_monthly_org_path_idx on people_v2.people_mart_workforce_monthly using gist (org_path);
 create index if not exists people_mart_workforce_monthly_2d_month_end_idx on people_v2.people_mart_workforce_monthly_2d (month_end);
 create index if not exists people_mart_workforce_monthly_2d_month_end_idx on people_v2.people_mart_workforce_monthly_2d (month_end);
+create index if not exists people_mart_workforce_monthly_2d_org_path_idx on people_v2.people_mart_workforce_monthly_2d using gist (org_path);
 create index if not exists people_mart_mobility_monthly_month_start_idx on people_v2.people_mart_mobility_monthly (month_start);
+create index if not exists people_mart_mobility_monthly_org_path_idx on people_v2.people_mart_mobility_monthly using gist (org_path);
 create index if not exists people_mart_recruiting_monthly_month_start_idx on people_v2.people_mart_recruiting_monthly (month_start);
 create index if not exists people_mart_stage_aging_monthly_month_start_idx on people_v2.people_mart_stage_aging_monthly (month_start);
+create index if not exists people_mart_stage_aging_monthly_org_path_idx on people_v2.people_mart_stage_aging_monthly using gist (org_path);
 create index if not exists people_mart_recruiter_load_monthly_month_end_idx on people_v2.people_mart_recruiter_load_monthly (month_end);
 create index if not exists people_mart_recruiter_load_monthly_month_end_idx on people_v2.people_mart_recruiter_load_monthly (month_end);
 create index if not exists people_mart_comp_monthly_month_end_idx on people_v2.people_mart_comp_monthly (month_end);
 create index if not exists people_mart_comp_monthly_month_end_idx on people_v2.people_mart_comp_monthly (month_end);
+create index if not exists people_mart_comp_monthly_org_path_idx on people_v2.people_mart_comp_monthly using gist (org_path);
 create index if not exists people_mart_learning_monthly_month_start_idx on people_v2.people_mart_learning_monthly (month_start);
 create index if not exists people_mart_skill_coverage_monthly_month_end_idx on people_v2.people_mart_skill_coverage_monthly (month_end);
 create index if not exists people_mart_skill_coverage_monthly_month_end_idx on people_v2.people_mart_skill_coverage_monthly (month_end);
+create index if not exists people_mart_skill_coverage_monthly_org_path_idx on people_v2.people_mart_skill_coverage_monthly using gist (org_path);
 create index if not exists people_mart_engagement_wave_wave_id_idx on people_v2.people_mart_engagement_wave (wave_id);
+create index if not exists people_mart_engagement_wave_org_path_idx on people_v2.people_mart_engagement_wave using gist (org_path);
 create index if not exists people_mart_source_health_daily_extract_date_idx on people_v2.people_mart_source_health_daily (extract_date);
 create index if not exists people_mart_applicant_flow_job_family_idx on people_v2.people_mart_applicant_flow (job_family);
 create index if not exists people_mart_funnel_monthly_month_start_idx on people_v2.people_mart_funnel_monthly (month_start);

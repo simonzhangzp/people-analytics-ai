@@ -3,6 +3,7 @@ from __future__ import annotations
 """Five-year workforce + T1 recruiting engine. Opening stock has no T1; window hires always go through accepted offers."""
 
 import calendar
+import hashlib
 import random
 from datetime import date, timedelta
 from pathlib import Path
@@ -51,6 +52,27 @@ BAND_MID = {
 }
 SOURCE_IDS = {"inbound": 1, "referral": 2, "sourced": 3, "internal": 4}
 STAGE_IDS = {"Application Review": 1, "Phone Screen": 2, "Onsite": 3, "Offer": 4}
+RECRUITER_USER_MIN = 201
+RECRUITER_USER_N = 24
+REGIONS = ("AMER", "EMEA", "APAC")
+
+
+def recruiter_user_id(opening_id: int) -> int:
+    return RECRUITER_USER_MIN + (int(opening_id) % RECRUITER_USER_N)
+
+
+def hash_pick(key: str, items: list):
+    if not items:
+        return None
+    digest = hashlib.md5(key.encode("utf-8")).digest()
+    return items[int.from_bytes(digest[:4], "big") % len(items)]
+
+
+def accompany_reports_to(worker_id: str, day: date) -> bool:
+    digest = hashlib.md5(f"{worker_id}|{day.isoformat()}|reports_to".encode("utf-8")).digest()[0]
+    return digest < 51
+
+
 SKILLS = {
     "Engineering": ["Python", "SQL", "Kubernetes", "System Design", "Testing", "Cloud", "CI/CD", "Observability"],
     "Sales": ["Negotiation", "CRM", "Discovery", "Forecasting", "Presentation", "Pipeline", "MEDDPICC"],
@@ -181,6 +203,7 @@ class WorldEngine:
         self.promotions: list[dict] = []
         self.transfers: list[dict] = []
         self.manager_changes: list[dict] = []
+        self.property_history: list[dict] = []
         self.training_events: list[dict] = []
         self.training_event_employees: list[dict] = []
         self.training_results: list[dict] = []
@@ -190,6 +213,7 @@ class WorldEngine:
         self.survey_waves: list[dict] = []
         self.survey_responses: list[dict] = []
         self.left_pool: list[dict] = []
+        self._employee_emit_seq = 0
         self.next_emp = 1
         self.next_offer = 77000
         self.next_app = 44000
@@ -227,6 +251,7 @@ class WorldEngine:
         return in_certified_headcount(status, w["employment_type"], w["hire_date"], w["termination_date"], as_of)
 
     def _emit_employee(self, w: dict, modified: date) -> None:
+        self._employee_emit_seq += 1
         self.employee_versions.append(
             {
                 "name": w["worker_id"],
@@ -248,6 +273,7 @@ class WorldEngine:
                 "hired_via_application_id": w.get("hired_via_application_id"),
                 "modified": utc(modified),
                 "modified_date": modified.isoformat(),
+                "emit_seq": self._employee_emit_seq,
                 "docstatus": 0,
             }
         )
@@ -457,6 +483,41 @@ class WorldEngine:
             }
         )
 
+    def _ph(
+        self,
+        parent: str,
+        parenttype: str,
+        employee: str,
+        day: date,
+        fieldname: str,
+        current,
+        new,
+        idx: int,
+    ) -> dict:
+        return {
+            "parent": parent,
+            "parenttype": parenttype,
+            "idx": idx,
+            "property": fieldname,
+            "fieldname": fieldname,
+            "current": current,
+            "new": new,
+            "employee": employee,
+            "event_date": day.isoformat(),
+        }
+
+    def _hash_new_manager(self, w: dict, day: date) -> str | None:
+        peers = [
+            x["worker_id"]
+            for x in self.workers
+            if x["region"] == w["region"] and x["worker_id"] != w["worker_id"]
+        ]
+        return hash_pick(f"{w['worker_id']}|{day.isoformat()}|mgr", peers)
+
+    def _business_day(self, month_start: date, me: date, w: dict) -> date:
+        day = month_start + timedelta(days=self.rng.randint(0, me.day - 1))
+        return max(day, w["hire_date"])
+
     def _emit_interview_scorecard(
         self, app_id: int, stage_name: str, day: date, family: str, hm: int, opened: date
     ) -> None:
@@ -464,9 +525,10 @@ class WorldEngine:
         starts = day + timedelta(days=interview_d)
         submitted = starts + timedelta(days=1 + scorecard_d)
         self.next_interview += 1
+        interview_id = self.next_interview
         self.interviews.append(
             {
-                "id": self.next_interview,
+                "id": interview_id,
                 "application_id": app_id,
                 "job_interview_id": STAGE_IDS[stage_name],
                 "starts_at": utc(starts, 14),
@@ -477,14 +539,17 @@ class WorldEngine:
             }
         )
         self.next_scorecard += 1
+        rating = "yes" if self.rng.random() < 0.55 else "no"
         self.scorecards.append(
             {
                 "id": self.next_scorecard,
                 "application_id": app_id,
                 "interview_kit_id": STAGE_IDS[stage_name],
+                "interview_id": interview_id,
                 "submitter_id": hm,
                 "interviewer_id": hm,
-                "candidate_rating": "yes" if self.rng.random() < 0.55 else "no",
+                "candidate_rating": rating,
+                "overall_recommendation": rating,
                 "submitted_at": utc(submitted, 16),
                 "status": "complete",
                 "hiring_manager_id": hm,
@@ -556,10 +621,13 @@ class WorldEngine:
                 "status": last_status,
                 "created_at": utc(created),
                 "job_interview_stage_id": last_stage_id,
-                "recruiter_id": 204,
+                "recruiter_id": recruiter_user_id(opening_id),
                 "source_id": SOURCE_IDS[source],
                 "source_name": source,
                 "opening_id": opening_id,
+                "rejected_at": None if hired_app else utc(cursor),
+                "hired_at": utc(cursor) if hired_app else None,
+                "rejection_reason_id": 1 if hired_app else 10,
             }
         )
         return app_id if hired_app else None
@@ -623,12 +691,18 @@ class WorldEngine:
             app["source_id"] = SOURCE_IDS["referral"] if accept else SOURCE_IDS[self._source()]
             app["source_name"] = "referral" if accept else "inbound"
             app["opening_id"] = opening_id
+            app["recruiter_id"] = recruiter_user_id(opening_id)
+            app["hired_at"] = utc(hire_day) if accept else None
+            app["rejected_at"] = None if accept else utc(hire_day)
+            app["rejection_reason_id"] = 1 if accept else 10
             self.offers.append(offer)
             self.applications.append(app)
             self.candidates.append(bundle["candidate"])
             last_opening_row = bundle["opening"]
             last_opening_row["hiring_manager_id"] = hm
             last_opening_row["job_family"] = w["job_family"]
+            last_opening_row["recruiter_id"] = recruiter_user_id(opening_id)
+            last_opening_row["region"] = w["region"]
             created = date.fromisoformat(app["created_at"][:10])
             cursor = created
             path = ["Application Review", "Phone Screen", "Onsite", "Offer"]
@@ -657,6 +731,8 @@ class WorldEngine:
         last_opening_row["opened_at"] = utc(opened)
         last_opening_row["hiring_manager_id"] = hm
         last_opening_row["job_family"] = w["job_family"]
+        last_opening_row["recruiter_id"] = recruiter_user_id(opening_id)
+        last_opening_row["region"] = w["region"]
         self.openings.append(last_opening_row)
 
     def _emit_cancelled_opening(self, month_start: date, me: date) -> None:
@@ -690,6 +766,8 @@ class WorldEngine:
                 "close_reason_id": 99,
                 "hiring_manager_id": hm,
                 "job_family": family,
+                "recruiter_id": recruiter_user_id(opening_id),
+                "region": REGIONS[opening_id % len(REGIONS)],
             }
         )
 
@@ -778,12 +856,14 @@ class WorldEngine:
         if self.rng.random() < self.promo_m:
             grades = FAMILY_GRADES[w["job_family"]]
             idx = grades.index(w["grade"]) if w["grade"] in grades else 0
+            old_grade = w["grade"]
             new_grade = grades[min(idx + 1, len(grades) - 1)]
-            day = month_start + timedelta(days=self.rng.randint(0, me.day - 1))
+            day = self._business_day(month_start, me, w)
+            promo_name = f"HR-EMP-PRO-{self.next_promo:06d}"
             self.promotions.append(
                 {
                     "doctype": "Employee Promotion",
-                    "name": f"HR-EMP-PRO-{self.next_promo:06d}",
+                    "name": promo_name,
                     "employee": w["worker_id"],
                     "promotion_date": day.isoformat(),
                     "docstatus": 1,
@@ -791,26 +871,51 @@ class WorldEngine:
                 }
             )
             self.next_promo += 1
+            ph_idx = 1
+            if old_grade != new_grade:
+                self.property_history.append(
+                    self._ph(promo_name, "Employee Promotion", w["worker_id"], day, "grade", old_grade, new_grade, ph_idx)
+                )
+                ph_idx += 1
+            if accompany_reports_to(w["worker_id"], day):
+                old_mgr = w.get("reports_to")
+                new_mgr = self._hash_new_manager(w, day)
+                if new_mgr and new_mgr != old_mgr:
+                    w["reports_to"] = new_mgr
+                    self.property_history.append(
+                        self._ph(
+                            promo_name, "Employee Promotion", w["worker_id"], day, "reports_to", old_mgr, new_mgr, ph_idx
+                        )
+                    )
             w["grade"] = new_grade
             self._emit_ssa(w, day, new_grade)
             self._emit_employee(w, day)
             return
         if self.rng.random() < self.transfer_m:
-            day = month_start + timedelta(days=self.rng.randint(0, me.day - 1))
+            day = self._business_day(month_start, me, w)
+            xfer_name = f"HR-EMP-TRN-{self.next_transfer:06d}"
             self.transfers.append(
                 {
                     "doctype": "Employee Transfer",
-                    "name": f"HR-EMP-TRN-{self.next_transfer:06d}",
+                    "name": xfer_name,
                     "employee": w["worker_id"],
                     "transfer_date": day.isoformat(),
                     "docstatus": 1,
                 }
             )
             self.next_transfer += 1
+            if accompany_reports_to(w["worker_id"], day):
+                old_mgr = w.get("reports_to")
+                new_mgr = self._hash_new_manager(w, day)
+                if new_mgr and new_mgr != old_mgr:
+                    w["reports_to"] = new_mgr
+                    self.property_history.append(
+                        self._ph(xfer_name, "Employee Transfer", w["worker_id"], day, "reports_to", old_mgr, new_mgr, 1)
+                    )
             self._emit_employee(w, day)
             return
         if self.rng.random() < mgr_m:
-            day = month_start + timedelta(days=self.rng.randint(0, me.day - 1))
+            day = self._business_day(month_start, me, w)
             peers = [x for x in self.workers if x["region"] == w["region"] and x["worker_id"] != w["worker_id"]]
             if not peers:
                 return
@@ -891,6 +996,7 @@ class WorldEngine:
                     "final_score": score,
                     "docstatus": 1,
                     "modified": utc(day),
+                    "submitted_at": utc(day, 12),
                 }
             )
             self.next_apr += 1
@@ -1103,6 +1209,7 @@ class WorldEngine:
             "promotions": self.promotions,
             "transfers": self.transfers,
             "manager_changes": self.manager_changes,
+            "property_history": self.property_history,
             "training_events": self.training_events,
             "training_event_employees": self.training_event_employees,
             "training_results": self.training_results,

@@ -208,7 +208,7 @@ ops:
     fact_scorecard: 12
     dim_candidate: 12
   disk_gate: fail_closed_occupied_plus_delta
-  disk_gate_note: Refuse when quota is missing. Admission is occupied + supabase_measured_people_v2_bytes × 1.3 ≤ quota − 2 GiB. measured comes from 5% people_v2 pg_total_relation_size × 20 (step 6a-3), not parquet × 2.8. A7 is lake_only when that full estimate exceeds 4.5 GiB; marts still exist in both branches.
+  disk_gate_note: Refuse when quota is missing. Admission is occupied + supabase_measured_people_v2_bytes × 1.3 ≤ quota − 2 GiB. measured comes from 5% people_v2 pg_total_relation_size × 20, excluding lake-only candidate EEOC/demographic person-level tables. A7 is lake_only when that admission would leave less than 2 GiB headroom (survey person-level then stays lake-only); candidate person-level never enters Postgres.
   postgres_publish_restricted_person_level: as_designed
   postgres_restricted_fallback_reason: null
   supabase_measured_people_v2_bytes: 4430561280

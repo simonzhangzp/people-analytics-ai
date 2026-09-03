@@ -13,6 +13,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
+import pyarrow.parquet as pq
+
 ROOT = Path(__file__).resolve().parent
 DP = ROOT.parent
 if str(DP) not in sys.path:
@@ -73,6 +75,22 @@ def _run_world(prefix: str, apply_case3: bool) -> tuple[dict, object]:
     return state, con
 
 
+def _state_from_bronze(prefix: str) -> dict:
+    emp = LAKE / "people_bronze" / prefix / "frappe_hr" / "Employee" / "part.parquet"
+    if not emp.exists():
+        raise SystemExit(f"missing bronze employee parquet: {emp}")
+    return {"employee_versions": pq.read_table(emp).to_pylist()}
+
+
+def _rebuild_from_bronze(prefix: str) -> tuple[dict, object]:
+    bronze = LAKE / "people_bronze" / prefix
+    silver = LAKE / "people_silver" / prefix
+    gold = LAKE / "people_gold" / prefix
+    print("rebuild_from_bronze", bronze, flush=True)
+    con = transform(bronze, silver, gold)
+    return _state_from_bronze(prefix), con
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if "--from-report" in argv:
@@ -81,8 +99,15 @@ def main(argv: list[str] | None = None) -> int:
         print("rewrote", dest)
         return 0
     require_owner_approval(argv)
-    print("scale", SCALE, "seed", SEED, "publish", False)
-    state, con = _run_world(PREFIX, True)
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except Exception:
+        pass
+    print("scale", SCALE, "seed", SEED, "publish", False, flush=True)
+    if "--from-bronze" in argv:
+        state, con = _rebuild_from_bronze(PREFIX)
+    else:
+        state, con = _run_world(PREFIX, True)
     coverage = coverage_matrix(con)
     funnel = funnel_distribution(con)
     signals = case_signals(con)

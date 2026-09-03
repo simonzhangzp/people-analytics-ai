@@ -1,9 +1,9 @@
-metric_id: offer_acceptance_rate
+metric_id: applications_per_opening
 status: certified
-grain: people_fact_offer
+grain: people_fact_application
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
 numerator:
-  expression: accepted / resolved
+  expression: applications / openings
 min_cell: 5
 sensitivity: internal
 sandbox:

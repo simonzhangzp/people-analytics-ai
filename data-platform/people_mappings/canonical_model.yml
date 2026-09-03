@@ -284,11 +284,14 @@ tables:
 - name: people_evt_worker_change
   columns:
   - event_id
+  - worker_id
+  - event_date
   - property
   - old_value
   - new_value
   - old_canonical_id
   - new_canonical_id
+  - source_object
   schema: people_v2
   master_source: frappe_hr
   key: event_id
@@ -538,7 +541,8 @@ tables:
   master_source: greenhouse_v3
   key: application_id
   id_kind: master_immutable
-  notes: application grain; no person/worker
+  postgres: false
+  notes: application grain; lake-only. Serving consumes people_mart_applicant_flow (min cell 10).
 - name: people_fact_candidate_eeoc_restricted
   columns:
   - application_id
@@ -551,7 +555,8 @@ tables:
   master_source: greenhouse_v3
   key: application_id
   id_kind: master_immutable
-  notes: application grain; no person/worker
+  postgres: false
+  notes: application grain; lake-only. Serving consumes people_mart_applicant_flow (min cell 10).
 - name: people_ref_city
   columns:
   - city

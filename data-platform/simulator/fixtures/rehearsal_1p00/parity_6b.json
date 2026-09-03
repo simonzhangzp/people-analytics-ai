@@ -1,0 +1,127 @@
+{
+  "ref": "zapmigfrtnwnkmezjefx",
+  "as_of": "2026-08-31",
+  "rows": [
+    {
+      "metric_id": "applications_per_opening",
+      "parquet": 26.566763546159684,
+      "rpc": 26.566763546159684,
+      "match": true
+    },
+    {
+      "metric_id": "average_headcount",
+      "parquet": 42293.55,
+      "rpc": 42293.55,
+      "match": true
+    },
+    {
+      "metric_id": "compa_ratio_median",
+      "parquet": 0.98,
+      "rpc": 0.98,
+      "match": true
+    },
+    {
+      "metric_id": "engagement_score",
+      "parquet": 3.667584727597,
+      "rpc": 3.667584727597,
+      "match": true
+    },
+    {
+      "metric_id": "headcount",
+      "parquet": 49834,
+      "rpc": 49834,
+      "match": true
+    },
+    {
+      "metric_id": "hires",
+      "parquet": 894,
+      "rpc": 894,
+      "match": true
+    },
+    {
+      "metric_id": "internal_mobility_rate",
+      "parquet": 0.00531765461331621,
+      "rpc": 0.00531765461331621,
+      "match": true
+    },
+    {
+      "metric_id": "involuntary_attrition_rate",
+      "parquet": 0.027451137777421038,
+      "rpc": 0.027451137777421038,
+      "match": true
+    },
+    {
+      "metric_id": "manager_turnover_rate",
+      "parquet": 0.013123684536337749,
+      "rpc": 0.013123684536337749,
+      "match": true
+    },
+    {
+      "metric_id": "offer_acceptance_rate",
+      "parquet": 0.8294168842471714,
+      "rpc": 0.8294168842471714,
+      "match": true
+    },
+    {
+      "metric_id": "promotion_rate",
+      "parquet": 0.00690291768671991,
+      "rpc": 0.00690291768671991,
+      "match": true
+    },
+    {
+      "metric_id": "quality_of_hire",
+      "parquet": 0.5013736263736264,
+      "rpc": 0.5013736263736264,
+      "match": true
+    },
+    {
+      "metric_id": "recruiter_load",
+      "parquet": 0.0,
+      "rpc": 0,
+      "match": true
+    },
+    {
+      "metric_id": "regrettable_attrition_rate",
+      "parquet": 0.03925031103262833,
+      "rpc": 0.03925031103262833,
+      "match": true
+    },
+    {
+      "metric_id": "skill_coverage",
+      "parquet": 1.0,
+      "rpc": 1,
+      "match": true
+    },
+    {
+      "metric_id": "span_of_control",
+      "parquet": 1.657484214436053,
+      "rpc": 1.657484214436053,
+      "match": true
+    },
+    {
+      "metric_id": "time_in_stage_hours",
+      "parquet": 96.0,
+      "rpc": 96,
+      "match": true
+    },
+    {
+      "metric_id": "time_to_fill_days",
+      "parquet": 34.0,
+      "rpc": 34,
+      "match": true
+    },
+    {
+      "metric_id": "training_hours_per_worker",
+      "parquet": 7.098767909459,
+      "rpc": 7.098767909459,
+      "match": true
+    },
+    {
+      "metric_id": "voluntary_attrition_rate",
+      "parquet": 0.14472047196693022,
+      "rpc": 0.14472047196693022,
+      "match": true
+    }
+  ],
+  "failed": []
+}

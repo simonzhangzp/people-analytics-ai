@@ -1,19 +1,13 @@
 metric_id: voluntary_attrition_rate
 status: certified
 grain: people_snap_worker_month
+architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
 numerator:
-  rule: BR-RET-001
-  param: categories
-  value: voluntary
-  fact: terminated_in_month
+  expression: terminated_in_month ∧ voluntary
 denominator:
-  rule: BR-WF-001
-  param: certified_population
-  aggregator: average_headcount
-tenure:
-  rule: BR-WF-004
-  param: bands
-annualize: true
+  expression: average_headcount
+min_cell: 5
+sensitivity: internal
 sandbox:
   rule_kind: parametric
-  rpc: people_get_metric_sandbox
+  rpc: people_v2.people_get_metric

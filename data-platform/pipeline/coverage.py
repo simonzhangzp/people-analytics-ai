@@ -350,8 +350,8 @@ def case_signals(con) -> dict:
         """
         SELECT
           CASE WHEN i.hiring_manager_id IN (101,102,103) THEN 'slow_hm' ELSE 'other_hm' END AS grp,
-          quantile_cont(date_diff('hour', CAST(i.starts_at AS TIMESTAMP), CAST(s.submitted_at AS TIMESTAMP)) / 24.0, 0.5) AS scorecard_lag_p50_days,
-          quantile_cont(date_diff('hour', CAST(st.entered_at AS TIMESTAMP), CAST(i.starts_at AS TIMESTAMP)) / 24.0, 0.5) AS interview_lag_p50_days,
+          quantile_cont(date_diff('hour', CAST(i.start_at AS TIMESTAMP), CAST(s.submitted_at AS TIMESTAMP)) / 24.0, 0.5) AS scorecard_lag_p50_days,
+          quantile_cont(date_diff('hour', CAST(st.entered_at AS TIMESTAMP), CAST(i.start_at AS TIMESTAMP)) / 24.0, 0.5) AS interview_lag_p50_days,
           count(*) AS n
         FROM people_fact_interview i
         JOIN people_fact_scorecard s
@@ -360,7 +360,7 @@ def case_signals(con) -> dict:
           ON st.application_id = i.application_id AND st.canonical_stage = 'Onsite'
         WHERE i.job_family = 'Sales'
           AND i.stage_id = 3
-          AND CAST(i.starts_at AS DATE) >= DATE '2026-05-01'
+          AND CAST(i.start_at AS DATE) >= DATE '2026-05-01'
         GROUP BY 1
         """
     ).fetchdf()
@@ -390,7 +390,7 @@ def case_signals(con) -> dict:
           ON st.application_id = i.application_id AND st.canonical_stage = 'Onsite'
         WHERE i.job_family = 'Sales'
           AND i.stage_id = 3
-          AND CAST(i.starts_at AS DATE) >= DATE '2026-05-01'
+          AND CAST(i.start_at AS DATE) >= DATE '2026-05-01'
         GROUP BY 1
         """
     ).fetchdf()

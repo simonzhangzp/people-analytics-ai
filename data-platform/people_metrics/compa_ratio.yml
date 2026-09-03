@@ -1,0 +1,11 @@
+metric_id: compa_ratio_median
+status: certified
+grain: people_fact_comp_assignment_restricted
+architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+numerator:
+  expression: median(base/band_mid)
+min_cell: 10
+sensitivity: restricted
+sandbox:
+  rule_kind: parametric
+  rpc: people_v2.people_get_metric

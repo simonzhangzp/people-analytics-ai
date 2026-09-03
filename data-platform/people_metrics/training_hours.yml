@@ -1,13 +1,13 @@
-metric_id: regrettable_attrition_rate
+metric_id: training_hours_per_worker
 status: certified
-grain: people_snap_worker_month
+grain: people_fact_training_participation
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
 numerator:
-  expression: is_regrettable
+  expression: sum(hours)
 denominator:
   expression: average_headcount
 min_cell: 5
-sensitivity: confidential
+sensitivity: internal
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric

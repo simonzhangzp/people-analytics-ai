@@ -16,19 +16,12 @@
     "EMEA": 660
   },
   "voluntary_attrition_2026_from_gold": {
-    "EMEA|5\u201310y": {
-      "region": "EMEA",
-      "tenure_band": "5\u201310y",
-      "voluntary_terms": 15,
-      "person_months": 1232,
-      "annualized": 0.1461
-    },
-    "EMEA|10y+": {
-      "region": "EMEA",
+    "AMER|10y+": {
+      "region": "AMER",
       "tenure_band": "10y+",
-      "voluntary_terms": 5,
-      "person_months": 735,
-      "annualized": 0.0816
+      "voluntary_terms": 9,
+      "person_months": 1157,
+      "annualized": 0.0933
     },
     "APAC|3\u20135y": {
       "region": "APAC",
@@ -37,40 +30,12 @@
       "person_months": 916,
       "annualized": 0.1703
     },
-    "APAC|5\u201310y": {
-      "region": "APAC",
-      "tenure_band": "5\u201310y",
-      "voluntary_terms": 14,
-      "person_months": 1330,
-      "annualized": 0.1263
-    },
-    "AMER|<1y": {
-      "region": "AMER",
-      "tenure_band": "<1y",
-      "voluntary_terms": 24,
-      "person_months": 1722,
-      "annualized": 0.1672
-    },
-    "AMER|1\u20133y": {
-      "region": "AMER",
-      "tenure_band": "1\u20133y",
-      "voluntary_terms": 37,
-      "person_months": 2441,
-      "annualized": 0.1819
-    },
-    "EMEA|1\u20133y": {
+    "EMEA|10y+": {
       "region": "EMEA",
-      "tenure_band": "1\u20133y",
-      "voluntary_terms": 20,
-      "person_months": 1434,
-      "annualized": 0.1674
-    },
-    "EMEA|<1y": {
-      "region": "EMEA",
-      "tenure_band": "<1y",
-      "voluntary_terms": 15,
-      "person_months": 960,
-      "annualized": 0.1875
+      "tenure_band": "10y+",
+      "voluntary_terms": 5,
+      "person_months": 735,
+      "annualized": 0.0816
     },
     "AMER|3\u20135y": {
       "region": "AMER",
@@ -79,33 +44,40 @@
       "person_months": 1471,
       "annualized": 0.1061
     },
-    "AMER|10y+": {
-      "region": "AMER",
-      "tenure_band": "10y+",
-      "voluntary_terms": 9,
-      "person_months": 1157,
-      "annualized": 0.0933
-    },
-    "APAC|10y+": {
-      "region": "APAC",
-      "tenure_band": "10y+",
-      "voluntary_terms": 5,
-      "person_months": 812,
-      "annualized": 0.0739
-    },
-    "EMEA|3\u20135y": {
+    "EMEA|5\u201310y": {
       "region": "EMEA",
-      "tenure_band": "3\u20135y",
-      "voluntary_terms": 3,
-      "person_months": 812,
-      "annualized": 0.0443
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 15,
+      "person_months": 1232,
+      "annualized": 0.1461
     },
-    "APAC|1\u20133y": {
+    "AMER|<1y": {
+      "region": "AMER",
+      "tenure_band": "<1y",
+      "voluntary_terms": 24,
+      "person_months": 1722,
+      "annualized": 0.1672
+    },
+    "APAC|5\u201310y": {
       "region": "APAC",
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 14,
+      "person_months": 1330,
+      "annualized": 0.1263
+    },
+    "EMEA|1\u20133y": {
+      "region": "EMEA",
       "tenure_band": "1\u20133y",
-      "voluntary_terms": 30,
-      "person_months": 1555,
-      "annualized": 0.2315
+      "voluntary_terms": 20,
+      "person_months": 1434,
+      "annualized": 0.1674
+    },
+    "APAC|<1y": {
+      "region": "APAC",
+      "tenure_band": "<1y",
+      "voluntary_terms": 28,
+      "person_months": 1065,
+      "annualized": 0.3155
     },
     "AMER|5\u201310y": {
       "region": "AMER",
@@ -114,12 +86,40 @@
       "person_months": 1999,
       "annualized": 0.1081
     },
-    "APAC|<1y": {
+    "APAC|1\u20133y": {
       "region": "APAC",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 30,
+      "person_months": 1555,
+      "annualized": 0.2315
+    },
+    "EMEA|<1y": {
+      "region": "EMEA",
       "tenure_band": "<1y",
-      "voluntary_terms": 28,
-      "person_months": 1065,
-      "annualized": 0.3155
+      "voluntary_terms": 15,
+      "person_months": 960,
+      "annualized": 0.1875
+    },
+    "AMER|1\u20133y": {
+      "region": "AMER",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 37,
+      "person_months": 2441,
+      "annualized": 0.1819
+    },
+    "EMEA|3\u20135y": {
+      "region": "EMEA",
+      "tenure_band": "3\u20135y",
+      "voluntary_terms": 3,
+      "person_months": 812,
+      "annualized": 0.0443
+    },
+    "APAC|10y+": {
+      "region": "APAC",
+      "tenure_band": "10y+",
+      "voluntary_terms": 5,
+      "person_months": 812,
+      "annualized": 0.0739
     }
   },
   "recruiting": {
@@ -216,10 +216,10 @@
     "mobility": {
       "promotion_count": 921,
       "transfer_count": 655,
-      "manager_change_count": 535,
+      "manager_change_count": 548,
       "promotion_annualized": 0.0867,
       "transfer_annualized": 0.0617,
-      "manager_change_annualized": 0.0504,
+      "manager_change_annualized": 0.0516,
       "baseline": {
         "promotion": 0.08,
         "transfer": 0.06,
@@ -833,16 +833,16 @@
     ],
     "case3_manager_change": [
       {
+        "group": "control",
+        "n_workers": 2395,
+        "manager_changes_since_2025q4": 90,
+        "changes_per_worker": 0.0376
+      },
+      {
         "group": "slice",
         "n_workers": 106,
         "manager_changes_since_2025q4": 9,
         "changes_per_worker": 0.0849
-      },
-      {
-        "group": "control",
-        "n_workers": 2395,
-        "manager_changes_since_2025q4": 89,
-        "changes_per_worker": 0.0372
       }
     ],
     "case4_scorecard_delay": [
@@ -1109,6 +1109,22 @@
       },
       "expected_value": 0,
       "details": "backfill residual must be 0"
+    },
+    {
+      "test_name": "hist_attr_switch_has_evt_worker_change",
+      "test_group": "gold",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": "every hist switch on org/job/grade/location/manager must have same-day evt_worker_change"
+    },
+    {
+      "test_name": "evt_worker_change_has_hist_attr_switch",
+      "test_group": "gold",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": "every evt_worker_change on the five attributes must match a hist value switch"
     }
   ],
   "dq_failed": [],

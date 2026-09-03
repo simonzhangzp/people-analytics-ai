@@ -86,10 +86,16 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
 
     con.execute(
         f"""
-        CREATE TABLE bronze_employee AS SELECT * FROM read_parquet('{emp}');
+        CREATE TABLE bronze_employee AS
+        SELECT * FROM read_parquet('{emp}', file_row_number=true);
         CREATE TABLE bronze_separation AS SELECT * FROM read_parquet('{sep}');
         """
     )
+    emp_cols = {r[0] for r in con.execute("DESCRIBE bronze_employee").fetchall()}
+    if "emit_seq" not in emp_cols:
+        con.execute("ALTER TABLE bronze_employee RENAME COLUMN file_row_number TO emit_seq")
+    elif "file_row_number" in emp_cols:
+        con.execute("ALTER TABLE bronze_employee DROP COLUMN file_row_number")
     _load_parquet(
         con,
         "bronze_offer",
@@ -100,13 +106,13 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
         con,
         "bronze_application",
         bronze / "greenhouse_v3" / "application",
-        "SELECT NULL::BIGINT AS id, NULL::BIGINT AS candidate_id, NULL::BIGINT AS job_id, NULL::VARCHAR AS status, NULL::VARCHAR AS created_at, NULL::INTEGER AS job_interview_stage_id, NULL::INTEGER AS recruiter_id, NULL::INTEGER AS source_id, NULL::VARCHAR AS source_name, NULL::BIGINT AS opening_id WHERE 1=0",
+        "SELECT NULL::BIGINT AS id, NULL::BIGINT AS candidate_id, NULL::BIGINT AS job_id, NULL::VARCHAR AS status, NULL::VARCHAR AS created_at, NULL::INTEGER AS job_interview_stage_id, NULL::INTEGER AS recruiter_id, NULL::INTEGER AS source_id, NULL::VARCHAR AS source_name, NULL::BIGINT AS opening_id, NULL::VARCHAR AS rejected_at, NULL::VARCHAR AS hired_at, NULL::INTEGER AS rejection_reason_id WHERE 1=0",
     )
     _load_parquet(
         con,
         "bronze_opening",
         bronze / "greenhouse_v3" / "opening",
-        "SELECT NULL::BIGINT AS id, NULL::BIGINT AS job_id, NULL::BOOLEAN AS open, NULL::VARCHAR AS opened_at, NULL::VARCHAR AS closed_at, NULL::BIGINT AS application_id, NULL::INTEGER AS close_reason_id, NULL::INTEGER AS hiring_manager_id, NULL::VARCHAR AS job_family WHERE 1=0",
+        "SELECT NULL::BIGINT AS id, NULL::BIGINT AS job_id, NULL::BOOLEAN AS open, NULL::VARCHAR AS opened_at, NULL::VARCHAR AS closed_at, NULL::BIGINT AS application_id, NULL::INTEGER AS close_reason_id, NULL::INTEGER AS hiring_manager_id, NULL::VARCHAR AS job_family, NULL::INTEGER AS recruiter_id, NULL::VARCHAR AS region WHERE 1=0",
     )
     _load_parquet(
         con,
@@ -124,7 +130,7 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
         con,
         "bronze_scorecard",
         bronze / "greenhouse_v3" / "scorecard",
-        "SELECT NULL::BIGINT AS id, NULL::BIGINT AS application_id, NULL::INTEGER AS interview_kit_id, NULL::INTEGER AS submitter_id, NULL::INTEGER AS interviewer_id, NULL::VARCHAR AS candidate_rating, NULL::VARCHAR AS submitted_at, NULL::VARCHAR AS status, NULL::INTEGER AS hiring_manager_id, NULL::VARCHAR AS job_family WHERE 1=0",
+        "SELECT NULL::BIGINT AS id, NULL::BIGINT AS application_id, NULL::INTEGER AS interview_kit_id, NULL::BIGINT AS interview_id, NULL::INTEGER AS submitter_id, NULL::INTEGER AS interviewer_id, NULL::VARCHAR AS candidate_rating, NULL::VARCHAR AS overall_recommendation, NULL::VARCHAR AS submitted_at, NULL::VARCHAR AS status, NULL::INTEGER AS hiring_manager_id, NULL::VARCHAR AS job_family WHERE 1=0",
     )
     _load_parquet(
         con,
@@ -136,7 +142,7 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
         con,
         "bronze_appraisal",
         bronze / "frappe_hr" / "Appraisal",
-        "SELECT NULL::VARCHAR AS name, NULL::VARCHAR AS employee, NULL::VARCHAR AS appraisal_cycle, NULL::DOUBLE AS final_score, NULL::INTEGER AS docstatus WHERE 1=0",
+        "SELECT NULL::VARCHAR AS name, NULL::VARCHAR AS employee, NULL::VARCHAR AS appraisal_cycle, NULL::DOUBLE AS final_score, NULL::DOUBLE AS total_score, NULL::DOUBLE AS self_score, NULL::INTEGER AS docstatus, NULL::VARCHAR AS modified, NULL::VARCHAR AS submitted_at WHERE 1=0",
     )
     _load_parquet(
         con,
@@ -172,7 +178,7 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
         con,
         "bronze_skill",
         bronze / "frappe_hr" / "Employee_Skill",
-        "SELECT NULL::VARCHAR AS parent, NULL::VARCHAR AS skill, NULL::DOUBLE AS proficiency, NULL::VARCHAR AS employee, NULL::VARCHAR AS job_family WHERE 1=0",
+        "SELECT NULL::VARCHAR AS parent, NULL::VARCHAR AS skill, NULL::DOUBLE AS proficiency, NULL::VARCHAR AS employee, NULL::VARCHAR AS job_family, NULL::VARCHAR AS evaluation_date WHERE 1=0",
     )
     _load_parquet(
         con,
@@ -213,7 +219,13 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
           source_id,
           source_name,
           opening_id AS requisition_id,
-          job_interview_stage_id
+          job_interview_stage_id AS current_stage_id,
+          rejected_at,
+          hired_at,
+          CASE WHEN source_name = 'referral' THEN CAST(recruiter_id AS VARCHAR) ELSE NULL END AS referrer_person_id,
+          rejection_reason_id,
+          CASE WHEN status IN ('rejected','Rejected') THEN 'rejected' WHEN status IN ('hired','Hired') THEN 'hired' ELSE NULL END AS rejection_type,
+          recruiter_id
         FROM bronze_application;
 
         CREATE TABLE people_dim_requisition AS
@@ -221,13 +233,21 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
           id AS requisition_id,
           job_id AS gh_job_id,
           id AS gh_opening_id,
-          CASE WHEN "open" THEN 'open' ELSE 'closed' END AS status,
+          CAST(NULL AS VARCHAR) AS job_id,
+          CAST(NULL AS VARCHAR) AS org_id,
+          CAST(NULL AS VARCHAR) AS location_id,
+          CAST(NULL AS VARCHAR) AS hiring_manager_person_id,
+          CAST(NULL AS VARCHAR) AS recruiter_person_id,
           opened_at,
           closed_at,
+          CASE WHEN "open" THEN 'open' ELSE 'closed' END AS status,
+          CASE close_reason_id WHEN 1 THEN 'hired' WHEN 99 THEN 'cancelled' ELSE CAST(close_reason_id AS VARCHAR) END AS close_reason,
           application_id AS hired_application_id,
           close_reason_id,
           hiring_manager_id,
-          job_family
+          recruiter_id,
+          job_family,
+          region
         FROM bronze_opening;
 
         CREATE TABLE people_evt_application_stage AS
@@ -253,9 +273,10 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
           id AS interview_id,
           application_id,
           job_interview_id AS stage_id,
-          starts_at,
-          ends_at,
+          starts_at AS start_at,
+          ends_at AS end_at,
           status,
+          CAST(NULL AS VARCHAR) AS interviewer_person_ids,
           hiring_manager_id,
           job_family
         FROM bronze_interview;
@@ -264,11 +285,14 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
         SELECT
           id AS scorecard_id,
           application_id,
+          interview_id,
+          CAST(NULL AS VARCHAR) AS submitted_by_person_id,
+          submitted_at,
+          coalesce(overall_recommendation, candidate_rating) AS overall_recommendation,
           interview_kit_id,
           submitter_id,
           interviewer_id,
           candidate_rating,
-          submitted_at,
           status,
           hiring_manager_id,
           job_family
@@ -294,6 +318,10 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
           employee AS worker_id,
           appraisal_cycle AS cycle_id,
           final_score,
+          total_score,
+          self_score,
+          CASE WHEN docstatus = 1 THEN 'submitted' ELSE 'draft' END AS status,
+          CAST(coalesce(submitted_at, modified) AS TIMESTAMP) AS submitted_at,
           docstatus
         FROM bronze_appraisal
         WHERE docstatus = 1;
@@ -320,7 +348,8 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
           ON r.employee = e.employee AND r.training_event = e.parent;
 
         CREATE TABLE people_fact_worker_skill AS
-        SELECT employee AS worker_id, skill AS skill_id, proficiency, job_family
+        SELECT employee AS worker_id, skill AS skill_id, proficiency,
+               CAST(evaluation_date AS DATE) AS evaluation_date, parent AS source_skill_map, job_family
         FROM bronze_skill;
 
         CREATE TABLE people_fact_survey_wave AS SELECT * FROM bronze_wave;
@@ -351,7 +380,7 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
             via_t1,
             reason_for_leaving,
             CAST(modified_date AS DATE) AS valid_from,
-            lead(CAST(modified_date AS DATE)) OVER (PARTITION BY name ORDER BY modified_date, modified) AS next_from
+            lead(CAST(modified_date AS DATE)) OVER (PARTITION BY name ORDER BY emit_seq, modified_date, modified) AS next_from
           FROM bronze_employee
         )
         SELECT

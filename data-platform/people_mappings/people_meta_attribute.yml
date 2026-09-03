@@ -20,3 +20,12 @@ fields:
     sensitivity: internal
     pii_class: none
     business_definition: Microsoft Learn catalog extract has no roles[]. Training Event has no roles array.
+  - canonical_table: people_dim_person_restricted
+    canonical_field: full_name
+    provenance: SYNTHETIC_EXTENSION
+    nullable: false
+    simulator_may_fill: true
+    metric_may_depend: false
+    sensitivity: restricted
+    pii_class: pii
+    business_definition: Frappe Employee.employee_name is SOURCE_NATIVE but is not published into serving. full_name is filled with person_id as a non-PII placeholder so the restricted table is not a silent null.

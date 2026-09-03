@@ -14,6 +14,8 @@ from io import StringIO
 from pathlib import Path
 
 import pandas as pd
+import pyarrow.parquet as pq
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -21,6 +23,7 @@ if str(ROOT) not in sys.path:
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from apply import (  # noqa: E402
+    TWO_GIB,
     assert_people_project,
     connect_publisher,
     disk_occupied,
@@ -32,17 +35,19 @@ SILVER = ROOT / "lake" / "people_silver" / "rehearsal_0p05"
 GOLD = ROOT / "lake" / "people_gold" / "rehearsal_0p05"
 BASELINE = ROOT / "simulator" / "scenario" / "baseline.yaml"
 REPORT = ROOT / "simulator" / "fixtures" / "rehearsal_0p05" / "landing_5pct.json"
-A7_LIMIT = int(4.5 * 1024**3)
-RESTRICTED = {
-    "people_fact_survey_score_restricted",
+A7_LIMIT = TWO_GIB
+LAKE_ONLY_NEVER = {
     "people_fact_candidate_eeoc_restricted",
     "people_fact_candidate_demographic_restricted",
+}
+RESTRICTED = {
+    "people_fact_survey_score_restricted",
 }
 HOT_WINDOW_START = date(2025, 9, 1)
 HOT_WINDOW = {
     "people_fact_application": "applied_at",
     "people_evt_application_stage": "entered_at",
-    "people_fact_interview": "starts_at",
+    "people_fact_interview": "start_at",
     "people_fact_scorecard": "submitted_at",
     "people_dim_candidate": "created_at",
 }
@@ -63,18 +68,37 @@ def _patch_ops(**updates) -> None:
     BASELINE.write_text(text, encoding="utf-8")
 
 
-def _exec_script(conn, sql: str) -> None:
+def _split_sql(sql: str) -> list[str]:
+    """Split on ';' outside untagged $$ dollar quotes (plpgsql / DO bodies)."""
+    parts: list[str] = []
     buf: list[str] = []
-    for line in sql.splitlines():
-        buf.append(line)
-        if line.rstrip().endswith(";"):
-            stmt = "\n".join(buf).strip()
-            buf = []
+    i = 0
+    in_dollar = False
+    while i < len(sql):
+        if sql.startswith("$$", i):
+            in_dollar = not in_dollar
+            buf.append("$$")
+            i += 2
+            continue
+        ch = sql[i]
+        if ch == ";" and not in_dollar:
+            stmt = "".join(buf).strip()
             if stmt:
-                conn.execute(stmt)
-    rest = "\n".join(buf).strip()
+                parts.append(stmt)
+            buf = []
+            i += 1
+            continue
+        buf.append(ch)
+        i += 1
+    rest = "".join(buf).strip()
     if rest:
-        conn.execute(rest)
+        parts.append(rest)
+    return parts
+
+
+def _exec_script(conn, sql: str) -> None:
+    for stmt in _split_sql(sql):
+        conn.execute(stmt)
     conn.commit()
 
 
@@ -117,14 +141,26 @@ def _coerce(df: pd.DataFrame, table: str, cols: list[str]) -> pd.DataFrame:
     return subset
 
 
+def _cast_ints(subset: pd.DataFrame, keep: list[str], types: dict[str, tuple[str, str]]) -> pd.DataFrame:
+    int_udt = {"int2", "int4", "int8"}
+    int_types = {"smallint", "integer", "bigint"}
+    for col in keep:
+        if col not in subset.columns:
+            continue
+        dtype, udt = types[col]
+        if dtype in int_types or udt in int_udt:
+            subset[col] = pd.to_numeric(subset[col], errors="coerce").astype("Int64")
+    return subset
+
+
 def _load_table(conn, table: str, path: Path, relkind: str) -> int:
+    if table in LAKE_ONLY_NEVER:
+        print("skip_lake_only", table)
+        return 0
     if relkind != "r":
         print("skip_non_table", table, relkind)
         return 0
     if not path.exists() or path.stat().st_size <= 0:
-        return 0
-    df = pd.read_parquet(path)
-    if df.empty:
         return 0
     with conn.cursor() as cur:
         cur.execute(
@@ -139,30 +175,33 @@ def _load_table(conn, table: str, path: Path, relkind: str) -> int:
         meta = [(r[0], r[1], r[2]) for r in cur.fetchall()]
     cols = [m[0] for m in meta]
     types = {m[0]: (m[1], m[2]) for m in meta}
-    keep = [c for c in cols if c in df.columns]
+    parquet = pq.ParquetFile(path)
+    parquet_cols = set(parquet.schema_arrow.names)
+    keep = [c for c in cols if c in parquet_cols]
     if not keep:
         print("skip_no_matching_columns", table)
         return 0
-    subset = _coerce(df, table, keep)
-    int_udt = {"int2", "int4", "int8"}
-    int_types = {"smallint", "integer", "bigint"}
-    for col in keep:
-        dtype, udt = types[col]
-        if dtype in int_types or udt in int_udt:
-            subset[col] = pd.to_numeric(subset[col], errors="coerce").astype("Int64")
-    if subset.empty:
-        return 0
-    buf = StringIO()
-    subset.to_csv(buf, index=False, header=False, na_rep="\\N")
-    buf.seek(0)
+    total = 0
     col_list = ", ".join(keep)
     with conn.cursor() as cur:
-        with cur.copy(
-            f"COPY people_v2.{table} ({col_list}) FROM STDIN WITH (FORMAT csv, NULL '\\N')"
-        ) as copy:
-            copy.write(buf.getvalue())
+        cur.execute("SET statement_timeout = 0")
+        cur.execute("SET idle_in_transaction_session_timeout = 0")
     conn.commit()
-    return len(subset)
+    for batch in parquet.iter_batches(columns=keep, batch_size=50_000):
+        subset = _coerce(batch.to_pandas(), table, keep)
+        subset = _cast_ints(subset, keep, types)
+        if subset.empty:
+            continue
+        buf = StringIO()
+        subset.to_csv(buf, index=False, header=False, na_rep="\\N")
+        with conn.cursor() as cur:
+            with cur.copy(
+                f"COPY people_v2.{table} ({col_list}) FROM STDIN WITH (FORMAT csv, NULL '\\N')"
+            ) as copy:
+                copy.write(buf.getvalue())
+        conn.commit()
+        total += len(subset)
+    return total
 
 
 def _relation_sizes(conn) -> list[dict]:
@@ -250,9 +289,12 @@ def main() -> int:
             r["bytes"] for r in table_bytes if r["name"].split(".")[-1] in RESTRICTED
         )
         as_designed_x20 = total * 20
-        a7 = "as_designed" if as_designed_x20 <= A7_LIMIT else "lake_only"
-        measured = as_designed_x20 if a7 == "as_designed" else (total - restricted_bytes) * 20
         occ = disk_occupied(conn)
+        quota = int(yaml.safe_load(BASELINE.read_text(encoding="utf-8"))["ops"]["supabase_disk_quota_bytes"])
+        occupied_empty = max(0, occ["occupied_bytes"] - total)
+        headroom = quota - occupied_empty - int(as_designed_x20 * 1.3)
+        a7 = "as_designed" if headroom >= TWO_GIB else "lake_only"
+        measured = as_designed_x20 if a7 == "as_designed" else max(0, (total - restricted_bytes) * 20)
         report = {
             "ref": PEOPLE_REF,
             "scale_loaded": 0.05,
@@ -264,8 +306,9 @@ def main() -> int:
             "bytes_5pct_restricted": restricted_bytes,
             "full_estimate_x20_as_designed": as_designed_x20,
             "supabase_measured_people_v2_bytes": measured,
-            "a7_limit_bytes": A7_LIMIT,
+            "a7_limit_bytes": TWO_GIB,
             "a7": a7,
+            "admission_headroom_bytes": headroom,
             "occupied_during_load": occ,
             "admission_measured_times_1_3": int(measured * 1.3),
         }
@@ -276,7 +319,7 @@ def main() -> int:
             postgres_publish_restricted_person_level=a7,
             postgres_restricted_fallback_reason="null"
             if a7 == "as_designed"
-            else "measured_x20_over_4_5_gib",
+            else "admission_headroom_below_2_gib",
         )
         print("full_estimate_x20_as_designed", as_designed_x20, "measured", measured, "a7", a7)
         _drop_people_v2_user_objects(conn)

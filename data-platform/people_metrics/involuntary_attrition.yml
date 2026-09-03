@@ -1,13 +1,13 @@
-metric_id: regrettable_attrition_rate
+metric_id: involuntary_attrition_rate
 status: certified
 grain: people_snap_worker_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
 numerator:
-  expression: is_regrettable
+  expression: terminated_in_month ∧ involuntary
 denominator:
   expression: average_headcount
 min_cell: 5
-sensitivity: confidential
+sensitivity: internal
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric

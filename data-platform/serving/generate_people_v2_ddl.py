@@ -26,13 +26,15 @@ def infer(name: str) -> str:
         return "timestamptz"
     if name.endswith("_date") or name in {"month_end", "month_start", "valid_from", "valid_to"}:
         return "date"
-    if name.startswith("is_") or name in {"open"}:
+    if name.endswith("_in_month") or name.startswith("is_") or name in {"open", "via_t1"}:
         return "boolean"
-    if name in {"n", "headcount", "hires", "depth", "level_rank"} or name.endswith("_count") or name.endswith("_id") and name.startswith("gh_"):
+    if name in {"n", "headcount", "hires", "depth", "level_rank", "open_requisitions", "applications"} or name.endswith("_count") or (name.endswith("_id") and name.startswith("gh_")):
         return "bigint"
+    if name.endswith("_score") or name in {"score_mean", "final_score", "total_score", "self_score"}:
+        return "double precision"
     if any(token in name for token in ("ratio", "rate", "p25", "p50", "p90", "p75", "avg_", "mean", "pct", "hours")):
         return "double precision"
-    if name in {"base", "variable", "band_min", "band_mid", "band_max", "applications", "control_total", "rows_received"}:
+    if name in {"base", "variable", "band_min", "band_mid", "band_max", "control_total", "rows_received"}:
         return "bigint"
     return "text"
 
@@ -53,6 +55,8 @@ def render() -> str:
     extra_idx = []
     for table in tables():
         name = table["name"]
+        if table.get("postgres") is False:
+            continue
         cols = table.get("columns") or []
         if not cols:
             continue

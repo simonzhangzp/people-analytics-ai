@@ -254,7 +254,7 @@ narrative: "Case 4: stage aging driven by hiring-manager latency"
 - Employee full extract **无 status 过滤**。`control_total` = 源内全部 Employee 文档（含 Left）。在职数为派生指标（BR-WF-001）。BR-DQ-003 缺席 = 文档从抽取中消失，不是 `status=Left`。
 - Postgres 中 `fact_application` / `evt_application_stage` / `fact_interview` / `fact_scorecard` 热窗口为 **12 个月**；全量在 lake；漏斗 mart 全历史。
 - 历史回填：60 个月末 full 抽取（dims 的 SCD2 月粒度）+ 全部文档（事件自带日期）；切流后每日。
-- 回填前确认独立项目配额（8 GB − 2 GiB 闸）。准入用 expected_backfill_delta **高端 6 GiB**；不得降低闸门。若 6 GiB 准入失败，A7：survey 与 candidate demographic 个人级只留 lake。日常 apply 在回填后改用实测/落地预估。
+- 回填前确认独立项目配额（8 GB − 2 GiB 闸）。准入用 occupied + measured × 1.3，且准入后余量必须 ≥ 2 GiB。candidate EEOC / demographic 个人级永不进 Postgres。若带上 survey 个人级后余量不足 2 GiB，A7：survey 个人级只留 lake。日常 apply 在回填后改用实测/落地预估。
 
 ---
 
@@ -549,13 +549,13 @@ from w join attr using (worker_id, month_end);
 | fact_interview / fact_scorecard | silver | 热窗口内随漏斗 | **热窗口：最近 12 个月** | 全量在 lake |
 | fact_offer | silver | ~70–90K | 是 | 体积小，全量发布 |
 | fact_survey_score_restricted | silver | ~1.6M | 是（隔离） | item 级在 lake |
-| fact_candidate_*_restricted | silver | ~1.4M | 是（隔离） | — |
+| fact_candidate_*_restricted | silver | ~1.4M | **否（lake only）** | 最敏感的候选人数据不进 serving 层，只有抑制后的聚合 `people_mart_applicant_flow`（min cell 10）出现。这是治理演示，不是磁盘妥协。 |
 | snap_worker_month (+ _restricted) | gold | ~3M | 是 | — |
 | snap_requisition_month / snap_recruiter_month | gold | ~1M / ~30K | 是 | — |
 | mart_* 全部 | gold | < 2M | 是 | — |
 | daily worker snapshot / salary slip / survey item | — | 91M / 4.8M / 4.8M | 否 | lake only |
 
-预计 Postgres 占用 4–6 GB（含索引；`fact_application` / `evt_application_stage` / `fact_interview` / `fact_scorecard` / `dim_candidate` 一律 12 个月热窗口）。Lake 上 application 全量约 **600 万行**。Serving 项目配额 8 GB；`apply.py` **fail-closed**：quota 缺失即拒绝；仅当 `database + WAL + system + expected_backfill_delta ≤ quota − 2 GiB` 才放行。publish 分四段（dims/xw → facts/events → snapshots → marts），每段后核对 `pg_database_size`，超预算即停。restricted 表按本节进 Postgres；若某段超预算，fallback = survey 与 candidate demographic **个人级行只留 lake**，仍可发布已抑制的聚合 mart。Hetzner 用 session pooler 5432 + `people_publisher`；Vercel 用 transaction pooler 6543。RPC 内 `set_config` 必须 `is_local = true`。凭证只在 env。
+预计 Postgres 占用随热窗口与 marts 变化（含索引；`fact_application` / `evt_application_stage` / `fact_interview` / `fact_scorecard` / `dim_candidate` 一律 12 个月热窗口）。Lake 上 application 全量约 **600 万行**。Serving 项目配额 8 GB；`apply.py` **fail-closed**：quota 缺失即拒绝；仅当 `database + WAL + system + expected_backfill_delta ≤ quota − 2 GiB` 才放行。publish 分四段（dims/xw → facts/events → snapshots → marts），每段后核对 `pg_database_size`，超预算即停。**候选人 EEOC / demographic 个人级永不进 Postgres**——站点只消费已抑制的 `people_mart_applicant_flow`。这是治理演示的一部分，不是容量妥协。`people_fact_survey_score_restricted` 仍进 Postgres（engagement 的 org 切分需要）；仅当准入后余量 < 2 GiB 时 A7 把 survey 个人级也留在 lake。Hetzner 用 session pooler 5432 + `people_publisher`；Vercel 用 transaction pooler 6543。RPC 内 `set_config` 必须 `is_local = true`。凭证只在 env。
 
 **治理与运行对象（同 schema）**：`people_meta_entity`、`people_meta_attribute`（含 provenance、sensitivity、pii_class）、`people_meta_relationship`、`people_meta_join_path`、`people_contract`、`people_metric`、`people_metric_version`、`people_metric_health`、`people_glossary`、`people_business_rule`、`people_lineage`、`people_quality_test`、`people_quality_result`、`people_quality_incident`、`people_serving_run`、`people_serving_pointer`、`people_replay_metric_value`、`people_policy_role`、`people_policy_rule`、`people_policy_demo_identity`、`people_access_log`、`people_suppression_log`、`people_skill_registry`、`people_skill_eval`、`people_model_registry`、`people_model_run`、`people_agent_trace`、`people_agent_tool_call`、`people_signal`、`people_brief`、`people_eval_case`、`people_eval_run`、`people_eval_result`。列定义在各自 Phase 的 PR 中给出，必须引用本文档的 grain 与键。
 
@@ -615,7 +615,7 @@ Metric YAML schema 见 AGENT_ARCHITECTURE §4.2.2；RPC 由 YAML 生成。
    );
    ```
    restricted 敏感度的 mart 行（如 comp）另加 `sensitivity <= current_setting('people.sensitivity_max')`。
-2. **个人粒度表（snap_*、evt_*、fact_*、*_restricted）**：`people_app` 无 SELECT；只有 `security definer` 的聚合 RPC（owner 为 `people_definer`，固定 `search_path`）读取，函数内部：断言身份 → 按 org_scope 过滤 → 按 sensitivity 门控 → 聚合 → 抑制（9.4）→ 写 access log。
+2. **个人粒度表（snap_*、evt_*、fact_*、*_restricted）**：`people_app` 无 SELECT；只有 `security definer` 的聚合 RPC（owner 为 `people_definer`，固定 `search_path`）读取，函数内部：断言身份 → 按 org_scope 过滤 → 按 sensitivity 门控 → 聚合 → 抑制（9.4）→ 写 access log。候选人 EEOC / demographic 个人级不在 serving schema 中，因此也不存在可被 RPC 误读的行；公平性与漏斗只走 `people_mart_applicant_flow`。
 
 ### 9.4 抑制算法（`people_get_metric_breakdown` 内）
 

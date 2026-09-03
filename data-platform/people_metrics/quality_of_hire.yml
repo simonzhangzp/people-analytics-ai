@@ -1,12 +1,12 @@
-metric_id: regrettable_attrition_rate
+metric_id: quality_of_hire
 status: certified
 grain: people_snap_worker_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
 numerator:
-  expression: is_regrettable
+  expression: 12m retention ∧ first score ≥ 3.5
 denominator:
-  expression: average_headcount
-min_cell: 5
+  expression: hires 12m ago
+min_cell: 10
 sensitivity: confidential
 sandbox:
   rule_kind: parametric

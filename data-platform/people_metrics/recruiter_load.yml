@@ -1,10 +1,12 @@
-metric_id: offer_acceptance_rate
+metric_id: recruiter_load
 status: certified
-grain: people_fact_offer
+grain: people_snap_recruiter_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
 numerator:
-  expression: accepted / resolved
-min_cell: 5
+  expression: open_requisitions
+denominator:
+  expression: recruiters
+min_cell: 3
 sensitivity: internal
 sandbox:
   rule_kind: parametric

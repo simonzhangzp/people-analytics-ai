@@ -62,7 +62,12 @@ def emit_bronze(state: dict, lake: Path, prefix: str) -> Path:
         for part in emp_root.iterdir():
             if part.is_dir() and part.name.startswith("extract_date="):
                 shutil.rmtree(part)
-    _write(root / "frappe_hr" / "Employee" / "part.parquet", state["employee_versions"])
+    employee_versions = []
+    for i, row in enumerate(state["employee_versions"]):
+        stamped = dict(row)
+        stamped["emit_seq"] = int(row["emit_seq"]) if row.get("emit_seq") is not None else i
+        employee_versions.append(stamped)
+    _write(root / "frappe_hr" / "Employee" / "part.parquet", employee_versions)
     _write(root / "frappe_hr" / "Employee_Separation" / "part.parquet", state["separations"])
     write_rows(root / "greenhouse_v3" / "offer" / "part.parquet", state["offers"])
     write_rows(root / "greenhouse_v3" / "application" / "part.parquet", state["applications"])
@@ -113,13 +118,33 @@ def emit_bronze(state: dict, lake: Path, prefix: str) -> Path:
         write_rows(root / "greenhouse_v3" / name / "part.parquet", extras[name])
     write_rows(root / "engagement_ext" / "survey_instrument" / "part.parquet", extras["survey_instrument"])
 
+    def _iter_applications():
+        leftover = list(state.get("applications") or [])
+        seen = {app.get("id") for app in leftover}
+        for app in leftover:
+            yield app
+        app_root = root / "greenhouse_v3" / "application"
+        if not app_root.exists():
+            return
+        for part in sorted(app_root.rglob("*.parquet")):
+            if part.stat().st_size <= 0:
+                continue
+            for batch in pq.ParquetFile(part).iter_batches(batch_size=20_000):
+                for row in batch.to_pylist():
+                    app_id = row.get("id")
+                    if app_id in seen:
+                        continue
+                    yield row
+
     def _eeoc():
-        for app in state["applications"]:
-            yield eeoc_row(app)
+        for app in _iter_applications():
+            if "id" in app:
+                yield eeoc_row(app)
 
     def _demo():
-        for app in state["applications"]:
-            yield from demographic_rows(app)
+        for app in _iter_applications():
+            if "id" in app:
+                yield from demographic_rows(app)
 
     _write_stream(root / "greenhouse_v3" / "eeoc" / "part.parquet", _eeoc())
     _write_stream(root / "greenhouse_v3" / "demographic_answer" / "part.parquet", _demo())
