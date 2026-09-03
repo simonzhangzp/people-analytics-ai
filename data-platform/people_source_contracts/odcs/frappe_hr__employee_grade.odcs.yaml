@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Employee Grade
+info:
+  title: Employee Grade
+  version: 1.0.0
+  description: Grade spine.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Employee_Grade/extract_date={date}/run_id={id}/
+schema:
+- name: Employee Grade
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Employee Grade
+  primaryKey:
+  - name
+  description: Grade spine.
+extract:
+  mode: full
+  cadence: daily
+  key: name
+  control_total_source: count of Employee Grade rows
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

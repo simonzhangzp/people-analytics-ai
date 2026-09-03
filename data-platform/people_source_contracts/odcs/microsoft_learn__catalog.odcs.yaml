@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:microsoft_learn:catalog
+info:
+  title: catalog
+  version: 1.0.0
+  description: trust data_only. duration_minutes and roles are SOURCE_GAP.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/microsoft_learn/catalog/extract_date={date}/run_id={id}/
+schema:
+- name: catalog
+  physicalType: parquet
+  physicalName: people_bronze/microsoft_learn/catalog
+  primaryKey:
+  - uid
+  description: trust data_only. duration_minutes and roles are SOURCE_GAP.
+extract:
+  mode: full
+  cadence: weekly
+  key: uid
+  control_total_source: count of catalog items returned by the public API
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 168
+piiClassification: public

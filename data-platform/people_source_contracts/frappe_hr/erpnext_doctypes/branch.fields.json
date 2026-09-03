@@ -1,0 +1,14 @@
+{
+  "name": "Branch",
+  "module": "Setup",
+  "istable": null,
+  "fields": [
+    {
+      "fieldname": "branch",
+      "label": "Branch",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    }
+  ]
+}

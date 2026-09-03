@@ -1,0 +1,199 @@
+{
+  "source": "hrms/setup.py get_custom_fields()",
+  "tag": "v16.15.0",
+  "commit": "1924234884731e389ecc4e5500653fcd59666911",
+  "note": "HRMS custom fields overlay ERPNext masters. Employee.employment_type and Employee.grade are custom fields, not ERPNext Employee.json columns. Effective Employee schema = employee.fields.json + custom_fields.json doctypes.Employee.",
+  "doctypes": {
+    "Company": [
+      {
+        "fieldname": "default_expense_claim_payable_account",
+        "label": "Default Expense Claim Payable Account",
+        "fieldtype": "Link",
+        "options": "Account",
+        "insert_after": "hr_settings_section"
+      },
+      {
+        "fieldname": "default_employee_advance_account",
+        "label": "Default Employee Advance Account",
+        "fieldtype": "Link",
+        "options": "Account",
+        "insert_after": "default_expense_claim_payable_account"
+      },
+      {
+        "fieldname": "default_payroll_payable_account",
+        "label": "Default Payroll Payable Account",
+        "fieldtype": "Link",
+        "options": "Account",
+        "insert_after": "column_break_10"
+      }
+    ],
+    "Department": [
+      {
+        "fieldname": "payroll_cost_center",
+        "label": "Payroll Cost Center",
+        "fieldtype": "Link",
+        "options": "Cost Center",
+        "insert_after": "section_break_4"
+      },
+      {
+        "fieldname": "leave_block_list",
+        "label": "Leave Block List",
+        "fieldtype": "Link",
+        "options": "Leave Block List",
+        "insert_after": "column_break_9"
+      },
+      {
+        "fieldname": "shift_request_approver",
+        "label": "Shift Request Approver",
+        "fieldtype": "Table",
+        "options": "Department Approver",
+        "insert_after": "approvers"
+      },
+      {
+        "fieldname": "leave_approvers",
+        "label": "Leave Approver",
+        "fieldtype": "Table",
+        "options": "Department Approver",
+        "insert_after": "shift_request_approver"
+      },
+      {
+        "fieldname": "expense_approvers",
+        "label": "Expense Approver",
+        "fieldtype": "Table",
+        "options": "Department Approver",
+        "insert_after": "leave_approvers"
+      }
+    ],
+    "Designation": [
+      {
+        "fieldname": "appraisal_template",
+        "label": "Appraisal Template",
+        "fieldtype": "Link",
+        "options": "Appraisal Template",
+        "insert_after": "description"
+      },
+      {
+        "fieldname": "skills",
+        "label": "Skills",
+        "fieldtype": "Table",
+        "options": "Designation Skill",
+        "insert_after": "required_skills_section"
+      }
+    ],
+    "Employee": [
+      {
+        "fieldname": "employment_type",
+        "label": "Employment Type",
+        "fieldtype": "Link",
+        "options": "Employment Type",
+        "insert_after": "department"
+      },
+      {
+        "fieldname": "job_applicant",
+        "label": "Job Applicant",
+        "fieldtype": "Link",
+        "options": "Job Applicant",
+        "insert_after": "employment_details"
+      },
+      {
+        "fieldname": "grade",
+        "label": "Grade",
+        "fieldtype": "Link",
+        "options": "Employee Grade",
+        "insert_after": "branch"
+      },
+      {
+        "fieldname": "default_shift",
+        "label": "Default Shift",
+        "fieldtype": "Link",
+        "options": "Shift Type",
+        "insert_after": "holiday_list"
+      },
+      {
+        "fieldname": "health_insurance_provider",
+        "label": "Health Insurance Provider",
+        "fieldtype": "Link",
+        "options": "Employee Health Insurance",
+        "insert_after": "health_insurance_section"
+      },
+      {
+        "fieldname": "health_insurance_no",
+        "label": "Health Insurance No",
+        "fieldtype": "Data",
+        "options": null,
+        "insert_after": "health_insurance_provider"
+      },
+      {
+        "fieldname": "expense_approver",
+        "label": "Expense Approver",
+        "fieldtype": "Link",
+        "options": "User",
+        "insert_after": "approvers_section"
+      },
+      {
+        "fieldname": "leave_approver",
+        "label": "Leave Approver",
+        "fieldtype": "Link",
+        "options": "User",
+        "insert_after": "expense_approver"
+      },
+      {
+        "fieldname": "shift_request_approver",
+        "label": "Shift Request Approver",
+        "fieldtype": "Link",
+        "options": "User",
+        "insert_after": "column_break_45"
+      },
+      {
+        "fieldname": "employee_advance_account",
+        "label": "Employee Advance Account",
+        "fieldtype": "Link",
+        "options": "Account",
+        "insert_after": "salary_mode"
+      },
+      {
+        "fieldname": "payroll_cost_center",
+        "label": "Payroll Cost Center",
+        "fieldtype": "Link",
+        "options": "Cost Center",
+        "insert_after": "salary_cb"
+      }
+    ],
+    "Project": [
+      {
+        "fieldname": "total_expense_claim",
+        "label": "Total Expense Claim (via Expense Claims)",
+        "fieldtype": "Currency",
+        "options": null,
+        "insert_after": "total_costing_amount"
+      }
+    ],
+    "Task": [
+      {
+        "fieldname": "total_expense_claim",
+        "label": "Total Expense Claim (via Expense Claim)",
+        "fieldtype": "Currency",
+        "options": "Company:company:default_currency",
+        "insert_after": "total_costing_amount"
+      }
+    ],
+    "Timesheet": [
+      {
+        "fieldname": "salary_slip",
+        "label": "Salary Slip",
+        "fieldtype": "Link",
+        "options": "Salary Slip",
+        "insert_after": "column_break_3"
+      }
+    ],
+    "Terms and Conditions": [
+      {
+        "fieldname": "hr",
+        "label": "HR",
+        "fieldtype": "Check",
+        "options": null,
+        "insert_after": "buying"
+      }
+    ]
+  }
+}

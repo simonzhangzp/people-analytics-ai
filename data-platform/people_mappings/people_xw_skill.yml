@@ -1,0 +1,40 @@
+canonical_version: people_v2
+gate: 1
+note: Frappe Skill rows are constructed 1:1 with O*NET elements.
+source_contract:
+  frappe: doctypes/skill.json
+  onet: Essential Skills.txt / Knowledge.txt
+fields:
+- canonical_table: people_xw_skill
+  canonical_field: skill_id
+  source_system: frappe_hr
+  source_object: Skill
+  transformation: canonical skill key = Skill.name
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: CANONICAL_KEY
+  business_definition: Skill spine is Frappe Skill.
+  source_field: name
+- canonical_table: people_xw_skill
+  canonical_field: frappe_skill
+  source_system: frappe_hr
+  source_object: Skill
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: SOURCE_NATIVE
+  business_definition: Frappe Skill.name.
+  source_field: name
+- canonical_table: people_xw_skill
+  canonical_field: onet_element_id
+  source_system: onet
+  source_object: Essential Skills.txt
+  transformation: 1:1 constructed map
+  nullable: true
+  data_type: text
+  effective_date_logic: current
+  provenance: CANONICAL_KEY
+  business_definition: O*NET element id.
+  source_field: Element ID

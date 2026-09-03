@@ -1,0 +1,47 @@
+{
+  "source_system": "engagement_ext",
+  "source_object": "survey_instrument",
+  "provenance": "SYNTHETIC_EXTENSION",
+  "extension_id": "E5",
+  "version": "engagement_ext.instrument.v1",
+  "scale": {
+    "type": "likert",
+    "min": 1,
+    "max": 5,
+    "labels": [
+      "strongly_disagree",
+      "disagree",
+      "neutral",
+      "agree",
+      "strongly_agree"
+    ]
+  },
+  "reverse_score_formula": "6 - raw",
+  "dimensions": [
+    {"dimension_id": "engagement", "label": "Engagement", "items": ["E1", "E2", "E3"]},
+    {"dimension_id": "manager", "label": "Manager", "items": ["M1", "M2", "M3"]},
+    {"dimension_id": "growth", "label": "Growth", "items": ["G1", "G2", "G3"]},
+    {"dimension_id": "wellbeing", "label": "Wellbeing", "items": ["W1", "W2", "W3"]}
+  ],
+  "fields": [
+    {"fieldname": "instrument_version", "type": "text", "reqd": true},
+    {"fieldname": "item_id", "type": "text", "reqd": true},
+    {"fieldname": "dimension", "type": "text", "reqd": true},
+    {"fieldname": "reverse", "type": "boolean", "reqd": true},
+    {"fieldname": "prompt", "type": "text", "reqd": true}
+  ],
+  "items": [
+    {"item_id": "E1", "dimension": "engagement", "reverse": false, "prompt": "I am proud to work at this company."},
+    {"item_id": "E2", "dimension": "engagement", "reverse": false, "prompt": "I would recommend this company as a place to work."},
+    {"item_id": "E3", "dimension": "engagement", "reverse": true, "prompt": "I often think about leaving this company."},
+    {"item_id": "M1", "dimension": "manager", "reverse": false, "prompt": "My manager supports me in doing my best work."},
+    {"item_id": "M2", "dimension": "manager", "reverse": false, "prompt": "I receive useful feedback from my manager."},
+    {"item_id": "M3", "dimension": "manager", "reverse": true, "prompt": "My manager is unavailable when I need help."},
+    {"item_id": "G1", "dimension": "growth", "reverse": false, "prompt": "I have opportunities to learn and grow."},
+    {"item_id": "G2", "dimension": "growth", "reverse": false, "prompt": "I can see a path to develop in my role."},
+    {"item_id": "G3", "dimension": "growth", "reverse": true, "prompt": "My skills are not being used."},
+    {"item_id": "W1", "dimension": "wellbeing", "reverse": false, "prompt": "My workload is sustainable."},
+    {"item_id": "W2", "dimension": "wellbeing", "reverse": false, "prompt": "I can maintain a healthy work-life balance."},
+    {"item_id": "W3", "dimension": "wellbeing", "reverse": true, "prompt": "I feel burned out by my work."}
+  ]
+}

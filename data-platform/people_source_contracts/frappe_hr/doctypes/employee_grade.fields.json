@@ -1,0 +1,30 @@
+{
+  "name": "Employee Grade",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "Prompt",
+  "fields": [
+    {
+      "fieldname": "default_salary_structure",
+      "label": "Default Salary Structure",
+      "fieldtype": "Link",
+      "options": "Salary Structure",
+      "reqd": null
+    },
+    {
+      "fieldname": "default_base_pay",
+      "label": "Default Base Pay",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "currency",
+      "label": "Currency",
+      "fieldtype": "Link",
+      "options": "Currency",
+      "reqd": null
+    }
+  ]
+}

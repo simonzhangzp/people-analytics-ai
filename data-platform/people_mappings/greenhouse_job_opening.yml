@@ -1,0 +1,155 @@
+canonical_version: people_v2
+gate: 1
+note: Requisition = opening. Status from open + closed_at (BR-TA-006). Hiring manager from job_hiring_manager. Recruiter from
+  application.recruiter_id via T8.
+source_contract:
+  pin:
+  - schemas/fields/opening.fields.json
+  - schemas/fields/job.fields.json
+  - schemas/fields/job_hiring_manager.fields.json
+fields:
+- canonical_table: people_dim_requisition
+  canonical_field: requisition_id
+  source_system: greenhouse_v3
+  source_object: opening
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: opened_at
+  provenance: CANONICAL_KEY
+  business_definition: Opening.id is the requisition key.
+  source_field: id
+- canonical_table: people_dim_requisition
+  canonical_field: gh_job_id
+  source_system: greenhouse_v3
+  source_object: opening
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: opened_at
+  provenance: SOURCE_NATIVE
+  business_definition: Parent job.
+  source_field: job_id
+- canonical_table: people_dim_requisition
+  canonical_field: gh_opening_id
+  source_system: greenhouse_v3
+  source_object: opening
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: opened_at
+  provenance: SOURCE_NATIVE
+  business_definition: Opening.id.
+  source_field: id
+- canonical_table: people_dim_requisition
+  canonical_field: job_id
+  source_system: greenhouse_v3
+  source_object: job
+  transformation: map job.name through people_xw_job.frappe_designation; null until mapped
+  nullable: true
+  data_type: text
+  effective_date_logic: opened_at
+  provenance: CANONICAL_KEY
+  business_definition: Canonical job. Harvest job.name is not Frappe Designation.
+  source_field: name
+- canonical_table: people_dim_requisition
+  canonical_field: org_id
+  source_system: greenhouse_v3
+  source_object: job
+  transformation: via people_xw_org.gh_department_id
+  nullable: true
+  data_type: text
+  effective_date_logic: opened_at
+  provenance: CANONICAL_KEY
+  business_definition: Org from GH department crosswalk.
+  source_field: department_id
+- canonical_table: people_dim_requisition
+  canonical_field: location_id
+  source_system: greenhouse_v3
+  source_object: job
+  transformation: first office_ids[] via people_xw_location.gh_office_id
+  nullable: true
+  data_type: text
+  effective_date_logic: opened_at
+  provenance: CANONICAL_KEY
+  business_definition: Location from first office.
+  source_field: office_ids
+- canonical_table: people_dim_requisition
+  canonical_field: hiring_manager_person_id
+  source_system: greenhouse_v3
+  source_object: job_hiring_manager
+  transformation: user.employee_id → person_id (T8)
+  nullable: true
+  data_type: uuid
+  effective_date_logic: opened_at
+  provenance: DERIVED
+  business_definition: Hiring manager from /v3/job_hiring_managers.
+  source_field: user_id
+- canonical_table: people_dim_requisition
+  canonical_field: recruiter_person_id
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: responsible recruiter user → employee_id → person_id; job has no recruiter field
+  nullable: true
+  data_type: uuid
+  effective_date_logic: opened_at
+  provenance: DERIVED
+  business_definition: Recruiter from application.recruiter_id.
+  source_field: recruiter_id
+- canonical_table: people_dim_requisition
+  canonical_field: opened_at
+  source_system: greenhouse_v3
+  source_object: opening
+  transformation: identity
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: opened_at
+  provenance: SOURCE_NATIVE
+  business_definition: Opening opened_at.
+  source_field: opened_at
+- canonical_table: people_dim_requisition
+  canonical_field: closed_at
+  source_system: greenhouse_v3
+  source_object: opening
+  transformation: identity
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: closed_at
+  provenance: SOURCE_NATIVE
+  business_definition: Opening closed_at.
+  source_field: closed_at
+- canonical_table: people_dim_requisition
+  canonical_field: status
+  source_system: greenhouse_v3
+  source_object: opening
+  transformation: open=true → open; else closed (BR-TA-006)
+  nullable: false
+  data_type: text
+  effective_date_logic: updated_at
+  provenance: DERIVED
+  business_definition: Harvest opening has no status enum.
+  source_fields:
+  - open
+  - closed_at
+- canonical_table: people_dim_requisition
+  canonical_field: close_reason
+  source_system: greenhouse_v3
+  source_object: opening
+  transformation: identity id; resolve label later
+  nullable: true
+  data_type: bigint
+  effective_date_logic: closed_at
+  provenance: SOURCE_NATIVE
+  business_definition: close_reason_id.
+  source_field: close_reason_id
+- canonical_table: people_dim_requisition
+  canonical_field: hired_application_id
+  source_system: greenhouse_v3
+  source_object: opening
+  transformation: identity
+  nullable: true
+  data_type: bigint
+  effective_date_logic: closed_at
+  provenance: SOURCE_NATIVE
+  business_definition: Application that filled the opening.
+  source_field: application_id

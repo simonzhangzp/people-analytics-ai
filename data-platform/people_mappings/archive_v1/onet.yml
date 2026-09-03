@@ -1,0 +1,20 @@
+canonical_entity: people_dim_occupation / people_dim_skill
+source_contract:
+  source_system: onet
+  pin: db_31_0_text.zip
+  download: https://www.onetcenter.org/dl_files/database/db_31_0_text.zip
+bronze: people_bronze people_onet file copies (Occupation Data.txt, Essential Skills.txt, …)
+fields:
+  - canonical_field: occupation_id
+    source_object: Occupation Data.txt
+    source_field: O*NET-SOC Code
+    transformation: strip trailing .00
+  - canonical_field: title
+    source_object: Occupation Data.txt
+    source_field: Title
+    transformation: identity
+  - canonical_field: skill_id
+    source_object: Essential Skills.txt
+    source_field: Element ID
+    transformation: prefix onet_
+note: Internal Frappe Skill rows are a different source. Do not overwrite O*NET skills with PEOPLE_SKILLS.

@@ -1,0 +1,67 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "demographic_answer_option",
+  "harvest_path_hint": "/v3/demographic_answer_options",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "demographic_question_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the parent `demographic_question` this option belongs to. Options are scoped to a single question and never shared across questions."
+    },
+    {
+      "name": "sort_order",
+      "type": "integer",
+      "format": null,
+      "description": "Display position within the parent question's choice list, ascending. Lower values render first; aliased from the underlying `priority` column."
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "format": null,
+      "description": "`true` while the option is still selectable by applicants; `false` after it has been soft-removed. Inactive options are returned by default \u2014 pass `active=true` to filter to live options only. Past `demographic_answers` continue to reference inactive rows so historical applicant submissions stay readable."
+    },
+    {
+      "name": "free_form",
+      "type": "boolean",
+      "format": null,
+      "description": "If `true`, selecting this option prompts the applicant for a free-text response (e.g. an `I prefer to self-describe` choice). The free-text content itself is not exposed via Harvest."
+    },
+    {
+      "name": "name",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Display label shown to applicants in the answer list (e.g. `Non-binary`, `I prefer to self-describe`). `null` on standard Greenhouse-supplied options whose label is rendered from a localized template rather than this column."
+    },
+    {
+      "name": "decline_to_answer",
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "format": null,
+      "description": "`true` when this option represents a structured `I don't wish to answer` choice; prefer this flag over matching on `name` when classifying declines. `null` on custom-organization options where the flag was never set; treat `null` as not a decline."
+    }
+  ]
+}

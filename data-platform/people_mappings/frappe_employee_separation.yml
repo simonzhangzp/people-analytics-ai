@@ -1,0 +1,200 @@
+canonical_version: people_v2
+gate: 1
+note: Employee Separation is process evidence. Termination date and reason remain on Employee.
+source_contract:
+  pin: doctypes/employee_separation.json
+fields:
+- canonical_table: people_evt_worker
+  canonical_field: event_id
+  source_system: frappe_hr
+  source_object: Employee Separation
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: boarding_begins_on
+  provenance: CANONICAL_KEY
+  business_definition: Separation document name.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: worker_id
+  source_system: frappe_hr
+  source_object: Employee Separation
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: boarding_begins_on
+  provenance: SOURCE_NATIVE
+  business_definition: Employee.link.
+  source_field: employee
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: person_id
+  source_system: frappe_hr
+  source_object: Employee Separation
+  transformation: xw_identity
+  nullable: false
+  data_type: uuid
+  effective_date_logic: boarding_begins_on
+  provenance: CANONICAL_KEY
+  business_definition: Person of the worker.
+  source_field: employee
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: event_type
+  source_system: frappe_hr
+  source_object: Employee Separation
+  transformation: literal separation
+  nullable: false
+  data_type: text
+  effective_date_logic: boarding_begins_on
+  provenance: CANONICAL_KEY
+  business_definition: separation.
+  source_field: null
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: event_date
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: prefer Employee.relieving_date; fallback boarding_begins_on
+  nullable: false
+  data_type: date
+  effective_date_logic: relieving_date
+  provenance: SOURCE_NATIVE
+  business_definition: Last day of employment.
+  source_field: relieving_date
+- canonical_table: people_evt_worker
+  canonical_field: recorded_at
+  source_system: frappe_hr
+  source_object: Employee Separation
+  transformation: identity
+  nullable: false
+  data_type: timestamptz
+  effective_date_logic: creation
+  provenance: SOURCE_NATIVE
+  business_definition: Document creation.
+  source_field: creation
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: source_system
+  source_system: frappe_hr
+  source_object: Employee Separation
+  transformation: literal frappe_hr
+  nullable: false
+  data_type: text
+  effective_date_logic: creation
+  provenance: CANONICAL_KEY
+  business_definition: HRIS.
+  source_field: null
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: source_object
+  source_system: frappe_hr
+  source_object: Employee Separation
+  transformation: literal Employee Separation
+  nullable: false
+  data_type: text
+  effective_date_logic: creation
+  provenance: CANONICAL_KEY
+  business_definition: Process evidence.
+  source_field: null
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: source_id
+  source_system: frappe_hr
+  source_object: Employee Separation
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: creation
+  provenance: SOURCE_NATIVE
+  business_definition: Separation.name.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: extract_id
+  source_system: ingest
+  source_object: people_meta_extract_run
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: extract_ts
+  provenance: CANONICAL_KEY
+  business_definition: Extract id.
+  source_field: extract_id
+- canonical_table: people_evt_worker_change
+  canonical_field: event_id
+  source_system: frappe_hr
+  source_object: Employee Separation
+  transformation: parent event_id
+  nullable: false
+  data_type: text
+  effective_date_logic: relieving_date
+  provenance: CANONICAL_KEY
+  business_definition: Separation event.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker_change
+  canonical_field: property
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: literal status
+  nullable: false
+  data_type: text
+  effective_date_logic: relieving_date
+  provenance: DERIVED
+  business_definition: Status change to Left (BR-WF-007).
+  source_field: status
+- canonical_table: people_evt_worker_change
+  canonical_field: old_value
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: prior status
+  nullable: true
+  data_type: text
+  effective_date_logic: relieving_date
+  provenance: DERIVED
+  business_definition: Status before Left.
+  source_field: status
+- canonical_table: people_evt_worker_change
+  canonical_field: new_value
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: literal Left
+  nullable: true
+  data_type: text
+  effective_date_logic: relieving_date
+  provenance: SOURCE_NATIVE
+  business_definition: Terminal status.
+  source_field: status
+- canonical_table: people_evt_worker_change
+  canonical_field: old_canonical_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: relieving_date
+  provenance: DERIVED
+  business_definition: Old status token.
+  source_field: status
+- canonical_table: people_evt_worker_change
+  canonical_field: new_canonical_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: literal Left
+  nullable: true
+  data_type: text
+  effective_date_logic: relieving_date
+  provenance: DERIVED
+  business_definition: New status token.
+  source_field: status

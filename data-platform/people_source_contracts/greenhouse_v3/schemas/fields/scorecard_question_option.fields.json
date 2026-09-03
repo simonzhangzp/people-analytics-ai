@@ -1,0 +1,49 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "scorecard_question_option",
+  "harvest_path_hint": "/v3/scorecard_question_options",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "scorecard_question_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the parent `scorecard_question` this option belongs to. Only questions with `answer_type` of `single_select` or `multi_select` carry options."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "format": null,
+      "description": "Display label shown to interviewers in the scorecard dropdown (e.g. `Strong Hire`, `No Hire`). Persisted verbatim as the choice text on `scorecard_question_answers` that select this option via the `scorecard_question_answer_options` join."
+    },
+    {
+      "name": "sort_order",
+      "type": "integer",
+      "format": null,
+      "description": "Display position within the parent question's choice list. Lower values render first; ties fall back to insertion order. Alias of the underlying `priority` column."
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "format": null,
+      "description": "`true` while the option is selectable on new scorecards. Set to `false` after removal \u2014 historical `scorecard_question_answers` that already selected the option are preserved, so past scorecards still resolve to the original label."
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:application_stage
+info:
+  title: application_stage
+  version: 1.0.0
+  description: Do not persist days_in_stage.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/application_stage/extract_date={date}/run_id={id}/
+schema:
+- name: application_stage
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/application_stage
+  primaryKey:
+  - id
+  description: Do not persist days_in_stage.
+extract:
+  mode: incremental
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

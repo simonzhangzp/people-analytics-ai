@@ -1,0 +1,17 @@
+canonical_version: people_v2
+gate: 1
+note: Feeds people_xw_org only. Not a second org spine.
+source_contract:
+  pin: schemas/fields/department.fields.json
+fields:
+- canonical_table: people_xw_org
+  canonical_field: gh_department_id
+  source_system: greenhouse_v3
+  source_object: department
+  transformation: identity
+  nullable: true
+  data_type: integer
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SOURCE_NATIVE
+  business_definition: Harvest department.id.
+  source_field: id

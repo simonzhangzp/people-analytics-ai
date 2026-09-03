@@ -1,0 +1,116 @@
+canonical_version: people_v2
+gate: 1
+note: T1 trigger. starts_at ← starts_on. sent_at ← sent_on. Status mapped to lowercase (BR-TA-007).
+source_contract:
+  pin: schemas/fields/offer.fields.json
+fields:
+- canonical_table: people_fact_offer
+  canonical_field: offer_id
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: CANONICAL_KEY
+  business_definition: Offer.id.
+  source_field: id
+- canonical_table: people_fact_offer
+  canonical_field: version
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: identity
+  nullable: false
+  data_type: integer
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Offer version.
+  source_field: version
+- canonical_table: people_fact_offer
+  canonical_field: application_id
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Application.
+  source_field: application_id
+- canonical_table: people_fact_offer
+  canonical_field: requisition_id
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: identity; fallback BR-TA-002 from job_id when opening_id is null
+  nullable: true
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Opening this offer fills.
+  source_field: opening_id
+- canonical_table: people_fact_offer
+  canonical_field: created_at
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: identity
+  nullable: false
+  data_type: timestamptz
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Offer created_at.
+  source_field: created_at
+- canonical_table: people_fact_offer
+  canonical_field: sent_at
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: cast date to timestamptz noon UTC
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: sent_on
+  provenance: SOURCE_NATIVE
+  business_definition: Harvest field is sent_on.
+  source_field: sent_on
+- canonical_table: people_fact_offer
+  canonical_field: resolved_at
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: identity
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: resolved_at
+  provenance: SOURCE_NATIVE
+  business_definition: Accepted/Rejected timestamp.
+  source_field: resolved_at
+- canonical_table: people_fact_offer
+  canonical_field: starts_at
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: cast date; this is T1 joining date into Employee.date_of_joining
+  nullable: true
+  data_type: date
+  effective_date_logic: starts_on
+  provenance: SOURCE_NATIVE
+  business_definition: Harvest field is starts_on.
+  source_field: starts_on
+- canonical_table: people_fact_offer
+  canonical_field: status
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: Created→unresolved; Accepted→accepted; Rejected→rejected; Deprecated→deprecated (BR-TA-007)
+  nullable: false
+  data_type: text
+  effective_date_logic: updated_at
+  provenance: DERIVED
+  business_definition: Canonical lowercase status.
+  source_field: status
+- canonical_table: people_dim_worker
+  canonical_field: hire_date
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: 'T1: Employee.date_of_joining ← offer.starts_on when Accepted'
+  nullable: false
+  data_type: date
+  effective_date_logic: starts_on
+  provenance: SOURCE_NATIVE
+  business_definition: Hire date from accepted offer.
+  source_field: starts_on

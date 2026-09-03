@@ -1,0 +1,51 @@
+{
+  "name": "Training Result Employee",
+  "module": "HR",
+  "istable": 1,
+  "issingle": null,
+  "autoname": null,
+  "fields": [
+    {
+      "fieldname": "employee",
+      "label": "Employee",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "reqd": null
+    },
+    {
+      "fieldname": "employee_name",
+      "label": "Employee Name",
+      "fieldtype": "Read Only",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "department",
+      "label": "Department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "reqd": null
+    },
+    {
+      "fieldname": "hours",
+      "label": "Hours",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "grade",
+      "label": "Grade",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "comments",
+      "label": "Comments",
+      "fieldtype": "Text",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

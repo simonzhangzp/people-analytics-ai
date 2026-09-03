@@ -1,0 +1,51 @@
+canonical_version: people_v2
+gate: 1
+note: Designation to O*NET-SOC is constructed 1:1 in the simulator; live orgs must supply the same table.
+source_contract:
+  frappe: erpnext_doctypes/designation.json
+  onet: db_31_0_text Occupation Data.txt
+fields:
+- canonical_table: people_xw_job
+  canonical_field: job_id
+  source_system: frappe_hr
+  source_object: Designation
+  transformation: canonical job key = Designation.name
+  nullable: false
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: CANONICAL_KEY
+  business_definition: Job spine is HRIS designation.
+  source_field: name
+- canonical_table: people_xw_job
+  canonical_field: frappe_designation
+  source_system: frappe_hr
+  source_object: Designation
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SOURCE_NATIVE
+  business_definition: Frappe Designation.name.
+  source_field: name
+- canonical_table: people_xw_job
+  canonical_field: onet_soc_code
+  source_system: onet
+  source_object: Occupation Data.txt
+  transformation: 1:1 constructed map from Designation to SOC
+  nullable: true
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: CANONICAL_KEY
+  business_definition: O*NET occupation code.
+  source_field: O*NET-SOC Code
+- canonical_table: people_xw_job
+  canonical_field: job_family
+  source_system: onet
+  source_object: Occupation Data.txt
+  transformation: SOC major group = first two digits (BR-WF-005)
+  nullable: true
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: Job family from SOC major group.
+  source_field: O*NET-SOC Code

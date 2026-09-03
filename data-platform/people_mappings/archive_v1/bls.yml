@@ -1,0 +1,17 @@
+canonical_entity: people_bls_series
+source_contract:
+  source_system: bls
+  api: https://api.bls.gov/publicAPI/v2/timeseries/data/
+  pin: publicAPI/v2
+fields:
+  - canonical_field: series_id
+    source_field: seriesID
+    transformation: identity
+  - canonical_field: source_period
+    source_fields: [year, period]
+    transformation: concat year-period
+  - canonical_field: value
+    source_field: value
+    transformation: identity
+series_map_documented_in: data-platform/people_ingestion/people_bls.py
+note: Series labels (job_openings, hires, quits, OEWS wages) are documented derivations from series_id. Used to calibrate simulator rates, not to define HR schemas.

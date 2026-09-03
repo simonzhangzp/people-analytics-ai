@@ -1,0 +1,39 @@
+scenario_id: engineering_apac_attrition_rise
+version: 2
+kind: behavior
+effective:
+  from: 2026-03-01
+  to: null
+target:
+  org_path: globaltech.engineering.*
+  location_region: APAC
+  job_family: Engineering
+  tenure_months: [0, 36]
+effect:
+  hazard_multiplier:
+    voluntary_separation: 2.0
+  ramp_months: 3
+  reason_mix:
+    Resignation - Better opportunity: 0.7
+    Resignation - Personal: 0.3
+correlated_signals:
+  - id: compa_ratio_lag
+    from: 2025-10-01
+    target:
+      location_region: APAC
+      job_family: Engineering
+      tenure_months: [0, 36]
+    effect:
+      slice_compa_ratio_median: 0.88
+      control_compa_ratio_median: 0.98
+    note: Correlation only. Do not treat as a causal driver of the hazard multiplier.
+  - id: manager_change_cluster
+    from: 2025-10-01
+    target:
+      location_region: APAC
+      job_family: Engineering
+      tenure_months: [0, 36]
+    effect:
+      manager_change_annual_multiplier: 3.0
+    note: Correlation only. Same slice and window as the pay lag.
+narrative: "Case 3: APAC Engineering 0–3y voluntary hazard doubles after a 3-month linear ramp. Engineering overall trailing-3m ≥ +2pp by closed form. Correlated (not causal): APAC Eng 0–3y compa-ratio lag and clustered manager changes from 2025Q4."

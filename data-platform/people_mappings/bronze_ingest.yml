@@ -1,0 +1,223 @@
+canonical_version: people_v2
+lake_path: people_bronze/<source_system>/<object>/extract_date=YYYY-MM-DD/run_id=<id>/part-*.parquet
+fields:
+- canonical_table: people_bronze
+  canonical_field: _source_system
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: extract_ts
+  provenance: CANONICAL_KEY
+  business_definition: Pinned source system id (frappe_hr, greenhouse_v3, onet, bls, microsoft_learn, engagement_ext).
+  source_field: source_system
+- canonical_table: people_bronze
+  canonical_field: _source_object
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: extract_ts
+  provenance: CANONICAL_KEY
+  business_definition: Pinned object name (Employee, application, …).
+  source_field: source_object
+- canonical_table: people_bronze
+  canonical_field: _source_version
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: extract_ts
+  provenance: CANONICAL_KEY
+  business_definition: Pin tag (hrms v16.15.0, Harvest v3, db_31_0_text).
+  source_field: source_version
+- canonical_table: people_bronze
+  canonical_field: _source_id
+  source_system: ingest
+  source_object: payload
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: extract_ts
+  provenance: SOURCE_NATIVE
+  business_definition: Source primary key (Employee.name / Harvest id).
+  source_field: natural_key
+- canonical_table: people_bronze
+  canonical_field: _extract_id
+  source_system: ingest
+  source_object: people_meta_extract_run
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: extract_ts
+  provenance: CANONICAL_KEY
+  business_definition: Extract run that wrote this file.
+  source_field: extract_id
+- canonical_table: people_bronze
+  canonical_field: _extract_ts
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: timestamptz
+  effective_date_logic: extract_ts
+  provenance: CANONICAL_KEY
+  business_definition: UTC write time.
+  source_field: extract_ts
+- canonical_table: people_bronze
+  canonical_field: _row_hash
+  source_system: ingest
+  source_object: payload
+  transformation: sha256 of canonicalized JSON
+  nullable: false
+  data_type: text
+  effective_date_logic: extract_ts
+  provenance: DERIVED
+  business_definition: Change detection for SCD2.
+  source_field: payload
+- canonical_table: people_bronze
+  canonical_field: payload
+  source_system: ingest
+  source_object: source
+  transformation: JSON string of the source-shaped record
+  nullable: false
+  data_type: text
+  effective_date_logic: extract_ts
+  provenance: SOURCE_NATIVE
+  business_definition: Immutable source document.
+  source_field: null
+- canonical_table: people_meta_extract_run
+  canonical_field: extract_id
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: started_at
+  provenance: CANONICAL_KEY
+  business_definition: Primary key of an extract.
+  source_field: extract_id
+- canonical_table: people_meta_extract_run
+  canonical_field: run_id
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: started_at
+  provenance: CANONICAL_KEY
+  business_definition: Pipeline run grouping extracts.
+  source_field: run_id
+- canonical_table: people_meta_extract_run
+  canonical_field: source_system
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: started_at
+  provenance: CANONICAL_KEY
+  business_definition: Same as bronze _source_system.
+  source_field: source_system
+- canonical_table: people_meta_extract_run
+  canonical_field: source_object
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: started_at
+  provenance: CANONICAL_KEY
+  business_definition: Same as bronze _source_object.
+  source_field: source_object
+- canonical_table: people_meta_extract_run
+  canonical_field: extract_date
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: date
+  effective_date_logic: extract_date
+  provenance: CANONICAL_KEY
+  business_definition: Partition date.
+  source_field: extract_date
+- canonical_table: people_meta_extract_run
+  canonical_field: mode
+  source_system: ingest
+  source_object: manifest
+  transformation: full or incremental
+  nullable: false
+  data_type: text
+  effective_date_logic: started_at
+  provenance: CANONICAL_KEY
+  business_definition: Extract mode.
+  source_field: mode
+- canonical_table: people_meta_extract_run
+  canonical_field: control_total
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: true
+  data_type: integer
+  effective_date_logic: finished_at
+  provenance: SOURCE_NATIVE
+  business_definition: Source-reported row count.
+  source_field: control_total
+- canonical_table: people_meta_extract_run
+  canonical_field: rows_received
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: integer
+  effective_date_logic: finished_at
+  provenance: DERIVED
+  business_definition: Rows written to bronze.
+  source_field: rows_received
+- canonical_table: people_meta_extract_run
+  canonical_field: status
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: finished_at
+  provenance: CANONICAL_KEY
+  business_definition: success | failed.
+  source_field: status
+- canonical_table: people_meta_extract_run
+  canonical_field: started_at
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: false
+  data_type: timestamptz
+  effective_date_logic: started_at
+  provenance: CANONICAL_KEY
+  business_definition: Extract start.
+  source_field: started_at
+- canonical_table: people_meta_extract_run
+  canonical_field: finished_at
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: finished_at
+  provenance: CANONICAL_KEY
+  business_definition: Extract end.
+  source_field: finished_at
+- canonical_table: people_meta_extract_run
+  canonical_field: scenario_ids
+  source_system: ingest
+  source_object: manifest
+  transformation: identity
+  nullable: true
+  data_type: text[]
+  effective_date_logic: started_at
+  provenance: CANONICAL_KEY
+  business_definition: Simulator scenarios that produced this extract. Empty for live pins.
+  source_field: scenario_ids

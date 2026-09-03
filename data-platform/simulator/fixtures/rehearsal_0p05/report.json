@@ -1,0 +1,1149 @@
+{
+  "scale": 0.05,
+  "seed": 20260301,
+  "window": {
+    "start": "2021-09-01",
+    "end": "2026-08-31"
+  },
+  "publish": false,
+  "path": "bronze \u2192 people_mappings \u2192 silver parquet \u2192 gold parquet (DuckDB)",
+  "source": "gold",
+  "cumulative_workers": 4278,
+  "ending_certified_headcount": 2501,
+  "ending_headcount_by_region": {
+    "AMER": 1130,
+    "APAC": 711,
+    "EMEA": 660
+  },
+  "voluntary_attrition_2026_from_gold": {
+    "EMEA|5\u201310y": {
+      "region": "EMEA",
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 15,
+      "person_months": 1232,
+      "annualized": 0.1461
+    },
+    "EMEA|10y+": {
+      "region": "EMEA",
+      "tenure_band": "10y+",
+      "voluntary_terms": 5,
+      "person_months": 735,
+      "annualized": 0.0816
+    },
+    "APAC|3\u20135y": {
+      "region": "APAC",
+      "tenure_band": "3\u20135y",
+      "voluntary_terms": 13,
+      "person_months": 916,
+      "annualized": 0.1703
+    },
+    "APAC|5\u201310y": {
+      "region": "APAC",
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 14,
+      "person_months": 1330,
+      "annualized": 0.1263
+    },
+    "AMER|<1y": {
+      "region": "AMER",
+      "tenure_band": "<1y",
+      "voluntary_terms": 24,
+      "person_months": 1722,
+      "annualized": 0.1672
+    },
+    "AMER|1\u20133y": {
+      "region": "AMER",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 37,
+      "person_months": 2441,
+      "annualized": 0.1819
+    },
+    "EMEA|1\u20133y": {
+      "region": "EMEA",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 20,
+      "person_months": 1434,
+      "annualized": 0.1674
+    },
+    "EMEA|<1y": {
+      "region": "EMEA",
+      "tenure_band": "<1y",
+      "voluntary_terms": 15,
+      "person_months": 960,
+      "annualized": 0.1875
+    },
+    "AMER|3\u20135y": {
+      "region": "AMER",
+      "tenure_band": "3\u20135y",
+      "voluntary_terms": 13,
+      "person_months": 1471,
+      "annualized": 0.1061
+    },
+    "AMER|10y+": {
+      "region": "AMER",
+      "tenure_band": "10y+",
+      "voluntary_terms": 9,
+      "person_months": 1157,
+      "annualized": 0.0933
+    },
+    "APAC|10y+": {
+      "region": "APAC",
+      "tenure_band": "10y+",
+      "voluntary_terms": 5,
+      "person_months": 812,
+      "annualized": 0.0739
+    },
+    "EMEA|3\u20135y": {
+      "region": "EMEA",
+      "tenure_band": "3\u20135y",
+      "voluntary_terms": 3,
+      "person_months": 812,
+      "annualized": 0.0443
+    },
+    "APAC|1\u20133y": {
+      "region": "APAC",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 30,
+      "person_months": 1555,
+      "annualized": 0.2315
+    },
+    "AMER|5\u201310y": {
+      "region": "AMER",
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 18,
+      "person_months": 1999,
+      "annualized": 0.1081
+    },
+    "APAC|<1y": {
+      "region": "APAC",
+      "tenure_band": "<1y",
+      "voluntary_terms": 28,
+      "person_months": 1065,
+      "annualized": 0.3155
+    }
+  },
+  "recruiting": {
+    "hires": 2478,
+    "openings": 2753,
+    "applications": 355505,
+    "offers_sent": 2926,
+    "offers_accepted": 2478,
+    "offer_acceptance": 0.8469
+  },
+  "coverage_matrix": {
+    "comp": {
+      "ssa_rows": 16119,
+      "compa_ratio_by_grade": [
+        {
+          "grade": "G10",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 50
+        },
+        {
+          "grade": "G3",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 380
+        },
+        {
+          "grade": "G4",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 959
+        },
+        {
+          "grade": "G5",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 1093
+        },
+        {
+          "grade": "G6",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 1244
+        },
+        {
+          "grade": "G7",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 470
+        },
+        {
+          "grade": "G8",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 33
+        },
+        {
+          "grade": "G9",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 49
+        }
+      ]
+    },
+    "performance": {
+      "appraisal_rows": 9936,
+      "final_score_bins": [
+        {
+          "score_bin": 2.0,
+          "n": 360
+        },
+        {
+          "score_bin": 3.0,
+          "n": 4161
+        },
+        {
+          "score_bin": 4.0,
+          "n": 4133
+        },
+        {
+          "score_bin": 5.0,
+          "n": 1282
+        }
+      ]
+    },
+    "mobility": {
+      "promotion_count": 921,
+      "transfer_count": 655,
+      "manager_change_count": 535,
+      "promotion_annualized": 0.0867,
+      "transfer_annualized": 0.0617,
+      "manager_change_annualized": 0.0504,
+      "baseline": {
+        "promotion": 0.08,
+        "transfer": 0.06,
+        "manager_change": 0.05
+      }
+    },
+    "learning": {
+      "training_rows": 3600,
+      "hours_sum": 17700.0,
+      "hours_per_participation": 4.92,
+      "hours_per_certified": 7.08
+    },
+    "skills": {
+      "avg_skills_per_worker": 6.38,
+      "gap_top": [
+        {
+          "job_family": "Engineering",
+          "skill_id": "Kubernetes",
+          "gap": 0.3981
+        },
+        {
+          "job_family": "Engineering",
+          "skill_id": "Observability",
+          "gap": 0.3912
+        },
+        {
+          "job_family": "Engineering",
+          "skill_id": "CI/CD",
+          "gap": 0.2654
+        },
+        {
+          "job_family": "Sales",
+          "skill_id": "MEDDPICC",
+          "gap": 0.2495
+        },
+        {
+          "job_family": "Engineering",
+          "skill_id": "Cloud",
+          "gap": 0.1257
+        },
+        {
+          "job_family": "Other",
+          "skill_id": "Documentation",
+          "gap": 0.1078
+        },
+        {
+          "job_family": "Sales",
+          "skill_id": "Pipeline",
+          "gap": 0.1053
+        },
+        {
+          "job_family": "Exec",
+          "skill_id": "Governance",
+          "gap": 0.0741
+        }
+      ]
+    },
+    "engagement": {
+      "waves": [
+        {
+          "wave_id": "WAV-2021-11",
+          "response_rate": 0.8489,
+          "n_invited": 1840
+        },
+        {
+          "wave_id": "WAV-2022-06",
+          "response_rate": 0.7605,
+          "n_invited": 1914
+        },
+        {
+          "wave_id": "WAV-2022-11",
+          "response_rate": 0.7039,
+          "n_invited": 1981
+        },
+        {
+          "wave_id": "WAV-2023-06",
+          "response_rate": 0.7591,
+          "n_invited": 2067
+        },
+        {
+          "wave_id": "WAV-2023-11",
+          "response_rate": 0.7767,
+          "n_invited": 2132
+        },
+        {
+          "wave_id": "WAV-2024-06",
+          "response_rate": 0.7705,
+          "n_invited": 2236
+        },
+        {
+          "wave_id": "WAV-2024-11",
+          "response_rate": 0.7063,
+          "n_invited": 2298
+        },
+        {
+          "wave_id": "WAV-2025-06",
+          "response_rate": 0.8497,
+          "n_invited": 2387
+        },
+        {
+          "wave_id": "WAV-2025-11",
+          "response_rate": 0.7012,
+          "n_invited": 2450
+        },
+        {
+          "wave_id": "WAV-2026-06",
+          "response_rate": 0.773,
+          "n_invited": 2543
+        }
+      ],
+      "dimension_means": [
+        {
+          "wave_id": "WAV-2021-11",
+          "dimension": "engagement",
+          "mean": 3.657,
+          "n": 4686
+        },
+        {
+          "wave_id": "WAV-2021-11",
+          "dimension": "growth",
+          "mean": 3.672,
+          "n": 4686
+        },
+        {
+          "wave_id": "WAV-2021-11",
+          "dimension": "manager",
+          "mean": 3.662,
+          "n": 4686
+        },
+        {
+          "wave_id": "WAV-2021-11",
+          "dimension": "wellbeing",
+          "mean": 3.663,
+          "n": 4686
+        },
+        {
+          "wave_id": "WAV-2022-06",
+          "dimension": "engagement",
+          "mean": 3.674,
+          "n": 4368
+        },
+        {
+          "wave_id": "WAV-2022-06",
+          "dimension": "growth",
+          "mean": 3.667,
+          "n": 4368
+        },
+        {
+          "wave_id": "WAV-2022-06",
+          "dimension": "manager",
+          "mean": 3.662,
+          "n": 4368
+        },
+        {
+          "wave_id": "WAV-2022-06",
+          "dimension": "wellbeing",
+          "mean": 3.652,
+          "n": 4368
+        },
+        {
+          "wave_id": "WAV-2022-11",
+          "dimension": "engagement",
+          "mean": 3.673,
+          "n": 4182
+        },
+        {
+          "wave_id": "WAV-2022-11",
+          "dimension": "growth",
+          "mean": 3.695,
+          "n": 4182
+        },
+        {
+          "wave_id": "WAV-2022-11",
+          "dimension": "manager",
+          "mean": 3.649,
+          "n": 4182
+        },
+        {
+          "wave_id": "WAV-2022-11",
+          "dimension": "wellbeing",
+          "mean": 3.681,
+          "n": 4182
+        },
+        {
+          "wave_id": "WAV-2023-06",
+          "dimension": "engagement",
+          "mean": 3.668,
+          "n": 4707
+        },
+        {
+          "wave_id": "WAV-2023-06",
+          "dimension": "growth",
+          "mean": 3.648,
+          "n": 4707
+        },
+        {
+          "wave_id": "WAV-2023-06",
+          "dimension": "manager",
+          "mean": 3.668,
+          "n": 4707
+        },
+        {
+          "wave_id": "WAV-2023-06",
+          "dimension": "wellbeing",
+          "mean": 3.667,
+          "n": 4707
+        },
+        {
+          "wave_id": "WAV-2023-11",
+          "dimension": "engagement",
+          "mean": 3.674,
+          "n": 4968
+        },
+        {
+          "wave_id": "WAV-2023-11",
+          "dimension": "growth",
+          "mean": 3.69,
+          "n": 4968
+        },
+        {
+          "wave_id": "WAV-2023-11",
+          "dimension": "manager",
+          "mean": 3.674,
+          "n": 4968
+        },
+        {
+          "wave_id": "WAV-2023-11",
+          "dimension": "wellbeing",
+          "mean": 3.674,
+          "n": 4968
+        },
+        {
+          "wave_id": "WAV-2024-06",
+          "dimension": "engagement",
+          "mean": 3.677,
+          "n": 5169
+        },
+        {
+          "wave_id": "WAV-2024-06",
+          "dimension": "growth",
+          "mean": 3.665,
+          "n": 5169
+        },
+        {
+          "wave_id": "WAV-2024-06",
+          "dimension": "manager",
+          "mean": 3.674,
+          "n": 5169
+        },
+        {
+          "wave_id": "WAV-2024-06",
+          "dimension": "wellbeing",
+          "mean": 3.665,
+          "n": 5169
+        },
+        {
+          "wave_id": "WAV-2024-11",
+          "dimension": "engagement",
+          "mean": 3.669,
+          "n": 4869
+        },
+        {
+          "wave_id": "WAV-2024-11",
+          "dimension": "growth",
+          "mean": 3.657,
+          "n": 4869
+        },
+        {
+          "wave_id": "WAV-2024-11",
+          "dimension": "manager",
+          "mean": 3.691,
+          "n": 4869
+        },
+        {
+          "wave_id": "WAV-2024-11",
+          "dimension": "wellbeing",
+          "mean": 3.663,
+          "n": 4869
+        },
+        {
+          "wave_id": "WAV-2025-06",
+          "dimension": "engagement",
+          "mean": 3.676,
+          "n": 6084
+        },
+        {
+          "wave_id": "WAV-2025-06",
+          "dimension": "growth",
+          "mean": 3.667,
+          "n": 6084
+        },
+        {
+          "wave_id": "WAV-2025-06",
+          "dimension": "manager",
+          "mean": 3.656,
+          "n": 6084
+        },
+        {
+          "wave_id": "WAV-2025-06",
+          "dimension": "wellbeing",
+          "mean": 3.658,
+          "n": 6084
+        },
+        {
+          "wave_id": "WAV-2025-11",
+          "dimension": "engagement",
+          "mean": 3.661,
+          "n": 5154
+        },
+        {
+          "wave_id": "WAV-2025-11",
+          "dimension": "growth",
+          "mean": 3.671,
+          "n": 5154
+        },
+        {
+          "wave_id": "WAV-2025-11",
+          "dimension": "manager",
+          "mean": 3.637,
+          "n": 5154
+        },
+        {
+          "wave_id": "WAV-2025-11",
+          "dimension": "wellbeing",
+          "mean": 3.688,
+          "n": 5154
+        },
+        {
+          "wave_id": "WAV-2026-06",
+          "dimension": "engagement",
+          "mean": 3.674,
+          "n": 5898
+        },
+        {
+          "wave_id": "WAV-2026-06",
+          "dimension": "growth",
+          "mean": 3.663,
+          "n": 5898
+        },
+        {
+          "wave_id": "WAV-2026-06",
+          "dimension": "manager",
+          "mean": 3.664,
+          "n": 5898
+        },
+        {
+          "wave_id": "WAV-2026-06",
+          "dimension": "wellbeing",
+          "mean": 3.655,
+          "n": 5898
+        }
+      ]
+    },
+    "recruiting": {
+      "time_to_fill_p50": 32.0,
+      "time_to_fill_p90": 81.3,
+      "time_to_fill_p90_over_p50": 2.5406,
+      "stage_aging": [
+        {
+          "canonical_stage": "Offer",
+          "aging_p50_days": 4.0,
+          "aging_p90_days": 8.0
+        },
+        {
+          "canonical_stage": "Onsite",
+          "aging_p50_days": 8.0,
+          "aging_p90_days": 23.0
+        },
+        {
+          "canonical_stage": "Review",
+          "aging_p50_days": 3.0,
+          "aging_p90_days": 11.0
+        },
+        {
+          "canonical_stage": "Screen",
+          "aging_p50_days": 5.0,
+          "aging_p90_days": 11.0
+        }
+      ],
+      "stage_aging_p50": [
+        {
+          "canonical_stage": "Offer",
+          "aging_p50_days": 4.0
+        },
+        {
+          "canonical_stage": "Onsite",
+          "aging_p50_days": 8.0
+        },
+        {
+          "canonical_stage": "Review",
+          "aging_p50_days": 3.0
+        },
+        {
+          "canonical_stage": "Screen",
+          "aging_p50_days": 5.0
+        }
+      ],
+      "openings": 2753,
+      "cancelled": 275,
+      "filled": 2478,
+      "cancel_rate": 0.0999,
+      "baseline_cancel_rate": 0.1
+    }
+  },
+  "funnel_distribution": {
+    "source_mix": [
+      {
+        "source": "inbound",
+        "n": 264622,
+        "share": 0.7444
+      },
+      {
+        "source": "sourced",
+        "n": 42474,
+        "share": 0.1195
+      },
+      {
+        "source": "referral",
+        "n": 30827,
+        "share": 0.0867
+      },
+      {
+        "source": "internal",
+        "n": 17582,
+        "share": 0.0495
+      }
+    ],
+    "review_to_screen": [
+      {
+        "source": "inbound",
+        "review_apps": 264622,
+        "to_screen": 26800,
+        "conv": 0.1013
+      },
+      {
+        "source": "internal",
+        "review_apps": 17582,
+        "to_screen": 7935,
+        "conv": 0.4513
+      },
+      {
+        "source": "referral",
+        "review_apps": 30827,
+        "to_screen": 13792,
+        "conv": 0.4474
+      },
+      {
+        "source": "sourced",
+        "review_apps": 42474,
+        "to_screen": 25238,
+        "conv": 0.5942
+      }
+    ],
+    "inbound_review_quick_reject": {
+      "inbound_review": 264622,
+      "share_rejected_in_review_within_5d": 0.7594
+    },
+    "apps_per_opening_by_family": [
+      {
+        "job_family": "Engineering",
+        "applications": 169361,
+        "openings": 971,
+        "apps_per_opening": 174.4
+      },
+      {
+        "job_family": "Exec",
+        "applications": 1546,
+        "openings": 69,
+        "apps_per_opening": 22.4
+      },
+      {
+        "job_family": "Other",
+        "applications": 131969,
+        "openings": 1134,
+        "apps_per_opening": 116.4
+      },
+      {
+        "job_family": "Sales",
+        "applications": 52629,
+        "openings": 579,
+        "apps_per_opening": 90.9
+      }
+    ],
+    "apps_per_opening_by_source_family": [
+      {
+        "job_family": "Engineering",
+        "source": "inbound",
+        "applications": 126320,
+        "openings": 971,
+        "apps_per_opening": 130.1
+      },
+      {
+        "job_family": "Engineering",
+        "source": "internal",
+        "applications": 8425,
+        "openings": 965,
+        "apps_per_opening": 8.7
+      },
+      {
+        "job_family": "Engineering",
+        "source": "referral",
+        "applications": 14268,
+        "openings": 971,
+        "apps_per_opening": 14.7
+      },
+      {
+        "job_family": "Engineering",
+        "source": "sourced",
+        "applications": 20348,
+        "openings": 969,
+        "apps_per_opening": 21.0
+      },
+      {
+        "job_family": "Exec",
+        "source": "inbound",
+        "applications": 1114,
+        "openings": 69,
+        "apps_per_opening": 16.1
+      },
+      {
+        "job_family": "Exec",
+        "source": "internal",
+        "applications": 65,
+        "openings": 40,
+        "apps_per_opening": 1.6
+      },
+      {
+        "job_family": "Exec",
+        "source": "referral",
+        "applications": 181,
+        "openings": 67,
+        "apps_per_opening": 2.7
+      },
+      {
+        "job_family": "Exec",
+        "source": "sourced",
+        "applications": 186,
+        "openings": 59,
+        "apps_per_opening": 3.2
+      },
+      {
+        "job_family": "Other",
+        "source": "inbound",
+        "applications": 98031,
+        "openings": 1134,
+        "apps_per_opening": 86.4
+      },
+      {
+        "job_family": "Other",
+        "source": "internal",
+        "applications": 6481,
+        "openings": 1091,
+        "apps_per_opening": 5.9
+      },
+      {
+        "job_family": "Other",
+        "source": "referral",
+        "applications": 11678,
+        "openings": 1134,
+        "apps_per_opening": 10.3
+      },
+      {
+        "job_family": "Other",
+        "source": "sourced",
+        "applications": 15779,
+        "openings": 1131,
+        "apps_per_opening": 14.0
+      },
+      {
+        "job_family": "Sales",
+        "source": "inbound",
+        "applications": 39157,
+        "openings": 579,
+        "apps_per_opening": 67.6
+      },
+      {
+        "job_family": "Sales",
+        "source": "internal",
+        "applications": 2611,
+        "openings": 545,
+        "apps_per_opening": 4.8
+      },
+      {
+        "job_family": "Sales",
+        "source": "referral",
+        "applications": 4700,
+        "openings": 579,
+        "apps_per_opening": 8.1
+      },
+      {
+        "job_family": "Sales",
+        "source": "sourced",
+        "applications": 6161,
+        "openings": 579,
+        "apps_per_opening": 10.6
+      }
+    ]
+  },
+  "case_signals": {
+    "case3_compa_ratio": [
+      {
+        "group": "slice",
+        "median_compa": 0.88,
+        "n": 106
+      },
+      {
+        "group": "control",
+        "median_compa": 0.98,
+        "n": 2395
+      }
+    ],
+    "case3_manager_change": [
+      {
+        "group": "slice",
+        "n_workers": 106,
+        "manager_changes_since_2025q4": 9,
+        "changes_per_worker": 0.0849
+      },
+      {
+        "group": "control",
+        "n_workers": 2395,
+        "manager_changes_since_2025q4": 89,
+        "changes_per_worker": 0.0372
+      }
+    ],
+    "case4_scorecard_delay": [
+      {
+        "group": "slow_hm",
+        "scorecard_lag_p50_days": 11.083,
+        "interview_lag_p50_days": 8.083,
+        "n": 109
+      },
+      {
+        "group": "other_hm",
+        "scorecard_lag_p50_days": 1.083,
+        "interview_lag_p50_days": 0.083,
+        "n": 277
+      }
+    ],
+    "case4_time_to_fill": [
+      {
+        "group": "slow_hm",
+        "ttf_p50_days": 50.5,
+        "ttf_p90_days": 96.0,
+        "n": 16
+      },
+      {
+        "group": "other_hm",
+        "ttf_p50_days": 29.0,
+        "ttf_p90_days": 61.0,
+        "n": 24
+      }
+    ],
+    "case4_onsite_aging": [
+      {
+        "group": "slow_hm",
+        "aging_p50_days": 23.0,
+        "aging_p90_days": 65.4,
+        "n": 109
+      },
+      {
+        "group": "other_hm",
+        "aging_p50_days": 13.0,
+        "aging_p90_days": 35.0,
+        "n": 277
+      }
+    ]
+  },
+  "engine_hires_accepted": {
+    "window_hires": 2478,
+    "accepted_offers": 2478
+  },
+  "case3_closed_form_full_scale": {
+    "scale": "full",
+    "method": "closed_form_independent_mix",
+    "mix": "baseline.population region_mix \u00d7 t0_tenure_mix \u00d7 job_family_mix (parameters)",
+    "trailing_3m": "2026-06..2026-08 (after 3-month ramp; multiplier at plateau)",
+    "engineering_overall": {
+      "without_scenario": 0.1334,
+      "with_scenario": 0.1574,
+      "delta_pp": 2.4,
+      "target_delta_pp": 2.0,
+      "meets_target": true
+    },
+    "apac_engineering_1_3y": {
+      "without_scenario": 0.1597,
+      "with_scenario": 0.3194,
+      "ratio": 2.0,
+      "target_ratio": 2.0,
+      "meets_target": true
+    },
+    "slice": {
+      "definition": "APAC \u00d7 Engineering \u00d7 tenure_months [0, 36) i.e. <1y and 1\u20133y",
+      "hazard_multiplier": 2.0,
+      "ramp_months": 3,
+      "weight_within_population": 0.0483
+    }
+  },
+  "case3_measured_trailing_3m": {
+    "with_scenario": {
+      "window": "2026-06..2026-08",
+      "voluntary_terms": 41,
+      "person_months": 2565,
+      "annualized": 0.1918
+    }
+  },
+  "ttf_p90_over_p50": 2.5406,
+  "case4_tail_visible": true,
+  "dq": [
+    {
+      "test_name": "hist_no_overlap",
+      "test_group": "temporal",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": ""
+    },
+    {
+      "test_name": "hist_no_gap",
+      "test_group": "temporal",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": ""
+    },
+    {
+      "test_name": "hist_first_valid_from_eq_hire",
+      "test_group": "temporal",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": ""
+    },
+    {
+      "test_name": "hire_before_termination",
+      "test_group": "temporal",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": ""
+    },
+    {
+      "test_name": "offer_application_ri",
+      "test_group": "ri",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": ""
+    },
+    {
+      "test_name": "offer_requisition_ri",
+      "test_group": "ri",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": ""
+    },
+    {
+      "test_name": "term_has_separation_ri",
+      "test_group": "ri",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": ""
+    },
+    {
+      "test_name": "hires_eq_accepted_offers",
+      "test_group": "transaction",
+      "status": "passed",
+      "observed_value": {
+        "hires": 2478,
+        "accepted": 2478
+      },
+      "expected_value": "equal",
+      "details": ""
+    },
+    {
+      "test_name": "window_hires_via_t1",
+      "test_group": "transaction",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": ""
+    },
+    {
+      "test_name": "rejected_without_later_accept_keeps_open_or_cancelled",
+      "test_group": "transaction",
+      "status": "passed",
+      "observed_value": 0,
+      "expected_value": 0,
+      "details": ""
+    },
+    {
+      "test_name": "snapshot_roll_forward",
+      "test_group": "gold",
+      "status": "passed",
+      "observed_value": {
+        "max_abs_residual": 0,
+        "months": 59,
+        "t1_bypass": 0,
+        "sample": [
+          {
+            "month_end": "2026-03-31",
+            "active": 2434,
+            "prev_active": 2426,
+            "hires": 42,
+            "rehires": 1,
+            "terms": 37,
+            "status_in": 3,
+            "status_out": 2,
+            "type_in": 1,
+            "type_out": 0,
+            "t1_bypass": 0,
+            "residual": 0
+          },
+          {
+            "month_end": "2026-04-30",
+            "active": 2447,
+            "prev_active": 2434,
+            "hires": 49,
+            "rehires": 0,
+            "terms": 37,
+            "status_in": 2,
+            "status_out": 3,
+            "type_in": 2,
+            "type_out": 0,
+            "t1_bypass": 0,
+            "residual": 0
+          },
+          {
+            "month_end": "2026-05-31",
+            "active": 2473,
+            "prev_active": 2447,
+            "hires": 50,
+            "rehires": 1,
+            "terms": 27,
+            "status_in": 6,
+            "status_out": 5,
+            "type_in": 1,
+            "type_out": 0,
+            "t1_bypass": 0,
+            "residual": 0
+          },
+          {
+            "month_end": "2026-06-30",
+            "active": 2474,
+            "prev_active": 2473,
+            "hires": 37,
+            "rehires": 0,
+            "terms": 41,
+            "status_in": 4,
+            "status_out": 1,
+            "type_in": 2,
+            "type_out": 0,
+            "t1_bypass": 0,
+            "residual": 0
+          },
+          {
+            "month_end": "2026-07-31",
+            "active": 2479,
+            "prev_active": 2474,
+            "hires": 49,
+            "rehires": 1,
+            "terms": 43,
+            "status_in": 0,
+            "status_out": 4,
+            "type_in": 2,
+            "type_out": 0,
+            "t1_bypass": 0,
+            "residual": 0
+          },
+          {
+            "month_end": "2026-08-31",
+            "active": 2501,
+            "prev_active": 2479,
+            "hires": 54,
+            "rehires": 2,
+            "terms": 37,
+            "status_in": 5,
+            "status_out": 3,
+            "type_in": 1,
+            "type_out": 0,
+            "t1_bypass": 0,
+            "residual": 0
+          }
+        ]
+      },
+      "expected_value": 0,
+      "details": "backfill residual must be 0"
+    }
+  ],
+  "dq_failed": [],
+  "case2_isolation": {
+    "fault": {
+      "extract_date": "2026-08-14",
+      "mode": "full",
+      "control_total": 4246,
+      "rows_received": 3417,
+      "isolated": true,
+      "pointer_moved": false,
+      "absence_closes_worker": false,
+      "volume_test_ok": false,
+      "status": "isolated",
+      "replay": {
+        "metric_id": "headcount",
+        "value_bad": 2008,
+        "value_expected": 2481
+      }
+    },
+    "prior_full": {
+      "extract_date": "2026-08-07",
+      "mode": "full",
+      "control_total": 4228,
+      "rows_received": 4228,
+      "volume_test_ok": true,
+      "isolated": false
+    },
+    "certified_pointer": "2026-08-07",
+    "missing_apac": 829,
+    "apac_closed_because_of_extract": [],
+    "ok": true
+  },
+  "answers": {
+    "q6_control_total_vs_spells": "Employee full extract includes Left. control_total is all Employee documents. Employed count is derived (BR-WF-001). BR-DQ-003 absence is a missing document, not status=Left.",
+    "q8_ending_target": "Keep public target 50k certified; hiring controller replaces attrition plus linear growth from opening stock."
+  }
+}

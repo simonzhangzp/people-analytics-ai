@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:offer
+info:
+  title: offer
+  version: 1.0.0
+  description: T1 trigger. starts_on.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/offer/extract_date={date}/run_id={id}/
+schema:
+- name: offer
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/offer
+  primaryKey:
+  - id
+  description: T1 trigger. starts_on.
+extract:
+  mode: incremental
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: confidential

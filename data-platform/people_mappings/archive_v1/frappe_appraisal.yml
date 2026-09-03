@@ -1,0 +1,72 @@
+canonical_entity: people_silver_appraisal
+source_contract:
+  source_system: frappe_hr
+  source_object: Appraisal
+  pin:
+    hrms: v16.15.0
+    schema: people_source_contracts/frappe_hr/doctypes/appraisal.json
+bronze_table: people_bronze_frappe_appraisal
+fields:
+  - canonical_field: appraisal_id
+    source_system: frappe_hr
+    source_object: Appraisal
+    source_field: name
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Appraisal document name.
+
+  - canonical_field: worker_id
+    source_system: frappe_hr
+    source_object: Appraisal
+    source_field: employee
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Employee appraised.
+
+  - canonical_field: appraisal_cycle_id
+    source_system: frappe_hr
+    source_object: Appraisal
+    source_field: appraisal_cycle
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: cycle dates on Appraisal Cycle
+    business_definition: Link to Appraisal Cycle.
+
+  - canonical_field: total_score
+    source_system: frappe_hr
+    source_object: Appraisal
+    source_field: total_score
+    transformation: identity
+    nullable: true
+    data_type: float
+    effective_date_logic: cycle
+    business_definition: Total goal score. Do not replace with a synthetic 1–5 rating.
+
+  - canonical_field: self_score
+    source_system: frappe_hr
+    source_object: Appraisal
+    source_field: self_score
+    transformation: identity
+    nullable: true
+    data_type: float
+    effective_date_logic: cycle
+    business_definition: Total self score.
+
+  - canonical_field: avg_feedback_score
+    source_system: frappe_hr
+    source_object: Appraisal
+    source_field: avg_feedback_score
+    transformation: identity
+    nullable: true
+    data_type: float
+    effective_date_logic: cycle
+    business_definition: Average feedback score.
+
+not_mapped_on_purpose:
+  - rating
+  - rating_label

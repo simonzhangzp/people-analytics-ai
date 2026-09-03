@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:office
+info:
+  title: office
+  version: 1.0.0
+  description: Crosswalk only.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/office/extract_date={date}/run_id={id}/
+schema:
+- name: office
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/office
+  primaryKey:
+  - id
+  description: Crosswalk only.
+extract:
+  mode: full
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

@@ -1,0 +1,72 @@
+{
+  "name": "Training Program",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "field:training_program",
+  "fields": [
+    {
+      "fieldname": "training_program",
+      "label": "Training Program",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Scheduled\nCompleted\nCancelled",
+      "reqd": null
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": 1
+    },
+    {
+      "fieldname": "trainer_name",
+      "label": "Trainer Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "trainer_email",
+      "label": "Trainer Email",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "supplier",
+      "label": "Supplier",
+      "fieldtype": "Link",
+      "options": "Supplier",
+      "reqd": null
+    },
+    {
+      "fieldname": "contact_number",
+      "label": "Contact Number",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "description",
+      "label": "Description",
+      "fieldtype": "Text Editor",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "amended_from",
+      "label": "Amended From",
+      "fieldtype": "Link",
+      "options": "Training Program",
+      "reqd": null
+    }
+  ]
+}

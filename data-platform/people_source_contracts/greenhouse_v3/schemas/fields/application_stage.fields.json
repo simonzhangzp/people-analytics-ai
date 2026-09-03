@@ -1,0 +1,67 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "application_stage",
+  "harvest_path_hint": "/v3/application_stages",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "application_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the application this stage entry belongs to."
+    },
+    {
+      "name": "job_interview_stage_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the interview stage occupied during this entry. References a `/v3/job_interview_stages` row scoped to the application's job."
+    },
+    {
+      "name": "entered_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the application entered this stage, in ISO 8601. `null` only for backfilled or partially recorded history."
+    },
+    {
+      "name": "exited_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the application left this stage, in ISO 8601. `null` while the application is still in this stage (the current stage entry)."
+    },
+    {
+      "name": "days_in_stage",
+      "type": "integer",
+      "format": null,
+      "description": "Whole number of calendar days the application has spent in this stage, computed as `exited_at - entered_at` for past stages and `now - entered_at` for the current stage."
+    },
+    {
+      "name": "current",
+      "type": "boolean",
+      "format": null,
+      "description": "`true` when this row represents the application's current interview stage; `false` for past stage entries in the candidate's history."
+    }
+  ]
+}

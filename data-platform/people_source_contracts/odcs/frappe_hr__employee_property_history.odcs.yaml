@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Employee Property History
+info:
+  title: Employee Property History
+  version: 1.0.0
+  description: Child of Transfer/Promotion.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Employee_Property_History/extract_date={date}/run_id={id}/
+schema:
+- name: Employee Property History
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Employee Property History
+  primaryKey:
+  - parent+idx
+  description: Child of Transfer/Promotion.
+extract:
+  mode: nested_incremental
+  cadence: daily
+  key: parent+idx
+  control_total_source: count of child rows on submitted parents
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

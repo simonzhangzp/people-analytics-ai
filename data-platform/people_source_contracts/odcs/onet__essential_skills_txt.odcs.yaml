@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:onet:Essential Skills.txt
+info:
+  title: Essential Skills.txt
+  version: 1.0.0
+  description: trust data_only.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/onet/Essential_Skills.txt/extract_date={date}/run_id={id}/
+schema:
+- name: Essential Skills.txt
+  physicalType: parquet
+  physicalName: people_bronze/onet/Essential Skills.txt
+  primaryKey:
+  - Element ID
+  description: trust data_only.
+extract:
+  mode: full
+  cadence: on_pin_change
+  key: Element ID
+  control_total_source: count of skill element rows
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 8760
+piiClassification: public

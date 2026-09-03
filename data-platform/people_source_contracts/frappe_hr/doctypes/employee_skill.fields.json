@@ -1,0 +1,30 @@
+{
+  "name": "Employee Skill",
+  "module": "HR",
+  "istable": 1,
+  "issingle": null,
+  "autoname": null,
+  "fields": [
+    {
+      "fieldname": "skill",
+      "label": "Skill",
+      "fieldtype": "Link",
+      "options": "Skill",
+      "reqd": 1
+    },
+    {
+      "fieldname": "proficiency",
+      "label": "Proficiency",
+      "fieldtype": "Rating",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "evaluation_date",
+      "label": "Evaluation Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

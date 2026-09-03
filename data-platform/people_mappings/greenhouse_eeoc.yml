@@ -1,0 +1,72 @@
+canonical_version: people_v2
+gate: 1
+note: Application grain. Nested {id, description} unwrapped. Never join to worker (BR-GOV-001).
+source_contract:
+  pin: schemas/fields/eeoc.fields.json
+fields:
+- canonical_table: people_fact_candidate_eeoc_restricted
+  canonical_field: application_id
+  source_system: greenhouse_v3
+  source_object: eeoc
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: submitted_at
+  provenance: SOURCE_NATIVE
+  business_definition: Application grain. Not candidate grain.
+  source_field: application_id
+- canonical_table: people_fact_candidate_eeoc_restricted
+  canonical_field: race
+  source_system: greenhouse_v3
+  source_object: eeoc
+  transformation: race.description
+  nullable: true
+  data_type: text
+  effective_date_logic: submitted_at
+  provenance: SOURCE_NATIVE
+  business_definition: Unwrap nested description.
+  source_field: race
+- canonical_table: people_fact_candidate_eeoc_restricted
+  canonical_field: gender
+  source_system: greenhouse_v3
+  source_object: eeoc
+  transformation: gender.description
+  nullable: true
+  data_type: text
+  effective_date_logic: submitted_at
+  provenance: SOURCE_NATIVE
+  business_definition: Unwrap nested description.
+  source_field: gender
+- canonical_table: people_fact_candidate_eeoc_restricted
+  canonical_field: veteran_status
+  source_system: greenhouse_v3
+  source_object: eeoc
+  transformation: veteran_status.description
+  nullable: true
+  data_type: text
+  effective_date_logic: submitted_at
+  provenance: SOURCE_NATIVE
+  business_definition: Unwrap nested description.
+  source_field: veteran_status
+- canonical_table: people_fact_candidate_eeoc_restricted
+  canonical_field: disability_status
+  source_system: greenhouse_v3
+  source_object: eeoc
+  transformation: disability_status.description
+  nullable: true
+  data_type: text
+  effective_date_logic: submitted_at
+  provenance: SOURCE_NATIVE
+  business_definition: Unwrap nested description.
+  source_field: disability_status
+- canonical_table: people_fact_candidate_eeoc_restricted
+  canonical_field: submitted_at
+  source_system: greenhouse_v3
+  source_object: eeoc
+  transformation: identity
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: submitted_at
+  provenance: SOURCE_NATIVE
+  business_definition: Questionnaire submit time.
+  source_field: submitted_at

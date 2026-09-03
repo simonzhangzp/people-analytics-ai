@@ -1,0 +1,131 @@
+canonical_version: people_v2
+gate: 1
+note: 'Identity links. Allowed match_method: transaction | employee_id | manual. Name/email joins are forbidden (architecture
+  F / §5.1). Conflicts with SOURCE_CONTRACT_FIRST email join.'
+source_contract:
+  frappe_hr: v16.15.0
+  greenhouse: Harvest v3
+  docs: docs/PEOPLE_CONTRACT_FIELD_CHECK.md
+fields:
+- canonical_table: people_xw_identity
+  canonical_field: person_id
+  source_system: canonical
+  source_object: people_xw_identity
+  transformation: generate uuid per distinct natural person
+  nullable: false
+  data_type: uuid
+  effective_date_logic: first match
+  provenance: CANONICAL_KEY
+  business_definition: Stable person key. Never reused across people.
+  source_field: null
+- canonical_table: people_xw_identity
+  canonical_field: worker_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: lookup people_dim_worker.frappe_employee
+  nullable: true
+  data_type: text
+  effective_date_logic: hire_date
+  provenance: CANONICAL_KEY
+  business_definition: Null for ATS-only person rows until T1 hire.
+  source_field: name
+- canonical_table: people_xw_identity
+  canonical_field: source_system
+  source_system: canonical
+  source_object: people_xw_identity
+  transformation: literal frappe_hr | greenhouse_v3 | engagement_ext | manual
+  nullable: false
+  data_type: text
+  effective_date_logic: row valid_from
+  provenance: CANONICAL_KEY
+  business_definition: System that minted source_id.
+  source_field: null
+- canonical_table: people_xw_identity
+  canonical_field: source_object
+  source_system: canonical
+  source_object: people_xw_identity
+  transformation: literal Employee | user | candidate | application | offer
+  nullable: false
+  data_type: text
+  effective_date_logic: row valid_from
+  provenance: CANONICAL_KEY
+  business_definition: Pinned source object name.
+  source_field: null
+- canonical_table: people_xw_identity
+  canonical_field: source_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity for HRIS; Harvest user.id / candidate.id / application.id / offer.id for ATS
+  nullable: false
+  data_type: text
+  effective_date_logic: row valid_from
+  provenance: SOURCE_NATIVE
+  business_definition: Natural key in the source system.
+  source_field: name
+- canonical_table: people_xw_identity
+  canonical_field: valid_from
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: coalesce(offer.starts_on, Employee.date_of_joining, candidate.created_at)
+  nullable: false
+  data_type: date
+  effective_date_logic: match start
+  provenance: DERIVED
+  business_definition: Start of this identity link.
+  source_field: date_of_joining
+- canonical_table: people_xw_identity
+  canonical_field: valid_to
+  source_system: canonical
+  source_object: people_xw_identity
+  transformation: next link or 9999-12-31
+  nullable: true
+  data_type: date
+  effective_date_logic: match end
+  provenance: DERIVED
+  business_definition: End of this identity link.
+  source_field: null
+- canonical_table: people_xw_identity
+  canonical_field: match_method
+  source_system: canonical
+  source_object: people_xw_identity
+  transformation: transaction | employee_id | manual only; never name or email
+  nullable: false
+  data_type: text
+  effective_date_logic: row valid_from
+  provenance: CANONICAL_KEY
+  business_definition: T1/T6 = transaction; T8 Harvest user.employee_id = Employee.name; else manual. Architecture F forbids
+    email/name joins.
+  source_field: null
+- canonical_table: people_xw_identity
+  canonical_field: source_id
+  source_system: greenhouse_v3
+  source_object: user
+  transformation: identity; link via user.employee_id = Employee.name (T8)
+  nullable: false
+  data_type: text
+  effective_date_logic: user.created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Harvest user row. Match method employee_id. Do not use primary_email.
+  source_field: id
+- canonical_table: people_xw_identity
+  canonical_field: source_id
+  source_system: greenhouse_v3
+  source_object: candidate
+  transformation: identity; person_id filled after T1 (accepted offer + Employee)
+  nullable: true
+  data_type: text
+  effective_date_logic: candidate.created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Pre-hire candidate identity. worker_id stays null until T1.
+  source_field: id
+- canonical_table: people_xw_identity
+  canonical_field: match_method
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: transaction when offer.status=Accepted and Employee.name is created from T1
+  nullable: false
+  data_type: text
+  effective_date_logic: offer.starts_on
+  provenance: CANONICAL_KEY
+  business_definition: T1 hire transaction links candidate/application/offer to the new Employee.
+  source_field: id

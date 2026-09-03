@@ -1,0 +1,40 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "referrer",
+  "harvest_path_hint": "/v3/referrers",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "user_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the Greenhouse user this referrer maps to, when the referrer is an internal employee. `null` for referrers that are not Greenhouse users (e.g. external agency recruiters, social-share visitors, LinkedIn referrers) and for referrers whose underlying user has since been removed. This is not the same id space as `applications.referrer_id` \u2014 applications point at this referrer's `id`, not at `user_id`."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "format": null,
+      "description": "Display name of the referrer as it appears on the candidate's application under \"Source & referrer\" (the \"Who Gets Credit\" label). For employee referrals this is typically the referring user's name; for non-user referrers it is the name captured at referral time."
+    }
+  ]
+}

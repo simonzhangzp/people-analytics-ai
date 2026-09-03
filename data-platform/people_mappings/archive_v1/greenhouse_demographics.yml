@@ -1,0 +1,66 @@
+canonical_entity: people_silver_applicant_demographics
+note: Demographics stay at Greenhouse application grain. Do not copy onto people_silver_candidate or people_silver_worker.
+
+eeoc:
+  source_system: greenhouse_v3
+  source_object: eeoc
+  harvest_path: /v3/eeoc
+  schema: people_source_contracts/greenhouse_v3/schemas/fields/eeoc.fields.json
+  bronze_table: people_bronze_greenhouse_eeoc
+  fields:
+    - canonical_field: source_eeoc_id
+      source_field: id
+      transformation: identity
+    - canonical_field: source_application_id
+      source_field: application_id
+      transformation: identity
+      business_definition: Each application has at most one EEOC response.
+    - canonical_field: source_candidate_id
+      source_field: candidate_id
+      transformation: identity
+      business_definition: Owner of the application. Not the grain.
+    - canonical_field: gender_description
+      source_field: gender.description
+      transformation: nested
+    - canonical_field: race_description
+      source_field: race.description
+      transformation: nested
+    - canonical_field: veteran_status_description
+      source_field: veteran_status.description
+      transformation: nested
+    - canonical_field: disability_status_description
+      source_field: disability_status.description
+      transformation: nested
+
+demographic_answers:
+  source_system: greenhouse_v3
+  source_object: demographic_answers
+  harvest_path: /v3/demographic_answers
+  schema: people_source_contracts/greenhouse_v3/schemas/fields/demographic_answer.fields.json
+  bronze_table: people_bronze_greenhouse_demographic_answer
+  fields:
+    - canonical_field: source_demographic_answer_id
+      source_field: id
+      transformation: identity
+    - canonical_field: source_application_id
+      source_field: application_id
+      transformation: identity
+      business_definition: Answers are per application. Re-apply creates a new set.
+    - canonical_field: demographic_question_id
+      source_field: demographic_question_id
+      transformation: identity
+    - canonical_field: demographic_answer_option_id
+      source_field: demographic_answer_option_id
+      transformation: identity
+    - canonical_field: free_form_text
+      source_field: free_form_text
+      transformation: identity
+
+supporting_resources:
+  - demographic_question_sets  # /v3/demographic_question_sets
+  - demographic_questions      # /v3/demographic_questions
+  - demographic_answer_options # /v3/demographic_answer_options
+
+not_mapped_on_purpose:
+  - people_worker.ethnicity_band
+  - people_worker.generation

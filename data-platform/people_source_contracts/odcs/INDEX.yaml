@@ -1,0 +1,207 @@
+canonical_version: people_v2
+note: 'GATE 1 condition 5. One ODCS-style contract per bronze object. Location: data-platform/people_source_contracts/odcs/'
+contracts:
+- id: urn:people:bronze:frappe_hr:Employee
+  file: frappe_hr__employee.odcs.yaml
+  source_system: frappe_hr
+  source_object: Employee
+- id: urn:people:bronze:frappe_hr:Department
+  file: frappe_hr__department.odcs.yaml
+  source_system: frappe_hr
+  source_object: Department
+- id: urn:people:bronze:frappe_hr:Designation
+  file: frappe_hr__designation.odcs.yaml
+  source_system: frappe_hr
+  source_object: Designation
+- id: urn:people:bronze:frappe_hr:Employee Grade
+  file: frappe_hr__employee_grade.odcs.yaml
+  source_system: frappe_hr
+  source_object: Employee Grade
+- id: urn:people:bronze:frappe_hr:Branch
+  file: frappe_hr__branch.odcs.yaml
+  source_system: frappe_hr
+  source_object: Branch
+- id: urn:people:bronze:frappe_hr:Employment Type
+  file: frappe_hr__employment_type.odcs.yaml
+  source_system: frappe_hr
+  source_object: Employment Type
+- id: urn:people:bronze:frappe_hr:Employee Transfer
+  file: frappe_hr__employee_transfer.odcs.yaml
+  source_system: frappe_hr
+  source_object: Employee Transfer
+- id: urn:people:bronze:frappe_hr:Employee Property History
+  file: frappe_hr__employee_property_history.odcs.yaml
+  source_system: frappe_hr
+  source_object: Employee Property History
+- id: urn:people:bronze:frappe_hr:Employee Promotion
+  file: frappe_hr__employee_promotion.odcs.yaml
+  source_system: frappe_hr
+  source_object: Employee Promotion
+- id: urn:people:bronze:frappe_hr:Employee Separation
+  file: frappe_hr__employee_separation.odcs.yaml
+  source_system: frappe_hr
+  source_object: Employee Separation
+- id: urn:people:bronze:frappe_hr:Salary Structure Assignment
+  file: frappe_hr__salary_structure_assignment.odcs.yaml
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+- id: urn:people:bronze:frappe_hr:Salary Structure
+  file: frappe_hr__salary_structure.odcs.yaml
+  source_system: frappe_hr
+  source_object: Salary Structure
+- id: urn:people:bronze:frappe_hr:Salary Component
+  file: frappe_hr__salary_component.odcs.yaml
+  source_system: frappe_hr
+  source_object: Salary Component
+- id: urn:people:bronze:frappe_hr:Salary Slip
+  file: frappe_hr__salary_slip.odcs.yaml
+  source_system: frappe_hr
+  source_object: Salary Slip
+- id: urn:people:bronze:frappe_hr:Salary Detail
+  file: frappe_hr__salary_detail.odcs.yaml
+  source_system: frappe_hr
+  source_object: Salary Detail
+- id: urn:people:bronze:frappe_hr:Appraisal Cycle
+  file: frappe_hr__appraisal_cycle.odcs.yaml
+  source_system: frappe_hr
+  source_object: Appraisal Cycle
+- id: urn:people:bronze:frappe_hr:Appraisal
+  file: frappe_hr__appraisal.odcs.yaml
+  source_system: frappe_hr
+  source_object: Appraisal
+- id: urn:people:bronze:frappe_hr:Training Program
+  file: frappe_hr__training_program.odcs.yaml
+  source_system: frappe_hr
+  source_object: Training Program
+- id: urn:people:bronze:frappe_hr:Training Event
+  file: frappe_hr__training_event.odcs.yaml
+  source_system: frappe_hr
+  source_object: Training Event
+- id: urn:people:bronze:frappe_hr:Training Event Employee
+  file: frappe_hr__training_event_employee.odcs.yaml
+  source_system: frappe_hr
+  source_object: Training Event Employee
+- id: urn:people:bronze:frappe_hr:Training Result
+  file: frappe_hr__training_result.odcs.yaml
+  source_system: frappe_hr
+  source_object: Training Result
+- id: urn:people:bronze:frappe_hr:Training Result Employee
+  file: frappe_hr__training_result_employee.odcs.yaml
+  source_system: frappe_hr
+  source_object: Training Result Employee
+- id: urn:people:bronze:frappe_hr:Training Feedback
+  file: frappe_hr__training_feedback.odcs.yaml
+  source_system: frappe_hr
+  source_object: Training Feedback
+- id: urn:people:bronze:frappe_hr:Employee Skill Map
+  file: frappe_hr__employee_skill_map.odcs.yaml
+  source_system: frappe_hr
+  source_object: Employee Skill Map
+- id: urn:people:bronze:frappe_hr:Employee Skill
+  file: frappe_hr__employee_skill.odcs.yaml
+  source_system: frappe_hr
+  source_object: Employee Skill
+- id: urn:people:bronze:frappe_hr:Skill
+  file: frappe_hr__skill.odcs.yaml
+  source_system: frappe_hr
+  source_object: Skill
+- id: urn:people:bronze:greenhouse_v3:candidate
+  file: greenhouse_v3__candidate.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: candidate
+- id: urn:people:bronze:greenhouse_v3:application
+  file: greenhouse_v3__application.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: application
+- id: urn:people:bronze:greenhouse_v3:application_stage
+  file: greenhouse_v3__application_stage.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: application_stage
+- id: urn:people:bronze:greenhouse_v3:job
+  file: greenhouse_v3__job.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: job
+- id: urn:people:bronze:greenhouse_v3:opening
+  file: greenhouse_v3__opening.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: opening
+- id: urn:people:bronze:greenhouse_v3:job_interview_stage
+  file: greenhouse_v3__job_interview_stage.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: job_interview_stage
+- id: urn:people:bronze:greenhouse_v3:job_hiring_manager
+  file: greenhouse_v3__job_hiring_manager.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: job_hiring_manager
+- id: urn:people:bronze:greenhouse_v3:department
+  file: greenhouse_v3__department.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: department
+- id: urn:people:bronze:greenhouse_v3:office
+  file: greenhouse_v3__office.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: office
+- id: urn:people:bronze:greenhouse_v3:user
+  file: greenhouse_v3__user.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: user
+- id: urn:people:bronze:greenhouse_v3:source
+  file: greenhouse_v3__source.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: source
+- id: urn:people:bronze:greenhouse_v3:referrer
+  file: greenhouse_v3__referrer.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: referrer
+- id: urn:people:bronze:greenhouse_v3:interview
+  file: greenhouse_v3__interview.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: interview
+- id: urn:people:bronze:greenhouse_v3:scorecard
+  file: greenhouse_v3__scorecard.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: scorecard
+- id: urn:people:bronze:greenhouse_v3:offer
+  file: greenhouse_v3__offer.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: offer
+- id: urn:people:bronze:greenhouse_v3:rejection_reason
+  file: greenhouse_v3__rejection_reason.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: rejection_reason
+- id: urn:people:bronze:greenhouse_v3:eeoc
+  file: greenhouse_v3__eeoc.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: eeoc
+- id: urn:people:bronze:greenhouse_v3:demographic_answer
+  file: greenhouse_v3__demographic_answer.odcs.yaml
+  source_system: greenhouse_v3
+  source_object: demographic_answer
+- id: urn:people:bronze:engagement_ext:survey_instrument
+  file: engagement_ext__survey_instrument.odcs.yaml
+  source_system: engagement_ext
+  source_object: survey_instrument
+- id: urn:people:bronze:engagement_ext:survey_wave
+  file: engagement_ext__survey_wave.odcs.yaml
+  source_system: engagement_ext
+  source_object: survey_wave
+- id: urn:people:bronze:engagement_ext:survey_response
+  file: engagement_ext__survey_response.odcs.yaml
+  source_system: engagement_ext
+  source_object: survey_response
+- id: urn:people:bronze:microsoft_learn:catalog
+  file: microsoft_learn__catalog.odcs.yaml
+  source_system: microsoft_learn
+  source_object: catalog
+- id: urn:people:bronze:onet:Occupation Data.txt
+  file: onet__occupation_data_txt.odcs.yaml
+  source_system: onet
+  source_object: Occupation Data.txt
+- id: urn:people:bronze:onet:Essential Skills.txt
+  file: onet__essential_skills_txt.odcs.yaml
+  source_system: onet
+  source_object: Essential Skills.txt
+- id: urn:people:bronze:bls:timeseries
+  file: bls__timeseries.odcs.yaml
+  source_system: bls
+  source_object: timeseries

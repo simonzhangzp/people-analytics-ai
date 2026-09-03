@@ -1,0 +1,84 @@
+canonical_version: people_v2
+gate: 1
+note: Employee Grade has no sort order. level_rank is E2. Current worker grade comes from Salary Structure Assignment.grade,
+  not Employee.
+source_contract:
+  pin: doctypes/employee_grade.json
+fields:
+- canonical_table: people_dim_grade
+  canonical_field: grade_id
+  source_system: frappe_hr
+  source_object: Employee Grade
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: CANONICAL_KEY
+  business_definition: Employee Grade.name.
+  source_field: name
+- canonical_table: people_dim_grade
+  canonical_field: grade_name
+  source_system: frappe_hr
+  source_object: Employee Grade
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SOURCE_NATIVE
+  business_definition: Grade label.
+  source_field: name
+- canonical_table: people_dim_grade
+  canonical_field: level_rank
+  source_system: engagement_ext
+  source_object: people_ref_grade_rank
+  transformation: integer rank from compensation architecture (E2)
+  nullable: false
+  data_type: integer
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E2. Employee Grade has no rank field.
+  source_field: level_rank
+- canonical_table: people_dim_grade
+  canonical_field: default_salary_structure
+  source_system: frappe_hr
+  source_object: Employee Grade
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SOURCE_NATIVE
+  business_definition: Default Salary Structure link.
+  source_field: default_salary_structure
+- canonical_table: people_dim_grade
+  canonical_field: valid_from
+  source_system: frappe_hr
+  source_object: Employee Grade
+  transformation: SCD2 start
+  nullable: false
+  data_type: date
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: Version start.
+  source_field: modified
+- canonical_table: people_dim_grade
+  canonical_field: valid_to
+  source_system: frappe_hr
+  source_object: Employee Grade
+  transformation: SCD2 end
+  nullable: true
+  data_type: date
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: Version end.
+  source_field: modified
+- canonical_table: people_dim_grade
+  canonical_field: is_current
+  source_system: frappe_hr
+  source_object: Employee Grade
+  transformation: valid_to is null
+  nullable: false
+  data_type: boolean
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: Current version flag.
+  source_field: modified

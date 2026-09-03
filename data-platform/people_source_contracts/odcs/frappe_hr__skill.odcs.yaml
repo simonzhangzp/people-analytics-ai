@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Skill
+info:
+  title: Skill
+  version: 1.0.0
+  description: Frappe skill master.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Skill/extract_date={date}/run_id={id}/
+schema:
+- name: Skill
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Skill
+  primaryKey:
+  - name
+  description: Frappe skill master.
+extract:
+  mode: full
+  cadence: daily
+  key: name
+  control_total_source: count of Skill
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Employment Type
+info:
+  title: Employment Type
+  version: 1.0.0
+  description: HRMS master linked from Employee.employment_type custom field.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Employment_Type/extract_date={date}/run_id={id}/
+schema:
+- name: Employment Type
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Employment Type
+  primaryKey:
+  - name
+  description: HRMS master linked from Employee.employment_type custom field.
+extract:
+  mode: full
+  cadence: daily
+  key: name
+  control_total_source: count of Employment Type rows
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

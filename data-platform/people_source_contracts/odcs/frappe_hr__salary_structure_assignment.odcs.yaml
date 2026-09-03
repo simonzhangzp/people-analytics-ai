@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Salary Structure Assignment
+info:
+  title: Salary Structure Assignment
+  version: 1.0.0
+  description: BR-DQ-001. Compensation.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Salary_Structure_Assignment/extract_date={date}/run_id={id}/
+schema:
+- name: Salary Structure Assignment
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Salary Structure Assignment
+  primaryKey:
+  - name
+  description: BR-DQ-001. Compensation.
+extract:
+  mode: incremental
+  cadence: daily
+  key: name
+  control_total_source: count of submitted SSA
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: restricted

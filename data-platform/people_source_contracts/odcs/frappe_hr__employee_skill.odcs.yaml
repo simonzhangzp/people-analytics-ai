@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Employee Skill
+info:
+  title: Employee Skill
+  version: 1.0.0
+  description: Child of Skill Map.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Employee_Skill/extract_date={date}/run_id={id}/
+schema:
+- name: Employee Skill
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Employee Skill
+  primaryKey:
+  - parent+skill
+  description: Child of Skill Map.
+extract:
+  mode: nested_incremental
+  cadence: daily
+  key: parent+skill
+  control_total_source: count of child skill rows
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

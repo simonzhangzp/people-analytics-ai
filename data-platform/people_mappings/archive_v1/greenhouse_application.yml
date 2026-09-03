@@ -1,0 +1,119 @@
+canonical_entity: people_silver_application
+source_contract:
+  source_system: greenhouse_v3
+  source_object: applications
+  harvest_path: /v3/applications
+  pin:
+    api: Harvest v3
+    schema: people_source_contracts/greenhouse_v3/schemas/fields/application.fields.json
+bronze_table: people_bronze_greenhouse_application
+fields:
+  - canonical_field: source_application_id
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: created_at
+    business_definition: One application of a candidate to a job.
+
+  - canonical_field: source_candidate_id
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: candidate_id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Parent candidate. Candidate 1 → many Applications.
+
+  - canonical_field: source_job_id
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: job_id
+    transformation: identity
+    nullable: true
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Job this application is on. Null for jobless prospects.
+
+  - canonical_field: recruiter_user_id
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: recruiter_id
+    transformation: identity
+    nullable: true
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Greenhouse user assigned as recruiter. Crosswalk via people_identity_crosswalk, never by name.
+
+  - canonical_field: coordinator_user_id
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: coordinator_id
+    transformation: identity
+    nullable: true
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Greenhouse coordinator user.
+
+  - canonical_field: source_id
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: source_id
+    transformation: identity
+    nullable: true
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Attribution source (job board, referral source, …).
+
+  - canonical_field: referrer_id
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: referrer_id
+    transformation: identity
+    nullable: true
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Referrer id, not a Greenhouse user.
+
+  - canonical_field: current_stage_id
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: stage_id
+    transformation: identity
+    nullable: true
+    data_type: integer
+    effective_date_logic: current
+    business_definition: Current job_interview_stage. History lives in application_stages.
+
+  - canonical_field: rejection_reason_id
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: rejection_reason_id
+    transformation: identity
+    nullable: true
+    data_type: integer
+    effective_date_logic: rejected_at
+    business_definition: Organization rejection reason.
+
+  - canonical_field: created_at
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: created_at
+    transformation: identity
+    nullable: false
+    data_type: timestamptz
+    effective_date_logic: created_at
+    business_definition: Application created timestamp (applied-at proxy when applied_at is absent).
+
+  - canonical_field: updated_at
+    source_system: greenhouse_v3
+    source_object: applications
+    source_field: updated_at
+    transformation: identity
+    nullable: false
+    data_type: timestamptz
+    effective_date_logic: updated_at
+    business_definition: Source updated timestamp.

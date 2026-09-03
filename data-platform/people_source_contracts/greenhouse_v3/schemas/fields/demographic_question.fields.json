@@ -1,0 +1,73 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "demographic_question",
+  "harvest_path_hint": "/v3/demographic_questions",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "sort_order",
+      "type": "integer",
+      "format": null,
+      "description": "Position of this question within its `demographic_question_set`, ascending. Lower values render first; aliased from the underlying `priority` column."
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "format": null,
+      "description": "`true` when the question is in use on its set; `false` after it has been soft-removed. Inactive questions are returned by default \u2014 pass `active=true` to filter to live questions only. Past `demographic_answers` continue to reference inactive rows so historical applicant submissions stay readable."
+    },
+    {
+      "name": "name",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Prompt text shown to applicants (e.g. `How would you describe your gender identity?`). `null` on standard Greenhouse-supplied questions where the displayed prompt is rendered by the candidate-facing application from a localized template rather than this column."
+    },
+    {
+      "name": "demographic_question_set_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the `demographic_question_set` this question belongs to. A set is what gets attached to a job post or candidate survey; questions are scoped to one set and never shared across sets. `null` for legacy questions not yet associated with a set."
+    },
+    {
+      "name": "required",
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "format": null,
+      "description": "If `true`, applicants must select an answer (or the auto-added `I don't wish to answer` option) before submitting the application. Standard Greenhouse-supplied questions return `null` since their requiredness is controlled at the question-set level."
+    },
+    {
+      "name": "answer_type",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Shape of the answer the applicant can submit. `multi_value_single_select` is a single-choice question; `multi_value_multi_select` lets the applicant pick more than one option. Both types draw their choices from `/v3/demographic_answer_options?demographic_question_id={id}`. Free-text demographic questions are not supported."
+    }
+  ]
+}

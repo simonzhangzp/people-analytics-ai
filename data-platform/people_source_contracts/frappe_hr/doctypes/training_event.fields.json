@@ -1,0 +1,142 @@
+{
+  "name": "Training Event",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "field:event_name",
+  "fields": [
+    {
+      "fieldname": "event_name",
+      "label": "Event Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "training_program",
+      "label": "Training Program",
+      "fieldtype": "Link",
+      "options": "Training Program",
+      "reqd": null
+    },
+    {
+      "fieldname": "event_status",
+      "label": "Event Status",
+      "fieldtype": "Select",
+      "options": "Scheduled\nCompleted\nCancelled",
+      "reqd": 1
+    },
+    {
+      "fieldname": "has_certificate",
+      "label": "Has Certificate",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "type",
+      "label": "Type",
+      "fieldtype": "Select",
+      "options": "Seminar\nTheory\nWorkshop\nConference\nExam\nInternet\nSelf-Study",
+      "reqd": 1
+    },
+    {
+      "fieldname": "level",
+      "label": "Level",
+      "fieldtype": "Select",
+      "options": "\nBeginner\nIntermediate\nAdvance",
+      "reqd": null
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": null
+    },
+    {
+      "fieldname": "trainer_name",
+      "label": "Trainer Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "trainer_email",
+      "label": "Trainer Email",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "supplier",
+      "label": "Supplier",
+      "fieldtype": "Link",
+      "options": "Supplier",
+      "reqd": null
+    },
+    {
+      "fieldname": "contact_number",
+      "label": "Contact Number",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "course",
+      "label": "Course",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "location",
+      "label": "Location",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "start_time",
+      "label": "Start Time",
+      "fieldtype": "Datetime",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "end_time",
+      "label": "End Time",
+      "fieldtype": "Datetime",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "introduction",
+      "label": "Introduction",
+      "fieldtype": "Text Editor",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "employees",
+      "label": "Employees",
+      "fieldtype": "Table",
+      "options": "Training Event Employee",
+      "reqd": null
+    },
+    {
+      "fieldname": "amended_from",
+      "label": "Amended From",
+      "fieldtype": "Link",
+      "options": "Training Event",
+      "reqd": null
+    },
+    {
+      "fieldname": "employee_emails",
+      "label": "Employee Emails",
+      "fieldtype": "Small Text",
+      "options": "Email",
+      "reqd": null
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+canonical_entity: people_silver_worker_event
+source_contract:
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  pin:
+    hrms: v16.15.0
+    schema: people_source_contracts/frappe_hr/doctypes/employee_promotion.json
+    child_schema: people_source_contracts/frappe_hr/doctypes/employee_property_history.json
+bronze_tables:
+  - people_bronze_frappe_employee_promotion
+  - people_bronze_frappe_employee_property_history
+fields:
+  - canonical_field: event_id
+    source_system: frappe_hr
+    source_object: Employee Promotion
+    source_field: name
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: One promotion document becomes one worker event.
+
+  - canonical_field: worker_id
+    source_system: frappe_hr
+    source_object: Employee Promotion
+    source_field: employee
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Employee promoted.
+
+  - canonical_field: event_type
+    source_system: frappe_hr
+    source_object: Employee Promotion
+    source_field: doctype
+    transformation: constant promotion
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Always promotion for this mapping.
+
+  - canonical_field: effective_at
+    source_system: frappe_hr
+    source_object: Employee Promotion
+    source_field: promotion_date
+    transformation: identity
+    nullable: false
+    data_type: date
+    effective_date_logic: promotion_date
+    business_definition: Effective date of the promotion.
+
+  - canonical_field: current_ctc
+    source_system: frappe_hr
+    source_object: Employee Promotion
+    source_field: current_ctc
+    transformation: identity
+    nullable: true
+    data_type: numeric
+    effective_date_logic: promotion_date
+    business_definition: CTC before promotion.
+
+  - canonical_field: revised_ctc
+    source_system: frappe_hr
+    source_object: Employee Promotion
+    source_field: revised_ctc
+    transformation: identity
+    nullable: true
+    data_type: numeric
+    effective_date_logic: promotion_date
+    business_definition: CTC after promotion.
+
+child_mapping:
+  canonical_entity: people_silver_worker_event_change
+  source_object: Employee Property History
+  note: Same child DocType as Employee Transfer. promotion_details → property/current/new rows.

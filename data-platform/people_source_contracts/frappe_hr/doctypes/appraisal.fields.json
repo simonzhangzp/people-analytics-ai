@@ -1,0 +1,170 @@
+{
+  "name": "Appraisal",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "naming_series:",
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "label": "Series",
+      "fieldtype": "Select",
+      "options": "HR-APR-.YYYY.-",
+      "reqd": 1
+    },
+    {
+      "fieldname": "employee",
+      "label": "Employee",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "employee_name",
+      "label": "Employee Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "department",
+      "label": "Department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "reqd": null
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": 1
+    },
+    {
+      "fieldname": "designation",
+      "label": "Designation",
+      "fieldtype": "Link",
+      "options": "Designation",
+      "reqd": null
+    },
+    {
+      "fieldname": "appraisal_cycle",
+      "label": "Appraisal Cycle",
+      "fieldtype": "Link",
+      "options": "Appraisal Cycle",
+      "reqd": 1
+    },
+    {
+      "fieldname": "appraisal_kra",
+      "label": "KRA vs Goals",
+      "fieldtype": "Table",
+      "options": "Appraisal KRA",
+      "reqd": null
+    },
+    {
+      "fieldname": "total_score",
+      "label": "Total Goal Score",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "self_score",
+      "label": "Total Self Score",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "avg_feedback_score",
+      "label": "Average Feedback Score",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "employee_image",
+      "label": "Employee Image",
+      "fieldtype": "Attach Image",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "appraisal_template",
+      "label": "Appraisal Template",
+      "fieldtype": "Link",
+      "options": "Appraisal Template",
+      "reqd": null
+    },
+    {
+      "fieldname": "amended_from",
+      "label": "Amended From",
+      "fieldtype": "Link",
+      "options": "Appraisal",
+      "reqd": null
+    },
+    {
+      "fieldname": "reflections",
+      "label": null,
+      "fieldtype": "Text Editor",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "goals",
+      "label": "Goals",
+      "fieldtype": "Table",
+      "options": "Appraisal Goal",
+      "reqd": null
+    },
+    {
+      "fieldname": "remarks",
+      "label": "Remarks",
+      "fieldtype": "Text",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "rate_goals_manually",
+      "label": "Rate Goals Manually",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "start_date",
+      "label": "Start Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "end_date",
+      "label": "End Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "goal_score_percentage",
+      "label": "Goal Score (%)",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "self_ratings",
+      "label": null,
+      "fieldtype": "Table",
+      "options": "Employee Feedback Rating",
+      "reqd": null
+    },
+    {
+      "fieldname": "final_score",
+      "label": "Final Score",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

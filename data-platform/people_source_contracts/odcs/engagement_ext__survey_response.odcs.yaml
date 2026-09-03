@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:engagement_ext:survey_response
+info:
+  title: survey_response
+  version: 1.0.0
+  description: Lake only. Not serving.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/engagement_ext/survey_response/extract_date={date}/run_id={id}/
+schema:
+- name: survey_response
+  physicalType: parquet
+  physicalName: people_bronze/engagement_ext/survey_response
+  primaryKey:
+  - response_id
+  description: Lake only. Not serving.
+extract:
+  mode: incremental
+  cadence: per_wave
+  key: response_id
+  control_total_source: count of item-level answers in source
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: confidential

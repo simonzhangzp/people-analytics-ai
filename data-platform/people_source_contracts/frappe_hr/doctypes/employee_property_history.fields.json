@@ -1,0 +1,35 @@
+{
+  "name": "Employee Property History",
+  "module": "HR",
+  "istable": 1,
+  "fields": [
+    {
+      "fieldname": "property",
+      "label": "Property",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "current",
+      "label": "Current",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "new",
+      "label": "New",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "fieldname",
+      "label": "Field Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

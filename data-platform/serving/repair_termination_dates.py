@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from people_ingestion.people_config import PEOPLE_REF, load_people_config
+from people_refs import refuse_blocked
 from people_ingestion.people_storage import PeopleLakeStore
 from people_orchestration.people_daily_pipeline import _load_silver
 from people_quality.people_incident import apply_people_apac_incident
@@ -51,6 +52,7 @@ def main() -> int:
 
     os.environ.setdefault("PEOPLE_AS_OF_DATE", "2026-08-30")
     config = load_people_config()
+    refuse_blocked(config.supabase_ref, PEOPLE_REF)
     if config.supabase_ref != PEOPLE_REF:
         print("refused: People serving ref mismatch", file=sys.stderr)
         return 2

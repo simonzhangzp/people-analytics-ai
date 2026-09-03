@@ -1,0 +1,251 @@
+version: 1
+status: certified
+lock: v1
+effective_from: 2026-09-02
+owner_signed:
+  - {item: 1, rule: BR-WF-001, topic: status_inclusion, decision: "Active/Suspended include; Inactive/Left exclude"}
+  - {item: 2, rule: BR-WF-001, topic: employment_type_certified_set, decision: "Full-time/Part-time/Probation certified; Intern/Apprentice/Contract separate_line"}
+  - {item: 3, rule: BR-WF-001, topic: drop_regular, decision: drop}
+  - {item: 4, rule: BR-RET-001, topic: Retirement, decision: other}
+  - {item: 5, rule: BR-RET-001, topic: End of contract, decision: other}
+  - {item: 6, rule: BR-RET-002, topic: missing_appraisal, decision: not_regrettable}
+note: >
+  v1 locked 2026-09-02. Rules only. No SQL. kind=parametric may be sandboxed later via
+  people_get_metric_sandbox (Phase 4: snapshot grain, session-scoped,
+  labeled not certified, suppression unchanged). kind=structural only
+  via versioned governance recalc. Metric YAML references rule ids and
+  param keys; it does not restate the rule.
+
+sandbox:
+  rpc: people_get_metric_sandbox
+  phase: 4
+  grain: snapshot
+  session_scoped: true
+  label: not_certified
+  suppression: same_as_certified
+  allowed_kinds: [parametric]
+
+rules:
+  BR-WF-001:
+    domain: workforce
+    kind: parametric
+    statement: >
+      Certified headcount as-of month_end is f(Employee.status, Employment Type.name)
+      and the spell window.
+    params:
+      status:
+        include: [Active, Suspended]
+        exclude: [Inactive, Left]
+      employment_type:
+        certified: [Full-time, Part-time, Probation]
+        separate_line: [Intern, Apprentice, Contract]
+        other_master: [Commission, Piecework]
+        proposed_drop: [Regular]
+      spell:
+        hire_on_or_before_as_of: true
+        termination_after_as_of_or_null: true
+      vocabulary_source: simulator/scenario/baseline.yaml#employment_type_master
+  BR-WF-004:
+    domain: workforce
+    kind: parametric
+    statement: tenure_months = complete months between hire_date and month_end.
+    params:
+      bands:
+        - {id: "<1y", min_months: 0, max_months: 12}
+        - {id: "1–3y", min_months: 12, max_months: 36}
+        - {id: "3–5y", min_months: 36, max_months: 60}
+        - {id: "5–10y", min_months: 60, max_months: 120}
+        - {id: "10y+", min_months: 120, max_months: null}
+  BR-WF-005:
+    domain: workforce
+    kind: structural
+    statement: job_family is the O*NET-SOC major group (first two digits of onet_soc_code).
+    params:
+      source_field: onet_soc_code
+      width: 2
+  BR-WF-006:
+    domain: workforce
+    kind: structural
+    statement: is_rehire is true when the person_id already has an earlier worker_id.
+    params:
+      grain: person_id
+  BR-WF-007:
+    domain: workforce
+    kind: structural
+    statement: Employee extract diffs not represented by Transfer/Promotion/SSA/Separation emit people_evt_worker_change.
+    params:
+      source_object: "Employee (extract diff)"
+  BR-WF-008:
+    domain: workforce
+    kind: structural
+    statement: people_hist_worker_attr intervals do not overlap, have no gaps, first valid_from equals hire_date.
+    params:
+      interval: closed_open
+  BR-RET-001:
+    domain: retention
+    kind: parametric
+    statement: termination_category from E6 map of Employee.reason_for_leaving. Unmapped text is other.
+    params:
+      categories: [voluntary, involuntary, other]
+      unmapped: other
+      reason_to_category:
+        Resignation - Better opportunity: voluntary
+        Resignation - Personal: voluntary
+        Termination - Performance: involuntary
+        Termination - Restructuring: involuntary
+        Retirement: other
+        Death: other
+        End of contract: other
+  BR-RET-002:
+    domain: retention
+    kind: parametric
+    statement: is_regrettable when voluntary and latest appraisal final_score meets threshold.
+    params:
+      scale: {min: 0.0, max: 5.0, type: float}
+      threshold: 4.0
+      missing_appraisal: not_regrettable
+      score_field: people_fact_appraisal.final_score
+  BR-ORG-001:
+    domain: org
+    kind: structural
+    statement: org_path is an ltree of ancestor Department.name values.
+    params:
+      path_type: ltree
+  BR-ORG-002:
+    domain: org
+    kind: structural
+    statement: SCD2 valid_from/valid_to/is_current from bronze _row_hash diffs.
+    params:
+      open_sentinel: "9999-12-31"
+  BR-TA-001:
+    domain: recruiting
+    kind: parametric
+    statement: canonical_stage from job_interview_stage.name tokens.
+    params:
+      stages: [Review, Screen, Onsite, Offer]
+      tokens:
+        Review: [Application Review]
+        Screen: [Phone, Screen]
+        Onsite: [Onsite, On-site, On site]
+        Offer: [Offer]
+      unmatched: fail_quality_test
+  BR-TA-002:
+    domain: recruiting
+    kind: structural
+    statement: application.requisition_id is the opening.id for application.job_id.
+    params:
+      prospect_rule: single_open_prospective_job
+  BR-TA-003:
+    domain: recruiting
+    kind: structural
+    statement: people_fact_application.applied_at = application.created_at.
+    params:
+      source_field: created_at
+      canonical_field: applied_at
+  BR-TA-004:
+    domain: recruiting
+    kind: parametric
+    statement: application.status map to canonical active | rejected | hired.
+    params:
+      map:
+        in_process: active
+        rejected: rejected
+        hired: hired
+        converted: active
+  BR-TA-005:
+    domain: recruiting
+    kind: structural
+    statement: hired_at is the accepted offer.resolved_at when application.status = hired.
+    params:
+      source: offer.resolved_at
+  BR-TA-006:
+    domain: recruiting
+    kind: parametric
+    statement: opening status from opening.open boolean.
+    params:
+      open_when: true
+      closed_otherwise: true
+  BR-TA-007:
+    domain: recruiting
+    kind: parametric
+    statement: offer.status title case to canonical lowercase.
+    params:
+      map:
+        Created: unresolved
+        Accepted: accepted
+        Rejected: rejected
+        Deprecated: deprecated
+  BR-TA-008:
+    domain: recruiting
+    kind: structural
+    statement: scorecard.interview_id joined via application and kit, not a native field.
+    params: {}
+  BR-TA-009:
+    domain: recruiting
+    kind: structural
+    statement: interviewer_person_ids from scorecard.interviewer_id via user.employee_id.
+    params: {}
+  BR-COMP-001:
+    domain: compensation
+    kind: parametric
+    statement: compa_ratio = base / band_mid from people_ref_comp_band.
+    params:
+      match: [grade_id, country, currency, as_of]
+  BR-COMP-002:
+    domain: compensation
+    kind: parametric
+    statement: SSA to_date is day before next from_date, then least(..., relieving_date).
+    params:
+      cap_by_termination: true
+  BR-SK-001:
+    domain: skills
+    kind: parametric
+    statement: target_proficiency is O*NET Importance scaled to 1–5.
+    params:
+      scale: [1, 5]
+  BR-GOV-001:
+    domain: governance
+    kind: structural
+    statement: Candidate demographic and EEOC rows are never joined to worker or person.
+    params:
+      denied_from: [people_fact_candidate_eeoc_restricted, people_fact_candidate_demographic_restricted]
+      denied_to: [people_dim_person, people_dim_worker]
+  BR-E5-001:
+    domain: engagement
+    kind: parametric
+    statement: Reverse-scored items use 6 − raw before averaging.
+    params:
+      likert_max: 5
+      reverse_transform: "6 - raw"
+      min_cell: 5
+  BR-DQ-001:
+    domain: quality
+    kind: structural
+    statement: Submittable Frappe DocTypes contribute to silver only when docstatus = 1.
+    params:
+      include: 1
+      ignore: 0
+      reversal: 2
+  BR-DQ-002:
+    domain: quality
+    kind: structural
+    statement: Frappe name is the canonical id. Simulator never emits rename.
+    params:
+      simulator_emits_rename: false
+  BR-DQ-003:
+    domain: quality
+    kind: structural
+    statement: >
+      Absence on a full extract is not a deletion or termination unless the extract
+      passes the volume test and the same source_id is absent on two consecutive full extracts.
+    params:
+      volume_test_ratio: 0.99
+      consecutive_full_absences: 2
+      replay:
+        metric_id: headcount
+        value_bad: naive_count_received_status_active
+        value_expected: last_certified_headcount
+      extract_filter: null
+      extract_filter_note: Full extract includes Left. Employed count is derived (BR-WF-001). Absence means the Employee document is missing, not status=Left.
+      full_extract_dow: Friday
+      other_days_mode: incremental

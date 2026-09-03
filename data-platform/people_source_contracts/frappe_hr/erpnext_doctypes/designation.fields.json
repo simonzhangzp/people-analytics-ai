@@ -1,0 +1,23 @@
+{
+  "name": "Designation",
+  "module": "Setup",
+  "istable": null,
+  "issingle": null,
+  "autoname": "field:designation_name",
+  "fields": [
+    {
+      "fieldname": "designation_name",
+      "label": "Designation",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "description",
+      "label": "Description",
+      "fieldtype": "Text",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

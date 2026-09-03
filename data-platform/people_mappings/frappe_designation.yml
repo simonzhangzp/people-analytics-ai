@@ -1,0 +1,83 @@
+canonical_version: people_v2
+gate: 1
+note: Designation is the job spine. job_family from O*NET SOC (BR-WF-005).
+source_contract:
+  pin: erpnext_doctypes/designation.json
+fields:
+- canonical_table: people_dim_job
+  canonical_field: job_id
+  source_system: frappe_hr
+  source_object: Designation
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: CANONICAL_KEY
+  business_definition: Designation.name.
+  source_field: name
+- canonical_table: people_dim_job
+  canonical_field: job_name
+  source_system: frappe_hr
+  source_object: Designation
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SOURCE_NATIVE
+  business_definition: Display name.
+  source_field: designation_name
+- canonical_table: people_dim_job
+  canonical_field: onet_soc_code
+  source_system: onet
+  source_object: Occupation Data.txt
+  transformation: via people_xw_job
+  nullable: true
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: CANONICAL_KEY
+  business_definition: SOC from crosswalk.
+  source_field: O*NET-SOC Code
+- canonical_table: people_dim_job
+  canonical_field: job_family
+  source_system: onet
+  source_object: Occupation Data.txt
+  transformation: SOC major group (BR-WF-005)
+  nullable: true
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: SOC major group.
+  source_field: O*NET-SOC Code
+- canonical_table: people_dim_job
+  canonical_field: valid_from
+  source_system: frappe_hr
+  source_object: Designation
+  transformation: SCD2 start (BR-ORG-002)
+  nullable: false
+  data_type: date
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: Version start.
+  source_field: modified
+- canonical_table: people_dim_job
+  canonical_field: valid_to
+  source_system: frappe_hr
+  source_object: Designation
+  transformation: SCD2 end (BR-ORG-002)
+  nullable: true
+  data_type: date
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: Version end.
+  source_field: modified
+- canonical_table: people_dim_job
+  canonical_field: is_current
+  source_system: frappe_hr
+  source_object: Designation
+  transformation: valid_to is null
+  nullable: false
+  data_type: boolean
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: Current version flag.
+  source_field: modified

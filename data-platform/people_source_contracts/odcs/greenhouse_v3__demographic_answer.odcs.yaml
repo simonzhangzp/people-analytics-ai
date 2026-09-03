@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:demographic_answer
+info:
+  title: demographic_answer
+  version: 1.0.0
+  description: Application grain. Never join worker/person.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/demographic_answer/extract_date={date}/run_id={id}/
+schema:
+- name: demographic_answer
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/demographic_answer
+  primaryKey:
+  - id
+  description: Application grain. Never join worker/person.
+extract:
+  mode: incremental
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: restricted

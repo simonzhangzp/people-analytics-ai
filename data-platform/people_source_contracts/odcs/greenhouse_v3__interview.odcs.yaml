@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:interview
+info:
+  title: interview
+  version: 1.0.0
+  description: starts_at/ends_at.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/interview/extract_date={date}/run_id={id}/
+schema:
+- name: interview
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/interview
+  primaryKey:
+  - id
+  description: starts_at/ends_at.
+extract:
+  mode: incremental
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

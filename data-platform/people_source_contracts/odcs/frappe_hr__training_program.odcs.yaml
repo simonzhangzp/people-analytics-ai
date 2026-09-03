@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Training Program
+info:
+  title: Training Program
+  version: 1.0.0
+  description: Catalog parent.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Training_Program/extract_date={date}/run_id={id}/
+schema:
+- name: Training Program
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Training Program
+  primaryKey:
+  - name
+  description: Catalog parent.
+extract:
+  mode: full
+  cadence: daily
+  key: name
+  control_total_source: count of Training Program
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

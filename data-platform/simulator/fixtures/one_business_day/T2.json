@@ -1,0 +1,48 @@
+{
+  "transaction": "T2",
+  "employee_transfer": {
+    "doctype": "Employee Transfer",
+    "name": "HR-EMP-TRN-0001",
+    "employee": "HR-EMP-000100",
+    "transfer_date": "2026-04-08",
+    "docstatus": 1,
+    "creation": "2026-04-08T12:00:00Z",
+    "modified": "2026-04-08T12:00:00Z",
+    "transfer_details": [
+      {
+        "doctype": "Employee Property History",
+        "property": "Department",
+        "fieldname": "department",
+        "current": "Engineering - Platform",
+        "new": "Sales - Enterprise"
+      },
+      {
+        "doctype": "Employee Property History",
+        "property": "Branch",
+        "fieldname": "branch",
+        "current": "APAC-SIN",
+        "new": "AMER-NYC"
+      }
+    ]
+  },
+  "employee": {
+    "doctype": "Employee",
+    "name": "HR-EMP-000100",
+    "employee_name": "Worker 000100",
+    "status": "Active",
+    "date_of_joining": "2020-01-06",
+    "department": "Sales - Enterprise",
+    "designation": "Software Developer",
+    "grade": "G5",
+    "branch": "AMER-NYC",
+    "employment_type": "Regular",
+    "reports_to": null,
+    "relieving_date": null,
+    "reason_for_leaving": null,
+    "gender": "Female",
+    "date_of_birth": "1990-01-15",
+    "docstatus": 0,
+    "creation": "2020-01-06T12:00:00Z",
+    "modified": "2020-01-06T12:00:00Z"
+  }
+}

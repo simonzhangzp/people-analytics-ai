@@ -1,0 +1,75 @@
+# Target canonical model (after mapping). Not applied to the warehouse yet.
+
+silver_tables:
+  people_silver_worker:
+    grain: one row per Frappe Employee
+    mapping: frappe_employee.yml
+  people_silver_department:
+    grain: one row per Frappe Department
+    source: Department
+  people_silver_designation:
+    grain: one row per Frappe Designation
+    source: Designation
+  people_silver_branch:
+    grain: one row per Frappe Branch
+    source: Branch
+  people_silver_employee_grade:
+    grain: one row per Employee Grade
+    source: Employee Grade
+  people_silver_worker_event:
+    grain: one row per lifecycle source document
+    mappings:
+      - frappe_employee_transfer.yml
+      - frappe_employee_promotion.yml
+      - frappe_employee_separation.yml
+      - hire from Employee.date_of_joining
+    columns:
+      - event_id
+      - worker_id
+      - event_type
+      - effective_at
+      - source_system
+      - source_object
+      - source_record_id
+  people_silver_worker_event_change:
+    grain: one row per Employee Property History child
+    columns:
+      - event_id
+      - attribute_name
+      - old_value
+      - new_value
+  people_silver_compensation_assignment:
+    mapping: frappe_salary_assignment.yml
+  people_silver_appraisal:
+    mapping: frappe_appraisal.yml
+  people_silver_training_event:
+    mapping: frappe_training.yml
+  people_silver_worker_skill:
+    mapping: frappe_skill.yml
+  people_silver_candidate:
+    mapping: greenhouse_candidate.yml
+  people_silver_application:
+    mapping: greenhouse_application.yml
+  people_silver_application_stage:
+    mapping: greenhouse_application_stage.yml
+  people_silver_offer:
+    mapping: greenhouse_offer.yml
+  people_silver_scorecard:
+    mapping: greenhouse_scorecard.yml
+  people_silver_job:
+    mapping: greenhouse_job_opening.yml
+  people_silver_opening:
+    mapping: greenhouse_job_opening.yml
+  people_silver_applicant_demographics:
+    mapping: greenhouse_demographics.yml
+  people_identity_crosswalk:
+    mapping: people_identity_crosswalk.yml
+
+removed_current_tables:
+  - people_assignment
+  - people_movement (wide)
+  - people_candidate flattened requisition/stage
+  - people_candidate_hire sequential CAND links
+  - people_engagement_response
+  - people_location.pay_multiplier
+  - people_job.base_salary / is_manager / job_family

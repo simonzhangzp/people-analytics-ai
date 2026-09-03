@@ -1,0 +1,25 @@
+{
+  "transaction": "T9",
+  "appraisal_cycle": {
+    "doctype": "Appraisal Cycle",
+    "name": "FY2026",
+    "cycle_name": "FY2026",
+    "start_date": "2026-01-01",
+    "end_date": "2026-12-31",
+    "status": "In Progress",
+    "calculate_final_score_based_on_formula": 0,
+    "final_score_formula": null
+  },
+  "appraisal": {
+    "doctype": "Appraisal",
+    "name": "HR-APR-000100",
+    "employee": "HR-EMP-000100",
+    "appraisal_cycle": "FY2026",
+    "total_score": 4.0,
+    "self_score": 4.2,
+    "avg_feedback_score": 3.9,
+    "final_score": 4.0333,
+    "docstatus": 1,
+    "modified": "2026-04-08T12:00:00Z"
+  }
+}

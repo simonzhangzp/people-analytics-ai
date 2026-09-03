@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Employee Skill Map
+info:
+  title: Employee Skill Map
+  version: 1.0.0
+  description: Not submittable.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Employee_Skill_Map/extract_date={date}/run_id={id}/
+schema:
+- name: Employee Skill Map
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Employee Skill Map
+  primaryKey:
+  - name
+  description: Not submittable.
+extract:
+  mode: incremental
+  cadence: daily
+  key: name
+  control_total_source: count of Employee Skill Map
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

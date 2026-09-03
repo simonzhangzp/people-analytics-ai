@@ -1,0 +1,196 @@
+{
+  "name": "Salary Component",
+  "module": "Payroll",
+  "istable": null,
+  "fields": [
+    {
+      "fieldname": "salary_component",
+      "label": "Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "salary_component_abbr",
+      "label": "Abbr",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "type",
+      "label": "Type",
+      "fieldtype": "Select",
+      "options": "Earning\nDeduction\nEmployer Contribution",
+      "reqd": 1
+    },
+    {
+      "fieldname": "is_tax_applicable",
+      "label": "Is Tax Applicable",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "depends_on_payment_days",
+      "label": "Depends on Payment Days",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "do_not_include_in_total",
+      "label": "Do Not Include in Total",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "deduct_full_tax_on_selected_payroll_date",
+      "label": "Deduct Full Tax on Selected Payroll Date",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "disabled",
+      "label": "Disabled",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "description",
+      "label": "Description",
+      "fieldtype": "Small Text",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "statistical_component",
+      "label": "Statistical Component",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "is_flexible_benefit",
+      "label": "Is Flexible Benefit",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "max_benefit_amount",
+      "label": "Max Benefit Amount (Yearly)",
+      "fieldtype": "Currency",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "variable_based_on_taxable_salary",
+      "label": "Variable Based On Taxable Salary",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "accounts",
+      "label": "Accounts",
+      "fieldtype": "Table",
+      "options": "Salary Component Account",
+      "reqd": null
+    },
+    {
+      "fieldname": "condition",
+      "label": "Condition",
+      "fieldtype": "Code",
+      "options": "PythonExpression",
+      "reqd": null
+    },
+    {
+      "fieldname": "amount_based_on_formula",
+      "label": "Amount based on formula",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "formula",
+      "label": "Formula",
+      "fieldtype": "Code",
+      "options": "PythonExpression",
+      "reqd": null
+    },
+    {
+      "fieldname": "amount",
+      "label": "Amount",
+      "fieldtype": "Currency",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "round_to_the_nearest_integer",
+      "label": "Round to the Nearest Integer",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "exempted_from_income_tax",
+      "label": "Exempted from Income Tax",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "is_income_tax_component",
+      "label": "Is Income Tax Component",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "remove_if_zero_valued",
+      "label": "Remove if Zero Valued",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "do_not_include_in_accounts",
+      "label": "Do Not Include in Accounting Entries",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "arrear_component",
+      "label": "Arrear Component",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "accrual_component",
+      "label": "Accrual Component",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "payout_method",
+      "label": "Payout Method",
+      "fieldtype": "Select",
+      "options": "\nAccrue and payout at end of payroll period\nAccrue per cycle, pay only on claim\nAllow claim for full benefit amount",
+      "reqd": null
+    },
+    {
+      "fieldname": "final_cycle_accrual_payout",
+      "label": "Payout Unclaimed Amount in Final Payroll Cycle",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

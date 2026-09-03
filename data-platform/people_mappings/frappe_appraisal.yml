@@ -1,0 +1,167 @@
+canonical_version: people_v2
+gate: 1
+note: Appraisal has no business status field. Canonical status is Frappe docstatus. Cycle status is SOURCE_NATIVE.
+source_contract:
+  pin:
+  - doctypes/appraisal.json
+  - doctypes/appraisal_cycle.json
+fields:
+- canonical_table: people_dim_appraisal_cycle
+  canonical_field: cycle_id
+  source_system: frappe_hr
+  source_object: Appraisal Cycle
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: start_date
+  provenance: CANONICAL_KEY
+  business_definition: Appraisal Cycle.name (autoname cycle_name).
+  source_field: name
+- canonical_table: people_dim_appraisal_cycle
+  canonical_field: cycle_name
+  source_system: frappe_hr
+  source_object: Appraisal Cycle
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: start_date
+  provenance: SOURCE_NATIVE
+  business_definition: Cycle label.
+  source_field: cycle_name
+- canonical_table: people_dim_appraisal_cycle
+  canonical_field: start_date
+  source_system: frappe_hr
+  source_object: Appraisal Cycle
+  transformation: identity
+  nullable: false
+  data_type: date
+  effective_date_logic: start_date
+  provenance: SOURCE_NATIVE
+  business_definition: Cycle start.
+  source_field: start_date
+- canonical_table: people_dim_appraisal_cycle
+  canonical_field: end_date
+  source_system: frappe_hr
+  source_object: Appraisal Cycle
+  transformation: identity
+  nullable: false
+  data_type: date
+  effective_date_logic: end_date
+  provenance: SOURCE_NATIVE
+  business_definition: Cycle end.
+  source_field: end_date
+- canonical_table: people_dim_appraisal_cycle
+  canonical_field: status
+  source_system: frappe_hr
+  source_object: Appraisal Cycle
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: start_date
+  provenance: SOURCE_NATIVE
+  business_definition: Not Started | In Progress | Completed.
+  source_field: status
+- canonical_table: people_fact_appraisal
+  canonical_field: appraisal_id
+  source_system: frappe_hr
+  source_object: Appraisal
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: end_date
+  provenance: CANONICAL_KEY
+  business_definition: Appraisal.name.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_appraisal
+  canonical_field: worker_id
+  source_system: frappe_hr
+  source_object: Appraisal
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: end_date
+  provenance: SOURCE_NATIVE
+  business_definition: Employee.link.
+  source_field: employee
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_appraisal
+  canonical_field: cycle_id
+  source_system: frappe_hr
+  source_object: Appraisal
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: end_date
+  provenance: SOURCE_NATIVE
+  business_definition: Appraisal Cycle link.
+  source_field: appraisal_cycle
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_appraisal
+  canonical_field: final_score
+  source_system: frappe_hr
+  source_object: Appraisal
+  transformation: identity
+  nullable: true
+  data_type: numeric
+  effective_date_logic: end_date
+  provenance: SOURCE_NATIVE
+  business_definition: Final score.
+  source_field: final_score
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_appraisal
+  canonical_field: total_score
+  source_system: frappe_hr
+  source_object: Appraisal
+  transformation: identity
+  nullable: true
+  data_type: numeric
+  effective_date_logic: end_date
+  provenance: SOURCE_NATIVE
+  business_definition: Total goal score.
+  source_field: total_score
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_appraisal
+  canonical_field: self_score
+  source_system: frappe_hr
+  source_object: Appraisal
+  transformation: identity
+  nullable: true
+  data_type: numeric
+  effective_date_logic: end_date
+  provenance: SOURCE_NATIVE
+  business_definition: Self score.
+  source_field: self_score
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_appraisal
+  canonical_field: status
+  source_system: frappe_hr
+  source_object: Appraisal
+  transformation: 0=draft 1=submitted 2=cancelled; Appraisal.json has no business status
+  nullable: false
+  data_type: text
+  effective_date_logic: modified
+  provenance: SOURCE_NATIVE
+  business_definition: Frappe docstatus, not a business workflow field.
+  source_field: docstatus
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_appraisal
+  canonical_field: submitted_at
+  source_system: frappe_hr
+  source_object: Appraisal
+  transformation: modified when docstatus=1
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: modified
+  provenance: DERIVED
+  business_definition: Submit timestamp.
+  source_field: modified
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)

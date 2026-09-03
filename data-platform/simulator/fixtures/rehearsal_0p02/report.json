@@ -1,0 +1,287 @@
+{
+  "scale": 0.02,
+  "seed": 20260301,
+  "window": {
+    "start": "2021-09-01",
+    "end": "2026-08-31"
+  },
+  "publish": false,
+  "cumulative_workers": 1600,
+  "ending_certified_headcount": 872,
+  "ending_headcount_by_region": {
+    "EMEA": 242,
+    "AMER": 360,
+    "APAC": 270
+  },
+  "voluntary_attrition_2026_with_scenario": {
+    "EMEA|3\u20135y": {
+      "region": "EMEA",
+      "tenure_band": "3\u20135y",
+      "voluntary_terms": 4,
+      "person_months": 506,
+      "annualized": 0.0949
+    },
+    "AMER|3\u20135y": {
+      "region": "AMER",
+      "tenure_band": "3\u20135y",
+      "voluntary_terms": 9,
+      "person_months": 785,
+      "annualized": 0.1376
+    },
+    "APAC|5\u201310y": {
+      "region": "APAC",
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 8,
+      "person_months": 606,
+      "annualized": 0.1584
+    },
+    "AMER|5\u201310y": {
+      "region": "AMER",
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 11,
+      "person_months": 693,
+      "annualized": 0.1905
+    },
+    "APAC|3\u20135y": {
+      "region": "APAC",
+      "tenure_band": "3\u20135y",
+      "voluntary_terms": 6,
+      "person_months": 571,
+      "annualized": 0.1261
+    },
+    "EMEA|5\u201310y": {
+      "region": "EMEA",
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 5,
+      "person_months": 525,
+      "annualized": 0.1143
+    },
+    "EMEA|1\u20133y": {
+      "region": "EMEA",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 7,
+      "person_months": 491,
+      "annualized": 0.1711
+    },
+    "AMER|1\u20133y": {
+      "region": "AMER",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 8,
+      "person_months": 816,
+      "annualized": 0.1176
+    },
+    "APAC|1\u20133y": {
+      "region": "APAC",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 11,
+      "person_months": 532,
+      "annualized": 0.2481
+    },
+    "EMEA|<1y": {
+      "region": "EMEA",
+      "tenure_band": "<1y",
+      "voluntary_terms": 1,
+      "person_months": 328,
+      "annualized": 0.0366
+    },
+    "AMER|<1y": {
+      "region": "AMER",
+      "tenure_band": "<1y",
+      "voluntary_terms": 6,
+      "person_months": 436,
+      "annualized": 0.1651
+    },
+    "APAC|<1y": {
+      "region": "APAC",
+      "tenure_band": "<1y",
+      "voluntary_terms": 3,
+      "person_months": 336,
+      "annualized": 0.1071
+    }
+  },
+  "voluntary_attrition_2026_without_scenario": {
+    "EMEA|3\u20135y": {
+      "region": "EMEA",
+      "tenure_band": "3\u20135y",
+      "voluntary_terms": 4,
+      "person_months": 506,
+      "annualized": 0.0949
+    },
+    "AMER|3\u20135y": {
+      "region": "AMER",
+      "tenure_band": "3\u20135y",
+      "voluntary_terms": 9,
+      "person_months": 785,
+      "annualized": 0.1376
+    },
+    "APAC|5\u201310y": {
+      "region": "APAC",
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 8,
+      "person_months": 606,
+      "annualized": 0.1584
+    },
+    "AMER|5\u201310y": {
+      "region": "AMER",
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 11,
+      "person_months": 693,
+      "annualized": 0.1905
+    },
+    "APAC|3\u20135y": {
+      "region": "APAC",
+      "tenure_band": "3\u20135y",
+      "voluntary_terms": 6,
+      "person_months": 571,
+      "annualized": 0.1261
+    },
+    "EMEA|5\u201310y": {
+      "region": "EMEA",
+      "tenure_band": "5\u201310y",
+      "voluntary_terms": 5,
+      "person_months": 525,
+      "annualized": 0.1143
+    },
+    "EMEA|1\u20133y": {
+      "region": "EMEA",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 7,
+      "person_months": 491,
+      "annualized": 0.1711
+    },
+    "AMER|1\u20133y": {
+      "region": "AMER",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 8,
+      "person_months": 816,
+      "annualized": 0.1176
+    },
+    "APAC|1\u20133y": {
+      "region": "APAC",
+      "tenure_band": "1\u20133y",
+      "voluntary_terms": 11,
+      "person_months": 532,
+      "annualized": 0.2481
+    },
+    "EMEA|<1y": {
+      "region": "EMEA",
+      "tenure_band": "<1y",
+      "voluntary_terms": 1,
+      "person_months": 328,
+      "annualized": 0.0366
+    },
+    "AMER|<1y": {
+      "region": "AMER",
+      "tenure_band": "<1y",
+      "voluntary_terms": 6,
+      "person_months": 436,
+      "annualized": 0.1651
+    },
+    "APAC|<1y": {
+      "region": "APAC",
+      "tenure_band": "<1y",
+      "voluntary_terms": 3,
+      "person_months": 336,
+      "annualized": 0.1071
+    }
+  },
+  "case3_effect": {
+    "slice": "APAC engineering \u00d7 1\u20133y from 2026-03-01",
+    "rows": [
+      {
+        "region": "APAC",
+        "tenure_band": "1\u20133y",
+        "voluntary_terms": 11,
+        "person_months": 532,
+        "annualized": 0.2481,
+        "without_terms": 11,
+        "extra_terms": 0,
+        "without_annualized": 0.2481
+      }
+    ],
+    "realized_extra_voluntary_terms_all_slices": 0,
+    "eligible_rolls": 178,
+    "expected_extra_terms": 1.51
+  },
+  "recruiting": {
+    "hires": 880,
+    "openings": 955,
+    "applications": 14044,
+    "offers_sent": 880,
+    "offers_accepted": 752,
+    "offer_acceptance": 0.8545
+  },
+  "snapshot_invariant": {
+    "rule": "active_t = active_{t-1} + hires - terms",
+    "max_abs_delta": 21,
+    "late_terms": 28,
+    "months": [
+      {
+        "month_end": "2026-03-31",
+        "active": 810,
+        "identity": 801,
+        "delta": 9
+      },
+      {
+        "month_end": "2026-04-30",
+        "active": 822,
+        "identity": 806,
+        "delta": 16
+      },
+      {
+        "month_end": "2026-05-31",
+        "active": 834,
+        "identity": 826,
+        "delta": 8
+      },
+      {
+        "month_end": "2026-06-30",
+        "active": 847,
+        "identity": 838,
+        "delta": 9
+      },
+      {
+        "month_end": "2026-07-31",
+        "active": 859,
+        "identity": 857,
+        "delta": 2
+      },
+      {
+        "month_end": "2026-08-31",
+        "active": 872,
+        "identity": 851,
+        "delta": 21
+      }
+    ]
+  },
+  "case2_isolation": {
+    "fault": {
+      "extract_date": "2026-08-14",
+      "mode": "full",
+      "control_total": 940,
+      "rows_received": 748,
+      "isolated": true,
+      "pointer_moved": false,
+      "absence_closes_worker": false,
+      "volume_test_ok": false,
+      "status": "isolated",
+      "replay": {
+        "metric_id": "headcount",
+        "value_bad": 748,
+        "value_expected": 940
+      }
+    },
+    "prior_full": {
+      "extract_date": "2026-08-07",
+      "mode": "full",
+      "control_total": 940,
+      "rows_received": 940,
+      "volume_test_ok": true,
+      "isolated": false
+    },
+    "certified_pointer": "2026-08-07",
+    "missing_apac": 192,
+    "apac_closed_because_of_extract": [],
+    "ok": true
+  }
+}

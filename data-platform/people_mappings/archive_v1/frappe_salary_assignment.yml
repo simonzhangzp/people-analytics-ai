@@ -1,0 +1,93 @@
+canonical_entity: people_silver_worker_event
+source_contract:
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  pin:
+    hrms: v16.15.0
+    schema: people_source_contracts/frappe_hr/doctypes/salary_structure_assignment.json
+bronze_table: people_bronze_frappe_salary_structure_assignment
+fields:
+  - canonical_field: compensation_event_id
+    source_system: frappe_hr
+    source_object: Salary Structure Assignment
+    source_field: name
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Source assignment document.
+
+  - canonical_field: worker_id
+    source_system: frappe_hr
+    source_object: Salary Structure Assignment
+    source_field: employee
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Employee receiving the structure.
+
+  - canonical_field: salary_structure_id
+    source_system: frappe_hr
+    source_object: Salary Structure Assignment
+    source_field: salary_structure
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Link to Salary Structure.
+
+  - canonical_field: effective_at
+    source_system: frappe_hr
+    source_object: Salary Structure Assignment
+    source_field: from_date
+    transformation: identity
+    nullable: false
+    data_type: date
+    effective_date_logic: from_date
+    business_definition: Date the assignment becomes effective.
+
+  - canonical_field: base_pay
+    source_system: frappe_hr
+    source_object: Salary Structure Assignment
+    source_field: base
+    transformation: identity
+    nullable: true
+    data_type: numeric
+    effective_date_logic: from_date
+    business_definition: Base component on the assignment. Not a job-catalog midpoint.
+
+  - canonical_field: currency
+    source_system: frappe_hr
+    source_object: Salary Structure Assignment
+    source_field: currency
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: from_date
+    business_definition: Currency of base / CTC.
+
+  - canonical_field: ctc
+    source_system: frappe_hr
+    source_object: Salary Structure Assignment
+    source_field: ctc
+    transformation: identity
+    nullable: true
+    data_type: numeric
+    effective_date_logic: from_date
+    business_definition: Total cost to company on the assignment.
+
+  - canonical_field: grade_id
+    source_system: frappe_hr
+    source_object: Salary Structure Assignment
+    source_field: grade
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: from_date
+    business_definition: Link to Employee Grade. ERPNext Employee.json v16.0.0 has no grade field; grade is on this assignment.
+
+not_mapped_on_purpose:
+  - pay_rate_type
+  - pay_multiplier
+  - job.base_salary as compa midpoint unless mapped from Employee Grade.default_base_pay

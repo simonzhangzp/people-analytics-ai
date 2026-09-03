@@ -1,0 +1,499 @@
+{
+  "name": "Employee",
+  "module": "Setup",
+  "istable": null,
+  "issingle": null,
+  "autoname": "naming_series:",
+  "fields": [
+    {
+      "fieldname": "employee",
+      "label": "Employee",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "naming_series",
+      "label": "Series",
+      "fieldtype": "Select",
+      "options": "HR-EMP-",
+      "reqd": null
+    },
+    {
+      "fieldname": "salutation",
+      "label": "Salutation",
+      "fieldtype": "Link",
+      "options": "Salutation",
+      "reqd": null
+    },
+    {
+      "fieldname": "first_name",
+      "label": "First Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "middle_name",
+      "label": "Middle Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "last_name",
+      "label": "Last Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "employee_name",
+      "label": "Full Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "image",
+      "label": "Image",
+      "fieldtype": "Attach Image",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": 1
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Active\nInactive\nSuspended\nLeft",
+      "reqd": 1
+    },
+    {
+      "fieldname": "employee_number",
+      "label": "Employee Number",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "gender",
+      "label": "Gender",
+      "fieldtype": "Link",
+      "options": "Gender",
+      "reqd": 1
+    },
+    {
+      "fieldname": "date_of_birth",
+      "label": "Date of Birth",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "date_of_joining",
+      "label": "Date of Joining",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "emergency_phone_number",
+      "label": "Emergency Phone",
+      "fieldtype": "Data",
+      "options": "Phone",
+      "reqd": null
+    },
+    {
+      "fieldname": "person_to_be_contacted",
+      "label": "Emergency Contact Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "relation",
+      "label": "Relation",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "user_id",
+      "label": "User ID",
+      "fieldtype": "Link",
+      "options": "User",
+      "reqd": null
+    },
+    {
+      "fieldname": "create_user",
+      "label": "Create User",
+      "fieldtype": "Button",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "create_user_permission",
+      "label": "Create User Permission",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "scheduled_confirmation_date",
+      "label": "Offer Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "final_confirmation_date",
+      "label": "Confirmation Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "contract_end_date",
+      "label": "Contract End Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "notice_number_of_days",
+      "label": "Notice (days)",
+      "fieldtype": "Int",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "date_of_retirement",
+      "label": "Date Of Retirement",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "department",
+      "label": "Department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "reqd": null
+    },
+    {
+      "fieldname": "designation",
+      "label": "Designation",
+      "fieldtype": "Link",
+      "options": "Designation",
+      "reqd": null
+    },
+    {
+      "fieldname": "reports_to",
+      "label": "Reports to",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "reqd": null
+    },
+    {
+      "fieldname": "branch",
+      "label": "Branch",
+      "fieldtype": "Link",
+      "options": "Branch",
+      "reqd": null
+    },
+    {
+      "fieldname": "holiday_list",
+      "label": "Holiday List",
+      "fieldtype": "Link",
+      "options": "Holiday List",
+      "reqd": null
+    },
+    {
+      "fieldname": "salary_mode",
+      "label": "Salary Mode",
+      "fieldtype": "Select",
+      "options": "\nBank\nCash\nCheque",
+      "reqd": null
+    },
+    {
+      "fieldname": "bank_name",
+      "label": "Bank Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "bank_ac_no",
+      "label": "Bank A/C No.",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "cell_number",
+      "label": "Mobile",
+      "fieldtype": "Data",
+      "options": "Phone",
+      "reqd": null
+    },
+    {
+      "fieldname": "prefered_contact_email",
+      "label": "Preferred Contact Email",
+      "fieldtype": "Select",
+      "options": "\nCompany Email\nPersonal Email\nUser ID",
+      "reqd": null
+    },
+    {
+      "fieldname": "prefered_email",
+      "label": "Preferred Email",
+      "fieldtype": "Data",
+      "options": "Email",
+      "reqd": null
+    },
+    {
+      "fieldname": "company_email",
+      "label": "Company Email",
+      "fieldtype": "Data",
+      "options": "Email",
+      "reqd": null
+    },
+    {
+      "fieldname": "personal_email",
+      "label": "Personal Email",
+      "fieldtype": "Data",
+      "options": "Email",
+      "reqd": null
+    },
+    {
+      "fieldname": "unsubscribed",
+      "label": "Unsubscribed",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "permanent_accommodation_type",
+      "label": "Permanent Address Is",
+      "fieldtype": "Select",
+      "options": "\nRented\nOwned",
+      "reqd": null
+    },
+    {
+      "fieldname": "permanent_address",
+      "label": "Permanent Address",
+      "fieldtype": "Small Text",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "current_accommodation_type",
+      "label": "Current Address Is",
+      "fieldtype": "Select",
+      "options": "\nRented\nOwned",
+      "reqd": null
+    },
+    {
+      "fieldname": "current_address",
+      "label": "Current Address",
+      "fieldtype": "Small Text",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "bio",
+      "label": "Bio / Cover Letter",
+      "fieldtype": "Text Editor",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "passport_number",
+      "label": "Passport Number",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "date_of_issue",
+      "label": "Date of Issue",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "valid_upto",
+      "label": "Valid Up To",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "place_of_issue",
+      "label": "Place of Issue",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "marital_status",
+      "label": "Marital Status",
+      "fieldtype": "Select",
+      "options": "\nSingle\nMarried\nDivorced\nWidowed",
+      "reqd": null
+    },
+    {
+      "fieldname": "blood_group",
+      "label": "Blood Group",
+      "fieldtype": "Select",
+      "options": "\nA+\nA-\nB+\nB-\nAB+\nAB-\nO+\nO-",
+      "reqd": null
+    },
+    {
+      "fieldname": "family_background",
+      "label": "Family Background",
+      "fieldtype": "Small Text",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "health_details",
+      "label": "Health Details",
+      "fieldtype": "Small Text",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "education",
+      "label": "Education",
+      "fieldtype": "Table",
+      "options": "Employee Education",
+      "reqd": null
+    },
+    {
+      "fieldname": "external_work_history",
+      "label": "External Work History",
+      "fieldtype": "Table",
+      "options": "Employee External Work History",
+      "reqd": null
+    },
+    {
+      "fieldname": "internal_work_history",
+      "label": "Internal Work History",
+      "fieldtype": "Table",
+      "options": "Employee Internal Work History",
+      "reqd": null
+    },
+    {
+      "fieldname": "resignation_letter_date",
+      "label": "Resignation Letter Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "relieving_date",
+      "label": "Relieving Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "reason_for_leaving",
+      "label": "Reason for Leaving",
+      "fieldtype": "Small Text",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "leave_encashed",
+      "label": "Leave Encashed?",
+      "fieldtype": "Select",
+      "options": "\nYes\nNo",
+      "reqd": null
+    },
+    {
+      "fieldname": "encashment_date",
+      "label": "Encashment Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "held_on",
+      "label": "Exit Interview Held On",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "new_workplace",
+      "label": "New Workplace",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "feedback",
+      "label": "Feedback",
+      "fieldtype": "Small Text",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "lft",
+      "label": "lft",
+      "fieldtype": "Int",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "rgt",
+      "label": "rgt",
+      "fieldtype": "Int",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "old_parent",
+      "label": "Old Parent",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "attendance_device_id",
+      "label": "Attendance Device ID (Biometric/RF tag ID)",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "salary_currency",
+      "label": "Salary Currency",
+      "fieldtype": "Link",
+      "options": "Currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "ctc",
+      "label": "Cost to Company (CTC)",
+      "fieldtype": "Currency",
+      "options": "salary_currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "iban",
+      "label": "IBAN",
+      "fieldtype": "Data",
+      "options": "IBAN",
+      "reqd": null
+    }
+  ]
+}

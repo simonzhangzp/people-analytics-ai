@@ -1,0 +1,15 @@
+{
+  "transaction": "T4",
+  "salary_structure_assignment": {
+    "doctype": "Salary Structure Assignment",
+    "name": "HR-SSA-CYCLE-0001",
+    "employee": "HR-EMP-000100",
+    "from_date": "2026-04-01",
+    "base": 150000,
+    "variable": 18000,
+    "currency": "USD",
+    "grade": "G5",
+    "salary_structure": "GT-PROF-USD",
+    "docstatus": 1
+  }
+}

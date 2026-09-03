@@ -1,0 +1,133 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "scorecard",
+  "harvest_path_hint": "/v3/scorecards",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "interview_kit_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the interview kit this scorecard was filled out against. The kit determines the questions, focus attributes, and rating scale on the scorecard. The kit also identifies which interview slot on the job's interview plan produced this scorecard."
+    },
+    {
+      "name": "interviewer_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the Greenhouse user who participated in the interview and to whom this scorecard is assigned. Each interviewer on a multi-interviewer interview gets their own scorecard."
+    },
+    {
+      "name": "interviewed_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the interview took place, in ISO 8601. Mirrors the underlying interview's scheduled time and is set when the scorecard is created (manual scorecards may set this independently)."
+    },
+    {
+      "name": "notes",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Free-text \"key takeaways\" the interviewer recorded on the scorecard (pros, cons, follow-ups). Plain text with `@`-mentions rendered as user names; use `notes_with_tags` for the version where mentions are tagged for downstream parsing."
+    },
+    {
+      "name": "notes_with_tags",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "`notes` with `@`-mentions rendered as embedded user tags (e.g. `@[User Name](user:123)`) instead of plain user names, for partners that need to resolve mentioned users."
+    },
+    {
+      "name": "submitter_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the Greenhouse user who actually submitted the scorecard. Usually the same as `interviewer_id`, but differs when an admin submits a scorecard on another interviewer's behalf."
+    },
+    {
+      "name": "candidate_rating",
+      "type": "string",
+      "format": null,
+      "description": "Interviewer's overall recommendation on whether the candidate passed the interview. One of `strong_no` (\"Definitely Not\" in the UI), `no`, `yes`, `strong_yes`, or `no_decision`. `no_decision` is recorded when the interviewer submitted the scorecard without choosing a recommendation."
+    },
+    {
+      "name": "private_notes",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Free-text private notes visible only to users with the \"see private notes\" permission. Plain text with `@`-mentions rendered as user names; use `private_notes_with_tags` for the tagged version."
+    },
+    {
+      "name": "private_notes_with_tags",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "`private_notes` with `@`-mentions rendered as embedded user tags instead of plain user names."
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "format": null,
+      "description": "Lifecycle status of the scorecard. `draft` is in-progress and not yet submitted; `complete` is submitted (and `submitted_at` is set). Only complete scorecards count toward interview completion and downstream analysis."
+    },
+    {
+      "name": "public_notes",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Free-text \"note to other interviewers\" the interviewer leaves for the rest of the hiring team. Plain text with `@`-mentions rendered as user names; use `public_notes_with_tags` for the tagged version."
+    },
+    {
+      "name": "public_notes_with_tags",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "`public_notes` with `@`-mentions rendered as embedded user tags instead of plain user names."
+    },
+    {
+      "name": "application_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the application this scorecard belongs to. Use it to look up the candidate via the applications endpoint."
+    },
+    {
+      "name": "submitted_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the scorecard was submitted (moved from `draft` to `complete`), in ISO 8601. `null` while `status` is `draft`. The delta between `interviewed_at` and `submitted_at` is a common \"time to submit scorecard\" measure."
+    }
+  ]
+}

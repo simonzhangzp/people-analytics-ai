@@ -1,0 +1,19 @@
+metric_id: voluntary_attrition_rate
+status: certified
+grain: people_snap_worker_month
+numerator:
+  rule: BR-RET-001
+  param: categories
+  value: voluntary
+  fact: terminated_in_month
+denominator:
+  rule: BR-WF-001
+  param: certified_population
+  aggregator: average_headcount
+tenure:
+  rule: BR-WF-004
+  param: bands
+annualize: true
+sandbox:
+  rule_kind: parametric
+  rpc: people_get_metric_sandbox

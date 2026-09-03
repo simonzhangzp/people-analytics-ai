@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Training Result
+info:
+  title: Training Result
+  version: 1.0.0
+  description: BR-DQ-001.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Training_Result/extract_date={date}/run_id={id}/
+schema:
+- name: Training Result
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Training Result
+  primaryKey:
+  - name
+  description: BR-DQ-001.
+extract:
+  mode: incremental
+  cadence: daily
+  key: name
+  control_total_source: count of submitted Training Result
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

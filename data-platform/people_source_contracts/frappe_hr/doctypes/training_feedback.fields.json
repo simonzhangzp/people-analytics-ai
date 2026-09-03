@@ -1,0 +1,72 @@
+{
+  "name": "Training Feedback",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "HR-TRF-.YYYY.-.#####",
+  "fields": [
+    {
+      "fieldname": "employee",
+      "label": "Employee",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "employee_name",
+      "label": "Employee Name",
+      "fieldtype": "Read Only",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "department",
+      "label": "Department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "reqd": null
+    },
+    {
+      "fieldname": "course",
+      "label": "Course",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "training_event",
+      "label": "Training Event",
+      "fieldtype": "Link",
+      "options": "Training Event",
+      "reqd": 1
+    },
+    {
+      "fieldname": "event_name",
+      "label": "Event Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "trainer_name",
+      "label": "Trainer Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "feedback",
+      "label": "Feedback",
+      "fieldtype": "Text",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "amended_from",
+      "label": "Amended From",
+      "fieldtype": "Link",
+      "options": "Training Feedback",
+      "reqd": null
+    }
+  ]
+}

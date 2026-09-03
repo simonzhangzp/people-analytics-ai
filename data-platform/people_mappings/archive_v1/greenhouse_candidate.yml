@@ -1,0 +1,75 @@
+canonical_entity: people_silver_candidate
+source_contract:
+  source_system: greenhouse_v3
+  source_object: candidates
+  harvest_path: /v3/candidates
+  pin:
+    api: Harvest v3
+    schema: people_source_contracts/greenhouse_v3/schemas/fields/candidate.fields.json
+bronze_table: people_bronze_greenhouse_candidate
+fields:
+  - canonical_field: source_candidate_id
+    source_system: greenhouse_v3
+    source_object: candidates
+    source_field: id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: created_at
+    business_definition: Greenhouse person id. One person, many applications.
+
+  - canonical_field: first_name
+    source_system: greenhouse_v3
+    source_object: candidates
+    source_field: first_name
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current
+    business_definition: Candidate given name.
+
+  - canonical_field: last_name
+    source_system: greenhouse_v3
+    source_object: candidates
+    source_field: last_name
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current
+    business_definition: Candidate family name.
+
+  - canonical_field: preferred_name
+    source_system: greenhouse_v3
+    source_object: candidates
+    source_field: preferred_name
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current
+    business_definition: Chosen name. ATS grain only.
+
+  - canonical_field: created_at
+    source_system: greenhouse_v3
+    source_object: candidates
+    source_field: created_at
+    transformation: identity
+    nullable: false
+    data_type: timestamptz
+    effective_date_logic: created_at
+    business_definition: Source created timestamp.
+
+  - canonical_field: updated_at
+    source_system: greenhouse_v3
+    source_object: candidates
+    source_field: updated_at
+    transformation: identity
+    nullable: false
+    data_type: timestamptz
+    effective_date_logic: updated_at
+    business_definition: Source updated timestamp.
+
+not_mapped_on_purpose:
+  - requisition_id on candidate
+  - current_stage on candidate
+  - applied_on on candidate
+  - ethnicity / gender from EEOC (application grain)

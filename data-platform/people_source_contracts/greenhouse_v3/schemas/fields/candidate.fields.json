@@ -1,0 +1,154 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "candidate",
+  "harvest_path_hint": "/v3/candidates",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "first_name",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "last_name",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "preferred_name",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Preferred or chosen name the candidate goes by, when different from their legal first name."
+    },
+    {
+      "name": "company",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Candidate's current company, as entered on their profile."
+    },
+    {
+      "name": "title",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Candidate's current job title, as entered on their profile."
+    },
+    {
+      "name": "last_activity_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp of the most recent activity on any of the candidate's applications (notes, emails, stage changes, etc.), in ISO 8601."
+    },
+    {
+      "name": "private",
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "format": null,
+      "description": "If true, the candidate is restricted to users with `View Private Candidates` access. Defaults to `false`."
+    },
+    {
+      "name": "can_email",
+      "type": "boolean",
+      "format": null,
+      "description": "Whether this candidate has consented to receive email communication from your organization."
+    },
+    {
+      "name": "time_zone",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Candidate's time zone as a Rails-style identifier (for example `Eastern Time (US & Canada)`)."
+    },
+    {
+      "name": "tags",
+      "type": "array",
+      "format": null,
+      "description": "Candidate tag names applied to this candidate within your organization."
+    },
+    {
+      "name": "linked_user_ids",
+      "type": "array",
+      "format": null,
+      "description": "Ids of Greenhouse users linked to this candidate (employees represented by both a user record and a candidate record)."
+    },
+    {
+      "name": "phone_numbers",
+      "type": "array",
+      "format": null,
+      "description": "Phone numbers on the candidate's profile. Each entry pairs the `value` with a `type` such as `mobile`, `home`, `work`, `skype`, or `other`. Ordered by type \u2014 `home`, `work`, `mobile`, `skype`, then `other` \u2014 and oldest first within a type."
+    },
+    {
+      "name": "addresses",
+      "type": "array",
+      "format": null,
+      "description": "Postal addresses on the candidate's profile. Each entry pairs the `value` with a `type` such as `home`, `work`, or `other`. Ordered oldest first."
+    },
+    {
+      "name": "email_addresses",
+      "type": "array",
+      "format": null,
+      "description": "Email addresses on the candidate's profile. Each entry pairs the `value` with a `type` such as `personal`, `work`, or `other`. Ordered by most recently updated, and oldest first among entries last updated at the same time."
+    },
+    {
+      "name": "website_addresses",
+      "type": "array",
+      "format": null,
+      "description": "Personal websites or portfolio URLs on the candidate's profile. Each entry pairs the `value` with a `type` such as `personal`, `company`, `portfolio`, `blog`, or `other`. Ordered oldest first."
+    },
+    {
+      "name": "social_media_addresses",
+      "type": "array",
+      "format": null,
+      "description": "Social media handles or URLs on the candidate's profile. Social entries are untyped \u2014 only the `value` is returned. Ordered oldest first."
+    },
+    {
+      "name": "custom_fields",
+      "type": [
+        "object",
+        "null"
+      ],
+      "format": null,
+      "description": null
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Employee
+info:
+  title: Employee
+  version: 1.0.0
+  description: 'ERPNext JSON + HRMS custom fields. Not submittable. Full extract only on Friday (control_total = all Employee
+    documents including Left). Other days incremental on modified. Employed count is derived (BR-WF-001). BR-DQ-003: absence
+    means the document is missing, not status=Left.'
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Employee/extract_date={date}/run_id={id}/
+schema:
+- name: Employee
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Employee
+  primaryKey:
+  - name
+  description: 'ERPNext JSON + HRMS custom fields. Not submittable. Full extract only on Friday (control_total = all Employee
+    documents including Left). Other days incremental on modified. Employed count is derived (BR-WF-001). BR-DQ-003: absence
+    means the document is missing, not status=Left.'
+extract:
+  mode: incremental_plus_weekly_full
+  cadence: daily
+  key: name
+  control_total_source: count of Employee rows in source (all statuses including Left)
+  watermark: modified
+  full_extract_dow: Friday
+  other_days_mode: incremental
+  control_total_on_full: all_employee_documents_including_left
+slaProperties:
+  freshnessHours: 24
+piiClassification: sensitive_pii

@@ -1,0 +1,168 @@
+{
+  "name": "Salary Detail",
+  "module": "Payroll",
+  "istable": 1,
+  "fields": [
+    {
+      "fieldname": "salary_component",
+      "label": "Component",
+      "fieldtype": "Link",
+      "options": "Salary Component",
+      "reqd": 1
+    },
+    {
+      "fieldname": "abbr",
+      "label": "Abbr",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "statistical_component",
+      "label": "Statistical Component",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "is_tax_applicable",
+      "label": "Is Tax Applicable",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "is_flexible_benefit",
+      "label": "Is Flexible Benefit",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "variable_based_on_taxable_salary",
+      "label": "Variable Based On Taxable Salary",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "depends_on_payment_days",
+      "label": "Depends on Payment Days",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "deduct_full_tax_on_selected_payroll_date",
+      "label": "Deduct Full Tax on Selected Payroll Date",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "condition",
+      "label": "Condition",
+      "fieldtype": "Code",
+      "options": "PythonExpression",
+      "reqd": null
+    },
+    {
+      "fieldname": "amount_based_on_formula",
+      "label": "Amount based on formula",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "formula",
+      "label": "Formula",
+      "fieldtype": "Code",
+      "options": "PythonExpression",
+      "reqd": null
+    },
+    {
+      "fieldname": "amount",
+      "label": "Amount",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "do_not_include_in_total",
+      "label": "Do not include in total",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "default_amount",
+      "label": "Default Amount",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "additional_amount",
+      "label": "Additional Amount",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "tax_on_flexible_benefit",
+      "label": "Tax on flexible benefit",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "tax_on_additional_salary",
+      "label": "Tax on additional salary",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "additional_salary",
+      "label": "Additional Salary ",
+      "fieldtype": "Link",
+      "options": "Additional Salary",
+      "reqd": null
+    },
+    {
+      "fieldname": "exempted_from_income_tax",
+      "label": "Exempted from Income Tax",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "year_to_date",
+      "label": "Year To Date",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "is_recurring_additional_salary",
+      "label": "Is Recurring Additional Salary",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "do_not_include_in_accounts",
+      "label": "Do Not Include in Accounting Entries",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "accrual_component",
+      "label": "Accrual Component",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

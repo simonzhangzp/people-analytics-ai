@@ -1,0 +1,152 @@
+canonical_version: people_v2
+gate: 1
+note: Proficiency is a Frappe Rating on Employee Skill. O*NET importance is the job-target, not the worker rating.
+source_contract:
+  pin:
+  - doctypes/employee_skill_map.json
+  - doctypes/employee_skill.json
+  - doctypes/skill.json
+fields:
+- canonical_table: people_dim_skill
+  canonical_field: skill_id
+  source_system: frappe_hr
+  source_object: Skill
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: CANONICAL_KEY
+  business_definition: Skill.name.
+  source_field: name
+- canonical_table: people_dim_skill
+  canonical_field: skill_name
+  source_system: frappe_hr
+  source_object: Skill
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: SOURCE_NATIVE
+  business_definition: Skill label.
+  source_field: skill_name
+- canonical_table: people_dim_skill
+  canonical_field: onet_element_id
+  source_system: onet
+  source_object: Essential Skills.txt
+  transformation: via people_xw_skill
+  nullable: true
+  data_type: text
+  effective_date_logic: current
+  provenance: CANONICAL_KEY
+  business_definition: O*NET element.
+  source_field: Element ID
+- canonical_table: people_dim_skill
+  canonical_field: element_type
+  source_system: onet
+  source_object: Essential Skills.txt
+  transformation: Skills | Knowledge | Technology Skills from the O*NET file of origin
+  nullable: true
+  data_type: text
+  effective_date_logic: current
+  provenance: SOURCE_NATIVE
+  business_definition: O*NET element type.
+  source_field: null
+- canonical_table: people_fact_worker_skill
+  canonical_field: worker_id
+  source_system: frappe_hr
+  source_object: Employee Skill Map
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: evaluation_date
+  provenance: SOURCE_NATIVE
+  business_definition: Employee on the skill map.
+  source_field: employee
+- canonical_table: people_fact_worker_skill
+  canonical_field: skill_id
+  source_system: frappe_hr
+  source_object: Employee Skill
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: evaluation_date
+  provenance: SOURCE_NESTED
+  business_definition: Skill link.
+  source_field: skill
+- canonical_table: people_fact_worker_skill
+  canonical_field: proficiency
+  source_system: frappe_hr
+  source_object: Employee Skill
+  transformation: 'Frappe Rating 0-1 scaled to 1-5: round(proficiency*5) with floor 1'
+  nullable: false
+  data_type: integer
+  effective_date_logic: evaluation_date
+  provenance: SOURCE_NESTED
+  business_definition: Worker proficiency 1-5.
+  source_field: proficiency
+- canonical_table: people_fact_worker_skill
+  canonical_field: evaluation_date
+  source_system: frappe_hr
+  source_object: Employee Skill
+  transformation: identity
+  nullable: true
+  data_type: date
+  effective_date_logic: evaluation_date
+  provenance: SOURCE_NESTED
+  business_definition: Evaluation date.
+  source_field: evaluation_date
+- canonical_table: people_fact_worker_skill
+  canonical_field: source_skill_map
+  source_system: frappe_hr
+  source_object: Employee Skill Map
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: evaluation_date
+  provenance: SOURCE_NATIVE
+  business_definition: Parent Employee Skill Map.name.
+  source_field: name
+- canonical_table: people_ref_job_skill_target
+  canonical_field: job_id
+  source_system: frappe_hr
+  source_object: Designation
+  transformation: via people_xw_job
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: CANONICAL_KEY
+  business_definition: Job for the target.
+  source_field: name
+- canonical_table: people_ref_job_skill_target
+  canonical_field: skill_id
+  source_system: onet
+  source_object: Essential Skills.txt
+  transformation: via people_xw_skill
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: CANONICAL_KEY
+  business_definition: Skill for the target.
+  source_field: Element ID
+- canonical_table: people_ref_job_skill_target
+  canonical_field: target_proficiency
+  source_system: onet
+  source_object: Essential Skills.txt
+  transformation: scale O*NET importance 1-5 (BR-SK-001)
+  nullable: true
+  data_type: integer
+  effective_date_logic: current
+  provenance: DERIVED
+  business_definition: Target proficiency from O*NET importance.
+  source_field: Importance
+- canonical_table: people_ref_job_skill_target
+  canonical_field: onet_importance
+  source_system: onet
+  source_object: Essential Skills.txt
+  transformation: identity
+  nullable: true
+  data_type: numeric
+  effective_date_logic: current
+  provenance: SOURCE_NATIVE
+  business_definition: O*NET importance.
+  source_field: Importance

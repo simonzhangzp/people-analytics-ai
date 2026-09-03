@@ -1,0 +1,51 @@
+{
+  "name": "Training Event Employee",
+  "module": "HR",
+  "istable": 1,
+  "issingle": null,
+  "autoname": null,
+  "fields": [
+    {
+      "fieldname": "employee",
+      "label": "Employee",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "reqd": null
+    },
+    {
+      "fieldname": "employee_name",
+      "label": "Employee Name",
+      "fieldtype": "Read Only",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "department",
+      "label": "Department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "reqd": null
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Open\nInvited\nCompleted\nFeedback Submitted",
+      "reqd": null
+    },
+    {
+      "fieldname": "attendance",
+      "label": "Attendance",
+      "fieldtype": "Select",
+      "options": "Present\nAbsent",
+      "reqd": null
+    },
+    {
+      "fieldname": "is_mandatory",
+      "label": "Is Mandatory",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

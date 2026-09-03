@@ -1,0 +1,15 @@
+scenario_id: apac_hris_feed_incomplete
+version: 1
+kind: extract_fault
+effective:
+  from: 2026-08-14
+  to: 2026-08-14
+target:
+  source_system: frappe_hr
+  source_object: Employee
+  filter:
+    branch_region: APAC
+effect:
+  extract_rows_received_pct: 0.35
+  extract_mode: full
+narrative: "Case 2: data issue, not workforce change. Forced full extract so BR-DQ-003 applies."

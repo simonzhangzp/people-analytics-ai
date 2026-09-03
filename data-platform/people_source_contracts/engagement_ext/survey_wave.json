@@ -1,0 +1,18 @@
+{
+  "source_system": "engagement_ext",
+  "source_object": "survey_wave",
+  "provenance": "SYNTHETIC_EXTENSION",
+  "extension_id": "E5",
+  "grain": "one row per survey wave",
+  "serving_table": "people_dim_survey_wave",
+  "fields": [
+    {"fieldname": "wave_id", "type": "text", "reqd": true},
+    {"fieldname": "instrument_version", "type": "text", "reqd": true},
+    {"fieldname": "start_date", "type": "date", "reqd": true},
+    {"fieldname": "end_date", "type": "date", "reqd": true},
+    {"fieldname": "target_population", "type": "text", "reqd": true, "description": "Active workers as of start_date"},
+    {"fieldname": "response_rate", "type": "numeric", "reqd": false}
+  ],
+  "baseline_cadence": "two waves per year (May, November)",
+  "baseline_response_rate": "0.70-0.85 of active workers"
+}

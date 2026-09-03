@@ -1,0 +1,35 @@
+{
+  "transaction": "T8",
+  "user": {
+    "id": 204,
+    "employee_id": "HR-EMP-000200",
+    "deactivated": false,
+    "created_at": "2026-04-08T12:00:00Z"
+  },
+  "employee": {
+    "doctype": "Employee",
+    "name": "HR-EMP-000200",
+    "employee_name": "Worker 000200",
+    "status": "Active",
+    "date_of_joining": "2018-06-01",
+    "department": "Sales - Enterprise",
+    "designation": "Sales Manager",
+    "grade": "G6",
+    "branch": "AMER-NYC",
+    "employment_type": "Regular",
+    "reports_to": null,
+    "relieving_date": null,
+    "reason_for_leaving": null,
+    "gender": "Female",
+    "date_of_birth": "1990-01-15",
+    "docstatus": 0,
+    "creation": "2018-06-01T12:00:00Z",
+    "modified": "2018-06-01T12:00:00Z"
+  },
+  "identity": {
+    "match_method": "employee_id",
+    "source_system": "greenhouse_v3",
+    "source_object": "user",
+    "source_id": "204"
+  }
+}

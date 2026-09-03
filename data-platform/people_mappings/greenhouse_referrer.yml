@@ -1,0 +1,19 @@
+canonical_version: people_v2
+gate: 1
+note: applications.referrer_id points at referrer.id, not user_id.
+source_contract:
+  pin: schemas/fields/referrer.fields.json
+fields:
+- canonical_table: people_fact_application
+  canonical_field: referrer_person_id
+  source_system: greenhouse_v3
+  source_object: referrer
+  transformation: referrer_id → referrer.user_id → user.employee_id
+  nullable: true
+  data_type: uuid
+  effective_date_logic: created_at
+  provenance: DERIVED
+  business_definition: Referrer person. Not a separate credited-to user.
+  source_fields:
+  - id
+  - user_id

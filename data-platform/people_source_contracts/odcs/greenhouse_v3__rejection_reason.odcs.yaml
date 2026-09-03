@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:rejection_reason
+info:
+  title: rejection_reason
+  version: 1.0.0
+  description: Reason master.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/rejection_reason/extract_date={date}/run_id={id}/
+schema:
+- name: rejection_reason
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/rejection_reason
+  primaryKey:
+  - id
+  description: Reason master.
+extract:
+  mode: full
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

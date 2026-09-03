@@ -1,0 +1,183 @@
+canonical_version: people_v2
+gate: 1
+note: E5. Item-level survey_response stays in the lake. Serving is worker × wave × dimension with min cell 5.
+source_contract:
+  pin: people_source_contracts/engagement_ext/
+  docs: docs/ENGAGEMENT_INSTRUMENT.md
+fields:
+- canonical_table: people_dim_survey_item
+  canonical_field: item_id
+  source_system: engagement_ext
+  source_object: survey_instrument
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: instrument_version
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E5 item id.
+  source_field: item_id
+- canonical_table: people_dim_survey_item
+  canonical_field: dimension
+  source_system: engagement_ext
+  source_object: survey_instrument
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: instrument_version
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: engagement | manager | growth | wellbeing.
+  source_field: dimension
+- canonical_table: people_dim_survey_item
+  canonical_field: reverse
+  source_system: engagement_ext
+  source_object: survey_instrument
+  transformation: identity
+  nullable: false
+  data_type: boolean
+  effective_date_logic: instrument_version
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Reverse-scored flag.
+  source_field: reverse
+- canonical_table: people_dim_survey_item
+  canonical_field: prompt
+  source_system: engagement_ext
+  source_object: survey_instrument
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: instrument_version
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Item text.
+  source_field: prompt
+- canonical_table: people_dim_survey_item
+  canonical_field: instrument_version
+  source_system: engagement_ext
+  source_object: survey_instrument
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: instrument_version
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: engagement_ext.instrument.v1.
+  source_field: instrument_version
+- canonical_table: people_dim_survey_wave
+  canonical_field: wave_id
+  source_system: engagement_ext
+  source_object: survey_wave
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: start_date
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Wave key.
+  source_field: wave_id
+- canonical_table: people_dim_survey_wave
+  canonical_field: instrument_version
+  source_system: engagement_ext
+  source_object: survey_wave
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: start_date
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Instrument used.
+  source_field: instrument_version
+- canonical_table: people_dim_survey_wave
+  canonical_field: start_date
+  source_system: engagement_ext
+  source_object: survey_wave
+  transformation: identity
+  nullable: false
+  data_type: date
+  effective_date_logic: start_date
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Wave start.
+  source_field: start_date
+- canonical_table: people_dim_survey_wave
+  canonical_field: end_date
+  source_system: engagement_ext
+  source_object: survey_wave
+  transformation: identity
+  nullable: false
+  data_type: date
+  effective_date_logic: end_date
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Wave end.
+  source_field: end_date
+- canonical_table: people_dim_survey_wave
+  canonical_field: target_population
+  source_system: engagement_ext
+  source_object: survey_wave
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: start_date
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Active workers as of start_date.
+  source_field: target_population
+- canonical_table: people_dim_survey_wave
+  canonical_field: response_rate
+  source_system: engagement_ext
+  source_object: survey_wave
+  transformation: identity
+  nullable: true
+  data_type: numeric
+  effective_date_logic: end_date
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Completed / invited.
+  source_field: response_rate
+- canonical_table: people_fact_survey_score_restricted
+  canonical_field: worker_id
+  source_system: engagement_ext
+  source_object: survey_response
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: wave_id
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Respondent worker.
+  source_field: worker_id
+- canonical_table: people_fact_survey_score_restricted
+  canonical_field: wave_id
+  source_system: engagement_ext
+  source_object: survey_response
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: wave_id
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Wave.
+  source_field: wave_id
+- canonical_table: people_fact_survey_score_restricted
+  canonical_field: dimension
+  source_system: engagement_ext
+  source_object: survey_instrument
+  transformation: group items by dimension
+  nullable: false
+  data_type: text
+  effective_date_logic: wave_id
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Dimension key.
+  source_field: dimension
+- canonical_table: people_fact_survey_score_restricted
+  canonical_field: score_mean
+  source_system: engagement_ext
+  source_object: survey_response
+  transformation: mean of reverse-adjusted Likert (BR-E5-001)
+  nullable: false
+  data_type: numeric
+  effective_date_logic: wave_id
+  provenance: DERIVED
+  business_definition: Dimension mean after reverse scoring.
+  source_field: score
+- canonical_table: people_fact_survey_score_restricted
+  canonical_field: items_answered
+  source_system: engagement_ext
+  source_object: survey_response
+  transformation: count of items in the dimension with a score
+  nullable: false
+  data_type: integer
+  effective_date_logic: wave_id
+  provenance: DERIVED
+  business_definition: Item completion count.
+  source_field: item_id

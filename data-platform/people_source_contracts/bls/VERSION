@@ -1,0 +1,4 @@
+{
+  "api": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+  "version": "publicAPI/v2"
+}

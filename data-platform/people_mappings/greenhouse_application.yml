@@ -1,0 +1,140 @@
+canonical_version: people_v2
+gate: 1
+note: applied_at ← created_at (BR-TA-003). Requisition via job_id + opening (BR-TA-002). referrer_person_id via referrer.user_id
+  → user.employee_id. Harvest has no separate credited user field.
+source_contract:
+  pin: schemas/fields/application.fields.json
+fields:
+- canonical_table: people_fact_application
+  canonical_field: application_id
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: CANONICAL_KEY
+  business_definition: Harvest application.id.
+  source_field: id
+- canonical_table: people_fact_application
+  canonical_field: candidate_id
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Candidate of this application.
+  source_field: candidate_id
+- canonical_table: people_fact_application
+  canonical_field: requisition_id
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: opening.id for this job_id (BR-TA-002); prospect uses prospective_job_ids[0] only when job_id is null
+  nullable: true
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: DERIVED
+  business_definition: Requisition = opening. No jobs[] array on Harvest v3 application.
+  source_field: job_id
+- canonical_table: people_fact_application
+  canonical_field: applied_at
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: identity (BR-TA-003)
+  nullable: false
+  data_type: timestamptz
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Harvest has no applied_at; created_at is the apply timestamp.
+  source_field: created_at
+- canonical_table: people_fact_application
+  canonical_field: status
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: in_process→active; rejected→rejected; hired→hired; converted stays converted then treated as active (BR-TA-004)
+  nullable: false
+  data_type: text
+  effective_date_logic: updated_at
+  provenance: DERIVED
+  business_definition: Canonical active | rejected | hired.
+  source_field: status
+- canonical_table: people_fact_application
+  canonical_field: rejected_at
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: identity
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: rejected_at
+  provenance: SOURCE_NATIVE
+  business_definition: Rejection timestamp.
+  source_field: rejected_at
+- canonical_table: people_fact_application
+  canonical_field: hired_at
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: when status=hired use accepted offer.resolved_at, else null (BR-TA-005)
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: resolved_at
+  provenance: DERIVED
+  business_definition: No Harvest hired_at field.
+  source_field: status
+- canonical_table: people_fact_application
+  canonical_field: source_id
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: identity
+  nullable: true
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Attributed source.
+  source_field: source_id
+- canonical_table: people_fact_application
+  canonical_field: referrer_person_id
+  source_system: greenhouse_v3
+  source_object: referrer
+  transformation: application.referrer_id → referrer.user_id → user.employee_id → person_id; null if referrer.user_id is null.
+    Not a distinct credited_to field.
+  nullable: true
+  data_type: uuid
+  effective_date_logic: created_at
+  provenance: DERIVED
+  business_definition: Referrer person when the referrer maps to an employee_id. Harvest v3 has referrer_id only.
+  source_field: user_id
+- canonical_table: people_fact_application
+  canonical_field: rejection_reason_id
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: identity
+  nullable: true
+  data_type: bigint
+  effective_date_logic: rejected_at
+  provenance: SOURCE_NATIVE
+  business_definition: Rejection reason id.
+  source_field: rejection_reason_id
+- canonical_table: people_fact_application
+  canonical_field: rejection_type
+  source_system: greenhouse_v3
+  source_object: rejection_reason
+  transformation: type.name via rejection_reason_id
+  nullable: true
+  data_type: text
+  effective_date_logic: rejected_at
+  provenance: SOURCE_NATIVE
+  business_definition: Reason type.
+  source_field: type
+- canonical_table: people_fact_application
+  canonical_field: current_stage_id
+  source_system: greenhouse_v3
+  source_object: application
+  transformation: identity; not stage_id
+  nullable: true
+  data_type: bigint
+  effective_date_logic: updated_at
+  provenance: SOURCE_NATIVE
+  business_definition: Current job_interview_stage.
+  source_field: job_interview_stage_id

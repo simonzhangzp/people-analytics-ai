@@ -1,0 +1,122 @@
+canonical_entity: people_identity_crosswalk
+bronze_table: people_bronze_identity_crosswalk
+note: Cross-system joins use this table only. Never join on person names.
+
+fields:
+  - canonical_field: crosswalk_id
+    source_system: people_pipeline
+    source_object: people_identity_crosswalk
+    source_field: ""
+    transformation: surrogate
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Surrogate for the link row.
+
+  - canonical_field: canonical_person_id
+    source_system: people_pipeline
+    source_object: people_identity_crosswalk
+    source_field: ""
+    transformation: assigned when a person is first seen
+    nullable: false
+    data_type: text
+    effective_date_logic: effective_start
+    business_definition: Person identity spanning candidate and employee.
+
+  - canonical_field: canonical_worker_id
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: name
+    transformation: identity when an Employee exists; null for candidates not hired
+    nullable: true
+    data_type: text
+    effective_date_logic: hire / employee create
+    business_definition: Canonical worker. Equals Frappe Employee.name after hire.
+
+  - canonical_field: source_system
+    source_system: people_pipeline
+    source_object: people_identity_crosswalk
+    source_field: ""
+    transformation: one of frappe_hr, greenhouse_v3
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: System that owns source_id.
+
+  - canonical_field: source_object
+    source_system: people_pipeline
+    source_object: people_identity_crosswalk
+    source_field: ""
+    transformation: Employee | User | candidates | applications | users
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Source object name.
+
+  - canonical_field: source_id
+    source_system: varies
+    source_object: varies
+    source_field: name or id
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Source primary key as text.
+
+  - canonical_field: match_method
+    source_system: people_pipeline
+    source_object: people_identity_crosswalk
+    source_field: ""
+    transformation: enumerated
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: How the link was made. Allowed values below. Names are forbidden.
+
+  - canonical_field: effective_start
+    source_system: varies
+    source_object: varies
+    source_field: created_at / date_of_joining
+    transformation: identity
+    nullable: false
+    data_type: date
+    effective_date_logic: effective_start
+    business_definition: When this link became valid.
+
+  - canonical_field: effective_end
+    source_system: varies
+    source_object: varies
+    source_field: ""
+    transformation: null while current
+    nullable: true
+    data_type: date
+    effective_date_logic: effective_end
+    business_definition: When this link stopped. Null if current.
+
+allowed_match_methods:
+  - frappe_employee_name
+  - greenhouse_user.employee_id == frappe Employee.name
+  - greenhouse_user.primary_email == frappe Employee.company_email
+  - greenhouse_application hired -> new frappe Employee (simulator workflow)
+forbidden_match_methods:
+  - person display name
+  - candidate first_name + last_name
+  - sequential CAND###### generated independently of Greenhouse ids
+
+examples:
+  - canonical_worker_id: HR-EMP-000123
+    source_system: frappe_hr
+    source_object: Employee
+    source_id: HR-EMP-000123
+    match_method: frappe_employee_name
+  - canonical_worker_id: HR-EMP-000123
+    source_system: greenhouse_v3
+    source_object: users
+    source_id: "89233"
+    match_method: greenhouse_user.employee_id == frappe Employee.name
+  - canonical_person_id: P-000123
+    canonical_worker_id: HR-EMP-000123
+    source_system: greenhouse_v3
+    source_object: applications
+    source_id: "44102"
+    match_method: greenhouse_application hired -> new frappe Employee (simulator workflow)

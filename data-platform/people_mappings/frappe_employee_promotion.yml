@@ -1,0 +1,214 @@
+canonical_version: people_v2
+gate: 1
+note: Child table is Employee Property History on promotion_details.
+source_contract:
+  pin:
+  - doctypes/employee_promotion.json
+  - doctypes/employee_property_history.json
+fields:
+- canonical_table: people_evt_worker
+  canonical_field: event_id
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: promotion_date
+  provenance: CANONICAL_KEY
+  business_definition: Promotion document name.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: worker_id
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: promotion_date
+  provenance: SOURCE_NATIVE
+  business_definition: Employee.link.
+  source_field: employee
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: person_id
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  transformation: xw_identity
+  nullable: false
+  data_type: uuid
+  effective_date_logic: promotion_date
+  provenance: CANONICAL_KEY
+  business_definition: Person of the worker.
+  source_field: employee
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: event_type
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  transformation: literal promotion
+  nullable: false
+  data_type: text
+  effective_date_logic: promotion_date
+  provenance: CANONICAL_KEY
+  business_definition: promotion.
+  source_field: null
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: event_date
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  transformation: identity
+  nullable: false
+  data_type: date
+  effective_date_logic: promotion_date
+  provenance: SOURCE_NATIVE
+  business_definition: Promotion effective date.
+  source_field: promotion_date
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: recorded_at
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  transformation: identity
+  nullable: false
+  data_type: timestamptz
+  effective_date_logic: creation
+  provenance: SOURCE_NATIVE
+  business_definition: Document creation.
+  source_field: creation
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: source_system
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  transformation: literal frappe_hr
+  nullable: false
+  data_type: text
+  effective_date_logic: creation
+  provenance: CANONICAL_KEY
+  business_definition: HRIS.
+  source_field: null
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: source_object
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  transformation: literal Employee Promotion
+  nullable: false
+  data_type: text
+  effective_date_logic: creation
+  provenance: CANONICAL_KEY
+  business_definition: Parent DocType.
+  source_field: null
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: source_id
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: creation
+  provenance: SOURCE_NATIVE
+  business_definition: Promotion.name.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker
+  canonical_field: extract_id
+  source_system: ingest
+  source_object: people_meta_extract_run
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: extract_ts
+  provenance: CANONICAL_KEY
+  business_definition: Extract id.
+  source_field: extract_id
+- canonical_table: people_evt_worker_change
+  canonical_field: event_id
+  source_system: frappe_hr
+  source_object: Employee Promotion
+  transformation: parent event_id
+  nullable: false
+  data_type: text
+  effective_date_logic: promotion_date
+  provenance: CANONICAL_KEY
+  business_definition: Parent promotion.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker_change
+  canonical_field: property
+  source_system: frappe_hr
+  source_object: Employee Property History
+  transformation: same mapping as transfer
+  nullable: false
+  data_type: text
+  effective_date_logic: promotion_date
+  provenance: SOURCE_NESTED
+  business_definition: Changed attribute.
+  source_field: fieldname
+  source_filter: parent.docstatus = 1
+  reversal: parent docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker_change
+  canonical_field: old_value
+  source_system: frappe_hr
+  source_object: Employee Property History
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: promotion_date
+  provenance: SOURCE_NESTED
+  business_definition: Value before.
+  source_field: current
+  source_filter: parent.docstatus = 1
+  reversal: parent docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker_change
+  canonical_field: new_value
+  source_system: frappe_hr
+  source_object: Employee Property History
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: promotion_date
+  provenance: SOURCE_NESTED
+  business_definition: Value after.
+  source_field: new
+  source_filter: parent.docstatus = 1
+  reversal: parent docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker_change
+  canonical_field: old_canonical_id
+  source_system: frappe_hr
+  source_object: Employee Property History
+  transformation: xw resolve
+  nullable: true
+  data_type: text
+  effective_date_logic: promotion_date
+  provenance: DERIVED
+  business_definition: Canonical old id.
+  source_field: current
+  source_filter: parent.docstatus = 1
+  reversal: parent docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker_change
+  canonical_field: new_canonical_id
+  source_system: frappe_hr
+  source_object: Employee Property History
+  transformation: xw resolve
+  nullable: true
+  data_type: text
+  effective_date_logic: promotion_date
+  provenance: DERIVED
+  business_definition: Canonical new id.
+  source_field: new
+  source_filter: parent.docstatus = 1
+  reversal: parent docstatus = 2 emits a reversal event (BR-DQ-001)

@@ -1,0 +1,161 @@
+{
+  "name": "Salary Structure Assignment",
+  "module": "Payroll",
+  "istable": null,
+  "fields": [
+    {
+      "fieldname": "employee",
+      "label": "Employee",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "employee_name",
+      "label": "Employee Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "department",
+      "label": "Department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "reqd": null
+    },
+    {
+      "fieldname": "designation",
+      "label": "Designation",
+      "fieldtype": "Link",
+      "options": "Designation",
+      "reqd": null
+    },
+    {
+      "fieldname": "salary_structure",
+      "label": "Salary Structure",
+      "fieldtype": "Link",
+      "options": "Salary Structure",
+      "reqd": 1
+    },
+    {
+      "fieldname": "from_date",
+      "label": "From Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": 1
+    },
+    {
+      "fieldname": "base",
+      "label": "Base",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "annual_gross_earning",
+      "label": "Annual Gross Earning",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "ctc",
+      "label": "Total Cost To Company (CTC)",
+      "fieldtype": "Currency",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "variable",
+      "label": "Variable",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "amended_from",
+      "label": "Amended From",
+      "fieldtype": "Link",
+      "options": "Salary Structure Assignment",
+      "reqd": null
+    },
+    {
+      "fieldname": "income_tax_slab",
+      "label": "Income Tax Slab",
+      "fieldtype": "Link",
+      "options": "Income Tax Slab",
+      "reqd": null
+    },
+    {
+      "fieldname": "currency",
+      "label": "Currency",
+      "fieldtype": "Link",
+      "options": "Currency",
+      "reqd": 1
+    },
+    {
+      "fieldname": "payroll_payable_account",
+      "label": "Payroll Payable Account",
+      "fieldtype": "Link",
+      "options": "Account",
+      "reqd": null
+    },
+    {
+      "fieldname": "payroll_cost_centers",
+      "label": "Cost Centers",
+      "fieldtype": "Table",
+      "options": "Employee Cost Center",
+      "reqd": null
+    },
+    {
+      "fieldname": "grade",
+      "label": "Grade",
+      "fieldtype": "Link",
+      "options": "Employee Grade",
+      "reqd": null
+    },
+    {
+      "fieldname": "tax_deducted_till_date",
+      "label": "Tax Deducted Till Date",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "taxable_earnings_till_date",
+      "label": "Taxable Earnings Till Date",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "employee_benefits",
+      "label": "Flexible Benefits",
+      "fieldtype": "Table",
+      "options": "Employee Benefit Detail",
+      "reqd": null
+    },
+    {
+      "fieldname": "max_benefits",
+      "label": "Maximum Benefit Amount",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "leave_encashment_amount_per_day",
+      "label": "Leave Encashment Amount Per Day",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    }
+  ]
+}

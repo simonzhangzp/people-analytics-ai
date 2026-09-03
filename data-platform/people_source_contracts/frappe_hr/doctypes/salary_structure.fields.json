@@ -1,0 +1,154 @@
+{
+  "name": "Salary Structure",
+  "module": "Payroll",
+  "istable": null,
+  "fields": [
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": 1
+    },
+    {
+      "fieldname": "letter_head",
+      "label": "Letter Head",
+      "fieldtype": "Link",
+      "options": "Letter Head",
+      "reqd": null
+    },
+    {
+      "fieldname": "is_active",
+      "label": "Is Active",
+      "fieldtype": "Select",
+      "options": "\nYes\nNo",
+      "reqd": 1
+    },
+    {
+      "fieldname": "payroll_frequency",
+      "label": "Payroll Frequency",
+      "fieldtype": "Select",
+      "options": "\nMonthly\nFortnightly\nBimonthly\nWeekly\nDaily",
+      "reqd": null
+    },
+    {
+      "fieldname": "is_default",
+      "label": "Is Default",
+      "fieldtype": "Select",
+      "options": "Yes\nNo",
+      "reqd": null
+    },
+    {
+      "fieldname": "salary_slip_based_on_timesheet",
+      "label": "Salary Slip Based on Timesheet",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "salary_component",
+      "label": "Salary Component",
+      "fieldtype": "Link",
+      "options": "Salary Component",
+      "reqd": null
+    },
+    {
+      "fieldname": "hour_rate",
+      "label": "Hour Rate",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "leave_encashment_amount_per_day",
+      "label": "Leave Encashment Amount Per Day",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "max_benefits",
+      "label": "Max Benefits (Amount)",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "earnings",
+      "label": "Earnings",
+      "fieldtype": "Table",
+      "options": "Salary Detail",
+      "reqd": null
+    },
+    {
+      "fieldname": "deductions",
+      "label": "Deductions",
+      "fieldtype": "Table",
+      "options": "Salary Detail",
+      "reqd": null
+    },
+    {
+      "fieldname": "employer_contributions",
+      "label": "Employer Contributions",
+      "fieldtype": "Table",
+      "options": "Salary Detail",
+      "reqd": null
+    },
+    {
+      "fieldname": "total_earning",
+      "label": "Total Earning",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "total_deduction",
+      "label": "Total Deduction",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "net_pay",
+      "label": "Net Pay",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "mode_of_payment",
+      "label": "Mode of Payment",
+      "fieldtype": "Link",
+      "options": "Mode of Payment",
+      "reqd": null
+    },
+    {
+      "fieldname": "payment_account",
+      "label": "Payment Account",
+      "fieldtype": "Link",
+      "options": "Account",
+      "reqd": null
+    },
+    {
+      "fieldname": "amended_from",
+      "label": "Amended From",
+      "fieldtype": "Link",
+      "options": "Salary Structure",
+      "reqd": null
+    },
+    {
+      "fieldname": "currency",
+      "label": "Currency",
+      "fieldtype": "Link",
+      "options": "Currency",
+      "reqd": 1
+    },
+    {
+      "fieldname": "employee_benefits",
+      "label": "Flexible Benefits",
+      "fieldtype": "Table",
+      "options": "Employee Benefit Detail",
+      "reqd": null
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "source_system": "engagement_ext",
+  "source_object": "survey_response",
+  "provenance": "SYNTHETIC_EXTENSION",
+  "extension_id": "E5",
+  "grain": "one row per worker x wave x item",
+  "destination": "lake only",
+  "sensitivity": "confidential",
+  "fields": [
+    {"fieldname": "response_id", "type": "text", "reqd": true},
+    {"fieldname": "wave_id", "type": "text", "reqd": true},
+    {"fieldname": "worker_id", "type": "text", "reqd": true},
+    {"fieldname": "item_id", "type": "text", "reqd": true},
+    {"fieldname": "score", "type": "integer", "reqd": true, "description": "Raw Likert 1-5 before reverse scoring"}
+  ],
+  "serving_note": "Item-level answers stay in the lake. Postgres serving exposes people_fact_survey_score_restricted (worker x wave x dimension) through aggregate RPCs with min cell 5."
+}

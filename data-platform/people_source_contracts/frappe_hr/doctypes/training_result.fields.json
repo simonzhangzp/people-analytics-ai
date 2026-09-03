@@ -1,0 +1,37 @@
+{
+  "name": "Training Result",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "HR-TRR-.YYYY.-.#####",
+  "fields": [
+    {
+      "fieldname": "training_event",
+      "label": "Training Event",
+      "fieldtype": "Link",
+      "options": "Training Event",
+      "reqd": 1
+    },
+    {
+      "fieldname": "employees",
+      "label": "Employees",
+      "fieldtype": "Table",
+      "options": "Training Result Employee",
+      "reqd": null
+    },
+    {
+      "fieldname": "amended_from",
+      "label": "Amended From",
+      "fieldtype": "Link",
+      "options": "Training Result",
+      "reqd": null
+    },
+    {
+      "fieldname": "employee_emails",
+      "label": "Employee Emails",
+      "fieldtype": "Small Text",
+      "options": "Email",
+      "reqd": null
+    }
+  ]
+}

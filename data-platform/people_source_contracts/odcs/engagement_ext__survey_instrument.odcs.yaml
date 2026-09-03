@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:engagement_ext:survey_instrument
+info:
+  title: survey_instrument
+  version: 1.0.0
+  description: E5. SYNTHETIC_EXTENSION.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/engagement_ext/survey_instrument/extract_date={date}/run_id={id}/
+schema:
+- name: survey_instrument
+  physicalType: parquet
+  physicalName: people_bronze/engagement_ext/survey_instrument
+  primaryKey:
+  - instrument_version
+  description: E5. SYNTHETIC_EXTENSION.
+extract:
+  mode: full
+  cadence: on_version_change
+  key: instrument_version
+  control_total_source: count of items in the pinned instrument
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

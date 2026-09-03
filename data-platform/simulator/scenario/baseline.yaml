@@ -1,0 +1,219 @@
+# Simulator world parameters. Tunable. Seeded runs must be byte-stable.
+
+simulator_seed: 20260301
+version: "1.0.0"
+company:
+  name: GlobalTech
+  business_groups: 4
+  departments: 25
+  teams: 150
+  department_tree_depth: 4
+locations:
+  cities: 30
+  countries: 10
+  regions: [AMER, EMEA, APAC]
+jobs:
+  designations_from_onet: 120
+grades:
+  ids: [G1, G2, G3, G4, G5, G6, G7, G8, G9, G10]
+population:
+  cumulative_workers_5y: 80000  # planning figure; rehearsal cumulative is derived from hiring controller
+  ending_active: 50000
+  ending_active_certified: 50000
+  ending_target_choice: keep_50k_certified_raise_hiring
+  opening_stock_share_of_ending: 0.72
+  rehire_rate: 0.02
+  region_mix: {AMER: 0.45, EMEA: 0.25, APAC: 0.30}
+  job_family_mix: {Engineering: 0.35, Sales: 0.20, Exec: 0.03, Other: 0.42}
+  employment_type_mix:
+    Full-time: 0.90
+    Part-time: 0.04
+    Probation: 0.02
+    Intern: 0.03
+    Contract: 0.01
+  t0_as_of: 2021-09-01
+  t0_tenure_mix:
+    "<1y": 0.18
+    "1–3y": 0.28
+    "3–5y": 0.22
+    "5–10y": 0.20
+    "10y+": 0.12
+  t0_tenure_days:
+    "<1y": [1, 364]
+    "1–3y": [365, 1094]
+    "3–5y": [1095, 1824]
+    "5–10y": [1825, 3649]
+    "10y+": [3650, 6570]
+attrition:
+  voluntary_annual: [0.10, 0.14]
+  involuntary_annual: [0.02, 0.03]
+  calibration: BLS JOLTS total quits JTS000000000000000QUR (monthly ~2.0–2.7% 2021–2024). GlobalTech uses a lower annual band for a large-tech mix.
+  hazard_base_annual: 0.12
+  involuntary_annual_point: 0.025
+  hazard_tenure_mult: {"<1y": 1.35, "1–3y": 1.10, "3–5y": 1.00, "5–10y": 0.85, "10y+": 0.60}
+  hazard_region_mult: {AMER: 1.00, EMEA: 0.92, APAC: 1.12}
+  hazard_family_mult: {Engineering: 1.08, Sales: 0.96, Exec: 0.82, Other: 0.96}
+  # region × tenure_band × job_family annual voluntary hazard (parameters, not 2% realizations)
+  hazard_voluntary_annual:
+    Engineering:
+      AMER: {"<1y": 0.1750, "1–3y": 0.1426, "3–5y": 0.1296, "5–10y": 0.1102, "10y+": 0.0778}
+      EMEA: {"<1y": 0.1610, "1–3y": 0.1312, "3–5y": 0.1192, "5–10y": 0.1013, "10y+": 0.0715}
+      APAC: {"<1y": 0.1960, "1–3y": 0.1597, "3–5y": 0.1452, "5–10y": 0.1234, "10y+": 0.0871}
+    Sales:
+      AMER: {"<1y": 0.1555, "1–3y": 0.1267, "3–5y": 0.1152, "5–10y": 0.0979, "10y+": 0.0691}
+      EMEA: {"<1y": 0.1431, "1–3y": 0.1166, "3–5y": 0.1060, "5–10y": 0.0901, "10y+": 0.0636}
+      APAC: {"<1y": 0.1742, "1–3y": 0.1419, "3–5y": 0.1290, "5–10y": 0.1097, "10y+": 0.0774}
+    Exec:
+      AMER: {"<1y": 0.1320, "1–3y": 0.1077, "3–5y": 0.0979, "5–10y": 0.0832, "10y+": 0.0587}
+      EMEA: {"<1y": 0.1215, "1–3y": 0.0991, "3–5y": 0.0901, "5–10y": 0.0766, "10y+": 0.0541}
+      APAC: {"<1y": 0.1481, "1–3y": 0.1206, "3–5y": 0.1097, "5–10y": 0.0932, "10y+": 0.0658}
+    Other:
+      AMER: {"<1y": 0.1555, "1–3y": 0.1267, "3–5y": 0.1152, "5–10y": 0.0979, "10y+": 0.0691}
+      EMEA: {"<1y": 0.1431, "1–3y": 0.1166, "3–5y": 0.1060, "5–10y": 0.0901, "10y+": 0.0636}
+      APAC: {"<1y": 0.1742, "1–3y": 0.1419, "3–5y": 0.1290, "5–10y": 0.1097, "10y+": 0.0774}
+movement:
+  promotion_annual: 0.08
+  transfer_annual: 0.06
+  standalone_manager_change_annual: 0.05
+compensation:
+  cycle_month: 4
+performance:
+  score_min: 1
+  score_max: 5
+learning:
+  training_events_per_year: 1000
+skills:
+  per_worker: [5, 12]
+recruiting:
+  openings_vs_hires_cancel_rate: 0.10
+  applications_per_opening: [12, 20]  # superseded; use apps_median_by_family
+  apps_median_by_family:
+    Engineering: 150
+    Sales: 80
+    Exec: 20
+    Other: 100
+  apps_lognormal_sigma: 0.55
+  source_mix: {inbound: 0.75, referral: 0.08, sourced: 0.12, internal: 0.05}
+  review_to_screen:
+    inbound: 0.10
+    referral: 0.40
+    sourced: 0.60
+    internal: 0.45
+  inbound_review_quick_reject: 0.65
+  screen_to_onsite: 0.50
+  onsite_to_offer: 0.40
+  stages: [Application Review, Phone Screen, Onsite, Offer]
+  offer_acceptance: [0.80, 0.90]
+  time_to_fill_lognormal:
+    median_days: 32
+    sigma: 0.72
+    lo: 10
+    hi: 240
+  stage_dwell_lognormal:
+    Application Review: {median: 6, sigma: 0.70, lo: 1, hi: 90}
+    Phone Screen: {median: 5, sigma: 0.65, lo: 1, hi: 60}
+    Onsite: {median: 8, sigma: 0.80, lo: 2, hi: 120}
+    Offer: {median: 4, sigma: 0.60, lo: 1, hi: 45}
+    quick_reject_review: {median: 2, sigma: 0.40, lo: 1, hi: 8}
+  case4_slow_hm_tail:
+    extra_ttf_median_days: 18
+    extra_ttf_sigma: 0.85
+    extra_onsite_median_days: 12
+    extra_onsite_sigma: 0.90
+  calibration: >
+    Applications per opening: Greenhouse Recruiting Benchmarks Report 2023 and Ashby
+    2024 Compensations & Benchmarks (tech inbound often 50–200; engineering above
+    sales; exec/sourced-heavy roles far lower). Source mix: Jobvite 2023 Recruiting
+    Benchmark (inbound majority, referral high-intent, sourced agency/outbound).
+    Review→Screen conversion: Jobvite/LinkedIn Talent Solutions — inbound ~10%,
+    referral ~4× inbound, sourced pre-qualified ~50–60%. Inbound 60–80% rejected in
+    Application Review within days after lognormal stage dwell (quick-reject median 2 days).
+    Cancelled openings ~10% of reqs: SHRM Talent Acquisition Benchmarking (cancelled
+    / frozen reqs). Time-to-fill later compared to SHRM median ~40–45 days (tech longer).
+engagement:
+  waves_per_year: 2
+  items: 12
+  dimensions: 4
+  response_rate: [0.70, 0.85]
+employment_type_master:
+  # ERPNext Employment Type fixture names + custom Regular. Certified set is owner-pending (BR-WF-001).
+  - name: Full-time
+    source: erpnext_fixture
+    in_certified_headcount: true
+  - name: Part-time
+    source: erpnext_fixture
+    in_certified_headcount: true
+  - name: Probation
+    source: erpnext_fixture
+    in_certified_headcount: true
+  - name: Intern
+    source: erpnext_fixture
+    in_certified_headcount: false
+    headcount_class: intern
+  - name: Contract
+    source: erpnext_fixture
+    in_certified_headcount: false
+    headcount_class: contingent
+  - name: Commission
+    source: erpnext_fixture
+    in_certified_headcount: false
+    headcount_class: other
+  - name: Piecework
+    source: erpnext_fixture
+    in_certified_headcount: false
+    headcount_class: other
+  - name: Apprentice
+    source: custom
+    in_certified_headcount: false
+    headcount_class: intern
+  - name: Regular
+    source: custom
+    in_certified_headcount: false
+    note: Owner signed drop 2026-09-02. Engine emits Full-time.
+extract:
+  frappe_dims: daily_full
+  frappe_documents: incremental_modified
+  frappe_weekly_full: true
+  frappe_employee_full_extract_dow: Friday
+  greenhouse: incremental_updated_after
+  greenhouse_weekly_full: true
+ops:
+  supabase_project_ref: zapmigfrtnwnkmezjefx
+  supabase_project: PeopleAnalyticsAI.net
+  supabase_compute: micro
+  supabase_disk_quota_bytes: 8589934592
+  supabase_min_headroom_bytes: 2147483648
+  supabase_expected_backfill_delta_bytes: 6442450944
+  expected_backfill_delta_gb: [4, 6]
+  expected_backfill_delta_admission: high_end
+  blocked_supabase_refs:
+    - fyvivwgyisrtmehzjqlv
+    - kgxbomcmgkwlmzyevqjw
+  supabase_plan: micro_8gb_spend_cap_on
+  stage_event_hot_window_months: 12
+  publish_pooler: session
+  publish_pooler_port: 5432
+  app_pooler: transaction
+  app_pooler_port: 6543
+  sslmode: require
+  rpc_set_config_is_local: true
+  people_app_login: nologin_until_step_7
+  people_publisher_login: env_only
+  people_v2_user_tables: 0
+  people_v2_data_api: revoked
+  postgres_hot_window_months:
+    fact_application: 12
+    evt_application_stage: 12
+    fact_interview: 12
+    fact_scorecard: 12
+    dim_candidate: 12
+  disk_gate: fail_closed_occupied_plus_delta
+  disk_gate_note: Refuse when quota is missing. Admission is occupied + supabase_measured_people_v2_bytes × 1.3 ≤ quota − 2 GiB. measured comes from 5% people_v2 pg_total_relation_size × 20 (step 6a-3), not parquet × 2.8. A7 is lake_only when that full estimate exceeds 4.5 GiB; marts still exist in both branches.
+  postgres_publish_restricted_person_level: as_designed
+  postgres_restricted_fallback_reason: null
+  supabase_measured_people_v2_bytes: 4430561280
+  publish_segments:
+    - dims_xw
+    - facts_events
+    - snapshots
+    - marts

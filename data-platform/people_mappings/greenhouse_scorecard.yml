@@ -1,0 +1,75 @@
+canonical_version: people_v2
+gate: 1
+note: overall_recommendation ← candidate_rating. submitted_by ← submitter_id. interview_id via BR-TA-008.
+source_contract:
+  pin: schemas/fields/scorecard.fields.json
+fields:
+- canonical_table: people_fact_scorecard
+  canonical_field: scorecard_id
+  source_system: greenhouse_v3
+  source_object: scorecard
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: submitted_at
+  provenance: CANONICAL_KEY
+  business_definition: Scorecard.id.
+  source_field: id
+- canonical_table: people_fact_scorecard
+  canonical_field: application_id
+  source_system: greenhouse_v3
+  source_object: scorecard
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: submitted_at
+  provenance: SOURCE_NATIVE
+  business_definition: Application.
+  source_field: application_id
+- canonical_table: people_fact_scorecard
+  canonical_field: interview_id
+  source_system: greenhouse_v3
+  source_object: scorecard
+  transformation: join interview on application_id and job_interview_id/interview_kit (BR-TA-008)
+  nullable: true
+  data_type: bigint
+  effective_date_logic: interviewed_at
+  provenance: DERIVED
+  business_definition: Scorecard has interview_kit_id, not interview_id.
+  source_fields:
+  - application_id
+  - interview_kit_id
+  - interviewed_at
+- canonical_table: people_fact_scorecard
+  canonical_field: submitted_by_person_id
+  source_system: greenhouse_v3
+  source_object: scorecard
+  transformation: submitter_id → user.employee_id → person_id
+  nullable: true
+  data_type: uuid
+  effective_date_logic: submitted_at
+  provenance: DERIVED
+  business_definition: Harvest field is submitter_id.
+  source_field: submitter_id
+- canonical_table: people_fact_scorecard
+  canonical_field: submitted_at
+  source_system: greenhouse_v3
+  source_object: scorecard
+  transformation: identity
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: submitted_at
+  provenance: SOURCE_NATIVE
+  business_definition: Submit time. Null while draft.
+  source_field: submitted_at
+- canonical_table: people_fact_scorecard
+  canonical_field: overall_recommendation
+  source_system: greenhouse_v3
+  source_object: scorecard
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: submitted_at
+  provenance: SOURCE_NATIVE
+  business_definition: Harvest field is candidate_rating.
+  source_field: candidate_rating

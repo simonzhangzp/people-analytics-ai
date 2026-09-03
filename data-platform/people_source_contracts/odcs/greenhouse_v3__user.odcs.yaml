@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:user
+info:
+  title: user
+  version: 1.0.0
+  description: employee_id is T8. Do not use primary_email.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/user/extract_date={date}/run_id={id}/
+schema:
+- name: user
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/user
+  primaryKey:
+  - id
+  description: employee_id is T8. Do not use primary_email.
+extract:
+  mode: full
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

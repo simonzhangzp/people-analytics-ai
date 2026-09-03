@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:bls:timeseries
+info:
+  title: timeseries
+  version: 1.0.0
+  description: trust data_only. Calibration only.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/bls/timeseries/extract_date={date}/run_id={id}/
+schema:
+- name: timeseries
+  physicalType: parquet
+  physicalName: people_bronze/bls/timeseries
+  primaryKey:
+  - seriesID+period
+  description: trust data_only. Calibration only.
+extract:
+  mode: full
+  cadence: monthly
+  key: seriesID+period
+  control_total_source: count of observations in the BLS response
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 720
+piiClassification: public

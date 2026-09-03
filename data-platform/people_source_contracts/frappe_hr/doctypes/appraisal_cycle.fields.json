@@ -1,0 +1,107 @@
+{
+  "name": "Appraisal Cycle",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "field:cycle_name",
+  "fields": [
+    {
+      "fieldname": "start_date",
+      "label": "Start Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "end_date",
+      "label": "End Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "description",
+      "label": null,
+      "fieldtype": "Text Editor",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "branch",
+      "label": "Branch",
+      "fieldtype": "Link",
+      "options": "Branch",
+      "reqd": null
+    },
+    {
+      "fieldname": "department",
+      "label": "Department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "reqd": null
+    },
+    {
+      "fieldname": "designation",
+      "label": "Designation",
+      "fieldtype": "Link",
+      "options": "Designation",
+      "reqd": null
+    },
+    {
+      "fieldname": "get_employees",
+      "label": "Get Employees",
+      "fieldtype": "Button",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": 1
+    },
+    {
+      "fieldname": "appraisees",
+      "label": null,
+      "fieldtype": "Table",
+      "options": "Appraisee",
+      "reqd": null
+    },
+    {
+      "fieldname": "cycle_name",
+      "label": "Cycle Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "kra_evaluation_method",
+      "label": "KRA Evaluation Method",
+      "fieldtype": "Select",
+      "options": "Automated Based on Goal Progress\nManual Rating",
+      "reqd": null
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Not Started\nIn Progress\nCompleted",
+      "reqd": null
+    },
+    {
+      "fieldname": "final_score_formula",
+      "label": "Final Score Formula",
+      "fieldtype": "Code",
+      "options": "PythonExpression",
+      "reqd": null
+    },
+    {
+      "fieldname": "calculate_final_score_based_on_formula",
+      "label": "Calculate Final Score based on Formula",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

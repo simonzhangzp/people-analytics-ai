@@ -1,0 +1,37 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "rejection_reason",
+  "harvest_path_hint": "/v3/rejection_reasons",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "format": null,
+      "description": "Display label shown to recruiters when rejecting a candidate (e.g. `Not a cultural fit`, `Lacking skill(s)/qualification(s)`, `Wasn't interested`, `Didn't like offer`, `Spam`). Unique within the organization. Free-text, since each organization customizes its own list under Configure > Custom Options > Rejection Reasons. Reason categorization (hire/non-hire, we vs. they rejected) is conveyed by the nested `type` rather than by the name."
+    },
+    {
+      "name": "type",
+      "type": "object",
+      "format": null,
+      "description": "The rejection reason type this reason rolls up to \u2014 the categorization Greenhouse uses to interpret outcomes in reporting. Reasons grouped under `We rejected them` mean the organization declined the candidate, `They rejected us` mean the candidate withdrew or declined an offer, `Security concern` flags fraud or other trust signals, and `None specified` is the catch-all. The `Security concern` type is only returned when the `enable_reject_as_security_concern` product flag is on for the organization."
+    }
+  ]
+}

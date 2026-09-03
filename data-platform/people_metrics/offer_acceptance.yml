@@ -1,0 +1,17 @@
+metric_id: offer_acceptance
+status: certified
+grain: people_fact_offer
+numerator:
+  rule: BR-TA-007
+  param: map
+  value: accepted
+denominator:
+  rule: BR-TA-007
+  param: map
+  values: [accepted, rejected]
+transaction_integrity:
+  hires_equals: accepted
+  opening_on_reject: remain_open
+sandbox:
+  rule_kind: parametric
+  rpc: people_get_metric_sandbox

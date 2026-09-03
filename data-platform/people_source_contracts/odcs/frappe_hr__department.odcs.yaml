@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Department
+info:
+  title: Department
+  version: 1.0.0
+  description: Org spine.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Department/extract_date={date}/run_id={id}/
+schema:
+- name: Department
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Department
+  primaryKey:
+  - name
+  description: Org spine.
+extract:
+  mode: full
+  cadence: daily
+  key: name
+  control_total_source: count of Department rows
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

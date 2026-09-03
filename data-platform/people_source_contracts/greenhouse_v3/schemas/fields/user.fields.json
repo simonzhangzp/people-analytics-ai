@@ -1,0 +1,136 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "user",
+  "harvest_path_hint": "/v3/users",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "first_name",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "last_name",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "primary_email",
+      "type": "string",
+      "format": null,
+      "description": "Primary email address on the user's account. Sign-in identifier and the address Greenhouse uses for outbound mail; additional verified addresses are not surfaced here. Service accounts (integration/ISU users) have no email and are excluded from this endpoint by default; when included via `show_service_accounts=true`, their `primary_email` is an empty string."
+    },
+    {
+      "name": "job_title",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Free-form job title set on the user's Greenhouse profile (e.g. `Senior Recruiter`). Not synchronized with any HRIS title."
+    },
+    {
+      "name": "agency_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the staffing agency this user belongs to, when the user is an external agency recruiter rather than an employee of your organization. `null` for in-house users."
+    },
+    {
+      "name": "name",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Concatenation of `first_name` and `last_name` rendered as a single display string. Provided for convenience; partners that need either component should read `first_name`/`last_name` directly."
+    },
+    {
+      "name": "deactivated",
+      "type": "boolean",
+      "format": null,
+      "description": "Whether the user has been deactivated. Deactivated users cannot sign in or be assigned to new jobs, but their historical activity (notes, scorecards, emails) is preserved. Toggle via `POST /v3/users/{id}/deactivate` and `POST /v3/users/{id}/activate`."
+    },
+    {
+      "name": "site_admin",
+      "type": "boolean",
+      "format": null,
+      "description": "Whether the user holds the Site Admin role. Site admins have unrestricted access to every non-confidential job and to organization-level settings. Demote a site admin to a Basic user with `POST /v3/users/{id}/revoke_permissions`."
+    },
+    {
+      "name": "employee_id",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Partner-supplied external employee identifier, typically the user's HRIS or payroll id. Free-form string; not unique across organizations and `null` when no employee id has been set."
+    },
+    {
+      "name": "linked_candidate_ids",
+      "type": "array",
+      "format": null,
+      "description": "Ids of candidate records linked to this user. Populated when an employee is represented by both a user record (for Greenhouse access) and a candidate record (for past or internal applications)."
+    },
+    {
+      "name": "office_ids",
+      "type": "array",
+      "format": null,
+      "description": "Ids of the offices this user is assigned to. Used to scope future job permissions and to filter the user list by office. Empty when the user is not pinned to any office."
+    },
+    {
+      "name": "department_ids",
+      "type": "array",
+      "format": null,
+      "description": "Ids of the departments this user is assigned to. Used to scope future job permissions and to filter the user list by department. Empty when the user is not pinned to any department."
+    },
+    {
+      "name": "interviewer_tags",
+      "type": "array",
+      "format": null,
+      "description": "Interviewer tags applied to this user \u2014 the labeled skill or panel groupings (e.g. `Senior Engineer`, `Bar Raiser`) used to suggest qualified interviewers when building an interview plan. Each entry pairs the tag's `id` with its `name`."
+    },
+    {
+      "name": "emails",
+      "type": "array",
+      "format": null,
+      "description": "All email addresses on the user's account, including the primary address and any additional verified addresses."
+    },
+    {
+      "name": "custom_fields",
+      "type": [
+        "object",
+        "null"
+      ],
+      "format": null,
+      "description": null
+    }
+  ]
+}

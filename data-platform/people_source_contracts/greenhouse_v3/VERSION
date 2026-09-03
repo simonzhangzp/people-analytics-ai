@@ -1,0 +1,12 @@
+{
+  "product": "Greenhouse Harvest API",
+  "version": "v3",
+  "docs": "https://harvestdocs.greenhouse.io/reference/get_v3-applications",
+  "openapi": "3.1.0",
+  "openapi_info": {
+    "title": "Harvest API",
+    "version": "v3"
+  },
+  "pinned_from": "embedded OpenAPI in harvestdocs.greenhouse.io HTML",
+  "note": "Harvest v1/v2 are deprecated. days_in_stage on application_stages is a source-computed field; canonical time_in_stage uses entered_at/exited_at."
+}

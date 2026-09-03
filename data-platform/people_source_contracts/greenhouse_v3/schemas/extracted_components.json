@@ -1,0 +1,2336 @@
+{
+  "application_stage": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "application_id": {
+        "type": "integer",
+        "description": "Id of the application this stage entry belongs to."
+      },
+      "job_interview_stage_id": {
+        "type": "integer",
+        "description": "Id of the interview stage occupied during this entry. References a `/v3/job_interview_stages` row scoped to the application's job."
+      },
+      "entered_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the application entered this stage, in ISO 8601. `null` only for backfilled or partially recorded history."
+      },
+      "exited_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the application left this stage, in ISO 8601. `null` while the application is still in this stage (the current stage entry)."
+      },
+      "days_in_stage": {
+        "type": "integer",
+        "description": "Whole number of calendar days the application has spent in this stage, computed as `exited_at - entered_at` for past stages and `now - entered_at` for the current stage."
+      },
+      "current": {
+        "type": "boolean",
+        "description": "`true` when this row represents the application's current interview stage; `false` for past stage entries in the candidate's history."
+      }
+    }
+  },
+  "application": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "agency_note_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the note created when the candidate was submitted by an agency, or `null` if the application did not come through an agency."
+      },
+      "candidate_id": {
+        "type": "integer",
+        "description": "Id of the candidate (person) this application belongs to."
+      },
+      "coordinator_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the user assigned as coordinator on the application's job, or `null` when unassigned."
+      },
+      "job_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the job this application is on. `null` for jobless prospect applications."
+      },
+      "job_post_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the job post the candidate applied through, or `null` if the application was created internally rather than from a posted role."
+      },
+      "recruiter_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the user assigned as recruiter on the application's job, or `null` when unassigned."
+      },
+      "referrer_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the referrer who credited this application, or `null` if there was no referral. References a referrer, not a Greenhouse user."
+      },
+      "rejection_reason_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the rejection reason selected for the application. References a `/v3/rejection_reasons` row scoped to the organization. `null` when the application was rejected without a reason, or has not been rejected."
+      },
+      "source_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the source the application is attributed to (e.g. a job board, an event, an employee referral source). `null` if no source is set."
+      },
+      "stage_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the interview stage the candidate is currently in for this application. `null` for prospect applications and applications in a terminal state."
+      },
+      "job_interview_stage_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the job interview stage definition (see `GET /v3/job_interview_stages`) the candidate is currently in for this application. `null` for prospect applications and applications in a terminal state."
+      },
+      "stage_name": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Display name of the candidate's current interview stage on this application."
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "rejected",
+          "hired",
+          "converted",
+          "in_process"
+        ],
+        "description": "Lifecycle status of the application. `in_process` for active candidates, `rejected` for rejected applications, `hired` once an offer is closed and the hire endpoint has fired, and `converted` for prospect applications that have been promoted to a candidate application via `convert_to_candidate`."
+      },
+      "needs_decision": {
+        "type": [
+          "boolean",
+          "null"
+        ],
+        "description": "`true` when the application is waiting on a hiring-team decision (scorecard completion, advance/reject, etc.) in its current stage."
+      },
+      "prospect": {
+        "type": "boolean",
+        "description": "`true` for prospect applications (sourced candidates not yet attached to a single job), `false` for candidate applications on a specific job."
+      },
+      "rejected_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the application was rejected, in ISO 8601. `null` for applications that have not been rejected."
+      },
+      "last_activity_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp of the most recent activity on this application (notes, emails, stage changes, etc.), in ISO 8601."
+      },
+      "location_address": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Free-form location string captured on the application (typically from the job post's location question)."
+      },
+      "answers": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "object",
+          "properties": {
+            "question": {
+              "type": "string",
+              "description": "Application-form question the candidate answered."
+            },
+            "answer": {
+              "type": "string",
+              "description": "Candidate's free-text answer to the question."
+            }
+          }
+        },
+        "description": "Free-text answers the candidate provided on the job post application form. Each entry pairs the question text with the candidate's answer."
+      },
+      "prospective_job_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "description": "For prospect applications, the ids of jobs the prospect is being considered for. Empty for non-prospect applications and for jobless prospects."
+      },
+      "custom_fields": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "type",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "array",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "approval_flow": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "job_id": {
+        "type": "integer",
+        "description": "Id of the job (hiring plan) this approval flow belongs to. References a `/v3/jobs` row."
+      },
+      "offer_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the specific offer this approval flow gates. Set only for `offer_candidate` flows attached to a real offer; null on the `open_job` and `offer_job` flows (which gate the job itself), and null on the `offer_candidate` prototype flow that lives on the job before any offer is created."
+      },
+      "approval_type": {
+        "type": "string",
+        "enum": [
+          "open_job",
+          "offer_job",
+          "offer_candidate"
+        ],
+        "description": "What this flow approves. `open_job` gates opening the job for recruiting, `offer_job` gates allowing offers to be created on the job, and `offer_candidate` gates extending an individual offer to a candidate (one flow per offer, plus a prototype on the job)."
+      },
+      "sequential": {
+        "type": "boolean",
+        "description": "When `true`, approver groups resolve one at a time in `sort_order` \u2014 only after the current group resolves as approved are the next group's approvers asked. When `false`, all groups are activated in parallel as soon as the flow is started."
+      },
+      "version": {
+        "type": "integer",
+        "description": "Monotonically increasing revision counter for this approval flow. Job approval flows increment when system fields (e.g., department, requisition id, openings) or custom fields marked as triggering re-approval change after the flow has started. Use this together with an approver's `version_sent` to tell whether a pending approver is responding to the current version or a stale request. Offer approval flows attached to a specific `offer_id` are always version 1."
+      },
+      "requested_by_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the user who started the flow by requesting approvals (the V3 `request_approvals` endpoint, or the in-app \"Request Approval\" button). References a `/v3/users` row. Null until the flow has been started \u2014 approver groups exist but no emails have been sent."
+      },
+      "approval_status": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "pending",
+          "rejected",
+          "approved",
+          null
+        ],
+        "description": "Denormalized terminal state of the flow, computed from the underlying approvers. `pending` while any group is still unresolved, `approved` once every group has reached its `approvals_required` threshold, `rejected` once any group has accumulated enough rejections to be unrecoverable. Updates to `sequential` and `replace_approver_groups` are only allowed while `pending`."
+      }
+    }
+  },
+  "candidate": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "first_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "last_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "preferred_name": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Preferred or chosen name the candidate goes by, when different from their legal first name."
+      },
+      "company": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Candidate's current company, as entered on their profile."
+      },
+      "title": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Candidate's current job title, as entered on their profile."
+      },
+      "last_activity_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp of the most recent activity on any of the candidate's applications (notes, emails, stage changes, etc.), in ISO 8601."
+      },
+      "private": {
+        "type": [
+          "boolean",
+          "null"
+        ],
+        "description": "If true, the candidate is restricted to users with `View Private Candidates` access. Defaults to `false`."
+      },
+      "can_email": {
+        "type": "boolean",
+        "description": "Whether this candidate has consented to receive email communication from your organization."
+      },
+      "time_zone": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Candidate's time zone as a Rails-style identifier (for example `Eastern Time (US & Canada)`)."
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Candidate tag names applied to this candidate within your organization."
+      },
+      "linked_user_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "description": "Ids of Greenhouse users linked to this candidate (employees represented by both a user record and a candidate record)."
+      },
+      "phone_numbers": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Phone numbers on the candidate's profile. Each entry pairs the `value` with a `type` such as `mobile`, `home`, `work`, `skype`, or `other`. Ordered by type \u2014 `home`, `work`, `mobile`, `skype`, then `other` \u2014 and oldest first within a type."
+      },
+      "addresses": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Postal addresses on the candidate's profile. Each entry pairs the `value` with a `type` such as `home`, `work`, or `other`. Ordered oldest first."
+      },
+      "email_addresses": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Email addresses on the candidate's profile. Each entry pairs the `value` with a `type` such as `personal`, `work`, or `other`. Ordered by most recently updated, and oldest first among entries last updated at the same time."
+      },
+      "website_addresses": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Personal websites or portfolio URLs on the candidate's profile. Each entry pairs the `value` with a `type` such as `personal`, `company`, `portfolio`, `blog`, or `other`. Ordered oldest first."
+      },
+      "social_media_addresses": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Social media handles or URLs on the candidate's profile. Social entries are untyped \u2014 only the `value` is returned. Ordered oldest first."
+      },
+      "custom_fields": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "type",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "array",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "demographic_answer_option": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "demographic_question_id": {
+        "type": "integer",
+        "description": "Id of the parent `demographic_question` this option belongs to. Options are scoped to a single question and never shared across questions."
+      },
+      "sort_order": {
+        "type": "integer",
+        "description": "Display position within the parent question's choice list, ascending. Lower values render first; aliased from the underlying `priority` column."
+      },
+      "active": {
+        "type": "boolean",
+        "description": "`true` while the option is still selectable by applicants; `false` after it has been soft-removed. Inactive options are returned by default \u2014 pass `active=true` to filter to live options only. Past `demographic_answers` continue to reference inactive rows so historical applicant submissions stay readable."
+      },
+      "free_form": {
+        "type": "boolean",
+        "description": "If `true`, selecting this option prompts the applicant for a free-text response (e.g. an `I prefer to self-describe` choice). The free-text content itself is not exposed via Harvest."
+      },
+      "name": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Display label shown to applicants in the answer list (e.g. `Non-binary`, `I prefer to self-describe`). `null` on standard Greenhouse-supplied options whose label is rendered from a localized template rather than this column."
+      },
+      "decline_to_answer": {
+        "type": [
+          "boolean",
+          "null"
+        ],
+        "description": "`true` when this option represents a structured `I don't wish to answer` choice; prefer this flag over matching on `name` when classifying declines. `null` on custom-organization options where the flag was never set; treat `null` as not a decline."
+      }
+    }
+  },
+  "demographic_answer": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "application_id": {
+        "type": "integer",
+        "description": "Id of the application this answer was submitted on. Demographic answers are scoped to a single application; if the same candidate applies to another job they re-answer the questionnaire and a new set of answers is created."
+      },
+      "demographic_question_id": {
+        "type": "integer",
+        "description": "Id of the `demographic_question` this answer responds to. One application produces at most one row per question per `demographic_answer_option`."
+      },
+      "demographic_answer_option_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the `demographic_answer_option` the applicant selected. `null` when the applicant skipped the question, when the question is multi-select and this row carries only the free-form text, or when the option has since been hard-deleted. For multi-select questions one row is returned per chosen option."
+      },
+      "free_form_text": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Applicant-supplied text for `free_form` answer options (e.g. an `Other \u2014 please describe` choice). `null` when the selected option is not marked free-form or when no text was entered. Highly sensitive self-identification data \u2014 handle with the same care as EEOC responses."
+      }
+    }
+  },
+  "demographic_question_set": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "title": {
+        "type": "string",
+        "description": "Name of the demographic question set, unique within the organization among active sets. Used as the section header for the grouping when the set is attached to a job post or candidate survey."
+      },
+      "description": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "External-facing copy shown to applicants above the questions on a job post or candidate survey, explaining why the organization is collecting this data. Required once any question in the set is marked `required`; otherwise optional."
+      },
+      "active": {
+        "type": "boolean",
+        "description": "`true` for sets currently in use; `false` after the set has been soft-removed (which also marks its `demographic_questions` inactive). Inactive sets are returned by default \u2014 pass `active=true` to filter to live sets only. Past applications continue to reference inactive sets so historical demographic responses stay readable."
+      },
+      "enabled": {
+        "type": [
+          "boolean",
+          "null"
+        ],
+        "description": "Whether the set is available for selection on new job posts and candidate surveys. `true` and `null` both mean enabled (legacy rows predate the column and are treated as enabled); pass `enabled=false` to filter to sets the organization has explicitly disabled."
+      }
+    }
+  },
+  "demographic_question": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "sort_order": {
+        "type": "integer",
+        "description": "Position of this question within its `demographic_question_set`, ascending. Lower values render first; aliased from the underlying `priority` column."
+      },
+      "active": {
+        "type": "boolean",
+        "description": "`true` when the question is in use on its set; `false` after it has been soft-removed. Inactive questions are returned by default \u2014 pass `active=true` to filter to live questions only. Past `demographic_answers` continue to reference inactive rows so historical applicant submissions stay readable."
+      },
+      "name": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Prompt text shown to applicants (e.g. `How would you describe your gender identity?`). `null` on standard Greenhouse-supplied questions where the displayed prompt is rendered by the candidate-facing application from a localized template rather than this column."
+      },
+      "demographic_question_set_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the `demographic_question_set` this question belongs to. A set is what gets attached to a job post or candidate survey; questions are scoped to one set and never shared across sets. `null` for legacy questions not yet associated with a set."
+      },
+      "required": {
+        "type": [
+          "boolean",
+          "null"
+        ],
+        "description": "If `true`, applicants must select an answer (or the auto-added `I don't wish to answer` option) before submitting the application. Standard Greenhouse-supplied questions return `null` since their requiredness is controlled at the question-set level."
+      },
+      "answer_type": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "multi_value_single_select",
+          "multi_value_multi_select"
+        ],
+        "description": "Shape of the answer the applicant can submit. `multi_value_single_select` is a single-choice question; `multi_value_multi_select` lets the applicant pick more than one option. Both types draw their choices from `/v3/demographic_answer_options?demographic_question_id={id}`. Free-text demographic questions are not supported."
+      }
+    }
+  },
+  "department": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "name": {
+        "type": "string",
+        "description": "Display name of the department (e.g. `Engineering`, `Marketing`)."
+      },
+      "parent_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the parent department in the organization's department tree. `null` for top-level departments. References another `/v3/departments` row."
+      },
+      "external_id": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Partner-supplied identifier for the department, typically the matching id from an HRIS or other external system. Free-form string and `null` when no external id has been set."
+      }
+    }
+  },
+  "eeoc": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "application_id": {
+        "type": "integer",
+        "description": "Id of the application this EEOC response is attached to. Each application has at most one EEOC response."
+      },
+      "candidate_id": {
+        "type": "integer",
+        "description": "Id of the candidate (person) who submitted this response \u2014 the application's owner."
+      },
+      "gender": {
+        "type": "object",
+        "description": "Self-identified gender. `id` and `description` are `null` when the candidate skipped the question. The fixed enum values for `description` are `Male`, `Female`, and `Decline To Self Identify`.",
+        "properties": {
+          "id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "race": {
+        "type": "object",
+        "description": "Self-identified race or ethnicity. `id` and `description` are `null` when the candidate skipped the question. The fixed enum values for `description` are `American Indian or Alaskan Native`, `Asian`, `Black or African American`, `Hispanic or Latino`, `White`, `Native Hawaiian or Other Pacific Islander`, `Two or More Races`, and `Decline To Self Identify`.",
+        "properties": {
+          "id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "veteran_status": {
+        "type": "object",
+        "description": "Self-identified protected-veteran status under VEVRAA. `id` and `description` are `null` when the candidate skipped the question. The fixed enum values for `description` are `I am not a protected veteran`, `I identify as one or more of the classifications of a protected veteran`, and `I don't wish to answer`.",
+        "properties": {
+          "id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "disability_status": {
+        "type": "object",
+        "description": "Self-identified disability status under Section 503. `id` and `description` are `null` when the candidate skipped the question. The fixed enum values for `description` are `Yes, I have a disability, or have had one in the past`, `No, I do not have a disability and have not had one in the past`, and `I do not want to answer`.",
+        "properties": {
+          "id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "submitted_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the candidate submitted the EEOC questionnaire, in ISO 8601. `null` while the questionnaire has been requested but not yet responded to."
+      }
+    }
+  },
+  "interview": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "job_id": {
+        "type": "integer",
+        "description": "Id of the job this interview is on."
+      },
+      "application_id": {
+        "type": "integer",
+        "description": "Id of the application this interview is scheduled against. Use it to look up the candidate."
+      },
+      "job_interview_id": {
+        "type": "integer",
+        "description": "Id of the job interview slot on the job's interview plan that this interview fulfills. Distinct from this interview's own `id`."
+      },
+      "starts_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Interview start time, in ISO 8601. `null` for interviews that have not yet been scheduled (for example, assigned take-home tests or interviews awaiting candidate availability) and for all-day events \u2014 see `all_day_start_on`."
+      },
+      "ends_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Interview end time, in ISO 8601. `null` when `starts_at` is also `null`, and for all-day events \u2014 see `all_day_end_on`."
+      },
+      "location": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Free-form location string copied from the calendar event (a room name, an address, or a meeting URL when the customer puts it in the location field). Use `video_conferencing_url` for the link generated by Greenhouse's video integrations."
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "to_be_scheduled",
+          "scheduled",
+          "awaiting_feedback",
+          "complete",
+          "skipped",
+          "collect_feedback",
+          "to_be_sent",
+          "sent",
+          "received"
+        ],
+        "description": "Lifecycle status of the interview. `to_be_scheduled` is the pre-schedule placeholder; `scheduled` is on the calendar; `awaiting_feedback` is past with scorecards outstanding; `complete` is past with all scorecards in; `collect_feedback` and `skipped` are alternative terminal states; `to_be_sent`, `sent`, and `received` are used for take-home tests sent through Greenhouse."
+      },
+      "organizer_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the Greenhouse user who scheduled the interview (the organizer on the underlying calendar event). `null` for interviews not yet scheduled through a calendar integration."
+      },
+      "scheduled_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the interview was first placed on a calendar through a Greenhouse calendaring integration (Google, Outlook, or Greenhouse Schedule), in ISO 8601. `null` for interviews that have never been scheduled via the calendar pipeline."
+      },
+      "all_day_start_on": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date",
+        "description": "Start date of an all-day interview, in `YYYY-MM-DD`. Set instead of `starts_at`/`ends_at` when the underlying calendar event is an all-day event. `null` for time-bounded interviews."
+      },
+      "all_day_end_on": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date",
+        "description": "End date of an all-day interview, in `YYYY-MM-DD`. Set instead of `starts_at`/`ends_at` when the underlying calendar event is an all-day event. `null` for time-bounded interviews."
+      },
+      "external_event_id": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Id of the calendar event on the organizer's calendar (Google Calendar event id, Outlook event id, etc.). Use this to correlate an interview with the event on the external calendar. `null` for interviews not yet pushed to an external calendar."
+      },
+      "video_conferencing_url": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Join URL for the interview's video conference, auto-populated by Greenhouse's Zoom, Google Meet, or Microsoft Teams integrations when one is attached during scheduling. `null` when no video conferencing was added."
+      },
+      "availability_received_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp Greenhouse first recorded availability for this interview's stage on this application (used to compute time-to-schedule), in ISO 8601. `null` if availability has not been collected for the stage."
+      }
+    }
+  },
+  "job_interview_stage": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "job_id": {
+        "type": "integer",
+        "description": "Id of the job whose interview plan this stage belongs to."
+      },
+      "sort_order": {
+        "type": "integer",
+        "description": "Position of this stage within the job's interview plan, ascending. The first stage (typically `Application Review`) is `0`; `Offer` is always last."
+      },
+      "name": {
+        "type": "string",
+        "description": "Name of the stage as it appears on the job's interview plan (e.g. `Application Review`, `Phone Screen`, `Onsite`, `Offer`). `Application Review` and `Offer` are added to every plan; intermediate stages can be picked from the Greenhouse library or created custom per job."
+      },
+      "active": {
+        "type": "boolean",
+        "description": "Whether the stage is on the job's current interview plan. Inactive stages are retained so that historical `application_stages` rows continue to resolve, but no new applications enter them."
+      }
+    }
+  },
+  "job_interview": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "job_interview_stage_id": {
+        "type": "integer",
+        "description": "Id of the `job_interview_stage` this slot belongs to (the section of the job's interview plan, e.g. \"Onsite\")."
+      },
+      "job_id": {
+        "type": "integer",
+        "description": "Id of the job whose interview plan this slot is defined on."
+      },
+      "sort_order": {
+        "type": "integer",
+        "description": "Position of this slot within its `job_interview_stage`, ascending. The first interview in the stage is `1`."
+      },
+      "scheduling_type": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "none",
+          "needs_scheduling",
+          "take_home_test",
+          "offer",
+          null
+        ],
+        "description": "How the slot is fulfilled when a candidate hits the stage. `needs_scheduling` is a calendared interview that coordinators book against candidate availability; `take_home_test` is an asynchronous test sent through Greenhouse; `offer` is the offer step; `none` is a feedback-only slot (no scheduling). `null` for legacy steps with no scheduling type set."
+      },
+      "duration": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Default length of the interview in minutes, used to seed the scheduler. `null` if not set on the slot."
+      },
+      "summary": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Candidate-facing summary copied from the interview's default Interview Prep when the slot was added to the job. Snapshot only \u2014 edits made later in the job's Interview Kit are not reflected here; use the Interview Kits endpoint for the live value."
+      },
+      "instructions": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Interviewer-facing instructions copied from the interview's default Interview Prep when the slot was added to the job. Snapshot only \u2014 edits made later in the job's Interview Kit are not reflected here; use the Interview Kits endpoint for the live value."
+      },
+      "name": {
+        "type": "string",
+        "description": "Name of the interview slot as it appears on the job's interview plan (e.g. \"Recruiter Phone Screen\", \"Hiring Manager Interview\")."
+      },
+      "active": {
+        "type": "boolean",
+        "description": "Whether the slot is on the job's current interview plan. Inactive slots are retained for historical interviews that were scheduled against them but are not used for new applications."
+      },
+      "require_scorecard": {
+        "type": [
+          "boolean",
+          "null"
+        ],
+        "description": "Whether interviewers must submit a scorecard for interviews scheduled against this slot. Only meaningful for `needs_scheduling` and `take_home_test` slots; `null` for `none` and `offer` slots, which never collect scorecards."
+      }
+    }
+  },
+  "job": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "name": {
+        "type": "string",
+        "description": "Internal job title shown to the hiring team in Greenhouse (e.g. `Senior Backend Engineer`). Distinct from the external-facing title on each `job_post`."
+      },
+      "requisition_id": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Partner-supplied external identifier for the requisition (e.g. an HRIS or ATS code). Free-form string, not unique across the organization, and `null` when no external id has been set."
+      },
+      "notes": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Internal HTML notes about the job, surfaced to the hiring team in the Greenhouse UI. Not exposed on public job posts."
+      },
+      "confidential": {
+        "type": "boolean",
+        "description": "If `true`, the job is restricted to users explicitly granted access on the Hiring Team. The legacy Confidential Jobs feature has been sunset \u2014 this flag cannot be set on new jobs and is preserved for jobs that already had it enabled."
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "open",
+          "draft",
+          "closed"
+        ],
+        "description": "Lifecycle status of the job. `draft` while it is being scaffolded, `open` once it has at least one open opening, and `closed` after every opening is closed. A job moves to `closed` automatically when its last open opening is closed via `PATCH /v3/openings/{id}`."
+      },
+      "opened_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the job first transitioned to `open`, in ISO 8601. `null` while the job is still in `draft`."
+      },
+      "closed_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the job most recently transitioned to `closed`, in ISO 8601. `null` for jobs that are still `open` or `draft`."
+      },
+      "is_template": {
+        "type": [
+          "boolean",
+          "null"
+        ],
+        "description": "If `true`, this job is a template used as the source for new jobs rather than a real requisition. Templates do not accept applications; reference them via `template_job_id` on `POST /v3/jobs`."
+      },
+      "copied_from_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the job (typically a template) this job was copied from on creation. `null` when the job was not created from another job."
+      },
+      "department_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the department this job is assigned to. `null` when no department is set."
+      },
+      "office_ids": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "integer"
+        },
+        "description": "Ids of the offices this job is assigned to. A job can span multiple offices; empty array or `null` when no offices are set."
+      },
+      "custom_fields": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "type",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "array",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "offer": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "version": {
+        "type": "integer",
+        "description": "Revision number of this offer within its application. Greenhouse creates a new offer row (incrementing `version`) whenever a tracked field on an existing offer changes \u2014 typically `starts_on`, `opening_id`, or a custom field configured to trigger a new version. Pair with `current_only=true` to filter the list endpoint down to the latest version per application."
+      },
+      "application_id": {
+        "type": "integer",
+        "description": "Id of the application this offer is extended on. Every offer belongs to exactly one application; the offer is voided if the application is rejected or deleted."
+      },
+      "job_id": {
+        "type": "integer",
+        "description": "Id of the job this offer's application is on."
+      },
+      "candidate_id": {
+        "type": "integer",
+        "description": "Id of the candidate (person) receiving this offer. Resolved through the offer's application."
+      },
+      "opening_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the specific opening this offer is being extended for. `null` when the offer has not yet been linked to an opening."
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "Created",
+          "Accepted",
+          "Rejected",
+          "Deprecated"
+        ],
+        "description": "Lifecycle status of the offer. `Created` for offers still being drafted or pending approval, `Accepted` once the candidate accepts, `Rejected` if declined or withdrawn, and `Deprecated` for superseded prior versions (a new offer version replaces an earlier one with this status)."
+      },
+      "starts_on": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date",
+        "description": "Candidate's proposed start date, in ISO 8601 (YYYY-MM-DD). `null` when no start date has been set on the offer."
+      },
+      "sent_on": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date",
+        "description": "Date the offer was sent to the candidate, in ISO 8601 (YYYY-MM-DD). `null` until the offer has been sent."
+      },
+      "resolved_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the offer was resolved (`Accepted` or `Rejected`), in ISO 8601. Date updates submitted through `PATCH /v3/offers/{id}` are normalized to noon UTC on the supplied date. `null` while the offer is still `Created` or has been superseded as `Deprecated` without a resolution."
+      },
+      "custom_fields": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "type",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "array",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "office": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "name": {
+        "type": "string",
+        "description": "Display name of the office (e.g. `San Francisco`, `Remote (US)`). Unique among active offices in the same organization."
+      },
+      "parent_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the parent office when offices are organized hierarchically. `null` for top-level offices. References another `/v3/offices` row in the same organization."
+      },
+      "external_id": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Stable identifier supplied by the customer or HRIS for cross-system reconciliation. `null` when no external id has been set. Available when the `org_structure_external_id` product flag is enabled."
+      },
+      "location": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Free-form physical location string for the office (e.g. `New York, NY, USA`). `null` for offices that have no location set, including most remote offices."
+      },
+      "primary_in_house_contact_user_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the Greenhouse user designated as the office's primary internal contact, typically the local recruiting lead. References a `/v3/users` row. `null` when no contact has been assigned."
+      }
+    }
+  },
+  "opening": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "job_id": {
+        "type": "integer",
+        "description": "Id of the parent job (requisition) this opening belongs to. Each opening is a single headcount slot under the job; the job carries the role's configuration and is the source of truth for things like the interview plan and hiring team."
+      },
+      "opened_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the opening first transitioned to `open` (i.e. became available to be filled), in ISO 8601. `null` while the opening's job is still in `draft`."
+      },
+      "closed_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the opening was closed, in ISO 8601. `null` while the opening is still `open`. Closing the last open opening on a job automatically closes the job itself."
+      },
+      "sort_order": {
+        "type": "integer",
+        "description": "Position of the opening within the job's openings list, used to preserve the order in which openings were created or arranged in Greenhouse."
+      },
+      "opening_id": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Partner-supplied external identifier for the opening (e.g. an HRIS or ATS position id). Free-form string, not required to be unique across the organization, and `null` when no external id has been set. Distinct from the Greenhouse `id`."
+      },
+      "application_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the application that filled this opening when it was closed as a hire. `null` for openings that are still `open` or that were closed without a hire."
+      },
+      "close_reason_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the `close_reason` recorded when the opening was closed (e.g. `Hire - New Headcount`, `On Hold`, `Requisition Cancelled`). `null` when the opening is still `open` or when it was closed without a close reason. Resolve via `GET /v3/close_reasons`."
+      },
+      "target_start_on": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date",
+        "description": "Target start date for the hire that will fill this opening, in ISO 8601 (`YYYY-MM-DD`). `null` when no target start date has been set."
+      },
+      "open": {
+        "type": "boolean",
+        "description": "Convenience flag \u2014 `true` while the opening is still available to be filled, `false` once it has been closed (filled or otherwise). Equivalent to `closed_at` being `null`."
+      },
+      "custom_fields": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "type",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "array",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "referrer": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "user_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the Greenhouse user this referrer maps to, when the referrer is an internal employee. `null` for referrers that are not Greenhouse users (e.g. external agency recruiters, social-share visitors, LinkedIn referrers) and for referrers whose underlying user has since been removed. This is not the same id space as `applications.referrer_id` \u2014 applications point at this referrer's `id`, not at `user_id`."
+      },
+      "name": {
+        "type": "string",
+        "description": "Display name of the referrer as it appears on the candidate's application under \"Source & referrer\" (the \"Who Gets Credit\" label). For employee referrals this is typically the referring user's name; for non-user referrers it is the name captured at referral time."
+      }
+    }
+  },
+  "rejection_detail": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "application_id": {
+        "type": "integer",
+        "description": "Id of the application this rejection record belongs to. Rejection details exist only for rejected applications; there is one record per rejected application."
+      },
+      "rejected_by_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the user who rejected the application. `null` for system-initiated rejections such as auto-rejection workflows."
+      },
+      "rejection_note_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the note created on the application capturing the free-text rejection message, or `null` when no note was entered. The note body itself is not returned here \u2014 fetch it through `/v3/notes/{id}`."
+      },
+      "rejection_reason_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the rejection reason selected for the application. References a `/v3/rejection_reasons` row scoped to the organization. `null` when the application was rejected without a reason."
+      },
+      "rejected_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the application was rejected, in ISO 8601. `null` only for legacy or partially backfilled rejection records."
+      },
+      "question_custom_fields": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "type",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "array",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "rejection_reason": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "name": {
+        "type": "string",
+        "description": "Display label shown to recruiters when rejecting a candidate (e.g. `Not a cultural fit`, `Lacking skill(s)/qualification(s)`, `Wasn't interested`, `Didn't like offer`, `Spam`). Unique within the organization. Free-text, since each organization customizes its own list under Configure > Custom Options > Rejection Reasons. Reason categorization (hire/non-hire, we vs. they rejected) is conveyed by the nested `type` rather than by the name."
+      },
+      "type": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id of the rejection reason type. Stable across all rejection reasons in the organization that share the same categorization."
+          },
+          "key": {
+            "type": "string",
+            "description": "Stable machine-readable identifier for the reason type. One of `WE_REJECTED_THEM`, `THEY_REJECTED_US`, `NONE_SPECIFIED`, or `SECURITY_CONCERN`. Prefer matching on `key` over `name` since it is not subject to localization."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the rejection reason type used in Greenhouse reporting. One of `We rejected them`, `They rejected us`, `None specified`, or `Security concern`."
+          }
+        },
+        "description": "The rejection reason type this reason rolls up to \u2014 the categorization Greenhouse uses to interpret outcomes in reporting. Reasons grouped under `We rejected them` mean the organization declined the candidate, `They rejected us` mean the candidate withdrew or declined an offer, `Security concern` flags fraud or other trust signals, and `None specified` is the catch-all. The `Security concern` type is only returned when the `enable_reject_as_security_concern` product flag is on for the organization."
+      }
+    }
+  },
+  "scorecard_candidate_attribute": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "scorecard_id": {
+        "type": "integer",
+        "description": "Id of the scorecard this attribute rating belongs to. One row per (scorecard, attribute) pair \u2014 the interviewer rated this candidate on this attribute on this scorecard."
+      },
+      "candidate_attribute_rating": {
+        "type": "string",
+        "description": "Interviewer's rating for the attribute on this scorecard. One of `definitely_not`, `no`, `yes`, `strong_yes`, `mixed`, or `no_decision`. `no_decision` is recorded when the row exists (e.g. a `note` was left) but no rating was selected."
+      },
+      "job_candidate_attribute_id": {
+        "type": "integer",
+        "description": "Id of the job's `job_candidate_attribute` being rated (the per-job attribute catalogue entry on `/v3/job_candidate_attributes`). The attribute's display name and `candidate_attribute_type` live on that record."
+      },
+      "note": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Free-text note the interviewer left for this attribute (e.g. a brief justification for the rating). `null` when no note was provided."
+      },
+      "value": {
+        "type": "string",
+        "description": "Read-only alias of `candidate_attribute_rating`, in the same vocabulary the nested write path accepts (`candidate_attributes[].value` on `POST`/`PATCH /v3/scorecards`). A rating cleared with `value: null` reads back as `no_decision`."
+      }
+    }
+  },
+  "scorecard_question_answer_option": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "scorecard_question_option_id": {
+        "type": "integer",
+        "description": "Id of the selected option in the question's option list. References a `/v3/scorecard_question_options` row."
+      },
+      "scorecard_question_answer_id": {
+        "type": "integer",
+        "description": "Id of the answer this selection belongs to. References a `/v3/scorecard_question_answers` row."
+      }
+    }
+  },
+  "scorecard_question_answer": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "scorecard_id": {
+        "type": "integer",
+        "description": "Id of the scorecard this answer belongs to. Every answer is tied to exactly one scorecard, which in turn belongs to a single interviewer's submission on one application."
+      },
+      "scorecard_question_id": {
+        "type": "integer",
+        "description": "Id of the `scorecard_question` this answer responds to. The question's `answer_type` (`text`, `yes_no`, `single_select`, `multi_select`) determines which field on the answer is populated: `text` uses `answer`, `yes_no` uses `boolean_value`, and `single_select`/`multi_select` use the `scorecard_question_answer_options` sub-resource."
+      },
+      "answer": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Free-text response for `text`-type scorecard questions. Plain text \u2014 HTML formatting and `@`-mention markup are stripped. `null` (or empty string) when the question is `yes_no`, `single_select`, or `multi_select`, or when the interviewer declined to answer."
+      },
+      "answer_with_tags": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "HTML-formatted version of `answer`, preserving rich-text formatting (bold, italic, etc.) and `@`-mentions as embedded user tags (e.g. `@[User Name](user:123)`). `null` when there is no formatting or markup to preserve (i.e. when the stored value would be identical to `answer`), and under the same conditions as `answer`."
+      },
+      "boolean_value": {
+        "type": [
+          "boolean",
+          "null"
+        ],
+        "description": "Response for `yes_no`-type scorecard questions: `true` for yes, `false` for no, `null` when the question is not `yes_no` or when the interviewer left it blank. Ignored on writes for any question whose `answer_type` is not `yes_no`."
+      },
+      "value": {
+        "type": [
+          "string",
+          "boolean",
+          "integer",
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "integer"
+        },
+        "description": "Read-only. The answer in the same vocabulary the nested write path accepts (`question_answers[].value` on `POST`/`PATCH /v3/scorecards`), dispatched on the question's `answer_type`: string for `text`, boolean for `yes_no`, the selected option id for `single_select`, an array of selected option ids for `multi_select`. `null` when unanswered."
+      }
+    }
+  },
+  "scorecard_question_candidate_attribute": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "scorecard_question_id": {
+        "type": "integer",
+        "description": "Id of the `scorecard_question` that evaluates this candidate attribute. Each row links one scorecard question to one focus attribute; the same question can be linked to multiple focus attributes (and vice versa) through additional rows."
+      },
+      "focus_candidate_attribute_id": {
+        "type": "integer",
+        "description": "Id of the `focus_candidate_attribute` this scorecard question is asking interviewers to assess. Despite the resource name, the foreign key points to a focus attribute (per interview kit) \u2014 not directly to a `job_candidate_attribute` or `candidate_attribute_type`. To get the attribute's display name or type, follow the chain `focus_candidate_attribute` \u2192 `job_candidate_attribute` \u2192 `candidate_attribute_type`."
+      }
+    }
+  },
+  "scorecard_question_option": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "scorecard_question_id": {
+        "type": "integer",
+        "description": "Id of the parent `scorecard_question` this option belongs to. Only questions with `answer_type` of `single_select` or `multi_select` carry options."
+      },
+      "name": {
+        "type": "string",
+        "description": "Display label shown to interviewers in the scorecard dropdown (e.g. `Strong Hire`, `No Hire`). Persisted verbatim as the choice text on `scorecard_question_answers` that select this option via the `scorecard_question_answer_options` join."
+      },
+      "sort_order": {
+        "type": "integer",
+        "description": "Display position within the parent question's choice list. Lower values render first; ties fall back to insertion order. Alias of the underlying `priority` column."
+      },
+      "active": {
+        "type": "boolean",
+        "description": "`true` while the option is selectable on new scorecards. Set to `false` after removal \u2014 historical `scorecard_question_answers` that already selected the option are preserved, so past scorecards still resolve to the original label."
+      }
+    }
+  },
+  "scorecard_question": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "interview_kit_id": {
+        "type": "integer",
+        "description": "Id of the interview kit this question belongs to. Each `interview_kit` carries its own ordered set of scorecard questions, so the same prompt configured on two kits has two distinct `scorecard_question` rows."
+      },
+      "question": {
+        "type": "string",
+        "description": "Text of the scorecard question \u2014 or, when `answer_type` is `instruction`, the body of the display-only instruction shown to interviewers. Supports basic HTML formatting (`<p>`, `<ul>`, `<li>`, `<b>`, `<i>`, `<a>`). Render or sanitize as needed."
+      },
+      "sort_order": {
+        "type": "integer",
+        "description": "Position of this question within its interview kit, ascending. Lower values render first; aliased from the underlying `priority` column. Questions and `instruction` rows share a single ordering."
+      },
+      "active": {
+        "type": "boolean",
+        "description": "`true` when the question is in use; `false` after it has been removed from the kit. Inactive questions are returned by default \u2014 pass `active=true` to filter to live questions only. Past `scorecard_question_answers` still reference inactive rows so historical scorecards stay readable."
+      },
+      "answer_type": {
+        "type": "string",
+        "enum": [
+          "text",
+          "yes_no",
+          "single_select",
+          "multi_select",
+          "instruction"
+        ],
+        "description": "Shape of the answer the interviewer fills in. `text` is free-form rich text; `yes_no` is a binary choice; `single_select` and `multi_select` pick from the question's `scorecard_question_options`; `instruction` is a display-only guidance row with no answer field and no `required` semantics \u2014 instructions exist to script interviewers and do not produce a `scorecard_question_answer`. Immutable after the question is created."
+      },
+      "required": {
+        "type": "boolean",
+        "description": "If `true`, an interviewer must answer this question before submitting the scorecard. Ignored when `answer_type` is `instruction`."
+      }
+    }
+  },
+  "scorecard": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "interview_kit_id": {
+        "type": "integer",
+        "description": "Id of the interview kit this scorecard was filled out against. The kit determines the questions, focus attributes, and rating scale on the scorecard. The kit also identifies which interview slot on the job's interview plan produced this scorecard."
+      },
+      "interviewer_id": {
+        "type": "integer",
+        "description": "Id of the Greenhouse user who participated in the interview and to whom this scorecard is assigned. Each interviewer on a multi-interviewer interview gets their own scorecard."
+      },
+      "interviewed_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the interview took place, in ISO 8601. Mirrors the underlying interview's scheduled time and is set when the scorecard is created (manual scorecards may set this independently)."
+      },
+      "notes": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Free-text \"key takeaways\" the interviewer recorded on the scorecard (pros, cons, follow-ups). Plain text with `@`-mentions rendered as user names; use `notes_with_tags` for the version where mentions are tagged for downstream parsing."
+      },
+      "notes_with_tags": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "`notes` with `@`-mentions rendered as embedded user tags (e.g. `@[User Name](user:123)`) instead of plain user names, for partners that need to resolve mentioned users."
+      },
+      "submitter_id": {
+        "type": "integer",
+        "description": "Id of the Greenhouse user who actually submitted the scorecard. Usually the same as `interviewer_id`, but differs when an admin submits a scorecard on another interviewer's behalf."
+      },
+      "candidate_rating": {
+        "type": "string",
+        "description": "Interviewer's overall recommendation on whether the candidate passed the interview. One of `strong_no` (\"Definitely Not\" in the UI), `no`, `yes`, `strong_yes`, or `no_decision`. `no_decision` is recorded when the interviewer submitted the scorecard without choosing a recommendation."
+      },
+      "private_notes": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Free-text private notes visible only to users with the \"see private notes\" permission. Plain text with `@`-mentions rendered as user names; use `private_notes_with_tags` for the tagged version."
+      },
+      "private_notes_with_tags": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "`private_notes` with `@`-mentions rendered as embedded user tags instead of plain user names."
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "complete"
+        ],
+        "description": "Lifecycle status of the scorecard. `draft` is in-progress and not yet submitted; `complete` is submitted (and `submitted_at` is set). Only complete scorecards count toward interview completion and downstream analysis."
+      },
+      "public_notes": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Free-text \"note to other interviewers\" the interviewer leaves for the rest of the hiring team. Plain text with `@`-mentions rendered as user names; use `public_notes_with_tags` for the tagged version."
+      },
+      "public_notes_with_tags": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "`public_notes` with `@`-mentions rendered as embedded user tags instead of plain user names."
+      },
+      "application_id": {
+        "type": "integer",
+        "description": "Id of the application this scorecard belongs to. Use it to look up the candidate via the applications endpoint."
+      },
+      "submitted_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "description": "Timestamp the scorecard was submitted (moved from `draft` to `complete`), in ISO 8601. `null` while `status` is `draft`. The delta between `interviewed_at` and `submitted_at` is a common \"time to submit scorecard\" measure."
+      }
+    }
+  },
+  "source": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "name": {
+        "type": "string",
+        "description": "Display name of the source as recruiters see it in Greenhouse (e.g. `LinkedIn (Prospecting)`, `Indeed`, `Referral`, `Internal Applicant`, or a custom agency name). For organization-specific sources this is the label the org configured; for global Greenhouse sources it is the standard public name."
+      },
+      "type": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id of the sourcing strategy. References the same strategy across all sources in the organization that roll up to it."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the sourcing strategy used in Greenhouse reporting (e.g. `Agencies`, `Referral`, `Third-party boards`, `Prospecting`, `Social media`)."
+          }
+        },
+        "description": "The sourcing strategy this source rolls up to \u2014 the broader category used for reporting. Sources are grouped under sourcing strategies such as `Agencies`, `Referral`, `Third-party boards`, `Prospecting`, `Social media`, `Company marketing`, `In person event`, `MyGreenhouse`, and `Other`. Use the strategy when aggregating candidate volume by channel; use the source itself when reporting on a specific channel within that category."
+      }
+    }
+  },
+  "user": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "first_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "last_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "primary_email": {
+        "type": "string",
+        "description": "Primary email address on the user's account. Sign-in identifier and the address Greenhouse uses for outbound mail; additional verified addresses are not surfaced here. Service accounts (integration/ISU users) have no email and are excluded from this endpoint by default; when included via `show_service_accounts=true`, their `primary_email` is an empty string."
+      },
+      "job_title": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Free-form job title set on the user's Greenhouse profile (e.g. `Senior Recruiter`). Not synchronized with any HRIS title."
+      },
+      "agency_id": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "description": "Id of the staffing agency this user belongs to, when the user is an external agency recruiter rather than an employee of your organization. `null` for in-house users."
+      },
+      "name": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Concatenation of `first_name` and `last_name` rendered as a single display string. Provided for convenience; partners that need either component should read `first_name`/`last_name` directly."
+      },
+      "deactivated": {
+        "type": "boolean",
+        "description": "Whether the user has been deactivated. Deactivated users cannot sign in or be assigned to new jobs, but their historical activity (notes, scorecards, emails) is preserved. Toggle via `POST /v3/users/{id}/deactivate` and `POST /v3/users/{id}/activate`."
+      },
+      "site_admin": {
+        "type": "boolean",
+        "description": "Whether the user holds the Site Admin role. Site admins have unrestricted access to every non-confidential job and to organization-level settings. Demote a site admin to a Basic user with `POST /v3/users/{id}/revoke_permissions`."
+      },
+      "employee_id": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "Partner-supplied external employee identifier, typically the user's HRIS or payroll id. Free-form string; not unique across organizations and `null` when no employee id has been set."
+      },
+      "linked_candidate_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "description": "Ids of candidate records linked to this user. Populated when an employee is represented by both a user record (for Greenhouse access) and a candidate record (for past or internal applications)."
+      },
+      "office_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "description": "Ids of the offices this user is assigned to. Used to scope future job permissions and to filter the user list by office. Empty when the user is not pinned to any office."
+      },
+      "department_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "description": "Ids of the departments this user is assigned to. Used to scope future job permissions and to filter the user list by department. Empty when the user is not pinned to any department."
+      },
+      "interviewer_tags": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "name"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Interviewer tags applied to this user \u2014 the labeled skill or panel groupings (e.g. `Senior Engineer`, `Bar Raiser`) used to suggest qualified interviewers when building an interview plan. Each entry pairs the tag's `id` with its `name`."
+      },
+      "emails": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "All email addresses on the user's account, including the primary address and any additional verified addresses."
+      },
+      "custom_fields": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "type",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "array",
+                    "null"
+                  ]
+                },
+                {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

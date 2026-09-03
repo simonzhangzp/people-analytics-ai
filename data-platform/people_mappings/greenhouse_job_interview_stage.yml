@@ -1,0 +1,61 @@
+canonical_version: people_v2
+gate: 1
+note: priority ← sort_order. canonical_stage from name tokens (BR-TA-001).
+source_contract:
+  pin: schemas/fields/job_interview_stage.fields.json
+fields:
+- canonical_table: people_dim_stage
+  canonical_field: stage_id
+  source_system: greenhouse_v3
+  source_object: job_interview_stage
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: CANONICAL_KEY
+  business_definition: job_interview_stage.id.
+  source_field: id
+- canonical_table: people_dim_stage
+  canonical_field: gh_job_id
+  source_system: greenhouse_v3
+  source_object: job_interview_stage
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Parent job.
+  source_field: job_id
+- canonical_table: people_dim_stage
+  canonical_field: stage_name
+  source_system: greenhouse_v3
+  source_object: job_interview_stage
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Stage label.
+  source_field: name
+- canonical_table: people_dim_stage
+  canonical_field: priority
+  source_system: greenhouse_v3
+  source_object: job_interview_stage
+  transformation: identity
+  nullable: false
+  data_type: integer
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Harvest field is sort_order, not priority.
+  source_field: sort_order
+- canonical_table: people_dim_stage
+  canonical_field: canonical_stage
+  source_system: greenhouse_v3
+  source_object: job_interview_stage
+  transformation: Review|Screen|Onsite|Offer from name tokens (BR-TA-001)
+  nullable: false
+  data_type: text
+  effective_date_logic: created_at
+  provenance: DERIVED
+  business_definition: Canonical funnel bucket.
+  source_field: name

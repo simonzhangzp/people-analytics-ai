@@ -1,0 +1,61 @@
+canonical_version: people_v2
+gate: 1
+note: Application grain. Never join to worker (BR-GOV-001).
+source_contract:
+  pin: schemas/fields/demographic_answer.fields.json
+fields:
+- canonical_table: people_fact_candidate_demographic_restricted
+  canonical_field: application_id
+  source_system: greenhouse_v3
+  source_object: demographic_answer
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Application grain.
+  source_field: application_id
+- canonical_table: people_fact_candidate_demographic_restricted
+  canonical_field: question_id
+  source_system: greenhouse_v3
+  source_object: demographic_answer
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Harvest field is demographic_question_id.
+  source_field: demographic_question_id
+- canonical_table: people_fact_candidate_demographic_restricted
+  canonical_field: answer_option_id
+  source_system: greenhouse_v3
+  source_object: demographic_answer
+  transformation: identity
+  nullable: true
+  data_type: bigint
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Harvest field is demographic_answer_option_id.
+  source_field: demographic_answer_option_id
+- canonical_table: people_fact_candidate_demographic_restricted
+  canonical_field: free_form_text
+  source_system: greenhouse_v3
+  source_object: demographic_answer
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Free-form text.
+  source_field: free_form_text
+- canonical_table: people_fact_candidate_demographic_restricted
+  canonical_field: submitted_at
+  source_system: greenhouse_v3
+  source_object: demographic_answer
+  transformation: identity; no submitted_at on demographic_answer
+  nullable: false
+  data_type: timestamptz
+  effective_date_logic: created_at
+  provenance: SOURCE_NATIVE
+  business_definition: Answer created_at.
+  source_field: created_at

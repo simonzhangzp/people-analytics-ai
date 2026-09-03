@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Appraisal Cycle
+info:
+  title: Appraisal Cycle
+  version: 1.0.0
+  description: Not submittable.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Appraisal_Cycle/extract_date={date}/run_id={id}/
+schema:
+- name: Appraisal Cycle
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Appraisal Cycle
+  primaryKey:
+  - name
+  description: Not submittable.
+extract:
+  mode: full
+  cadence: daily
+  key: name
+  control_total_source: count of Appraisal Cycle
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: confidential

@@ -1,0 +1,164 @@
+canonical_version: people_v2
+gate: 1
+note: Restricted. Grade for the worker as-of a date comes from SSA.grade, not Employee.
+source_contract:
+  pin: doctypes/salary_structure_assignment.json
+fields:
+- canonical_table: people_fact_comp_assignment_restricted
+  canonical_field: comp_assignment_id
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: from_date
+  provenance: CANONICAL_KEY
+  business_definition: SSA.name.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_comp_assignment_restricted
+  canonical_field: worker_id
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: from_date
+  provenance: SOURCE_NATIVE
+  business_definition: Employee.link.
+  source_field: employee
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_comp_assignment_restricted
+  canonical_field: from_date
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: identity
+  nullable: false
+  data_type: date
+  effective_date_logic: from_date
+  provenance: SOURCE_NATIVE
+  business_definition: Assignment start.
+  source_field: from_date
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_comp_assignment_restricted
+  canonical_field: to_date
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: lead(from_date) over worker - 1 day, then least(that, Employee.relieving_date) so to_date ≤ termination_date
+    (BR-COMP-002)
+  nullable: true
+  data_type: date
+  effective_date_logic: from_date
+  provenance: DERIVED
+  business_definition: Day before the next SSA, capped by termination_date.
+  source_field: from_date
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_comp_assignment_restricted
+  canonical_field: salary_structure
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: from_date
+  provenance: SOURCE_NATIVE
+  business_definition: Salary Structure link.
+  source_field: salary_structure
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_comp_assignment_restricted
+  canonical_field: base
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: identity
+  nullable: true
+  data_type: numeric
+  effective_date_logic: from_date
+  provenance: SOURCE_NATIVE
+  business_definition: Base pay.
+  source_field: base
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_comp_assignment_restricted
+  canonical_field: variable
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: identity
+  nullable: true
+  data_type: numeric
+  effective_date_logic: from_date
+  provenance: SOURCE_NATIVE
+  business_definition: Variable pay.
+  source_field: variable
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_comp_assignment_restricted
+  canonical_field: currency
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: from_date
+  provenance: SOURCE_NATIVE
+  business_definition: Currency.
+  source_field: currency
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_comp_assignment_restricted
+  canonical_field: source_ssa
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: from_date
+  provenance: SOURCE_NATIVE
+  business_definition: Provenance SSA.name.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_hist_worker_attr
+  canonical_field: grade_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: as-of from Employee.grade (HRMS custom field). SSA.grade remains the payroll assignment grade.
+  nullable: true
+  data_type: text
+  effective_date_logic: from_date
+  provenance: SOURCE_NATIVE
+  business_definition: Current worker grade from HRMS custom field Employee.grade.
+  source_field: grade
+- canonical_table: people_evt_worker
+  canonical_field: event_type
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: literal comp_change when base/variable/grade changes
+  nullable: false
+  data_type: text
+  effective_date_logic: from_date
+  provenance: DERIVED
+  business_definition: Compensation change event.
+  source_field: from_date
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_evt_worker_change
+  canonical_field: property
+  source_system: frappe_hr
+  source_object: Salary Structure Assignment
+  transformation: emit base, variable, and/or grade rows
+  nullable: false
+  data_type: text
+  effective_date_logic: from_date
+  provenance: SOURCE_NATIVE
+  business_definition: Comp attribute changed.
+  source_fields:
+  - base
+  - variable
+  - grade
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)

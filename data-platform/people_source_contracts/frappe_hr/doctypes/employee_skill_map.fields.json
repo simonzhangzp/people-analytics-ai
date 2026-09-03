@@ -1,0 +1,44 @@
+{
+  "name": "Employee Skill Map",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "field:employee",
+  "fields": [
+    {
+      "fieldname": "employee",
+      "label": "Employee",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "reqd": null
+    },
+    {
+      "fieldname": "employee_name",
+      "label": "Employee Name",
+      "fieldtype": "Read Only",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "designation",
+      "label": "Designation",
+      "fieldtype": "Read Only",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "employee_skills",
+      "label": "Employee Skills",
+      "fieldtype": "Table",
+      "options": "Employee Skill",
+      "reqd": null
+    },
+    {
+      "fieldname": "trainings",
+      "label": "Trainings",
+      "fieldtype": "Table",
+      "options": "Employee Training",
+      "reqd": null
+    }
+  ]
+}

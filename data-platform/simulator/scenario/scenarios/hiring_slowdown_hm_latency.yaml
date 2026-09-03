@@ -1,0 +1,24 @@
+scenario_id: hiring_slowdown_hm_latency
+version: 1
+kind: behavior
+effective:
+  from: 2026-05-01
+  to: null
+target:
+  org_path: globaltech.sales.*
+effect:
+  stage_dwell_multiplier:
+    Onsite: 1.6
+  offer_acceptance_delta: -0.08
+correlated_signals:
+  - id: hm_scorecard_interview_latency
+    from: 2026-05-01
+    target:
+      org_path: globaltech.sales.*
+      job_family: Sales
+      hiring_manager_ids: [101, 102, 103]
+    effect:
+      interview_schedule_delay_days: 8
+      scorecard_submit_delay_days: 10
+    note: Correlation only. Delay is attributed to a small set of hiring managers, not to the requisition mix itself.
+narrative: "Case 4: Sales Onsite dwell ×1.6 and offer acceptance −8 points from 2026-05-01. Scorecard and interview latency concentrated on hiring managers 101–103."

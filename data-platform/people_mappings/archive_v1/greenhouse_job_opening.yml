@@ -1,0 +1,58 @@
+canonical_entity: people_silver_requisition
+note: Greenhouse Job is the requisition. Opening is the headcount slot. Do not flatten into one REQ table in Bronze.
+
+job:
+  source_system: greenhouse_v3
+  source_object: jobs
+  harvest_path: /v3/jobs
+  schema: people_source_contracts/greenhouse_v3/schemas/fields/job.fields.json
+  bronze_table: people_bronze_greenhouse_job
+  fields:
+    - canonical_field: source_job_id
+      source_field: id
+      transformation: identity
+    - canonical_field: created_at
+      source_field: created_at
+      transformation: identity
+    - canonical_field: updated_at
+      source_field: updated_at
+      transformation: identity
+
+opening:
+  source_system: greenhouse_v3
+  source_object: openings
+  harvest_path: /v3/openings
+  schema: people_source_contracts/greenhouse_v3/schemas/fields/opening.fields.json
+  bronze_table: people_bronze_greenhouse_opening
+  fields:
+    - canonical_field: source_opening_id
+      source_field: id
+      transformation: identity
+    - canonical_field: source_job_id
+      source_field: job_id
+      transformation: identity
+    - canonical_field: opened_at
+      source_field: opened_at
+      transformation: identity
+      business_definition: When the slot became open. Time-to-fill start.
+    - canonical_field: closed_at
+      source_field: closed_at
+      transformation: identity
+      business_definition: When the slot closed. Null while open.
+
+derived_after_mapping:
+  - canonical_field: time_to_fill_days
+    source_fields: [openings.opened_at, applications hired timestamp or openings.closed_at]
+    transformation: timestamp_diff_days(filled_at, opened_at)
+    business_definition: Days from opening.opened_at to hire/close. Not applied_on minus 21 days.
+
+supporting_resources:
+  - departments # /v3/departments
+  - offices     # /v3/offices
+  - users       # /v3/users  recruiter identities
+  - sources     # /v3/sources
+  - referrers   # /v3/referrers
+  - job_interview_stages # /v3/job_interview_stages
+  - job_interviews       # /v3/job_interviews
+  - approval_flows       # /v3/approval_flows
+  - rejection_reasons    # /v3/rejection_reasons

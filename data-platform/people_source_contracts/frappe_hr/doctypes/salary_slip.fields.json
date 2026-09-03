@@ -1,0 +1,476 @@
+{
+  "name": "Salary Slip",
+  "module": "Payroll",
+  "istable": null,
+  "fields": [
+    {
+      "fieldname": "posting_date",
+      "label": "Posting Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "employee",
+      "label": "Employee",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "employee_name",
+      "label": "Employee Name",
+      "fieldtype": "Read Only",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "department",
+      "label": "Department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "reqd": null
+    },
+    {
+      "fieldname": "designation",
+      "label": "Designation",
+      "fieldtype": "Link",
+      "options": "Designation",
+      "reqd": null
+    },
+    {
+      "fieldname": "branch",
+      "label": "Branch",
+      "fieldtype": "Link",
+      "options": "Branch",
+      "reqd": null
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Draft\nSubmitted\nCancelled\nWithheld",
+      "reqd": null
+    },
+    {
+      "fieldname": "journal_entry",
+      "label": "Journal Entry",
+      "fieldtype": "Link",
+      "options": "Journal Entry",
+      "reqd": null
+    },
+    {
+      "fieldname": "payroll_entry",
+      "label": "Payroll Entry",
+      "fieldtype": "Link",
+      "options": "Payroll Entry",
+      "reqd": null
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": 1
+    },
+    {
+      "fieldname": "letter_head",
+      "label": "Letter Head",
+      "fieldtype": "Link",
+      "options": "Letter Head",
+      "reqd": null
+    },
+    {
+      "fieldname": "salary_slip_based_on_timesheet",
+      "label": "Salary Slip Based on Timesheet",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "start_date",
+      "label": "Start Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "end_date",
+      "label": "End Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "salary_structure",
+      "label": "Salary Structure",
+      "fieldtype": "Link",
+      "options": "Salary Structure",
+      "reqd": 1
+    },
+    {
+      "fieldname": "payroll_frequency",
+      "label": "Payroll Frequency",
+      "fieldtype": "Select",
+      "options": "\nMonthly\nFortnightly\nBimonthly\nWeekly\nDaily",
+      "reqd": null
+    },
+    {
+      "fieldname": "total_working_days",
+      "label": "Working Days",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "leave_without_pay",
+      "label": "Leave Without Pay",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "payment_days",
+      "label": "Payment Days",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "timesheets",
+      "label": "Salary Slip Timesheet",
+      "fieldtype": "Table",
+      "options": "Salary Slip Timesheet",
+      "reqd": null
+    },
+    {
+      "fieldname": "total_working_hours",
+      "label": "Total Working Hours",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "hour_rate",
+      "label": "Hour Rate",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "bank_name",
+      "label": "Bank Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "bank_account_no",
+      "label": "Bank Account No",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "deduct_tax_for_unsubmitted_tax_exemption_proof",
+      "label": "Deduct Tax For Unsubmitted Tax Exemption Proof",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "earnings",
+      "label": "Earnings",
+      "fieldtype": "Table",
+      "options": "Salary Detail",
+      "reqd": null
+    },
+    {
+      "fieldname": "deductions",
+      "label": "Deductions",
+      "fieldtype": "Table",
+      "options": "Salary Detail",
+      "reqd": null
+    },
+    {
+      "fieldname": "gross_pay",
+      "label": "Gross Pay",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "net_pay",
+      "label": "Net Pay",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "rounded_total",
+      "label": "Rounded Total",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "amended_from",
+      "label": "Amended From",
+      "fieldtype": "Link",
+      "options": "Salary Slip",
+      "reqd": null
+    },
+    {
+      "fieldname": "mode_of_payment",
+      "label": "Mode Of Payment",
+      "fieldtype": "Select",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "absent_days",
+      "label": "Absent Days",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "unmarked_days",
+      "label": "Unmarked days",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "currency",
+      "label": "Currency",
+      "fieldtype": "Link",
+      "options": "Currency",
+      "reqd": 1
+    },
+    {
+      "fieldname": "total_deduction",
+      "label": "Total Deduction",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "total_in_words",
+      "label": "Total in words",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "base_hour_rate",
+      "label": "Hour Rate (Company Currency)",
+      "fieldtype": "Currency",
+      "options": "Company:company:default_currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "base_gross_pay",
+      "label": "Gross Pay (Company Currency)",
+      "fieldtype": "Currency",
+      "options": "Company:company:default_currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "exchange_rate",
+      "label": "Exchange Rate",
+      "fieldtype": "Float",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "base_total_deduction",
+      "label": "Total Deduction (Company Currency)",
+      "fieldtype": "Currency",
+      "options": "Company:company:default_currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "base_net_pay",
+      "label": "Net Pay (Company Currency)",
+      "fieldtype": "Currency",
+      "options": "Company:company:default_currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "base_rounded_total",
+      "label": "Rounded Total (Company Currency)",
+      "fieldtype": "Currency",
+      "options": "Company:company:default_currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "base_total_in_words",
+      "label": "Total in words (Company Currency)",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "year_to_date",
+      "label": "Year To Date",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "month_to_date",
+      "label": "Month To Date",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "base_year_to_date",
+      "label": "Year To Date(Company Currency)",
+      "fieldtype": "Currency",
+      "options": "Company:company:default_currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "base_month_to_date",
+      "label": "Month To Date(Company Currency)",
+      "fieldtype": "Currency",
+      "options": "Company:company:default_currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "leave_details",
+      "label": "Leave Details",
+      "fieldtype": "Table",
+      "options": "Salary Slip Leave",
+      "reqd": null
+    },
+    {
+      "fieldname": "gross_year_to_date",
+      "label": "Gross Year To Date",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "base_gross_year_to_date",
+      "label": "Gross Year To Date(Company Currency)",
+      "fieldtype": "Currency",
+      "options": "Company:company:default_currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "ctc",
+      "label": "CTC",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "income_from_other_sources",
+      "label": "Income from Other Sources",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "total_earnings",
+      "label": "Total Earnings",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "non_taxable_earnings",
+      "label": "Non Taxable Earnings",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "deductions_before_tax_calculation",
+      "label": "Deductions before tax calculation",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "tax_exemption_declaration",
+      "label": "Tax Exemption Declaration",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "standard_tax_exemption_amount",
+      "label": "Standard Tax Exemption Amount",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "annual_taxable_amount",
+      "label": "Annual Taxable Amount",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "income_tax_deducted_till_date",
+      "label": "Income Tax Deducted Till Date",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "future_income_tax_deductions",
+      "label": "Future Income Tax",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "current_month_income_tax",
+      "label": "Current Month Income Tax",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "total_income_tax",
+      "label": "Total Income Tax",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "salary_withholding",
+      "label": "Salary Withholding",
+      "fieldtype": "Link",
+      "options": "Salary Withholding",
+      "reqd": null
+    },
+    {
+      "fieldname": "salary_withholding_cycle",
+      "label": "Salary Withholding Cycle",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "current_payroll_period",
+      "label": "Current Payroll Period",
+      "fieldtype": "Link",
+      "options": "Payroll Period",
+      "reqd": null
+    },
+    {
+      "fieldname": "accrued_benefits",
+      "label": "Accrued Benefits",
+      "fieldtype": "Table",
+      "options": "Employee Benefit Detail",
+      "reqd": null
+    }
+  ]
+}

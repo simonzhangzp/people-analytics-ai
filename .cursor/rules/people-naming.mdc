@@ -1,0 +1,24 @@
+---
+description: All People Analytics data objects must start with people
+alwaysApply: true
+---
+
+Every People Analytics database object, lake path, RPC, and pipeline dataset starts with `people`.
+
+QuantReview leftovers in the shared staging `public` schema stay unprefixed on purpose. Do not rename or drop them.
+
+```text
+✅ people_mart_workforce_overview
+✅ people_workspaces
+✅ people_consume_ai_quota()
+✅ data-platform/lake/people_bronze/
+
+❌ workspaces
+❌ serving.mart_workforce_overview
+❌ consume_ai_quota()
+❌ lake/bronze/
+```
+
+Workbench knowledge tables use `people_workbench_metrics`, not `people_metric_definitions`, so they do not collide with warehouse `people_metric_definition`.
+
+Apply People v2 DDL only to the dedicated project PeopleAnalyticsAI.net (`zapmigfrtnwnkmezjefx`). Scripts must fail-closed on QuantReview production (`fyvivwgyisrtmehzjqlv`) and on `quantreview-staging` (`kgxbomcmgkwlmzyevqjw`). Staging v1 `public.people_*` stays live until cutover; do not clean its empty `people_v2` until step 9.

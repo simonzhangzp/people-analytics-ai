@@ -1,0 +1,11 @@
+metric_id: headcount
+status: certified
+grain: people_snap_worker_month
+population:
+  rule: BR-WF-001
+  param: certified_population
+measure:
+  op: count
+sandbox:
+  rule_kind: parametric
+  rpc: people_get_metric_sandbox

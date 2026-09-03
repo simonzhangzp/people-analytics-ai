@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Designation
+info:
+  title: Designation
+  version: 1.0.0
+  description: Job spine.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Designation/extract_date={date}/run_id={id}/
+schema:
+- name: Designation
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Designation
+  primaryKey:
+  - name
+  description: Job spine.
+extract:
+  mode: full
+  cadence: daily
+  key: name
+  control_total_source: count of Designation rows
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

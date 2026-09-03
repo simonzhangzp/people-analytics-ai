@@ -1,0 +1,53 @@
+canonical_version: people_v2
+architecture: docs/PEOPLE_DATA_ARCHITECTURE.md
+section: '6'
+note: Gold snapshots and marts. Combined with canonical_model.yml for people_v2 DDL.
+tables:
+- name: people_snap_worker_month
+  key: worker_id
+  columns: [worker_id, person_id, month_end, month_start, org_id, org_path, job_id, job_family, grade_id, location_id, region, manager_worker_id, employment_type, status, is_certified, hire_date, tenure_band, hired_in_month, terminated_in_month, termination_category, via_t1, is_rehire]
+- name: people_snap_requisition_month
+  key: requisition_id
+  columns: [month_end, requisition_id, job_family, hiring_manager_id, is_open, days_open, applications_active, offers_outstanding]
+- name: people_snap_recruiter_month
+  key: recruiter_user_id
+  columns: [month_end, recruiter_user_id, person_id, open_requisitions, active_applications, interviews_scheduled, offers_sent, hires, avg_req_load, candidate_load]
+- name: people_mart_workforce_monthly
+  key: month_end
+  columns: [month_end, region, tenure_band, job_family, headcount, hires, terms_vol, terms_invol]
+- name: people_mart_workforce_monthly_2d
+  key: month_end
+  columns: [month_end, location, job_family, headcount, hires, terms_vol]
+- name: people_mart_mobility_monthly
+  key: month_start
+  columns: [month_start, promotions, transfers, internal_mobility]
+- name: people_mart_recruiting_monthly
+  key: month_start
+  columns: [month_start, offers_accepted, offers_resolved, hires]
+- name: people_mart_stage_aging_monthly
+  key: month_start
+  columns: [month_start, canonical_stage, aging_p50_days]
+- name: people_mart_recruiter_load_monthly
+  key: month_end
+  columns: [month_end, recruiter_user_id, person_id, open_requisitions, active_applications, interviews_scheduled, offers_sent, hires, avg_req_load, candidate_load]
+- name: people_mart_comp_monthly
+  key: month_end
+  columns: [month_end, job_family, region, grade_id, n, compa_p25, compa_p50, compa_p75]
+- name: people_mart_learning_monthly
+  key: month_start
+  columns: [month_start, participants, training_hours, completion]
+- name: people_mart_skill_coverage_monthly
+  key: month_end
+  columns: [month_end, job_family, coverage_ratio]
+- name: people_mart_engagement_wave
+  key: wave_id
+  columns: [wave_id, dimension, n, mean, favorable_pct]
+- name: people_mart_source_health_daily
+  key: extract_date
+  columns: [extract_date, source_system, source_object, control_total, rows_received, freshness_hours, tests_failed]
+- name: people_mart_applicant_flow
+  key: job_family
+  columns: [job_family, race, gender, n]
+- name: people_mart_funnel_monthly
+  key: month_start
+  columns: [month_start, source_name, applications, hired]

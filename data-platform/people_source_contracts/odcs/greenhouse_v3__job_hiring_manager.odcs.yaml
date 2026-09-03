@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:job_hiring_manager
+info:
+  title: job_hiring_manager
+  version: 1.0.0
+  description: /v3/job_hiring_managers.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/job_hiring_manager/extract_date={date}/run_id={id}/
+schema:
+- name: job_hiring_manager
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/job_hiring_manager
+  primaryKey:
+  - id
+  description: /v3/job_hiring_managers.
+extract:
+  mode: full
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

@@ -1,0 +1,89 @@
+canonical_entity: people_silver_offer
+source_contract:
+  source_system: greenhouse_v3
+  source_object: offers
+  harvest_path: /v3/offers
+  pin:
+    api: Harvest v3
+    schema: people_source_contracts/greenhouse_v3/schemas/fields/offer.fields.json
+bronze_table: people_bronze_greenhouse_offer
+fields:
+  - canonical_field: source_offer_id
+    source_system: greenhouse_v3
+    source_object: offers
+    source_field: id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: created_at
+    business_definition: Offer row id. Greenhouse writes a new row when a tracked field changes.
+
+  - canonical_field: offer_version
+    source_system: greenhouse_v3
+    source_object: offers
+    source_field: version
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: created_at of this version
+    business_definition: Revision number within the application. Preserve full version history. Do not keep current_only in Bronze.
+
+  - canonical_field: source_application_id
+    source_system: greenhouse_v3
+    source_object: offers
+    source_field: application_id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Application the offer is extended on.
+
+  - canonical_field: source_job_id
+    source_system: greenhouse_v3
+    source_object: offers
+    source_field: job_id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Job of the application.
+
+  - canonical_field: source_candidate_id
+    source_system: greenhouse_v3
+    source_object: offers
+    source_field: candidate_id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Candidate resolved through the application.
+
+  - canonical_field: opening_id
+    source_system: greenhouse_v3
+    source_object: offers
+    source_field: opening_id
+    transformation: identity
+    nullable: true
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Headcount slot this offer fills.
+
+  - canonical_field: created_at
+    source_system: greenhouse_v3
+    source_object: offers
+    source_field: created_at
+    transformation: identity
+    nullable: false
+    data_type: timestamptz
+    effective_date_logic: created_at
+    business_definition: Version created timestamp.
+
+  - canonical_field: updated_at
+    source_system: greenhouse_v3
+    source_object: offers
+    source_field: updated_at
+    transformation: identity
+    nullable: false
+    data_type: timestamptz
+    effective_date_logic: updated_at
+    business_definition: Version updated timestamp.

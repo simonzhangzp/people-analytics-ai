@@ -15,4 +15,6 @@ Do not build generic dashboard pages. Every analytical view must have a clear bu
 
 AI recommendations must visibly distinguish proposals, assumptions, approved definitions, and missing evidence.
 
-Raw People data is local-first; privacy messaging must remain visible wherever files are added or analyzed.
+Privacy messaging must remain visible wherever files are added or analyzed. The primary Analyze path stores uploaded files on the Formulator analysis server workspace; the `/workbench` fallback remains browser-local.
+
+All People data objects start with `people` (`people_mart_*`, `people_workspaces`, lake folders `people_bronze` / `people_silver` / `people_gold`). See `.cursor/rules/people-naming.mdc`.

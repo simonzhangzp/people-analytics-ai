@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Salary Detail
+info:
+  title: Salary Detail
+  version: 1.0.0
+  description: Earnings/deductions child.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Salary_Detail/extract_date={date}/run_id={id}/
+schema:
+- name: Salary Detail
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Salary Detail
+  primaryKey:
+  - parent+idx
+  description: Earnings/deductions child.
+extract:
+  mode: nested_incremental
+  cadence: daily
+  key: parent+idx
+  control_total_source: count of child rows on submitted slips
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: restricted

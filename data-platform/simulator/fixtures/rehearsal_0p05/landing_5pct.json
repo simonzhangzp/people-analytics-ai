@@ -1,0 +1,755 @@
+{
+  "ref": "zapmigfrtnwnkmezjefx",
+  "scale_loaded": 0.05,
+  "hot_window_start": "2025-09-01",
+  "tables_loaded": {
+    "people_dim_appraisal_cycle": 5,
+    "people_dim_candidate": 73449,
+    "people_dim_date": 60,
+    "people_dim_grade": 10,
+    "people_dim_job": 4,
+    "people_dim_learning_resource": 1,
+    "people_dim_location": 3,
+    "people_dim_org": 5,
+    "people_dim_person": 4227,
+    "people_dim_person_restricted": 4227,
+    "people_dim_recruiter": 1,
+    "people_dim_rejection_reason": 3,
+    "people_dim_requisition": 2753,
+    "people_dim_skill": 27,
+    "people_dim_source": 4,
+    "people_dim_stage": 11012,
+    "people_dim_survey_item": 12,
+    "people_dim_survey_wave": 10,
+    "people_dim_worker": 4278,
+    "people_evt_application_stage": 101429,
+    "people_evt_manager_change": 0,
+    "people_evt_promotion": 0,
+    "people_evt_transfer": 0,
+    "people_evt_worker": 24264,
+    "people_evt_worker_change": 2121,
+    "people_fact_application": 73643,
+    "people_fact_appraisal": 9936,
+    "people_fact_candidate_demographic_restricted": 711010,
+    "people_fact_candidate_eeoc_restricted": 355505,
+    "people_fact_comp_assignment": 0,
+    "people_fact_comp_assignment_restricted": 16119,
+    "people_fact_interview": 112188,
+    "people_fact_offer": 2926,
+    "people_fact_scorecard": 24096,
+    "people_fact_separation": 0,
+    "people_fact_survey_score": 0,
+    "people_fact_survey_score_restricted": 66780,
+    "people_fact_survey_wave": 0,
+    "people_fact_training_participation": 3600,
+    "people_fact_worker_skill": 27279,
+    "people_hist_worker_attr": 8896,
+    "people_mart_applicant_flow": 96,
+    "people_mart_comp_monthly": 2151,
+    "people_mart_engagement_wave": 40,
+    "people_mart_funnel_monthly": 262,
+    "people_mart_learning_monthly": 60,
+    "people_mart_mobility_monthly": 60,
+    "people_mart_recruiter_load_monthly": 60,
+    "people_mart_recruiting_monthly": 61,
+    "people_mart_skill_coverage_monthly": 4,
+    "people_mart_source_health_daily": 2,
+    "people_mart_stage_aging_monthly": 268,
+    "people_mart_workforce_monthly": 3597,
+    "people_mart_workforce_monthly_2d": 720,
+    "people_ref_city": 3,
+    "people_ref_comp_band": 10,
+    "people_ref_job_skill_target": 27,
+    "people_ref_separation_reason_map": 7,
+    "people_snap_recruiter_month": 60,
+    "people_snap_requisition_month": 82759,
+    "people_snap_worker_month": 131314,
+    "people_xw_identity": 2499,
+    "people_xw_job": 4,
+    "people_xw_location": 3,
+    "people_xw_org": 5,
+    "people_xw_skill": 27
+  },
+  "pg_total_relation_size": [
+    {
+      "name": "people_v2.people_fact_candidate_demographic_restricted",
+      "relkind": "r",
+      "bytes": 74022912
+    },
+    {
+      "name": "people_v2.people_fact_candidate_eeoc_restricted",
+      "relkind": "r",
+      "bytes": 42426368
+    },
+    {
+      "name": "people_v2.people_snap_worker_month",
+      "relkind": "r",
+      "bytes": 27172864
+    },
+    {
+      "name": "people_v2.people_fact_interview",
+      "relkind": "r",
+      "bytes": 14450688
+    },
+    {
+      "name": "people_v2.people_evt_application_stage",
+      "relkind": "r",
+      "bytes": 9011200
+    },
+    {
+      "name": "people_v2.people_fact_application",
+      "relkind": "r",
+      "bytes": 8200192
+    },
+    {
+      "name": "people_v2.people_snap_requisition_month",
+      "relkind": "r",
+      "bytes": 6791168
+    },
+    {
+      "name": "people_v2.people_fact_survey_score_restricted",
+      "relkind": "r",
+      "bytes": 6782976
+    },
+    {
+      "name": "people_v2.people_evt_worker",
+      "relkind": "r",
+      "bytes": 6422528
+    },
+    {
+      "name": "people_v2.people_dim_candidate",
+      "relkind": "r",
+      "bytes": 5767168
+    },
+    {
+      "name": "people_v2.people_fact_comp_assignment_restricted",
+      "relkind": "r",
+      "bytes": 3334144
+    },
+    {
+      "name": "people_v2.people_fact_worker_skill",
+      "relkind": "r",
+      "bytes": 2768896
+    },
+    {
+      "name": "people_v2.people_fact_scorecard",
+      "relkind": "r",
+      "bytes": 2555904
+    },
+    {
+      "name": "people_v2.people_hist_worker_attr",
+      "relkind": "r",
+      "bytes": 2048000
+    },
+    {
+      "name": "people_v2.people_fact_appraisal",
+      "relkind": "r",
+      "bytes": 1695744
+    },
+    {
+      "name": "people_v2.people_dim_stage",
+      "relkind": "r",
+      "bytes": 1196032
+    },
+    {
+      "name": "people_v2.people_fact_offer",
+      "relkind": "r",
+      "bytes": 835584
+    },
+    {
+      "name": "people_v2.people_dim_worker",
+      "relkind": "r",
+      "bytes": 729088
+    },
+    {
+      "name": "people_v2.people_xw_identity",
+      "relkind": "r",
+      "bytes": 688128
+    },
+    {
+      "name": "people_v2.people_dim_person",
+      "relkind": "r",
+      "bytes": 614400
+    },
+    {
+      "name": "people_v2.people_dim_person_restricted",
+      "relkind": "r",
+      "bytes": 581632
+    },
+    {
+      "name": "people_v2.people_fact_training_participation",
+      "relkind": "r",
+      "bytes": 516096
+    },
+    {
+      "name": "people_v2.people_mart_comp_monthly",
+      "relkind": "r",
+      "bytes": 434176
+    },
+    {
+      "name": "people_v2.people_mart_workforce_monthly",
+      "relkind": "r",
+      "bytes": 417792
+    },
+    {
+      "name": "people_v2.people_dim_requisition",
+      "relkind": "r",
+      "bytes": 409600
+    },
+    {
+      "name": "people_v2.people_evt_worker_change",
+      "relkind": "r",
+      "bytes": 393216
+    },
+    {
+      "name": "people_v2.people_mart_workforce_monthly_2d",
+      "relkind": "r",
+      "bytes": 106496
+    },
+    {
+      "name": "people_v2.people_mart_funnel_monthly",
+      "relkind": "r",
+      "bytes": 65536
+    },
+    {
+      "name": "people_v2.people_mart_stage_aging_monthly",
+      "relkind": "r",
+      "bytes": 65536
+    },
+    {
+      "name": "people_v2.people_dim_date",
+      "relkind": "r",
+      "bytes": 49152
+    },
+    {
+      "name": "people_v2.people_snap_recruiter_month",
+      "relkind": "r",
+      "bytes": 49152
+    },
+    {
+      "name": "people_v2.people_dim_org",
+      "relkind": "r",
+      "bytes": 40960
+    },
+    {
+      "name": "people_v2.people_dim_appraisal_cycle",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_dim_grade",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_dim_job",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_dim_learning_resource",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_dim_location",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_dim_recruiter",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_dim_rejection_reason",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_dim_skill",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_dim_source",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_dim_survey_item",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_dim_survey_wave",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_mart_applicant_flow",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_mart_engagement_wave",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_mart_learning_monthly",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_mart_mobility_monthly",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_mart_recruiter_load_monthly",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_mart_recruiting_monthly",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_mart_skill_coverage_monthly",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_mart_source_health_daily",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_ref_city",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_ref_comp_band",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_ref_job_skill_target",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_ref_separation_reason_map",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_xw_job",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_xw_location",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_xw_org",
+      "relkind": "r",
+      "bytes": 32768
+    },
+    {
+      "name": "people_v2.people_xw_skill",
+      "relkind": "r",
+      "bytes": 32768
+    }
+  ],
+  "indexes": [
+    {
+      "name": "people_v2.people_fact_candidate_demographic_restricted_application_id_idx",
+      "relkind": "i",
+      "bytes": 24109056
+    },
+    {
+      "name": "people_v2.people_fact_candidate_eeoc_restricted_application_id_idx",
+      "relkind": "i",
+      "bytes": 13426688
+    },
+    {
+      "name": "people_v2.people_snap_worker_month_org_path_idx",
+      "relkind": "i",
+      "bytes": 5275648
+    },
+    {
+      "name": "people_v2.people_fact_interview_application_id_idx",
+      "relkind": "i",
+      "bytes": 3956736
+    },
+    {
+      "name": "people_v2.people_fact_interview_interview_id_idx",
+      "relkind": "i",
+      "bytes": 3776512
+    },
+    {
+      "name": "people_v2.people_evt_application_stage_application_id_idx",
+      "relkind": "i",
+      "bytes": 2039808
+    },
+    {
+      "name": "people_v2.people_fact_application_application_id_idx",
+      "relkind": "i",
+      "bytes": 1671168
+    },
+    {
+      "name": "people_v2.people_dim_candidate_candidate_id_idx",
+      "relkind": "i",
+      "bytes": 1662976
+    },
+    {
+      "name": "people_v2.people_evt_worker_event_id_idx",
+      "relkind": "i",
+      "bytes": 1622016
+    },
+    {
+      "name": "people_v2.people_snap_worker_month_worker_id_idx",
+      "relkind": "i",
+      "bytes": 1392640
+    },
+    {
+      "name": "people_v2.people_snap_worker_month_month_end_idx",
+      "relkind": "i",
+      "bytes": 1007616
+    },
+    {
+      "name": "people_v2.people_fact_survey_score_restricted_worker_id_idx",
+      "relkind": "i",
+      "bytes": 786432
+    },
+    {
+      "name": "people_v2.people_snap_requisition_month_requisition_id_idx",
+      "relkind": "i",
+      "bytes": 786432
+    },
+    {
+      "name": "people_v2.people_snap_requisition_month_month_end_idx",
+      "relkind": "i",
+      "bytes": 729088
+    },
+    {
+      "name": "people_v2.people_fact_scorecard_scorecard_id_idx",
+      "relkind": "i",
+      "bytes": 557056
+    },
+    {
+      "name": "people_v2.people_fact_comp_assignment_restricted_comp_assignment_id_idx",
+      "relkind": "i",
+      "bytes": 524288
+    },
+    {
+      "name": "people_v2.people_fact_scorecard_application_id_idx",
+      "relkind": "i",
+      "bytes": 524288
+    },
+    {
+      "name": "people_v2.people_evt_worker_worker_id_idx",
+      "relkind": "i",
+      "bytes": 434176
+    },
+    {
+      "name": "people_v2.people_dim_stage_stage_id_idx",
+      "relkind": "i",
+      "bytes": 417792
+    },
+    {
+      "name": "people_v2.people_fact_comp_assignment_restricted_worker_id_idx",
+      "relkind": "i",
+      "bytes": 352256
+    },
+    {
+      "name": "people_v2.people_fact_worker_skill_worker_id_idx",
+      "relkind": "i",
+      "bytes": 352256
+    },
+    {
+      "name": "people_v2.people_fact_appraisal_appraisal_id_idx",
+      "relkind": "i",
+      "bytes": 327680
+    },
+    {
+      "name": "people_v2.people_fact_worker_skill_skill_id_idx",
+      "relkind": "i",
+      "bytes": 286720
+    },
+    {
+      "name": "people_v2.people_hist_worker_attr_worker_id_idx",
+      "relkind": "i",
+      "bytes": 278528
+    },
+    {
+      "name": "people_v2.people_dim_person_person_id_idx",
+      "relkind": "i",
+      "bytes": 245760
+    },
+    {
+      "name": "people_v2.people_dim_person_restricted_person_id_idx",
+      "relkind": "i",
+      "bytes": 245760
+    },
+    {
+      "name": "people_v2.people_fact_appraisal_worker_id_idx",
+      "relkind": "i",
+      "bytes": 221184
+    },
+    {
+      "name": "people_v2.people_dim_worker_worker_id_idx",
+      "relkind": "i",
+      "bytes": 204800
+    },
+    {
+      "name": "people_v2.people_xw_identity_person_id_idx",
+      "relkind": "i",
+      "bytes": 172032
+    },
+    {
+      "name": "people_v2.people_evt_worker_change_event_id_idx",
+      "relkind": "i",
+      "bytes": 155648
+    },
+    {
+      "name": "people_v2.people_fact_offer_application_id_idx",
+      "relkind": "i",
+      "bytes": 131072
+    },
+    {
+      "name": "people_v2.people_fact_training_participation_worker_id_idx",
+      "relkind": "i",
+      "bytes": 131072
+    },
+    {
+      "name": "people_v2.people_xw_identity_worker_id_idx",
+      "relkind": "i",
+      "bytes": 122880
+    },
+    {
+      "name": "people_v2.people_dim_requisition_requisition_id_idx",
+      "relkind": "i",
+      "bytes": 114688
+    },
+    {
+      "name": "people_v2.people_fact_offer_offer_id_idx",
+      "relkind": "i",
+      "bytes": 81920
+    },
+    {
+      "name": "people_v2.people_fact_training_participation_training_event_id_idx",
+      "relkind": "i",
+      "bytes": 57344
+    },
+    {
+      "name": "people_v2.people_mart_workforce_monthly_month_end_idx",
+      "relkind": "i",
+      "bytes": 57344
+    },
+    {
+      "name": "people_v2.people_mart_comp_monthly_month_end_idx",
+      "relkind": "i",
+      "bytes": 40960
+    },
+    {
+      "name": "people_v2.people_dim_appraisal_cycle_cycle_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_date_date_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_date_month_end_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_grade_grade_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_job_job_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_learning_resource_resource_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_location_location_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_org_org_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_recruiter_person_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_rejection_reason_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_skill_skill_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_source_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_survey_item_item_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_survey_wave_wave_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_applicant_flow_job_family_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_engagement_wave_wave_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_funnel_monthly_month_start_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_learning_monthly_month_start_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_mobility_monthly_month_start_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_recruiter_load_monthly_month_end_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_recruiting_monthly_month_start_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_skill_coverage_monthly_month_end_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_source_health_daily_extract_date_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_stage_aging_monthly_month_start_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_mart_workforce_monthly_2d_month_end_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_ref_city_city_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_ref_comp_band_grade_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_ref_job_skill_target_skill_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_ref_separation_reason_map_raw_reason_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_snap_recruiter_month_month_end_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_snap_recruiter_month_recruiter_user_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_xw_job_job_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_xw_location_location_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_xw_org_org_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_xw_skill_skill_id_idx",
+      "relkind": "i",
+      "bytes": 16384
+    },
+    {
+      "name": "people_v2.people_dim_org_org_path_idx",
+      "relkind": "i",
+      "bytes": 8192
+    }
+  ],
+  "bytes_5pct_tables": 221528064,
+  "bytes_5pct_restricted": 123232256,
+  "full_estimate_x20_as_designed": 4430561280,
+  "supabase_measured_people_v2_bytes": 4430561280,
+  "a7_limit_bytes": 4831838208,
+  "a7": "as_designed",
+  "occupied_during_load": {
+    "database_bytes": 232923663,
+    "wal_bytes": 0,
+    "system_bytes": 15273634,
+    "occupied_bytes": 248197297
+  },
+  "admission_measured_times_1_3": 5759729664
+}

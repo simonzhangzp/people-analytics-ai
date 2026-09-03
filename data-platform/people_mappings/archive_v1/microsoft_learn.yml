@@ -1,0 +1,21 @@
+canonical_entity: people_external_learning_content
+source_contract:
+  source_system: microsoft_learn
+  source_object: catalog
+  pin: people_source_contracts/microsoft_learn/VERSION
+  catalog_url: https://learn.microsoft.com/api/catalog/?locale=en-us&type=modules,learningPaths,appliedSkills,certifications,courses
+note: External catalog only. Do not mix with Frappe Training Event activity.
+fields:
+  - canonical_field: content_id
+    source_field: uid
+    transformation: coalesce(uid, id, url)
+    business_definition: Catalog identity.
+  - canonical_field: title
+    source_field: title
+    transformation: identity
+  - canonical_field: url
+    source_field: url
+    transformation: identity
+  - canonical_field: last_modified
+    source_field: last_modified
+    transformation: coalesce(last_modified, lastModified)

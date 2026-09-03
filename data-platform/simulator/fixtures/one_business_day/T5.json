@@ -1,0 +1,40 @@
+{
+  "transaction": "T5",
+  "employee": {
+    "doctype": "Employee",
+    "name": "HR-EMP-000150",
+    "employee_name": "Worker 000150",
+    "status": "Left",
+    "date_of_joining": "2021-03-01",
+    "department": "Engineering - Platform",
+    "designation": "Software Developer",
+    "grade": "G4",
+    "branch": "APAC-SIN",
+    "employment_type": "Regular",
+    "reports_to": null,
+    "relieving_date": "2026-04-08",
+    "reason_for_leaving": "Resignation - Better opportunity",
+    "gender": "Female",
+    "date_of_birth": "1990-01-15",
+    "docstatus": 0,
+    "creation": "2021-03-01T12:00:00Z",
+    "modified": "2021-03-01T12:00:00Z"
+  },
+  "termination_category": "voluntary",
+  "e6_vocabulary": [
+    "Death",
+    "Resignation - Better opportunity",
+    "Resignation - Personal",
+    "Retirement",
+    "Termination - Performance",
+    "Termination - Restructuring"
+  ],
+  "employee_separation": {
+    "doctype": "Employee Separation",
+    "name": "HR-EMP-SEP-0001",
+    "employee": "HR-EMP-000150",
+    "boarding_begins_on": "2026-04-08",
+    "boarding_status": "In Process",
+    "docstatus": 1
+  }
+}

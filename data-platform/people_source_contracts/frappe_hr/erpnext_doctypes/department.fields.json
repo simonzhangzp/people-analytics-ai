@@ -1,0 +1,65 @@
+{
+  "name": "Department",
+  "module": "Setup",
+  "istable": null,
+  "issingle": null,
+  "autoname": null,
+  "fields": [
+    {
+      "fieldname": "department_name",
+      "label": "Department",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "parent_department",
+      "label": "Parent Department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "reqd": null
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": 1
+    },
+    {
+      "fieldname": "is_group",
+      "label": "Is Group",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "disabled",
+      "label": "Disabled",
+      "fieldtype": "Check",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "lft",
+      "label": "lft",
+      "fieldtype": "Int",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "rgt",
+      "label": "rgt",
+      "fieldtype": "Int",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "old_parent",
+      "label": "Old Parent",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

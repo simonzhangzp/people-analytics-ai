@@ -1,0 +1,8 @@
+{
+  "product": "engagement_ext",
+  "version": "instrument.v1",
+  "provenance": "SYNTHETIC_EXTENSION",
+  "registry": "E5",
+  "note": "No Frappe HR or Greenhouse survey module exists in the pinned contracts. This folder is the GATE 1 contract for the synthetic engagement instrument.",
+  "docs": "docs/ENGAGEMENT_INSTRUMENT.md"
+}

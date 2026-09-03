@@ -1,0 +1,251 @@
+canonical_version: people_v2
+gate: 1
+note: 'Every SYNTHETIC_EXTENSION must appear here and later in people_meta_attribute. E8 was proposed then withdrawn: HRMS
+  custom field Employee.employment_type exists.'
+extensions:
+- id: E1
+  object: people_ref_comp_band
+  reason: Frappe HR has no compensation band object; compa-ratio requires band_mid.
+  real_world_source: Compensation system / market survey
+- id: E2
+  object: people_dim_grade.level_rank
+  reason: Employee Grade has no sort order.
+  real_world_source: Job architecture document
+- id: E3
+  object: people_ref_city
+  reason: Frappe Branch has only a name.
+  real_world_source: Address master
+- id: E4
+  object: people_dim_recruiter
+  reason: Harvest user has identity and permissions only.
+  real_world_source: TA operating config
+- id: E5
+  object: engagement_ext (survey_instrument, survey_wave, survey_response)
+  reason: No open-source HRIS in this pin has a survey module.
+  real_world_source: Engagement platform
+  contract: people_source_contracts/engagement_ext/
+- id: E6
+  object: people_ref_separation_reason_map
+  reason: Employee.reason_for_leaving is free text; simulator uses a controlled vocabulary.
+  real_world_source: Separation reason master
+- id: E7
+  object: GlobalTech org tree names and structure
+  reason: Synthetic company overlay on people_dim_org.
+  real_world_source: none
+- id: E8
+  object: people_dim_worker.employment_type
+  reason: Withdrawn. HRMS v16.15.0 get_custom_fields() adds Employee.employment_type (Link Employment Type) and Employee.grade
+    (Link Employee Grade). Provenance is SOURCE_NATIVE (hrms custom field).
+  real_world_source: hrms/setup.py
+  status: withdrawn
+  gate1_decision: Not approved. Use SOURCE_NATIVE from the HRMS custom-field overlay.
+fields:
+- canonical_table: people_ref_comp_band
+  canonical_field: grade_id
+  source_system: engagement_ext
+  source_object: people_ref_comp_band
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E1 grade.
+  source_field: grade_id
+- canonical_table: people_ref_comp_band
+  canonical_field: country
+  source_system: engagement_ext
+  source_object: people_ref_comp_band
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E1 country.
+  source_field: country
+- canonical_table: people_ref_comp_band
+  canonical_field: currency
+  source_system: engagement_ext
+  source_object: people_ref_comp_band
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E1 currency.
+  source_field: currency
+- canonical_table: people_ref_comp_band
+  canonical_field: band_min
+  source_system: engagement_ext
+  source_object: people_ref_comp_band
+  transformation: identity
+  nullable: false
+  data_type: numeric
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E1 minimum.
+  source_field: band_min
+- canonical_table: people_ref_comp_band
+  canonical_field: band_mid
+  source_system: engagement_ext
+  source_object: people_ref_comp_band
+  transformation: identity
+  nullable: false
+  data_type: numeric
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E1 midpoint. BR-COMP-001 uses this.
+  source_field: band_mid
+- canonical_table: people_ref_comp_band
+  canonical_field: band_max
+  source_system: engagement_ext
+  source_object: people_ref_comp_band
+  transformation: identity
+  nullable: false
+  data_type: numeric
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E1 maximum.
+  source_field: band_max
+- canonical_table: people_ref_comp_band
+  canonical_field: valid_from
+  source_system: engagement_ext
+  source_object: people_ref_comp_band
+  transformation: identity
+  nullable: false
+  data_type: date
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Band version start.
+  source_field: valid_from
+- canonical_table: people_ref_comp_band
+  canonical_field: valid_to
+  source_system: engagement_ext
+  source_object: people_ref_comp_band
+  transformation: identity
+  nullable: true
+  data_type: date
+  effective_date_logic: valid_to
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: Band version end.
+  source_field: valid_to
+- canonical_table: people_ref_city
+  canonical_field: city
+  source_system: engagement_ext
+  source_object: people_ref_city
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E3 city.
+  source_field: city
+- canonical_table: people_ref_city
+  canonical_field: country
+  source_system: engagement_ext
+  source_object: people_ref_city
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E3 country.
+  source_field: country
+- canonical_table: people_ref_city
+  canonical_field: region
+  source_system: engagement_ext
+  source_object: people_ref_city
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E3 region.
+  source_field: region
+- canonical_table: people_ref_separation_reason_map
+  canonical_field: raw_reason
+  source_system: engagement_ext
+  source_object: people_ref_separation_reason_map
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E6 raw text key.
+  source_field: raw_reason
+- canonical_table: people_ref_separation_reason_map
+  canonical_field: termination_category
+  source_system: engagement_ext
+  source_object: people_ref_separation_reason_map
+  transformation: voluntary | involuntary | other (BR-RET-001)
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E6 category.
+  source_field: termination_category
+- canonical_table: people_dim_recruiter
+  canonical_field: person_id
+  source_system: greenhouse_v3
+  source_object: user
+  transformation: user.employee_id → person_id (T8)
+  nullable: false
+  data_type: uuid
+  effective_date_logic: valid_from
+  provenance: CANONICAL_KEY
+  business_definition: Recruiter person. Must be an employee.
+  source_field: employee_id
+- canonical_table: people_dim_recruiter
+  canonical_field: specialization
+  source_system: engagement_ext
+  source_object: people_dim_recruiter
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E4 specialization.
+  source_field: specialization
+- canonical_table: people_dim_recruiter
+  canonical_field: supported_region
+  source_system: engagement_ext
+  source_object: people_dim_recruiter
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E4 region.
+  source_field: supported_region
+- canonical_table: people_dim_recruiter
+  canonical_field: supported_job_family
+  source_system: engagement_ext
+  source_object: people_dim_recruiter
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E4 job family.
+  source_field: supported_job_family
+- canonical_table: people_dim_recruiter
+  canonical_field: valid_from
+  source_system: engagement_ext
+  source_object: people_dim_recruiter
+  transformation: identity
+  nullable: false
+  data_type: date
+  effective_date_logic: valid_from
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E4 version start.
+  source_field: valid_from
+- canonical_table: people_dim_recruiter
+  canonical_field: valid_to
+  source_system: engagement_ext
+  source_object: people_dim_recruiter
+  transformation: identity
+  nullable: true
+  data_type: date
+  effective_date_logic: valid_to
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E4 version end.
+  source_field: valid_to

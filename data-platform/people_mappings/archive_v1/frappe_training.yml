@@ -1,0 +1,41 @@
+canonical_entity: people_silver_training
+note: Internal learning is Frappe Training Program / Event / Result / Feedback. Microsoft Learn stays in people_external_learning_content.
+
+training_event:
+  source_system: frappe_hr
+  source_object: Training Event
+  schema: people_source_contracts/frappe_hr/doctypes/training_event.json
+  bronze_table: people_bronze_frappe_training_event
+  fields:
+    - canonical_field: training_event_id
+      source_field: name
+      transformation: identity
+    - canonical_field: training_program_id
+      source_field: training_program
+      transformation: identity
+    - canonical_field: event_status
+      source_field: event_status
+      transformation: identity
+    - canonical_field: start_at
+      source_field: start_time
+      transformation: identity
+    - canonical_field: end_at
+      source_field: end_time
+      transformation: identity
+
+training_result:
+  source_system: frappe_hr
+  source_object: Training Result
+  schema: people_source_contracts/frappe_hr/doctypes/training_result.json
+  bronze_table: people_bronze_frappe_training_result
+  fields:
+    - canonical_field: training_result_id
+      source_field: name
+      transformation: identity
+    - canonical_field: training_event_id
+      source_field: training_event
+      transformation: identity
+
+not_mapped_on_purpose:
+  - COURSE-xxx catalog
+  - learning hours (no duration field on pinned Training Event/Result)

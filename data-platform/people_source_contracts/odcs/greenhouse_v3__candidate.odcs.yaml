@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:candidate
+info:
+  title: candidate
+  version: 1.0.0
+  description: updated_after watermark.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/candidate/extract_date={date}/run_id={id}/
+schema:
+- name: candidate
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/candidate
+  primaryKey:
+  - id
+  description: updated_after watermark.
+extract:
+  mode: incremental_plus_weekly_full
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total for the extract window
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: sensitive_pii

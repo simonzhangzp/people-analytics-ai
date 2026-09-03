@@ -1,0 +1,140 @@
+canonical_entity: people_silver_worker_event
+source_contract:
+  source_system: frappe_hr
+  source_object: Employee Transfer
+  pin:
+    hrms: v16.15.0
+    commit: "1924234884731e389ecc4e5500653fcd59666911"
+    schema: people_source_contracts/frappe_hr/doctypes/employee_transfer.json
+    child_schema: people_source_contracts/frappe_hr/doctypes/employee_property_history.json
+bronze_tables:
+  - people_bronze_frappe_employee_transfer
+  - people_bronze_frappe_employee_property_history
+fields:
+  - canonical_field: event_id
+    source_system: frappe_hr
+    source_object: Employee Transfer
+    source_field: name
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: One transfer document becomes one worker event.
+
+  - canonical_field: worker_id
+    source_system: frappe_hr
+    source_object: Employee Transfer
+    source_field: employee
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Employee being transferred.
+
+  - canonical_field: event_type
+    source_system: frappe_hr
+    source_object: Employee Transfer
+    source_field: doctype
+    transformation: constant transfer
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Always transfer for this mapping. Do not sample event_type.
+
+  - canonical_field: effective_at
+    source_system: frappe_hr
+    source_object: Employee Transfer
+    source_field: transfer_date
+    transformation: identity
+    nullable: false
+    data_type: date
+    effective_date_logic: transfer_date
+    business_definition: Effective date of the transfer. This is the only allowed effective date for transfer events.
+
+  - canonical_field: source_system
+    source_system: frappe_hr
+    source_object: Employee Transfer
+    source_field: ""
+    transformation: constant frappe_hr
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Provenance of the event.
+
+  - canonical_field: source_object
+    source_system: frappe_hr
+    source_object: Employee Transfer
+    source_field: doctype
+    transformation: constant Employee Transfer
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Source object name.
+
+  - canonical_field: source_record_id
+    source_system: frappe_hr
+    source_object: Employee Transfer
+    source_field: name
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Frappe document name (HR-EMP-TRN-YYYY-#####).
+
+child_mapping:
+  canonical_entity: people_silver_worker_event_change
+  source_object: Employee Property History
+  grain: one child row per change
+  fields:
+    - canonical_field: event_id
+      source_field: parent
+      transformation: identity
+      business_definition: Parent Employee Transfer.name
+    - canonical_field: attribute_name
+      source_field: property
+      transformation: identity
+      business_definition: Property label (Department, Branch, Designation, …)
+    - canonical_field: attribute_fieldname
+      source_field: fieldname
+      transformation: identity
+      business_definition: Employee fieldname when present
+    - canonical_field: old_value
+      source_field: current
+      transformation: identity
+      business_definition: Value before the transfer
+    - canonical_field: new_value
+      source_field: new
+      transformation: identity
+      business_definition: Value after the transfer
+
+example:
+  source:
+    name: HR-EMP-TRN-2026-00012
+    employee: HR-EMP-000123
+    transfer_date: 2026-03-01
+    transfer_details:
+      - property: Department
+        current: Engineering
+        new: AI
+      - property: Branch
+        current: Raleigh
+        new: New York
+      - property: Designation
+        current: Manager
+        new: Director
+  canonical:
+    event:
+      event_id: HR-EMP-TRN-2026-00012
+      worker_id: HR-EMP-000123
+      event_type: transfer
+      effective_at: 2026-03-01
+    changes:
+      - {attribute_name: Department, old_value: Engineering, new_value: AI}
+      - {attribute_name: Branch, old_value: Raleigh, new_value: New York}
+      - {attribute_name: Designation, old_value: Manager, new_value: Director}
+
+not_mapped_on_purpose:
+  - time_in_role_days
+  - org_id on the event row
+  - job_id on the event row
+  - location_id on the event row

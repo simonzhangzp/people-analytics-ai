@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:application
+info:
+  title: application
+  version: 1.0.0
+  description: No jobs[] array; job_id scalar.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/application/extract_date={date}/run_id={id}/
+schema:
+- name: application
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/application
+  primaryKey:
+  - id
+  description: No jobs[] array; job_id scalar.
+extract:
+  mode: incremental_plus_weekly_full
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

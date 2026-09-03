@@ -1,0 +1,39 @@
+canonical_version: people_v2
+gate: 2
+note: Allowed and denied join paths. Fairness RPCs may not walk denied edges.
+denied:
+  - id: gov001_eeoc_to_person
+    from: people_fact_candidate_eeoc_restricted
+    via:
+      - people_fact_application
+      - people_dim_candidate
+    to:
+      - people_dim_person
+      - people_dim_worker
+    rule: BR-GOV-001
+    eval: evals/golden/gov001_denied_eeoc_person_join.yaml
+  - id: gov001_demographic_to_person
+    from: people_fact_candidate_demographic_restricted
+    via:
+      - people_fact_application
+      - people_dim_candidate
+    to:
+      - people_dim_person
+      - people_dim_worker
+    rule: BR-GOV-001
+    eval: evals/golden/gov001_denied_eeoc_person_join.yaml
+fairness_rpc:
+  allowed_dimensions:
+    - requisition_id
+    - org_id
+    - location_id
+    - job_family
+  min_cell: 10
+  denied_dimensions:
+    - person_id
+    - worker_id
+    - candidate_id
+    - race
+    - gender
+    - veteran_status
+    - disability_status

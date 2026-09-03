@@ -1,0 +1,94 @@
+canonical_version: people_v2
+gate: 1
+note: Branch has only branch name. Geography is E3.
+source_contract:
+  pin: erpnext_doctypes/branch.json
+fields:
+- canonical_table: people_dim_location
+  canonical_field: location_id
+  source_system: frappe_hr
+  source_object: Branch
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: CANONICAL_KEY
+  business_definition: Branch.name.
+  source_field: name
+- canonical_table: people_dim_location
+  canonical_field: branch_name
+  source_system: frappe_hr
+  source_object: Branch
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SOURCE_NATIVE
+  business_definition: Branch label.
+  source_field: branch
+- canonical_table: people_dim_location
+  canonical_field: city
+  source_system: engagement_ext
+  source_object: people_ref_city
+  transformation: E3 lookup
+  nullable: true
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E3.
+  source_field: city
+- canonical_table: people_dim_location
+  canonical_field: country
+  source_system: engagement_ext
+  source_object: people_ref_city
+  transformation: E3 lookup
+  nullable: true
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E3.
+  source_field: country
+- canonical_table: people_dim_location
+  canonical_field: region
+  source_system: engagement_ext
+  source_object: people_ref_city
+  transformation: E3 lookup
+  nullable: true
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E3.
+  source_field: region
+- canonical_table: people_dim_location
+  canonical_field: valid_from
+  source_system: frappe_hr
+  source_object: Branch
+  transformation: SCD2 start
+  nullable: false
+  data_type: date
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: Version start.
+  source_field: modified
+- canonical_table: people_dim_location
+  canonical_field: valid_to
+  source_system: frappe_hr
+  source_object: Branch
+  transformation: SCD2 end
+  nullable: true
+  data_type: date
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: Version end.
+  source_field: modified
+- canonical_table: people_dim_location
+  canonical_field: is_current
+  source_system: frappe_hr
+  source_object: Branch
+  transformation: valid_to is null
+  nullable: false
+  data_type: boolean
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: Current version flag.
+  source_field: modified

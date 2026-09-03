@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Employee Transfer
+info:
+  title: Employee Transfer
+  version: 1.0.0
+  description: BR-DQ-001. Cancelled docs are reversals.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Employee_Transfer/extract_date={date}/run_id={id}/
+schema:
+- name: Employee Transfer
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Employee Transfer
+  primaryKey:
+  - name
+  description: BR-DQ-001. Cancelled docs are reversals.
+extract:
+  mode: incremental
+  cadence: daily
+  key: name
+  control_total_source: count of submitted (docstatus=1) Employee Transfer
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

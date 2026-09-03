@@ -1,0 +1,67 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "office",
+  "harvest_path_hint": "/v3/offices",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "format": null,
+      "description": "Display name of the office (e.g. `San Francisco`, `Remote (US)`). Unique among active offices in the same organization."
+    },
+    {
+      "name": "parent_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the parent office when offices are organized hierarchically. `null` for top-level offices. References another `/v3/offices` row in the same organization."
+    },
+    {
+      "name": "external_id",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Stable identifier supplied by the customer or HRIS for cross-system reconciliation. `null` when no external id has been set. Available when the `org_structure_external_id` product flag is enabled."
+    },
+    {
+      "name": "location",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Free-form physical location string for the office (e.g. `New York, NY, USA`). `null` for offices that have no location set, including most remote offices."
+    },
+    {
+      "name": "primary_in_house_contact_user_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the Greenhouse user designated as the office's primary internal contact, typically the local recruiting lead. References a `/v3/users` row. `null` when no contact has been assigned."
+    }
+  ]
+}

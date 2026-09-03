@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Training Result Employee
+info:
+  title: Training Result Employee
+  version: 1.0.0
+  description: Parent filter docstatus=1.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Training_Result_Employee/extract_date={date}/run_id={id}/
+schema:
+- name: Training Result Employee
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Training Result Employee
+  primaryKey:
+  - parent+employee
+  description: Parent filter docstatus=1.
+extract:
+  mode: nested_incremental
+  cadence: daily
+  key: parent+employee
+  control_total_source: count of child rows on submitted results
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

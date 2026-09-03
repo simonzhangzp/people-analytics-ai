@@ -1,0 +1,76 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "scorecard_question_answer",
+  "harvest_path_hint": "/v3/scorecard_question_answers",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "scorecard_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the scorecard this answer belongs to. Every answer is tied to exactly one scorecard, which in turn belongs to a single interviewer's submission on one application."
+    },
+    {
+      "name": "scorecard_question_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the `scorecard_question` this answer responds to. The question's `answer_type` (`text`, `yes_no`, `single_select`, `multi_select`) determines which field on the answer is populated: `text` uses `answer`, `yes_no` uses `boolean_value`, and `single_select`/`multi_select` use the `scorecard_question_answer_options` sub-resource."
+    },
+    {
+      "name": "answer",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Free-text response for `text`-type scorecard questions. Plain text \u2014 HTML formatting and `@`-mention markup are stripped. `null` (or empty string) when the question is `yes_no`, `single_select`, or `multi_select`, or when the interviewer declined to answer."
+    },
+    {
+      "name": "answer_with_tags",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "HTML-formatted version of `answer`, preserving rich-text formatting (bold, italic, etc.) and `@`-mentions as embedded user tags (e.g. `@[User Name](user:123)`). `null` when there is no formatting or markup to preserve (i.e. when the stored value would be identical to `answer`), and under the same conditions as `answer`."
+    },
+    {
+      "name": "boolean_value",
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "format": null,
+      "description": "Response for `yes_no`-type scorecard questions: `true` for yes, `false` for no, `null` when the question is not `yes_no` or when the interviewer left it blank. Ignored on writes for any question whose `answer_type` is not `yes_no`."
+    },
+    {
+      "name": "value",
+      "type": [
+        "string",
+        "boolean",
+        "integer",
+        "array",
+        "null"
+      ],
+      "format": null,
+      "description": "Read-only. The answer in the same vocabulary the nested write path accepts (`question_answers[].value` on `POST`/`PATCH /v3/scorecards`), dispatched on the question's `answer_type`: string for `text`, boolean for `yes_no`, the selected option id for `single_select`, an array of selected option ids for `multi_select`. `null` when unanswered."
+    }
+  ]
+}

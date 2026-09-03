@@ -1,0 +1,186 @@
+canonical_entity: people_silver_worker
+source_contract:
+  source_system: frappe_hr
+  source_object: Employee
+  pin:
+    erpnext: v16.0.0
+    schema: people_source_contracts/frappe_hr/erpnext_doctypes/employee.json
+bronze_table: people_bronze_frappe_employee
+fields:
+  - canonical_field: worker_id
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: name
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: current Employee master; history via worker events
+    business_definition: Canonical worker key. Equals Frappe Employee.name (for example HR-EMP-000123).
+
+  - canonical_field: employee_number
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: employee_number
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current
+    business_definition: Optional HR employee number when different from name.
+
+  - canonical_field: first_name
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: first_name
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: current
+    business_definition: Given name from the Employee master.
+
+  - canonical_field: last_name
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: last_name
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current
+    business_definition: Family name from the Employee master.
+
+  - canonical_field: employment_status
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: status
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: current
+    business_definition: Frappe status enum Active / Inactive / Suspended / Left.
+
+  - canonical_field: hire_date
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: date_of_joining
+    transformation: identity
+    nullable: false
+    data_type: date
+    effective_date_logic: date_of_joining
+    business_definition: First day of employment.
+
+  - canonical_field: termination_date
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: relieving_date
+    transformation: identity
+    nullable: true
+    data_type: date
+    effective_date_logic: relieving_date
+    business_definition: Last day of employment. Null while employed.
+
+  - canonical_field: termination_reason
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: reason_for_leaving
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current
+    business_definition: Reason recorded on the Employee master at exit.
+
+  - canonical_field: designation_id
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: designation
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current; changes via Employee Promotion / Transfer Property History
+    business_definition: Link to Designation.name.
+
+  - canonical_field: department_id
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: department
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current; changes via Transfer Property History
+    business_definition: Link to Department.name.
+
+  - canonical_field: branch_id
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: branch
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current; changes via Transfer Property History
+    business_definition: Link to Branch.name.
+
+  - canonical_field: company_id
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: company
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: current; new_company on Transfer when create_new_employee_id
+    business_definition: Link to Company.
+
+  - canonical_field: manager_worker_id
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: reports_to
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current
+    business_definition: Manager Employee.name. Join by id, never by name.
+
+  - canonical_field: gender
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: gender
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: current
+    business_definition: HRIS gender on the employee master. Not Greenhouse EEOC.
+
+  - canonical_field: date_of_birth
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: date_of_birth
+    transformation: identity
+    nullable: false
+    data_type: date
+    effective_date_logic: current
+    business_definition: Date of birth. Required on Frappe Employee. Not a serving dashboard field.
+
+  - canonical_field: company_email
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: company_email
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current
+    business_definition: Work email used for Greenhouse user crosswalk when employee_id is absent.
+
+  - canonical_field: user_id
+    source_system: frappe_hr
+    source_object: Employee
+    source_field: user_id
+    transformation: identity
+    nullable: true
+    data_type: text
+    effective_date_logic: current
+    business_definition: Frappe User link on the employee.
+
+unmapped_source_fields_remain_in_bronze: true
+not_mapped_on_purpose:
+  - preferred_first_name  # Frappe has first_name; Greenhouse Candidate.preferred_name is ATS grain
+  - fte                   # not on Employee.json v16.0.0
+  - generation            # derive later from date_of_birth if approved
+  - ethnicity_band        # not on Employee; Greenhouse EEOC is application grain
+  - region                # not on Employee or Branch

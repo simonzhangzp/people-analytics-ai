@@ -1,0 +1,61 @@
+canonical_version: people_v2
+gate: 1
+note: Do not persist days_in_stage. Time-in-stage is gold/metric from entered_at/exited_at.
+source_contract:
+  pin: schemas/fields/application_stage.fields.json
+fields:
+- canonical_table: people_evt_application_stage
+  canonical_field: application_id
+  source_system: greenhouse_v3
+  source_object: application_stage
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: entered_at
+  provenance: SOURCE_NATIVE
+  business_definition: Application of the stage entry.
+  source_field: application_id
+- canonical_table: people_evt_application_stage
+  canonical_field: stage_id
+  source_system: greenhouse_v3
+  source_object: application_stage
+  transformation: identity
+  nullable: false
+  data_type: bigint
+  effective_date_logic: entered_at
+  provenance: SOURCE_NATIVE
+  business_definition: Stage definition id.
+  source_field: job_interview_stage_id
+- canonical_table: people_evt_application_stage
+  canonical_field: entered_at
+  source_system: greenhouse_v3
+  source_object: application_stage
+  transformation: identity
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: entered_at
+  provenance: SOURCE_NATIVE
+  business_definition: Stage entry time.
+  source_field: entered_at
+- canonical_table: people_evt_application_stage
+  canonical_field: exited_at
+  source_system: greenhouse_v3
+  source_object: application_stage
+  transformation: identity
+  nullable: true
+  data_type: timestamptz
+  effective_date_logic: exited_at
+  provenance: SOURCE_NATIVE
+  business_definition: Null while current.
+  source_field: exited_at
+- canonical_table: people_evt_application_stage
+  canonical_field: is_current
+  source_system: greenhouse_v3
+  source_object: application_stage
+  transformation: identity
+  nullable: false
+  data_type: boolean
+  effective_date_logic: entered_at
+  provenance: SOURCE_NATIVE
+  business_definition: Harvest field is current, not is_current.
+  source_field: current

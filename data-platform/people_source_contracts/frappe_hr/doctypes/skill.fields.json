@@ -1,0 +1,23 @@
+{
+  "name": "Skill",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "field:skill_name",
+  "fields": [
+    {
+      "fieldname": "skill_name",
+      "label": "Skill Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "description",
+      "label": "Description",
+      "fieldtype": "Text",
+      "options": null,
+      "reqd": null
+    }
+  ]
+}

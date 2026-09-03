@@ -1,0 +1,17 @@
+{
+  "name": "Employment Type",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "field:employee_type_name",
+  "is_submittable": null,
+  "fields": [
+    {
+      "fieldname": "employee_type_name",
+      "label": "Employment Type",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": 1
+    }
+  ]
+}

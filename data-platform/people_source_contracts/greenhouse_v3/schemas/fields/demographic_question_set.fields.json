@@ -1,0 +1,55 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "demographic_question_set",
+  "harvest_path_hint": "/v3/demographic_question_sets",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "format": null,
+      "description": "Name of the demographic question set, unique within the organization among active sets. Used as the section header for the grouping when the set is attached to a job post or candidate survey."
+    },
+    {
+      "name": "description",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "External-facing copy shown to applicants above the questions on a job post or candidate survey, explaining why the organization is collecting this data. Required once any question in the set is marked `required`; otherwise optional."
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "format": null,
+      "description": "`true` for sets currently in use; `false` after the set has been soft-removed (which also marks its `demographic_questions` inactive). Inactive sets are returned by default \u2014 pass `active=true` to filter to live sets only. Past applications continue to reference inactive sets so historical demographic responses stay readable."
+    },
+    {
+      "name": "enabled",
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "format": null,
+      "description": "Whether the set is available for selection on new job posts and candidate surveys. `true` and `null` both mean enabled (legacy rows predate the column and are treated as enabled); pass `enabled=false` to filter to sets the organization has explicitly disabled."
+    }
+  ]
+}

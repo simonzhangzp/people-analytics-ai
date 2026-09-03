@@ -1,0 +1,79 @@
+{
+  "name": "Employee Promotion",
+  "module": "HR",
+  "istable": null,
+  "issingle": null,
+  "autoname": "HR-EMP-PRO-.YYYY.-.#####",
+  "fields": [
+    {
+      "fieldname": "employee",
+      "label": "Employee",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "employee_name",
+      "label": "Employee Name",
+      "fieldtype": "Data",
+      "options": null,
+      "reqd": null
+    },
+    {
+      "fieldname": "department",
+      "label": "Department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "reqd": null
+    },
+    {
+      "fieldname": "promotion_date",
+      "label": "Promotion Date",
+      "fieldtype": "Date",
+      "options": null,
+      "reqd": 1
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": null
+    },
+    {
+      "fieldname": "promotion_details",
+      "label": null,
+      "fieldtype": "Table",
+      "options": "Employee Property History",
+      "reqd": null
+    },
+    {
+      "fieldname": "amended_from",
+      "label": "Amended From",
+      "fieldtype": "Link",
+      "options": "Employee Promotion",
+      "reqd": null
+    },
+    {
+      "fieldname": "salary_currency",
+      "label": "Salary Currency",
+      "fieldtype": "Link",
+      "options": "Currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "current_ctc",
+      "label": "Current CTC",
+      "fieldtype": "Currency",
+      "options": "salary_currency",
+      "reqd": null
+    },
+    {
+      "fieldname": "revised_ctc",
+      "label": "Revised CTC",
+      "fieldtype": "Currency",
+      "options": "salary_currency",
+      "reqd": null
+    }
+  ]
+}

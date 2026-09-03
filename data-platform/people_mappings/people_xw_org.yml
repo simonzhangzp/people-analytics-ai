@@ -1,0 +1,62 @@
+canonical_version: people_v2
+gate: 1
+note: Greenhouse department is not Frappe Department. Mapping is explicit and versioned.
+source_contract:
+  frappe: erpnext_doctypes/department.json
+  greenhouse: schemas/fields/department.fields.json
+fields:
+- canonical_table: people_xw_org
+  canonical_field: org_id
+  source_system: frappe_hr
+  source_object: Department
+  transformation: canonical org key = Frappe Department.name
+  nullable: false
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: CANONICAL_KEY
+  business_definition: Org spine is HRIS department.
+  source_field: name
+- canonical_table: people_xw_org
+  canonical_field: frappe_department
+  source_system: frappe_hr
+  source_object: Department
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SOURCE_NATIVE
+  business_definition: Frappe Department.name.
+  source_field: name
+- canonical_table: people_xw_org
+  canonical_field: gh_department_id
+  source_system: greenhouse_v3
+  source_object: department
+  transformation: manual or employee_id-backed map of GH department.id to Frappe Department.name; never name-match
+  nullable: true
+  data_type: integer
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: CANONICAL_KEY
+  business_definition: Null until an explicit crosswalk row is approved.
+  source_field: id
+- canonical_table: people_xw_org
+  canonical_field: valid_from
+  source_system: frappe_hr
+  source_object: Department
+  transformation: SCD2 start (BR-ORG-002)
+  nullable: false
+  data_type: date
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: When this GH↔Frappe pair became valid.
+  source_field: modified
+- canonical_table: people_xw_org
+  canonical_field: valid_to
+  source_system: frappe_hr
+  source_object: Department
+  transformation: SCD2 end (BR-ORG-002)
+  nullable: true
+  data_type: date
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: DERIVED
+  business_definition: When this pair was replaced.
+  source_field: modified

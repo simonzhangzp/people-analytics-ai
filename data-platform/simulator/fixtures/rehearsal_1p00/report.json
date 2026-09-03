@@ -1,0 +1,1120 @@
+{
+  "scale": 1.0,
+  "seed": 20260301,
+  "window": {
+    "start": "2021-09-01",
+    "end": "2026-08-31"
+  },
+  "publish": false,
+  "owner_approval": true,
+  "path": "bronze \u2192 people_mappings \u2192 silver parquet \u2192 gold parquet (DuckDB)",
+  "ending_certified_headcount": 50020,
+  "ending_headcount_by_region": {
+    "AMER": 22747,
+    "APAC": 14234,
+    "EMEA": 13039
+  },
+  "recruiting": {
+    "hires": 48617,
+    "offers_accepted": 48617,
+    "time_to_fill_p50": 32.0,
+    "time_to_fill_p90": 81.0,
+    "time_to_fill_p90_over_p50": 2.5312,
+    "stage_aging": [
+      {
+        "canonical_stage": "Offer",
+        "aging_p50_days": 4.0,
+        "aging_p90_days": 8.0
+      },
+      {
+        "canonical_stage": "Onsite",
+        "aging_p50_days": 8.0,
+        "aging_p90_days": 23.0
+      },
+      {
+        "canonical_stage": "Review",
+        "aging_p50_days": 3.0,
+        "aging_p90_days": 11.0
+      },
+      {
+        "canonical_stage": "Screen",
+        "aging_p50_days": 5.0,
+        "aging_p90_days": 12.0
+      }
+    ],
+    "stage_aging_p50": [
+      {
+        "canonical_stage": "Offer",
+        "aging_p50_days": 4.0
+      },
+      {
+        "canonical_stage": "Onsite",
+        "aging_p50_days": 8.0
+      },
+      {
+        "canonical_stage": "Review",
+        "aging_p50_days": 3.0
+      },
+      {
+        "canonical_stage": "Screen",
+        "aging_p50_days": 5.0
+      }
+    ],
+    "openings": 54019,
+    "cancelled": 5402,
+    "filled": 48617,
+    "cancel_rate": 0.1,
+    "baseline_cancel_rate": 0.1
+  },
+  "coverage_matrix": {
+    "comp": {
+      "ssa_rows": 321037,
+      "compa_ratio_by_grade": [
+        {
+          "grade": "G10",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 1009
+        },
+        {
+          "grade": "G3",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 7223
+        },
+        {
+          "grade": "G4",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 19533
+        },
+        {
+          "grade": "G5",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 21880
+        },
+        {
+          "grade": "G6",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 24745
+        },
+        {
+          "grade": "G7",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 8700
+        },
+        {
+          "grade": "G8",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 696
+        },
+        {
+          "grade": "G9",
+          "p25": 0.98,
+          "p50": 0.98,
+          "p75": 0.98,
+          "n": 831
+        }
+      ]
+    },
+    "performance": {
+      "appraisal_rows": 199510,
+      "final_score_bins": [
+        {
+          "score_bin": 2.0,
+          "n": 7860
+        },
+        {
+          "score_bin": 3.0,
+          "n": 82966
+        },
+        {
+          "score_bin": 4.0,
+          "n": 82976
+        },
+        {
+          "score_bin": 5.0,
+          "n": 25708
+        }
+      ]
+    },
+    "mobility": {
+      "promotion_count": 17691,
+      "transfer_count": 13137,
+      "manager_change_count": 0,
+      "promotion_annualized": 0.0835,
+      "transfer_annualized": 0.062,
+      "manager_change_annualized": 0.0,
+      "baseline": {
+        "promotion": 0.08,
+        "transfer": 0.06,
+        "manager_change": 0.05
+      }
+    },
+    "learning": {
+      "training_rows": 74700,
+      "hours_sum": 353760.0,
+      "hours_per_participation": 4.74,
+      "hours_per_certified": 7.07
+    },
+    "skills": {
+      "avg_skills_per_worker": 6.37,
+      "gap_top": [
+        {
+          "job_family": "Engineering",
+          "skill_id": "Kubernetes",
+          "gap": 0.3988
+        },
+        {
+          "job_family": "Engineering",
+          "skill_id": "Observability",
+          "gap": 0.3732
+        },
+        {
+          "job_family": "Engineering",
+          "skill_id": "CI/CD",
+          "gap": 0.2496
+        },
+        {
+          "job_family": "Sales",
+          "skill_id": "MEDDPICC",
+          "gap": 0.2474
+        },
+        {
+          "job_family": "Other",
+          "skill_id": "Documentation",
+          "gap": 0.125
+        },
+        {
+          "job_family": "Engineering",
+          "skill_id": "Cloud",
+          "gap": 0.1247
+        },
+        {
+          "job_family": "Sales",
+          "skill_id": "Pipeline",
+          "gap": 0.1214
+        },
+        {
+          "job_family": "Exec",
+          "skill_id": "Governance",
+          "gap": 0.1062
+        }
+      ]
+    },
+    "engagement": {
+      "waves": [
+        {
+          "wave_id": "WAV-2021-11",
+          "response_rate": 0.7835,
+          "n_invited": 36843
+        },
+        {
+          "wave_id": "WAV-2022-06",
+          "response_rate": 0.7266,
+          "n_invited": 38304
+        },
+        {
+          "wave_id": "WAV-2022-11",
+          "response_rate": 0.7211,
+          "n_invited": 39551
+        },
+        {
+          "wave_id": "WAV-2023-06",
+          "response_rate": 0.8456,
+          "n_invited": 41376
+        },
+        {
+          "wave_id": "WAV-2023-11",
+          "response_rate": 0.7827,
+          "n_invited": 42737
+        },
+        {
+          "wave_id": "WAV-2024-06",
+          "response_rate": 0.8412,
+          "n_invited": 44573
+        },
+        {
+          "wave_id": "WAV-2024-11",
+          "response_rate": 0.8476,
+          "n_invited": 45879
+        },
+        {
+          "wave_id": "WAV-2025-06",
+          "response_rate": 0.7952,
+          "n_invited": 47755
+        },
+        {
+          "wave_id": "WAV-2025-11",
+          "response_rate": 0.7747,
+          "n_invited": 49094
+        },
+        {
+          "wave_id": "WAV-2026-06",
+          "response_rate": 0.7076,
+          "n_invited": 50975
+        }
+      ],
+      "dimension_means": [
+        {
+          "wave_id": "WAV-2021-11",
+          "dimension": "engagement",
+          "mean": 3.665,
+          "n": 86595
+        },
+        {
+          "wave_id": "WAV-2021-11",
+          "dimension": "growth",
+          "mean": 3.671,
+          "n": 86595
+        },
+        {
+          "wave_id": "WAV-2021-11",
+          "dimension": "manager",
+          "mean": 3.671,
+          "n": 86595
+        },
+        {
+          "wave_id": "WAV-2021-11",
+          "dimension": "wellbeing",
+          "mean": 3.667,
+          "n": 86595
+        },
+        {
+          "wave_id": "WAV-2022-06",
+          "dimension": "engagement",
+          "mean": 3.668,
+          "n": 83493
+        },
+        {
+          "wave_id": "WAV-2022-06",
+          "dimension": "growth",
+          "mean": 3.667,
+          "n": 83493
+        },
+        {
+          "wave_id": "WAV-2022-06",
+          "dimension": "manager",
+          "mean": 3.669,
+          "n": 83493
+        },
+        {
+          "wave_id": "WAV-2022-06",
+          "dimension": "wellbeing",
+          "mean": 3.672,
+          "n": 83493
+        },
+        {
+          "wave_id": "WAV-2022-11",
+          "dimension": "engagement",
+          "mean": 3.669,
+          "n": 85566
+        },
+        {
+          "wave_id": "WAV-2022-11",
+          "dimension": "growth",
+          "mean": 3.668,
+          "n": 85566
+        },
+        {
+          "wave_id": "WAV-2022-11",
+          "dimension": "manager",
+          "mean": 3.666,
+          "n": 85566
+        },
+        {
+          "wave_id": "WAV-2022-11",
+          "dimension": "wellbeing",
+          "mean": 3.666,
+          "n": 85566
+        },
+        {
+          "wave_id": "WAV-2023-06",
+          "dimension": "engagement",
+          "mean": 3.668,
+          "n": 104964
+        },
+        {
+          "wave_id": "WAV-2023-06",
+          "dimension": "growth",
+          "mean": 3.671,
+          "n": 104964
+        },
+        {
+          "wave_id": "WAV-2023-06",
+          "dimension": "manager",
+          "mean": 3.668,
+          "n": 104964
+        },
+        {
+          "wave_id": "WAV-2023-06",
+          "dimension": "wellbeing",
+          "mean": 3.662,
+          "n": 104964
+        },
+        {
+          "wave_id": "WAV-2023-11",
+          "dimension": "engagement",
+          "mean": 3.674,
+          "n": 100356
+        },
+        {
+          "wave_id": "WAV-2023-11",
+          "dimension": "growth",
+          "mean": 3.668,
+          "n": 100356
+        },
+        {
+          "wave_id": "WAV-2023-11",
+          "dimension": "manager",
+          "mean": 3.67,
+          "n": 100356
+        },
+        {
+          "wave_id": "WAV-2023-11",
+          "dimension": "wellbeing",
+          "mean": 3.666,
+          "n": 100356
+        },
+        {
+          "wave_id": "WAV-2024-06",
+          "dimension": "engagement",
+          "mean": 3.667,
+          "n": 112485
+        },
+        {
+          "wave_id": "WAV-2024-06",
+          "dimension": "growth",
+          "mean": 3.667,
+          "n": 112485
+        },
+        {
+          "wave_id": "WAV-2024-06",
+          "dimension": "manager",
+          "mean": 3.665,
+          "n": 112485
+        },
+        {
+          "wave_id": "WAV-2024-06",
+          "dimension": "wellbeing",
+          "mean": 3.665,
+          "n": 112485
+        },
+        {
+          "wave_id": "WAV-2024-11",
+          "dimension": "engagement",
+          "mean": 3.669,
+          "n": 116658
+        },
+        {
+          "wave_id": "WAV-2024-11",
+          "dimension": "growth",
+          "mean": 3.667,
+          "n": 116658
+        },
+        {
+          "wave_id": "WAV-2024-11",
+          "dimension": "manager",
+          "mean": 3.666,
+          "n": 116658
+        },
+        {
+          "wave_id": "WAV-2024-11",
+          "dimension": "wellbeing",
+          "mean": 3.664,
+          "n": 116658
+        },
+        {
+          "wave_id": "WAV-2025-06",
+          "dimension": "engagement",
+          "mean": 3.67,
+          "n": 113925
+        },
+        {
+          "wave_id": "WAV-2025-06",
+          "dimension": "growth",
+          "mean": 3.671,
+          "n": 113925
+        },
+        {
+          "wave_id": "WAV-2025-06",
+          "dimension": "manager",
+          "mean": 3.666,
+          "n": 113925
+        },
+        {
+          "wave_id": "WAV-2025-06",
+          "dimension": "wellbeing",
+          "mean": 3.667,
+          "n": 113925
+        },
+        {
+          "wave_id": "WAV-2025-11",
+          "dimension": "engagement",
+          "mean": 3.663,
+          "n": 114096
+        },
+        {
+          "wave_id": "WAV-2025-11",
+          "dimension": "growth",
+          "mean": 3.666,
+          "n": 114096
+        },
+        {
+          "wave_id": "WAV-2025-11",
+          "dimension": "manager",
+          "mean": 3.671,
+          "n": 114096
+        },
+        {
+          "wave_id": "WAV-2025-11",
+          "dimension": "wellbeing",
+          "mean": 3.665,
+          "n": 114096
+        },
+        {
+          "wave_id": "WAV-2026-06",
+          "dimension": "engagement",
+          "mean": 3.667,
+          "n": 108210
+        },
+        {
+          "wave_id": "WAV-2026-06",
+          "dimension": "growth",
+          "mean": 3.668,
+          "n": 108210
+        },
+        {
+          "wave_id": "WAV-2026-06",
+          "dimension": "manager",
+          "mean": 3.668,
+          "n": 108210
+        },
+        {
+          "wave_id": "WAV-2026-06",
+          "dimension": "wellbeing",
+          "mean": 3.668,
+          "n": 108210
+        }
+      ]
+    },
+    "recruiting": {
+      "time_to_fill_p50": 32.0,
+      "time_to_fill_p90": 81.0,
+      "time_to_fill_p90_over_p50": 2.5312,
+      "stage_aging": [
+        {
+          "canonical_stage": "Offer",
+          "aging_p50_days": 4.0,
+          "aging_p90_days": 8.0
+        },
+        {
+          "canonical_stage": "Onsite",
+          "aging_p50_days": 8.0,
+          "aging_p90_days": 23.0
+        },
+        {
+          "canonical_stage": "Review",
+          "aging_p50_days": 3.0,
+          "aging_p90_days": 11.0
+        },
+        {
+          "canonical_stage": "Screen",
+          "aging_p50_days": 5.0,
+          "aging_p90_days": 12.0
+        }
+      ],
+      "stage_aging_p50": [
+        {
+          "canonical_stage": "Offer",
+          "aging_p50_days": 4.0
+        },
+        {
+          "canonical_stage": "Onsite",
+          "aging_p50_days": 8.0
+        },
+        {
+          "canonical_stage": "Review",
+          "aging_p50_days": 3.0
+        },
+        {
+          "canonical_stage": "Screen",
+          "aging_p50_days": 5.0
+        }
+      ],
+      "openings": 54019,
+      "cancelled": 5402,
+      "filled": 48617,
+      "cancel_rate": 0.1,
+      "baseline_cancel_rate": 0.1
+    }
+  },
+  "funnel_distribution": {
+    "source_mix": [
+      {
+        "source": "inbound",
+        "n": 5220675,
+        "share": 0.745
+      },
+      {
+        "source": "sourced",
+        "n": 833397,
+        "share": 0.1189
+      },
+      {
+        "source": "referral",
+        "n": 606064,
+        "share": 0.0865
+      },
+      {
+        "source": "internal",
+        "n": 347784,
+        "share": 0.0496
+      }
+    ],
+    "review_to_screen": [
+      {
+        "source": "inbound",
+        "review_apps": 5220675,
+        "to_screen": 530587,
+        "conv": 0.1016
+      },
+      {
+        "source": "internal",
+        "review_apps": 347784,
+        "to_screen": 156800,
+        "conv": 0.4509
+      },
+      {
+        "source": "referral",
+        "review_apps": 606064,
+        "to_screen": 271894,
+        "conv": 0.4486
+      },
+      {
+        "source": "sourced",
+        "review_apps": 833397,
+        "to_screen": 499633,
+        "conv": 0.5995
+      }
+    ],
+    "inbound_review_quick_reject": {
+      "inbound_review": 5220675,
+      "share_rejected_in_review_within_5d": 0.7574
+    },
+    "apps_per_opening_by_family": [
+      {
+        "job_family": "Engineering",
+        "applications": 3316183,
+        "openings": 18939,
+        "apps_per_opening": 175.1
+      },
+      {
+        "job_family": "Exec",
+        "applications": 36817,
+        "openings": 1572,
+        "apps_per_opening": 23.4
+      },
+      {
+        "job_family": "Other",
+        "applications": 2629898,
+        "openings": 22647,
+        "apps_per_opening": 116.1
+      },
+      {
+        "job_family": "Sales",
+        "applications": 1025022,
+        "openings": 10861,
+        "apps_per_opening": 94.4
+      }
+    ],
+    "apps_per_opening_by_source_family": [
+      {
+        "job_family": "Engineering",
+        "source": "inbound",
+        "applications": 2473992,
+        "openings": 18939,
+        "apps_per_opening": 130.6
+      },
+      {
+        "job_family": "Engineering",
+        "source": "internal",
+        "applications": 165037,
+        "openings": 18792,
+        "apps_per_opening": 8.8
+      },
+      {
+        "job_family": "Engineering",
+        "source": "referral",
+        "applications": 281580,
+        "openings": 18938,
+        "apps_per_opening": 14.9
+      },
+      {
+        "job_family": "Engineering",
+        "source": "sourced",
+        "applications": 395574,
+        "openings": 18935,
+        "apps_per_opening": 20.9
+      },
+      {
+        "job_family": "Exec",
+        "source": "inbound",
+        "applications": 26628,
+        "openings": 1572,
+        "apps_per_opening": 16.9
+      },
+      {
+        "job_family": "Exec",
+        "source": "internal",
+        "applications": 1760,
+        "openings": 990,
+        "apps_per_opening": 1.8
+      },
+      {
+        "job_family": "Exec",
+        "source": "referral",
+        "applications": 4292,
+        "openings": 1540,
+        "apps_per_opening": 2.8
+      },
+      {
+        "job_family": "Exec",
+        "source": "sourced",
+        "applications": 4137,
+        "openings": 1370,
+        "apps_per_opening": 3.0
+      },
+      {
+        "job_family": "Other",
+        "source": "inbound",
+        "applications": 1958141,
+        "openings": 22647,
+        "apps_per_opening": 86.5
+      },
+      {
+        "job_family": "Other",
+        "source": "internal",
+        "applications": 130315,
+        "openings": 22007,
+        "apps_per_opening": 5.9
+      },
+      {
+        "job_family": "Other",
+        "source": "referral",
+        "applications": 228926,
+        "openings": 22638,
+        "apps_per_opening": 10.1
+      },
+      {
+        "job_family": "Other",
+        "source": "sourced",
+        "applications": 312516,
+        "openings": 22615,
+        "apps_per_opening": 13.8
+      },
+      {
+        "job_family": "Sales",
+        "source": "inbound",
+        "applications": 761914,
+        "openings": 10861,
+        "apps_per_opening": 70.2
+      },
+      {
+        "job_family": "Sales",
+        "source": "internal",
+        "applications": 50672,
+        "openings": 10356,
+        "apps_per_opening": 4.9
+      },
+      {
+        "job_family": "Sales",
+        "source": "referral",
+        "applications": 91266,
+        "openings": 10845,
+        "apps_per_opening": 8.4
+      },
+      {
+        "job_family": "Sales",
+        "source": "sourced",
+        "applications": 121170,
+        "openings": 10814,
+        "apps_per_opening": 11.2
+      }
+    ]
+  },
+  "case_signals": {
+    "case3_compa_ratio": [
+      {
+        "group": "slice",
+        "median_compa": 0.88,
+        "n": 2106
+      },
+      {
+        "group": "control",
+        "median_compa": 0.98,
+        "n": 47914
+      }
+    ],
+    "case3_manager_change": [
+      {
+        "group": "slice",
+        "n_workers": 2106,
+        "manager_changes_since_2025q4": 0,
+        "changes_per_worker": 0.0
+      },
+      {
+        "group": "control",
+        "n_workers": 47914,
+        "manager_changes_since_2025q4": 0,
+        "changes_per_worker": 0.0
+      }
+    ],
+    "case4_scorecard_delay": [
+      {
+        "group": "other_hm",
+        "scorecard_lag_p50_days": 1.083,
+        "interview_lag_p50_days": 0.083,
+        "n": 4425
+      },
+      {
+        "group": "slow_hm",
+        "scorecard_lag_p50_days": 11.083,
+        "interview_lag_p50_days": 8.083,
+        "n": 3050
+      }
+    ],
+    "case4_time_to_fill": [
+      {
+        "group": "other_hm",
+        "ttf_p50_days": 33.0,
+        "ttf_p90_days": 86.0,
+        "n": 448
+      },
+      {
+        "group": "slow_hm",
+        "ttf_p50_days": 54.0,
+        "ttf_p90_days": 125.0,
+        "n": 340
+      }
+    ],
+    "case4_onsite_aging": [
+      {
+        "group": "slow_hm",
+        "aging_p50_days": 27.0,
+        "aging_p90_days": 61.0,
+        "n": 3050
+      },
+      {
+        "group": "other_hm",
+        "aging_p50_days": 12.0,
+        "aging_p90_days": 34.0,
+        "n": 4425
+      }
+    ]
+  },
+  "dq_failed": [],
+  "roll_forward": {
+    "test_name": "snapshot_roll_forward",
+    "test_group": "gold",
+    "status": "passed",
+    "observed_value": {
+      "max_abs_residual": 0,
+      "months": 59,
+      "t1_bypass": 0,
+      "sample": [
+        {
+          "month_end": "2026-03-31",
+          "active": 48775,
+          "prev_active": 48518,
+          "hires": 825,
+          "rehires": 20,
+          "terms": 606,
+          "status_in": 35,
+          "status_out": 41,
+          "type_in": 24,
+          "type_out": 0,
+          "t1_bypass": 0,
+          "residual": 0
+        },
+        {
+          "month_end": "2026-04-30",
+          "active": 49009,
+          "prev_active": 48775,
+          "hires": 839,
+          "rehires": 17,
+          "terms": 643,
+          "status_in": 41,
+          "status_out": 33,
+          "type_in": 13,
+          "type_out": 0,
+          "t1_bypass": 0,
+          "residual": 0
+        },
+        {
+          "month_end": "2026-05-31",
+          "active": 49268,
+          "prev_active": 49009,
+          "hires": 892,
+          "rehires": 15,
+          "terms": 659,
+          "status_in": 42,
+          "status_out": 45,
+          "type_in": 14,
+          "type_out": 0,
+          "t1_bypass": 0,
+          "residual": 0
+        },
+        {
+          "month_end": "2026-06-30",
+          "active": 49523,
+          "prev_active": 49268,
+          "hires": 879,
+          "rehires": 23,
+          "terms": 664,
+          "status_in": 43,
+          "status_out": 45,
+          "type_in": 19,
+          "type_out": 0,
+          "t1_bypass": 0,
+          "residual": 0
+        },
+        {
+          "month_end": "2026-07-31",
+          "active": 49805,
+          "prev_active": 49523,
+          "hires": 898,
+          "rehires": 16,
+          "terms": 649,
+          "status_in": 44,
+          "status_out": 42,
+          "type_in": 15,
+          "type_out": 0,
+          "t1_bypass": 0,
+          "residual": 0
+        },
+        {
+          "month_end": "2026-08-31",
+          "active": 50020,
+          "prev_active": 49805,
+          "hires": 881,
+          "rehires": 15,
+          "terms": 695,
+          "status_in": 38,
+          "status_out": 51,
+          "type_in": 27,
+          "type_out": 0,
+          "t1_bypass": 0,
+          "residual": 0
+        }
+      ]
+    },
+    "expected_value": 0,
+    "details": "backfill residual must be 0"
+  },
+  "case2": {
+    "fault": {
+      "extract_date": "2026-08-14",
+      "mode": "full",
+      "control_total": 84110,
+      "rows_received": 67653,
+      "isolated": true,
+      "pointer_moved": false,
+      "replay": {
+        "metric_id": "headcount",
+        "value_bad": 40285,
+        "value_expected": 49838
+      }
+    },
+    "prior_full": {
+      "extract_date": "2026-08-07",
+      "mode": "full",
+      "control_total": 83866,
+      "rows_received": 83866,
+      "volume_test_ok": true
+    }
+  },
+  "case3_measured": {
+    "with_scenario": {
+      "window": "2026-06..2026-08",
+      "voluntary_terms": 716,
+      "person_months": 49851,
+      "annualized": 0.1724
+    },
+    "without_scenario": {
+      "window": "2026-06..2026-08",
+      "voluntary_terms": 615,
+      "person_months": 50225,
+      "annualized": 0.1469
+    },
+    "delta_pp": 2.55,
+    "closed_form_delta_pp": 2.4
+  },
+  "case3_closed_form": {
+    "scale": "full",
+    "method": "closed_form_independent_mix",
+    "mix": "baseline.population region_mix \u00d7 t0_tenure_mix \u00d7 job_family_mix (parameters)",
+    "trailing_3m": "2026-06..2026-08 (after 3-month ramp; multiplier at plateau)",
+    "engineering_overall": {
+      "without_scenario": 0.1334,
+      "with_scenario": 0.1574,
+      "delta_pp": 2.4,
+      "target_delta_pp": 2.0,
+      "meets_target": true
+    },
+    "apac_engineering_1_3y": {
+      "without_scenario": 0.1597,
+      "with_scenario": 0.3194,
+      "ratio": 2.0,
+      "target_ratio": 2.0,
+      "meets_target": true
+    },
+    "slice": {
+      "definition": "APAC \u00d7 Engineering \u00d7 tenure_months [0, 36) i.e. <1y and 1\u20133y",
+      "hazard_multiplier": 2.0,
+      "ramp_months": 3,
+      "weight_within_population": 0.0483
+    }
+  },
+  "parquet_bytes": {
+    "bronze": {
+      "department": 1093,
+      "office": 1139,
+      "rejection_reason": 1095,
+      "source": 1071,
+      "user": 1265,
+      "scorecard": 26808245,
+      "opening": 1219042,
+      "offer": 1575942,
+      "interview": 28740283,
+      "candidate": 49572912,
+      "application_stage": 128461636,
+      "application": 98518872,
+      "Appraisal_Cycle": 2307,
+      "Branch": 1505,
+      "Department": 2734,
+      "Designation": 1113,
+      "Employee": 5252489,
+      "Employee_Grade": 1439,
+      "Employee_Promotion": 282951,
+      "Employee_Property_History": 471450,
+      "Employee_Separation": 547800,
+      "Employee_Skill_Map": 1081373,
+      "Employee_Transfer": 208144,
+      "Employment_Type": 1070,
+      "Salary_Structure": 1555,
+      "Skill": 1031,
+      "Training_Event": 73660,
+      "Training_Event_Employee": 448993,
+      "Training_Program": 1018,
+      "Training_Result": 67797,
+      "Training_Result_Employee": 492784,
+      "Salary_Structure_Assignment": 5083180,
+      "Employee_Skill": 3348600,
+      "extract_date=2026-08-07": 767075,
+      "extract_date=2026-08-14": 647953,
+      "Appraisal": 3582126,
+      "survey_instrument": 1519,
+      "survey_wave": 2684,
+      "survey_response": 27105502
+    },
+    "silver": {
+      "people_dim_appraisal_cycle": 865,
+      "people_dim_candidate": 63758913,
+      "people_dim_date": 906,
+      "people_dim_grade": 1222,
+      "people_dim_job": 1123,
+      "people_dim_learning_resource": 1100,
+      "people_dim_location": 1111,
+      "people_dim_org": 2137,
+      "people_dim_person": 1299036,
+      "people_dim_person_restricted": 2212977,
+      "people_dim_recruiter": 901,
+      "people_dim_rejection_reason": 571,
+      "people_dim_requisition": 1096667,
+      "people_dim_skill": 1267,
+      "people_dim_source": 548,
+      "people_dim_stage": 195,
+      "people_dim_survey_item": 895,
+      "people_dim_survey_wave": 976,
+      "people_dim_worker": 2668572,
+      "people_evt_application_stage": 97363062,
+      "people_evt_manager_change": 128,
+      "people_evt_promotion": 237320,
+      "people_evt_transfer": 179948,
+      "people_evt_worker": 14549016,
+      "people_evt_worker_change": 169259,
+      "people_fact_application": 79205409,
+      "people_fact_appraisal": 2177597,
+      "people_fact_candidate_demographic_restricted": 221,
+      "people_fact_candidate_eeoc_restricted": 233,
+      "people_fact_comp_assignment": 3698387,
+      "people_fact_comp_assignment_restricted": 5284924,
+      "people_fact_interview": 21603004,
+      "people_fact_offer": 1069159,
+      "people_fact_scorecard": 19877820,
+      "people_fact_separation": 426399,
+      "people_fact_training_participation": 512378,
+      "people_fact_worker_skill": 1445517,
+      "people_hist_worker_attr": 5386126,
+      "people_ref_city": 485,
+      "people_ref_comp_band": 1323,
+      "people_ref_job_skill_target": 1266,
+      "people_ref_separation_reason_map": 591,
+      "people_xw_identity": 1244049,
+      "people_xw_job": 837,
+      "people_xw_location": 963,
+      "people_xw_org": 1101,
+      "people_xw_skill": 1048
+    },
+    "gold": {
+      "people_dim_requisition": 1096667,
+      "people_dim_worker": 2668572,
+      "people_evt_application_stage": 97363062,
+      "people_evt_manager_change": 128,
+      "people_evt_promotion": 237320,
+      "people_evt_transfer": 179948,
+      "people_fact_application": 79205409,
+      "people_fact_appraisal": 2177597,
+      "people_fact_comp_assignment": 3698387,
+      "people_fact_interview": 21603004,
+      "people_fact_scorecard": 19877820,
+      "people_fact_survey_score": 27610268,
+      "people_fact_survey_score_restricted": 9595671,
+      "people_fact_survey_wave": 1696,
+      "people_fact_training_participation": 512378,
+      "people_fact_worker_skill": 1445517,
+      "people_mart_applicant_flow": 154,
+      "people_mart_comp_monthly": 15641,
+      "people_mart_engagement_wave": 1745,
+      "people_mart_funnel_monthly": 3136,
+      "people_mart_learning_monthly": 1299,
+      "people_mart_mobility_monthly": 1567,
+      "people_mart_recruiter_load_monthly": 2604,
+      "people_mart_recruiting_monthly": 1618,
+      "people_mart_skill_coverage_monthly": 534,
+      "people_mart_source_health_daily": 1089,
+      "people_mart_stage_aging_monthly": 1582,
+      "people_mart_workforce_monthly": 28163,
+      "people_mart_workforce_monthly_2d": 8857,
+      "people_ref_comp_band": 1323,
+      "people_snap_recruiter_month": 2604,
+      "people_snap_requisition_month": 2885872,
+      "people_snap_worker_month": 17480910
+    }
+  },
+  "control_prefix": "rehearsal_1p00_nocase3",
+  "control_prefix_role": "case3_control_only_not_serving",
+  "a7_restricted_person_level": "as_designed"
+}

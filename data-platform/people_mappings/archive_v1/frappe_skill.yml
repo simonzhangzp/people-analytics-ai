@@ -1,0 +1,58 @@
+canonical_entity: people_silver_worker_skill
+source_contract:
+  source_system: frappe_hr
+  source_object: Employee Skill Map / Employee Skill / Skill
+  pin:
+    hrms: v16.15.0
+    schemas:
+      - people_source_contracts/frappe_hr/doctypes/employee_skill_map.json
+      - people_source_contracts/frappe_hr/doctypes/employee_skill.json
+      - people_source_contracts/frappe_hr/doctypes/skill.json
+bronze_tables:
+  - people_bronze_frappe_employee_skill_map
+  - people_bronze_frappe_employee_skill
+  - people_bronze_frappe_skill
+fields:
+  - canonical_field: worker_id
+    source_system: frappe_hr
+    source_object: Employee Skill Map
+    source_field: employee
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: evaluation_date
+    business_definition: Employee assessed.
+
+  - canonical_field: skill_id
+    source_system: frappe_hr
+    source_object: Employee Skill
+    source_field: skill
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Link to Skill.name. O*NET skills remain in people_dim_skill with provenance live_public.
+
+  - canonical_field: proficiency
+    source_system: frappe_hr
+    source_object: Employee Skill
+    source_field: proficiency
+    transformation: identity
+    nullable: false
+    data_type: rating
+    effective_date_logic: evaluation_date
+    business_definition: Frappe Rating value.
+
+  - canonical_field: evaluation_date
+    source_system: frappe_hr
+    source_object: Employee Skill
+    source_field: evaluation_date
+    transformation: identity
+    nullable: true
+    data_type: date
+    effective_date_logic: evaluation_date
+    business_definition: Date of the skill assessment.
+
+not_mapped_on_purpose:
+  - PEOPLE_SKILLS skill_python catalog
+  - is_critical hardcoded set

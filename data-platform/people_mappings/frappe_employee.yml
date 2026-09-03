@@ -1,0 +1,308 @@
+canonical_version: people_v2
+gate: 1
+note: Employee effective schema = ERPNext employee.json + HRMS custom fields. employment_type and grade are SOURCE_NATIVE
+  (hrms/setup.py). E8 withdrawn.
+source_contract:
+  pin:
+  - erpnext_doctypes/employee.json
+  - custom_fields.json
+  - erpnext_doctypes/employee_effective.fields.json
+fields:
+- canonical_table: people_dim_person
+  canonical_field: person_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: uuid from xw_identity where source_object=Employee
+  nullable: false
+  data_type: uuid
+  effective_date_logic: date_of_joining
+  provenance: CANONICAL_KEY
+  business_definition: Person key. No PII.
+  source_field: name
+- canonical_table: people_dim_person
+  canonical_field: first_seen_at
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: min(creation, candidate.created_at) across xw rows
+  nullable: false
+  data_type: timestamptz
+  effective_date_logic: first_seen_at
+  provenance: DERIVED
+  business_definition: Earliest sighting.
+  source_field: creation
+- canonical_table: people_dim_person
+  canonical_field: first_seen_source
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: frappe_hr if Employee precedes candidate else greenhouse_v3
+  nullable: false
+  data_type: text
+  effective_date_logic: first_seen_at
+  provenance: DERIVED
+  business_definition: System of first sighting.
+  source_field: name
+- canonical_table: people_dim_person_restricted
+  canonical_field: person_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: same as people_dim_person
+  nullable: false
+  data_type: uuid
+  effective_date_logic: date_of_joining
+  provenance: CANONICAL_KEY
+  business_definition: Restricted PII key.
+  source_field: name
+- canonical_table: people_dim_person_restricted
+  canonical_field: full_name
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: current
+  provenance: SOURCE_NATIVE
+  business_definition: Employee.employee_name.
+  source_field: employee_name
+- canonical_table: people_dim_person_restricted
+  canonical_field: gender
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: current
+  provenance: SOURCE_NATIVE
+  business_definition: HRIS gender. Never from Harvest EEOC (BR-GOV-001).
+  source_field: gender
+- canonical_table: people_dim_person_restricted
+  canonical_field: date_of_birth
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: true
+  data_type: date
+  effective_date_logic: current
+  provenance: SOURCE_NATIVE
+  business_definition: HRIS DOB.
+  source_field: date_of_birth
+- canonical_table: people_dim_worker
+  canonical_field: worker_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity; one spell per Employee.name unless create_new_employee_id transfer
+  nullable: false
+  data_type: text
+  effective_date_logic: date_of_joining
+  provenance: CANONICAL_KEY
+  business_definition: Equals Employee.name.
+  source_field: name
+- canonical_table: people_dim_worker
+  canonical_field: person_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: xw_identity
+  nullable: false
+  data_type: uuid
+  effective_date_logic: date_of_joining
+  provenance: CANONICAL_KEY
+  business_definition: Person of this spell.
+  source_field: name
+- canonical_table: people_dim_worker
+  canonical_field: frappe_employee
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: date_of_joining
+  provenance: SOURCE_NATIVE
+  business_definition: Employee.name.
+  source_field: name
+- canonical_table: people_dim_worker
+  canonical_field: hire_date
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity; T1 backfill from offer.starts_on when Employee is created from accepted offer
+  nullable: false
+  data_type: date
+  effective_date_logic: date_of_joining
+  provenance: SOURCE_NATIVE
+  business_definition: First day of this spell.
+  source_field: date_of_joining
+- canonical_table: people_dim_worker
+  canonical_field: termination_date
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: true
+  data_type: date
+  effective_date_logic: relieving_date
+  provenance: SOURCE_NATIVE
+  business_definition: Last day. Null while employed.
+  source_field: relieving_date
+- canonical_table: people_dim_worker
+  canonical_field: termination_reason_raw
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: relieving_date
+  provenance: SOURCE_NATIVE
+  business_definition: Free text. Mapped via E6.
+  source_field: reason_for_leaving
+- canonical_table: people_dim_worker
+  canonical_field: termination_category
+  source_system: engagement_ext
+  source_object: people_ref_separation_reason_map
+  transformation: map reason_for_leaving through E6 (BR-RET-001)
+  nullable: true
+  data_type: text
+  effective_date_logic: relieving_date
+  provenance: DERIVED
+  business_definition: voluntary | involuntary | other.
+  source_field: termination_category
+- canonical_table: people_dim_worker
+  canonical_field: employment_type
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity; HRMS custom field Link Employment Type
+  nullable: true
+  data_type: text
+  effective_date_logic: SCD2 from extract diff; valid_to is next change or 9999-12-31 (BR-ORG-002)
+  provenance: SOURCE_NATIVE
+  business_definition: HRMS custom field on Employee (hrms/setup.py). Not on ERPNext Employee.json. Values are Employment
+    Type.name.
+  source_field: employment_type
+- canonical_table: people_dim_worker
+  canonical_field: is_rehire
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: true when person_id already has an earlier worker_id (BR-WF-006)
+  nullable: false
+  data_type: boolean
+  effective_date_logic: date_of_joining
+  provenance: DERIVED
+  business_definition: Rehire flag.
+  source_field: name
+- canonical_table: people_dim_worker
+  canonical_field: hired_via_application_id
+  source_system: greenhouse_v3
+  source_object: offer
+  transformation: 'T1: accepted offer whose starts_on = date_of_joining; null for pre-ATS hires'
+  nullable: true
+  data_type: bigint
+  effective_date_logic: date_of_joining
+  provenance: CANONICAL_KEY
+  business_definition: Application that produced this hire.
+  source_field: application_id
+- canonical_table: people_evt_worker
+  canonical_field: event_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: hash(source_system, source_object, source_id, event_type, event_date)
+  nullable: false
+  data_type: text
+  effective_date_logic: date_of_joining
+  provenance: CANONICAL_KEY
+  business_definition: Hire event id.
+  source_field: name
+- canonical_table: people_evt_worker
+  canonical_field: worker_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: date_of_joining
+  provenance: CANONICAL_KEY
+  business_definition: Worker of the hire event.
+  source_field: name
+- canonical_table: people_evt_worker
+  canonical_field: person_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: xw_identity
+  nullable: false
+  data_type: uuid
+  effective_date_logic: date_of_joining
+  provenance: CANONICAL_KEY
+  business_definition: Person of the hire event.
+  source_field: name
+- canonical_table: people_evt_worker
+  canonical_field: event_type
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: hire or rehire (BR-WF-006)
+  nullable: false
+  data_type: text
+  effective_date_logic: date_of_joining
+  provenance: DERIVED
+  business_definition: hire | rehire from Employee insert.
+  source_field: date_of_joining
+- canonical_table: people_evt_worker
+  canonical_field: event_date
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: false
+  data_type: date
+  effective_date_logic: date_of_joining
+  provenance: SOURCE_NATIVE
+  business_definition: Business effective date of hire.
+  source_field: date_of_joining
+- canonical_table: people_evt_worker
+  canonical_field: recorded_at
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: false
+  data_type: timestamptz
+  effective_date_logic: creation
+  provenance: SOURCE_NATIVE
+  business_definition: DocType creation.
+  source_field: creation
+- canonical_table: people_evt_worker
+  canonical_field: source_system
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: literal frappe_hr
+  nullable: false
+  data_type: text
+  effective_date_logic: creation
+  provenance: CANONICAL_KEY
+  business_definition: HRIS.
+  source_field: null
+- canonical_table: people_evt_worker
+  canonical_field: source_object
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: literal Employee
+  nullable: false
+  data_type: text
+  effective_date_logic: creation
+  provenance: CANONICAL_KEY
+  business_definition: Employee (not extract diff).
+  source_field: null
+- canonical_table: people_evt_worker
+  canonical_field: source_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: creation
+  provenance: SOURCE_NATIVE
+  business_definition: Employee.name.
+  source_field: name
+- canonical_table: people_evt_worker
+  canonical_field: extract_id
+  source_system: ingest
+  source_object: people_meta_extract_run
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: extract_ts
+  provenance: CANONICAL_KEY
+  business_definition: Extract that observed the hire.
+  source_field: extract_id

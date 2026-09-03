@@ -1,0 +1,558 @@
+{
+  "T1": {
+    "transaction": "T1",
+    "offer": {
+      "id": 77001,
+      "application_id": 44001,
+      "job_id": 8811,
+      "opening_id": 99021,
+      "status": "Accepted",
+      "starts_on": "2026-04-08",
+      "sent_on": "2026-04-01",
+      "resolved_at": "2026-04-08T09:00:00Z",
+      "created_at": "2026-03-29T12:00:00Z",
+      "version": 1
+    },
+    "application": {
+      "id": 44001,
+      "candidate_id": 33001,
+      "job_id": 8811,
+      "status": "hired",
+      "created_at": "2026-02-27T12:00:00Z",
+      "job_interview_stage_id": 4,
+      "recruiter_id": 204
+    },
+    "opening": {
+      "id": 99021,
+      "job_id": 8811,
+      "open": false,
+      "opened_at": "2026-02-17T12:00:00Z",
+      "closed_at": "2026-04-08T09:00:00Z",
+      "application_id": 44001,
+      "close_reason_id": 1
+    },
+    "candidate": {
+      "id": 33001,
+      "created_at": "2026-02-26T12:00:00Z"
+    },
+    "employee": {
+      "doctype": "Employee",
+      "name": "HR-EMP-000301",
+      "employee_name": "Worker 000301",
+      "status": "Active",
+      "date_of_joining": "2026-04-08",
+      "department": "Engineering - Platform",
+      "designation": "Software Developer",
+      "grade": "G5",
+      "branch": "APAC-SIN",
+      "employment_type": "Regular",
+      "reports_to": null,
+      "relieving_date": null,
+      "reason_for_leaving": null,
+      "gender": "Female",
+      "date_of_birth": "1990-01-15",
+      "docstatus": 0,
+      "creation": "2026-04-08T12:00:00Z",
+      "modified": "2026-04-08T12:00:00Z"
+    },
+    "salary_structure_assignment": {
+      "doctype": "Salary Structure Assignment",
+      "name": "HR-SSA-000301",
+      "employee": "HR-EMP-000301",
+      "salary_structure": "GT-PROF-USD",
+      "from_date": "2026-04-08",
+      "base": 140000,
+      "variable": 15000,
+      "currency": "USD",
+      "grade": "G5",
+      "docstatus": 1
+    },
+    "identity": {
+      "person_id": "PER-876dddd42f72",
+      "worker_id": "HR-EMP-000301",
+      "match_method": "transaction",
+      "source_system": "greenhouse_v3",
+      "source_object": "offer",
+      "source_id": "77001"
+    },
+    "user": {
+      "id": 204,
+      "employee_id": "HR-EMP-000200",
+      "deactivated": false
+    }
+  },
+  "T2": {
+    "transaction": "T2",
+    "employee_transfer": {
+      "doctype": "Employee Transfer",
+      "name": "HR-EMP-TRN-0001",
+      "employee": "HR-EMP-000100",
+      "transfer_date": "2026-04-08",
+      "docstatus": 1,
+      "creation": "2026-04-08T12:00:00Z",
+      "modified": "2026-04-08T12:00:00Z",
+      "transfer_details": [
+        {
+          "doctype": "Employee Property History",
+          "property": "Department",
+          "fieldname": "department",
+          "current": "Engineering - Platform",
+          "new": "Sales - Enterprise"
+        },
+        {
+          "doctype": "Employee Property History",
+          "property": "Branch",
+          "fieldname": "branch",
+          "current": "APAC-SIN",
+          "new": "AMER-NYC"
+        }
+      ]
+    },
+    "employee": {
+      "doctype": "Employee",
+      "name": "HR-EMP-000100",
+      "employee_name": "Worker 000100",
+      "status": "Active",
+      "date_of_joining": "2020-01-06",
+      "department": "Sales - Enterprise",
+      "designation": "Software Developer",
+      "grade": "G5",
+      "branch": "AMER-NYC",
+      "employment_type": "Regular",
+      "reports_to": null,
+      "relieving_date": null,
+      "reason_for_leaving": null,
+      "gender": "Female",
+      "date_of_birth": "1990-01-15",
+      "docstatus": 0,
+      "creation": "2020-01-06T12:00:00Z",
+      "modified": "2020-01-06T12:00:00Z"
+    }
+  },
+  "T3": {
+    "transaction": "T3",
+    "employee_promotion": {
+      "doctype": "Employee Promotion",
+      "name": "HR-EMP-PRO-0001",
+      "employee": "HR-EMP-000100",
+      "promotion_date": "2026-04-08",
+      "docstatus": 1,
+      "promotion_details": [
+        {
+          "doctype": "Employee Property History",
+          "property": "Designation",
+          "fieldname": "designation",
+          "current": "Software Developer",
+          "new": "Sales Manager"
+        },
+        {
+          "doctype": "Employee Property History",
+          "property": "Grade",
+          "fieldname": "grade",
+          "current": "G5",
+          "new": "G6"
+        }
+      ]
+    },
+    "salary_structure_assignment": {
+      "doctype": "Salary Structure Assignment",
+      "name": "HR-SSA-000102",
+      "employee": "HR-EMP-000100",
+      "from_date": "2026-04-08",
+      "base": 165000,
+      "variable": 20000,
+      "currency": "USD",
+      "grade": "G6",
+      "salary_structure": "GT-PROF-USD",
+      "docstatus": 1
+    },
+    "employee": {
+      "doctype": "Employee",
+      "name": "HR-EMP-000100",
+      "employee_name": "Worker 000100",
+      "status": "Active",
+      "date_of_joining": "2020-01-06",
+      "department": "Engineering - Platform",
+      "designation": "Sales Manager",
+      "grade": "G6",
+      "branch": "APAC-SIN",
+      "employment_type": "Regular",
+      "reports_to": null,
+      "relieving_date": null,
+      "reason_for_leaving": null,
+      "gender": "Female",
+      "date_of_birth": "1990-01-15",
+      "docstatus": 0,
+      "creation": "2020-01-06T12:00:00Z",
+      "modified": "2020-01-06T12:00:00Z"
+    }
+  },
+  "T4": {
+    "transaction": "T4",
+    "salary_structure_assignment": {
+      "doctype": "Salary Structure Assignment",
+      "name": "HR-SSA-CYCLE-0001",
+      "employee": "HR-EMP-000100",
+      "from_date": "2026-04-01",
+      "base": 150000,
+      "variable": 18000,
+      "currency": "USD",
+      "grade": "G5",
+      "salary_structure": "GT-PROF-USD",
+      "docstatus": 1
+    }
+  },
+  "T5": {
+    "transaction": "T5",
+    "employee": {
+      "doctype": "Employee",
+      "name": "HR-EMP-000150",
+      "employee_name": "Worker 000150",
+      "status": "Left",
+      "date_of_joining": "2021-03-01",
+      "department": "Engineering - Platform",
+      "designation": "Software Developer",
+      "grade": "G4",
+      "branch": "APAC-SIN",
+      "employment_type": "Regular",
+      "reports_to": null,
+      "relieving_date": "2026-04-08",
+      "reason_for_leaving": "Resignation - Better opportunity",
+      "gender": "Female",
+      "date_of_birth": "1990-01-15",
+      "docstatus": 0,
+      "creation": "2021-03-01T12:00:00Z",
+      "modified": "2021-03-01T12:00:00Z"
+    },
+    "termination_category": "voluntary",
+    "e6_vocabulary": [
+      "Death",
+      "Resignation - Better opportunity",
+      "Resignation - Personal",
+      "Retirement",
+      "Termination - Performance",
+      "Termination - Restructuring"
+    ],
+    "employee_separation": {
+      "doctype": "Employee Separation",
+      "name": "HR-EMP-SEP-0001",
+      "employee": "HR-EMP-000150",
+      "boarding_begins_on": "2026-04-08",
+      "boarding_status": "In Process",
+      "docstatus": 1
+    }
+  },
+  "T6": {
+    "transaction": "T6",
+    "prior_employee": "HR-EMP-000150",
+    "employee": {
+      "doctype": "Employee",
+      "name": "HR-EMP-000151",
+      "employee_name": "Worker 000151",
+      "status": "Active",
+      "date_of_joining": "2026-04-08",
+      "department": "Engineering - Platform",
+      "designation": "Software Developer",
+      "grade": "G4",
+      "branch": "APAC-SIN",
+      "employment_type": "Regular",
+      "reports_to": null,
+      "relieving_date": null,
+      "reason_for_leaving": null,
+      "gender": "Female",
+      "date_of_birth": "1990-01-15",
+      "docstatus": 0,
+      "creation": "2026-04-08T12:00:00Z",
+      "modified": "2026-04-08T12:00:00Z"
+    },
+    "identity": {
+      "person_id": "PER-0edf14c760ff",
+      "worker_id": "HR-EMP-000151",
+      "match_method": "transaction",
+      "is_rehire": true
+    },
+    "hire_event": {
+      "event_type": "rehire",
+      "worker_id": "HR-EMP-000151",
+      "person_id": "PER-0edf14c760ff",
+      "source_id": "HR-EMP-000151",
+      "prior_worker_id": "HR-EMP-000150"
+    },
+    "salary_structure_assignment": {
+      "doctype": "Salary Structure Assignment",
+      "name": "HR-SSA-000151",
+      "employee": "HR-EMP-000151",
+      "from_date": "2026-04-08",
+      "base": 130000,
+      "variable": 10000,
+      "currency": "USD",
+      "grade": "G4",
+      "salary_structure": "GT-PROF-USD",
+      "docstatus": 1
+    }
+  },
+  "T7": {
+    "transaction": "T7",
+    "employee": {
+      "doctype": "Employee",
+      "name": "HR-EMP-000100",
+      "employee_name": "Worker 000100",
+      "status": "Active",
+      "date_of_joining": "2020-01-06",
+      "department": "Engineering - Platform",
+      "designation": "Software Developer",
+      "grade": "G5",
+      "branch": "APAC-SIN",
+      "employment_type": "Regular",
+      "reports_to": "HR-EMP-000200",
+      "relieving_date": null,
+      "reason_for_leaving": null,
+      "gender": "Female",
+      "date_of_birth": "1990-01-15",
+      "docstatus": 0,
+      "creation": "2020-01-06T12:00:00Z",
+      "modified": "2026-04-08T12:00:00Z",
+      "_extract_diff": true
+    },
+    "source_object": "Employee (extract diff)",
+    "change": {
+      "fieldname": "reports_to",
+      "current": "HR-EMP-000099",
+      "new": "HR-EMP-000200"
+    }
+  },
+  "T8": {
+    "transaction": "T8",
+    "user": {
+      "id": 204,
+      "employee_id": "HR-EMP-000200",
+      "deactivated": false,
+      "created_at": "2026-04-08T12:00:00Z"
+    },
+    "employee": {
+      "doctype": "Employee",
+      "name": "HR-EMP-000200",
+      "employee_name": "Worker 000200",
+      "status": "Active",
+      "date_of_joining": "2018-06-01",
+      "department": "Sales - Enterprise",
+      "designation": "Sales Manager",
+      "grade": "G6",
+      "branch": "AMER-NYC",
+      "employment_type": "Regular",
+      "reports_to": null,
+      "relieving_date": null,
+      "reason_for_leaving": null,
+      "gender": "Female",
+      "date_of_birth": "1990-01-15",
+      "docstatus": 0,
+      "creation": "2018-06-01T12:00:00Z",
+      "modified": "2018-06-01T12:00:00Z"
+    },
+    "identity": {
+      "match_method": "employee_id",
+      "source_system": "greenhouse_v3",
+      "source_object": "user",
+      "source_id": "204"
+    }
+  },
+  "T9": {
+    "transaction": "T9",
+    "appraisal_cycle": {
+      "doctype": "Appraisal Cycle",
+      "name": "FY2026",
+      "cycle_name": "FY2026",
+      "start_date": "2026-01-01",
+      "end_date": "2026-12-31",
+      "status": "In Progress",
+      "calculate_final_score_based_on_formula": 0,
+      "final_score_formula": null
+    },
+    "appraisal": {
+      "doctype": "Appraisal",
+      "name": "HR-APR-000100",
+      "employee": "HR-EMP-000100",
+      "appraisal_cycle": "FY2026",
+      "total_score": 4.0,
+      "self_score": 4.2,
+      "avg_feedback_score": 3.9,
+      "final_score": 4.0333,
+      "docstatus": 1,
+      "modified": "2026-04-08T12:00:00Z"
+    }
+  },
+  "T10": {
+    "transaction": "T10",
+    "survey_wave": {
+      "wave_id": "WAV-2026-05",
+      "instrument_version": "engagement_ext.instrument.v1",
+      "start_date": "2026-04-08",
+      "end_date": "2026-04-22",
+      "target_population": "active_workers",
+      "response_rate": 0.78
+    },
+    "survey_response": [
+      {
+        "response_id": "RSP-HR-EMP-000100-E1",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "E1",
+        "score": 4
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-E2",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "E2",
+        "score": 4
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-E3",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "E3",
+        "score": 2
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-M1",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "M1",
+        "score": 4
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-M2",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "M2",
+        "score": 4
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-M3",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "M3",
+        "score": 2
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-G1",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "G1",
+        "score": 4
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-G2",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "G2",
+        "score": 4
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-G3",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "G3",
+        "score": 2
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-W1",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "W1",
+        "score": 4
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-W2",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "W2",
+        "score": 4
+      },
+      {
+        "response_id": "RSP-HR-EMP-000100-W3",
+        "wave_id": "WAV-2026-05",
+        "worker_id": "HR-EMP-000100",
+        "item_id": "W3",
+        "score": 2
+      }
+    ]
+  },
+  "T11": {
+    "transaction": "T11",
+    "application": {
+      "id": 44099,
+      "candidate_id": 33999,
+      "job_id": 8811,
+      "status": "in_process",
+      "created_at": "2026-03-18T12:00:00Z",
+      "job_interview_stage_id": 3
+    },
+    "application_stages": [
+      {
+        "id": 8001,
+        "application_id": 44099,
+        "job_interview_stage_id": 1,
+        "stage_name": "Application Review",
+        "entered_at": "2026-03-18T12:00:00Z",
+        "exited_at": "2026-03-23T12:00:00Z",
+        "current": false
+      },
+      {
+        "id": 8002,
+        "application_id": 44099,
+        "job_interview_stage_id": 2,
+        "stage_name": "Phone Screen",
+        "entered_at": "2026-03-23T12:00:00Z",
+        "exited_at": "2026-03-28T12:00:00Z",
+        "current": false
+      },
+      {
+        "id": 8003,
+        "application_id": 44099,
+        "job_interview_stage_id": 3,
+        "stage_name": "Onsite",
+        "entered_at": "2026-03-28T12:00:00Z",
+        "exited_at": "2026-04-02T12:00:00Z",
+        "current": false
+      },
+      {
+        "id": 8004,
+        "application_id": 44099,
+        "job_interview_stage_id": 4,
+        "stage_name": "Offer",
+        "entered_at": "2026-04-02T12:00:00Z",
+        "exited_at": null,
+        "current": true
+      }
+    ],
+    "interview": {
+      "id": 56001,
+      "application_id": 44099,
+      "job_interview_id": 3,
+      "starts_at": "2026-04-08T14:00:00Z",
+      "ends_at": "2026-04-08T15:00:00Z",
+      "status": "scheduled"
+    },
+    "scorecard": {
+      "id": 61001,
+      "application_id": 44099,
+      "interview_kit_id": 3,
+      "submitter_id": 204,
+      "interviewer_id": 204,
+      "candidate_rating": "yes",
+      "submitted_at": "2026-04-08T16:00:00Z",
+      "status": "complete"
+    },
+    "offer": {
+      "id": 77099,
+      "application_id": 44099,
+      "opening_id": 99021,
+      "job_id": 8811,
+      "status": "Created",
+      "starts_on": "2026-04-29",
+      "created_at": "2026-04-08T17:00:00Z",
+      "version": 1
+    }
+  }
+}

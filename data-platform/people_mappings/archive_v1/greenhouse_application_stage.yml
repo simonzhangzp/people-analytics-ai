@@ -1,0 +1,96 @@
+canonical_entity: people_silver_application_stage
+source_contract:
+  source_system: greenhouse_v3
+  source_object: application_stages
+  harvest_path: /v3/application_stages
+  pin:
+    api: Harvest v3
+    schema: people_source_contracts/greenhouse_v3/schemas/fields/application_stage.fields.json
+bronze_table: people_bronze_greenhouse_application_stage
+bronze_must_persist:
+  - id
+  - application_id
+  - job_interview_stage_id
+  - entered_at
+  - exited_at
+  - current
+  - created_at
+  - updated_at
+  - raw_payload
+  - ingested_at
+  - ingestion_run_id
+fields:
+  - canonical_field: source_application_stage_id
+    source_system: greenhouse_v3
+    source_object: application_stages
+    source_field: id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: entered_at
+    business_definition: One row per interview stage occupied by an application.
+
+  - canonical_field: source_application_id
+    source_system: greenhouse_v3
+    source_object: application_stages
+    source_field: application_id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Parent application.
+
+  - canonical_field: job_interview_stage_id
+    source_system: greenhouse_v3
+    source_object: application_stages
+    source_field: job_interview_stage_id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Stage definition on the job's interview plan.
+
+  - canonical_field: entered_at
+    source_system: greenhouse_v3
+    source_object: application_stages
+    source_field: entered_at
+    transformation: identity
+    nullable: true
+    data_type: timestamptz
+    effective_date_logic: entered_at
+    business_definition: When the application entered this stage.
+
+  - canonical_field: exited_at
+    source_system: greenhouse_v3
+    source_object: application_stages
+    source_field: exited_at
+    transformation: identity
+    nullable: true
+    data_type: timestamptz
+    effective_date_logic: exited_at
+    business_definition: When the application left this stage. Null while current=true.
+
+  - canonical_field: is_current
+    source_system: greenhouse_v3
+    source_object: application_stages
+    source_field: current
+    transformation: identity
+    nullable: false
+    data_type: boolean
+    effective_date_logic: current
+    business_definition: True for the live stage row.
+
+  - canonical_field: time_in_stage_hours
+    source_system: greenhouse_v3
+    source_object: application_stages
+    source_fields:
+      - entered_at
+      - exited_at
+    transformation: timestamp_diff_hours(exited_at, entered_at)
+    nullable: true
+    data_type: numeric
+    effective_date_logic: exited_at; for current rows use as_of in Gold only
+    business_definition: Hours in stage. Silver stores completed intervals only (exited_at not null). Gold may compute open-interval hours at snapshot as_of. Do not copy API days_in_stage.
+
+not_mapped_on_purpose:
+  - days_in_stage  # Harvest returns a source-computed integer; Bronze may keep it in raw_payload only

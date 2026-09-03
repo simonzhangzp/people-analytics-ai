@@ -1,0 +1,128 @@
+canonical_version: people_v2
+gate: 1
+note: As-of history is rebuilt from hire initial state + people_evt_worker + people_evt_worker_change. Not stored in a source
+  object.
+source_contract:
+  rules: BR-WF-008
+fields:
+- canonical_table: people_hist_worker_attr
+  canonical_field: worker_id
+  source_system: canonical
+  source_object: people_evt_worker
+  transformation: identity from event stream (BR-WF-008)
+  nullable: false
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: CANONICAL_KEY
+  business_definition: Worker of the interval.
+  source_field: worker_id
+- canonical_table: people_hist_worker_attr
+  canonical_field: valid_from
+  source_system: canonical
+  source_object: people_evt_worker
+  transformation: interval start; first interval valid_from = hire_date (BR-WF-008)
+  nullable: false
+  data_type: date
+  effective_date_logic: valid_from
+  provenance: DERIVED
+  business_definition: Inclusive start. Seamlessly covers hire_date.
+  source_field: event_date
+- canonical_table: people_hist_worker_attr
+  canonical_field: valid_to
+  source_system: canonical
+  source_object: people_evt_worker
+  transformation: next event_date or 9999-12-31; intervals do not overlap (BR-WF-008)
+  nullable: true
+  data_type: date
+  effective_date_logic: valid_to
+  provenance: DERIVED
+  business_definition: Exclusive end.
+  source_field: event_date
+- canonical_table: people_hist_worker_attr
+  canonical_field: org_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: as-of from hire snapshot + property history department (BR-WF-008)
+  nullable: true
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: DERIVED
+  business_definition: Org as-of.
+  source_field: department
+- canonical_table: people_hist_worker_attr
+  canonical_field: job_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: as-of from hire snapshot + property history designation (BR-WF-008)
+  nullable: true
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: DERIVED
+  business_definition: Job as-of.
+  source_field: designation
+- canonical_table: people_hist_worker_attr
+  canonical_field: grade_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: as-of from hire snapshot + property history grade; current Employee.grade is the HRMS custom field (BR-WF-008)
+  nullable: true
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: DERIVED
+  business_definition: Grade as-of. Source field is HRMS custom field, not ERPNext Employee.json.
+  source_field: grade
+- canonical_table: people_hist_worker_attr
+  canonical_field: location_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: as-of from hire snapshot + property history branch (BR-WF-008)
+  nullable: true
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: DERIVED
+  business_definition: Location as-of.
+  source_field: branch
+- canonical_table: people_hist_worker_attr
+  canonical_field: manager_worker_id
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: as-of from hire snapshot + property history reports_to (BR-WF-008)
+  nullable: true
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: DERIVED
+  business_definition: Manager worker as-of.
+  source_field: reports_to
+- canonical_table: people_hist_worker_attr
+  canonical_field: employment_type
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: as-of from hire snapshot + property history employment_type (BR-WF-008)
+  nullable: true
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: SOURCE_NATIVE
+  business_definition: HRMS custom field. Same Link as people_dim_worker.employment_type.
+  source_field: employment_type
+- canonical_table: people_hist_worker_attr
+  canonical_field: status
+  source_system: frappe_hr
+  source_object: Employee
+  transformation: as-of Active/Inactive/Suspended/Left (BR-WF-008)
+  nullable: false
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: DERIVED
+  business_definition: Employment status as-of.
+  source_field: status
+- canonical_table: people_hist_worker_attr
+  canonical_field: source_event_id
+  source_system: canonical
+  source_object: people_evt_worker
+  transformation: event that opened this interval (BR-WF-008)
+  nullable: false
+  data_type: text
+  effective_date_logic: valid_from
+  provenance: CANONICAL_KEY
+  business_definition: Provenance event.
+  source_field: event_id

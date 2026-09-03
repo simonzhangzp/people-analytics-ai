@@ -1,0 +1,106 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "opening",
+  "harvest_path_hint": "/v3/openings",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "job_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the parent job (requisition) this opening belongs to. Each opening is a single headcount slot under the job; the job carries the role's configuration and is the source of truth for things like the interview plan and hiring team."
+    },
+    {
+      "name": "opened_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the opening first transitioned to `open` (i.e. became available to be filled), in ISO 8601. `null` while the opening's job is still in `draft`."
+    },
+    {
+      "name": "closed_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the opening was closed, in ISO 8601. `null` while the opening is still `open`. Closing the last open opening on a job automatically closes the job itself."
+    },
+    {
+      "name": "sort_order",
+      "type": "integer",
+      "format": null,
+      "description": "Position of the opening within the job's openings list, used to preserve the order in which openings were created or arranged in Greenhouse."
+    },
+    {
+      "name": "opening_id",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Partner-supplied external identifier for the opening (e.g. an HRIS or ATS position id). Free-form string, not required to be unique across the organization, and `null` when no external id has been set. Distinct from the Greenhouse `id`."
+    },
+    {
+      "name": "application_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the application that filled this opening when it was closed as a hire. `null` for openings that are still `open` or that were closed without a hire."
+    },
+    {
+      "name": "close_reason_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the `close_reason` recorded when the opening was closed (e.g. `Hire - New Headcount`, `On Hold`, `Requisition Cancelled`). `null` when the opening is still `open` or when it was closed without a close reason. Resolve via `GET /v3/close_reasons`."
+    },
+    {
+      "name": "target_start_on",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "Target start date for the hire that will fill this opening, in ISO 8601 (`YYYY-MM-DD`). `null` when no target start date has been set."
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "format": null,
+      "description": "Convenience flag \u2014 `true` while the opening is still available to be filled, `false` once it has been closed (filled or otherwise). Equivalent to `closed_at` being `null`."
+    },
+    {
+      "name": "custom_fields",
+      "type": [
+        "object",
+        "null"
+      ],
+      "format": null,
+      "description": null
+    }
+  ]
+}

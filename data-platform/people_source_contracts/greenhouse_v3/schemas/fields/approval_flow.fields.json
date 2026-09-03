@@ -1,0 +1,76 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "approval_flow",
+  "harvest_path_hint": "/v3/approval_flows",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "job_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the job (hiring plan) this approval flow belongs to. References a `/v3/jobs` row."
+    },
+    {
+      "name": "offer_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the specific offer this approval flow gates. Set only for `offer_candidate` flows attached to a real offer; null on the `open_job` and `offer_job` flows (which gate the job itself), and null on the `offer_candidate` prototype flow that lives on the job before any offer is created."
+    },
+    {
+      "name": "approval_type",
+      "type": "string",
+      "format": null,
+      "description": "What this flow approves. `open_job` gates opening the job for recruiting, `offer_job` gates allowing offers to be created on the job, and `offer_candidate` gates extending an individual offer to a candidate (one flow per offer, plus a prototype on the job)."
+    },
+    {
+      "name": "sequential",
+      "type": "boolean",
+      "format": null,
+      "description": "When `true`, approver groups resolve one at a time in `sort_order` \u2014 only after the current group resolves as approved are the next group's approvers asked. When `false`, all groups are activated in parallel as soon as the flow is started."
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "format": null,
+      "description": "Monotonically increasing revision counter for this approval flow. Job approval flows increment when system fields (e.g., department, requisition id, openings) or custom fields marked as triggering re-approval change after the flow has started. Use this together with an approver's `version_sent` to tell whether a pending approver is responding to the current version or a stale request. Offer approval flows attached to a specific `offer_id` are always version 1."
+    },
+    {
+      "name": "requested_by_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the user who started the flow by requesting approvals (the V3 `request_approvals` endpoint, or the in-app \"Request Approval\" button). References a `/v3/users` row. Null until the flow has been started \u2014 approver groups exist but no emails have been sent."
+    },
+    {
+      "name": "approval_status",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Denormalized terminal state of the flow, computed from the underlying approvers. `pending` while any group is still unresolved, `approved` once every group has reached its `approvals_required` threshold, `rejected` once any group has accumulated enough rejections to be unrecoverable. Updates to `sequential` and `replace_approver_groups` are only allowed while `pending`."
+    }
+  ]
+}

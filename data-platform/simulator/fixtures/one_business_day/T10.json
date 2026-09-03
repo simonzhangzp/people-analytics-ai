@@ -1,0 +1,97 @@
+{
+  "transaction": "T10",
+  "survey_wave": {
+    "wave_id": "WAV-2026-05",
+    "instrument_version": "engagement_ext.instrument.v1",
+    "start_date": "2026-04-08",
+    "end_date": "2026-04-22",
+    "target_population": "active_workers",
+    "response_rate": 0.78
+  },
+  "survey_response": [
+    {
+      "response_id": "RSP-HR-EMP-000100-E1",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "E1",
+      "score": 4
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-E2",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "E2",
+      "score": 4
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-E3",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "E3",
+      "score": 2
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-M1",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "M1",
+      "score": 4
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-M2",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "M2",
+      "score": 4
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-M3",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "M3",
+      "score": 2
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-G1",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "G1",
+      "score": 4
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-G2",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "G2",
+      "score": 4
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-G3",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "G3",
+      "score": 2
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-W1",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "W1",
+      "score": 4
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-W2",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "W2",
+      "score": 4
+    },
+    {
+      "response_id": "RSP-HR-EMP-000100-W3",
+      "wave_id": "WAV-2026-05",
+      "worker_id": "HR-EMP-000100",
+      "item_id": "W3",
+      "score": 2
+    }
+  ]
+}

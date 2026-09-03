@@ -1,0 +1,48 @@
+canonical_entity: people_silver_worker_event
+source_contract:
+  source_system: frappe_hr
+  source_object: Employee Separation
+  pin:
+    hrms: v16.15.0
+    schema: people_source_contracts/frappe_hr/doctypes/employee_separation.json
+bronze_table: people_bronze_frappe_employee_separation
+fields:
+  - canonical_field: event_id
+    source_system: frappe_hr
+    source_object: Employee Separation
+    source_field: name
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Separation process document.
+
+  - canonical_field: worker_id
+    source_system: frappe_hr
+    source_object: Employee Separation
+    source_field: employee
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Employee leaving.
+
+  - canonical_field: event_type
+    source_system: frappe_hr
+    source_object: Employee Separation
+    source_field: doctype
+    transformation: constant separation
+    nullable: false
+    data_type: text
+    effective_date_logic: n/a
+    business_definition: Always separation for this mapping.
+
+  - canonical_field: effective_at
+    source_system: frappe_hr
+    source_object: Employee Separation
+    source_field: boarding_begins_on
+    transformation: identity
+    nullable: true
+    data_type: date
+    effective_date_logic: boarding_begins_on; last working day remains Employee.relieving_date
+    business_definition: Separation process start. Canonical termination_date on the worker is still Employee.relieving_date.

@@ -1,0 +1,18 @@
+canonical_version: people_v2
+gate: 1
+note: 'trust: data_only. Calibrates simulator rates. Not a §5 silver table.'
+source_contract:
+  pin: publicAPI/v2
+  connector: people_ingestion/people_bls.py
+fields:
+- canonical_table: people_bronze
+  canonical_field: _source_id
+  source_system: bls
+  source_object: timeseries
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: source_period
+  provenance: SOURCE_NATIVE
+  business_definition: BLS series id. Calibration only.
+  source_field: seriesID

@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:onet:Occupation Data.txt
+info:
+  title: Occupation Data.txt
+  version: 1.0.0
+  description: trust data_only.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/onet/Occupation_Data.txt/extract_date={date}/run_id={id}/
+schema:
+- name: Occupation Data.txt
+  physicalType: parquet
+  physicalName: people_bronze/onet/Occupation Data.txt
+  primaryKey:
+  - O*NET-SOC Code
+  description: trust data_only.
+extract:
+  mode: full
+  cadence: on_pin_change
+  key: O*NET-SOC Code
+  control_total_source: count of occupation rows in the pinned zip
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 8760
+piiClassification: public

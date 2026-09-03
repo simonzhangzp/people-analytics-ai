@@ -1,0 +1,573 @@
+canonical_version: people_v2
+architecture: docs/PEOPLE_DATA_ARCHITECTURE.md
+section: '5'
+note: Silver column inventory for GATE 1 coverage. Gold/marts are out of scope.
+tables:
+- name: people_xw_identity
+  columns:
+  - person_id
+  - worker_id
+  - source_system
+  - source_object
+  - source_id
+  - valid_from
+  - valid_to
+  - match_method
+  schema: people_v2
+  master_source: canonical
+  key: person_id
+  id_kind: surrogate
+  notes: person_id surrogate; worker_id = Employee.name
+- name: people_xw_org
+  columns:
+  - org_id
+  - frappe_department
+  - gh_department_id
+  - valid_from
+  - valid_to
+  schema: people_v2
+  master_source: frappe_hr
+  key: org_id
+  id_kind: master_immutable
+  natural_key: Department.name
+- name: people_xw_location
+  columns:
+  - location_id
+  - frappe_branch
+  - gh_office_id
+  - city
+  - country
+  - region
+  schema: people_v2
+  master_source: frappe_hr
+  key: location_id
+  id_kind: master_immutable
+  natural_key: Branch.name
+- name: people_xw_job
+  columns:
+  - job_id
+  - frappe_designation
+  - onet_soc_code
+  - job_family
+  schema: people_v2
+  master_source: frappe_hr
+  key: job_id
+  id_kind: master_immutable
+  natural_key: Designation.name
+- name: people_xw_skill
+  columns:
+  - skill_id
+  - frappe_skill
+  - onet_element_id
+  schema: people_v2
+  master_source: frappe_hr
+  key: skill_id
+  id_kind: master_immutable
+  natural_key: Skill.name
+- name: people_dim_org
+  columns:
+  - org_id
+  - org_name
+  - parent_org_id
+  - company
+  - is_group
+  - org_path
+  - depth
+  - bg
+  - valid_from
+  - valid_to
+  - is_current
+  schema: people_v2
+  master_source: frappe_hr
+  key: org_id
+  id_kind: master_immutable
+  natural_key: Department.name
+- name: people_dim_job
+  columns:
+  - job_id
+  - job_name
+  - onet_soc_code
+  - job_family
+  - valid_from
+  - valid_to
+  - is_current
+  schema: people_v2
+  master_source: frappe_hr
+  key: job_id
+  id_kind: master_immutable
+  natural_key: Designation.name
+- name: people_dim_grade
+  columns:
+  - grade_id
+  - grade_name
+  - level_rank
+  - default_salary_structure
+  - valid_from
+  - valid_to
+  - is_current
+  schema: people_v2
+  master_source: frappe_hr
+  key: grade_id
+  id_kind: master_immutable
+  natural_key: Employee Grade.name
+- name: people_dim_location
+  columns:
+  - location_id
+  - branch_name
+  - city
+  - country
+  - region
+  - valid_from
+  - valid_to
+  - is_current
+  schema: people_v2
+  master_source: frappe_hr
+  key: location_id
+  id_kind: master_immutable
+  natural_key: Branch.name
+- name: people_dim_date
+  columns:
+  - date
+  - month_end
+  - is_month_end
+  schema: people_v2
+  master_source: canonical
+  key: date
+  id_kind: generated
+- name: people_dim_appraisal_cycle
+  columns:
+  - cycle_id
+  - cycle_name
+  - start_date
+  - end_date
+  - status
+  schema: people_v2
+  master_source: frappe_hr
+  key: cycle_id
+  id_kind: master_immutable
+  natural_key: Appraisal Cycle.name
+- name: people_dim_stage
+  columns:
+  - stage_id
+  - gh_job_id
+  - stage_name
+  - priority
+  - canonical_stage
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: stage_id
+  id_kind: master_immutable
+  natural_key: job_interview_stage.id
+- name: people_dim_source
+  columns:
+  - id
+  - name
+  - type
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: id
+  id_kind: master_immutable
+  natural_key: source.id
+- name: people_dim_rejection_reason
+  columns:
+  - id
+  - name
+  - type
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: id
+  id_kind: master_immutable
+  natural_key: rejection_reason.id
+- name: people_dim_skill
+  columns:
+  - skill_id
+  - skill_name
+  - onet_element_id
+  - element_type
+  schema: people_v2
+  master_source: frappe_hr
+  key: skill_id
+  id_kind: master_immutable
+  natural_key: Skill.name
+- name: people_dim_learning_resource
+  columns:
+  - resource_id
+  - source
+  - title
+  - url
+  - level
+  - duration_minutes
+  - roles
+  - products
+  schema: people_v2
+  master_source: mixed
+  key: resource_id
+  id_kind: master_immutable
+  notes: source column distinguishes internal Training Event vs microsoft_learn
+- name: people_dim_survey_wave
+  columns:
+  - wave_id
+  - instrument_version
+  - start_date
+  - end_date
+  - target_population
+  - response_rate
+  schema: people_v2
+  master_source: engagement_ext
+  key: wave_id
+  id_kind: master_immutable
+- name: people_dim_survey_item
+  columns:
+  - item_id
+  - dimension
+  - reverse
+  - prompt
+  - instrument_version
+  schema: people_v2
+  master_source: engagement_ext
+  key: item_id
+  id_kind: master_immutable
+- name: people_dim_person
+  columns:
+  - person_id
+  - first_seen_at
+  - first_seen_source
+  schema: people_v2
+  master_source: canonical
+  key: person_id
+  id_kind: surrogate
+  notes: PER-sha1; exception to master-id rule
+- name: people_dim_person_restricted
+  columns:
+  - person_id
+  - full_name
+  - gender
+  - date_of_birth
+  schema: people_v2
+  master_source: canonical
+  key: person_id
+  id_kind: surrogate
+- name: people_dim_worker
+  columns:
+  - worker_id
+  - person_id
+  - frappe_employee
+  - hire_date
+  - termination_date
+  - termination_reason_raw
+  - termination_category
+  - employment_type
+  - is_rehire
+  - hired_via_application_id
+  schema: people_v2
+  master_source: frappe_hr
+  key: worker_id
+  id_kind: master_immutable
+  natural_key: Employee.name
+- name: people_evt_worker
+  columns:
+  - event_id
+  - worker_id
+  - person_id
+  - event_type
+  - event_date
+  - recorded_at
+  - source_system
+  - source_object
+  - source_id
+  - extract_id
+  schema: people_v2
+  master_source: frappe_hr
+  key: event_id
+  id_kind: master_immutable
+  natural_key: source document name
+- name: people_evt_worker_change
+  columns:
+  - event_id
+  - property
+  - old_value
+  - new_value
+  - old_canonical_id
+  - new_canonical_id
+  schema: people_v2
+  master_source: frappe_hr
+  key: event_id
+  id_kind: master_immutable
+  natural_key: parent event_id + property
+- name: people_hist_worker_attr
+  columns:
+  - worker_id
+  - valid_from
+  - valid_to
+  - org_id
+  - job_id
+  - grade_id
+  - location_id
+  - manager_worker_id
+  - employment_type
+  - status
+  - source_event_id
+  schema: people_v2
+  master_source: canonical
+  key: worker_id
+  id_kind: master_immutable
+  notes: interval grain worker_id+valid_from; rebuilt BR-WF-008
+- name: people_fact_comp_assignment_restricted
+  columns:
+  - comp_assignment_id
+  - worker_id
+  - from_date
+  - to_date
+  - salary_structure
+  - base
+  - variable
+  - currency
+  - source_ssa
+  schema: people_v2
+  master_source: frappe_hr
+  key: comp_assignment_id
+  id_kind: master_immutable
+  natural_key: Salary Structure Assignment.name
+- name: people_ref_comp_band
+  columns:
+  - grade_id
+  - country
+  - currency
+  - band_min
+  - band_mid
+  - band_max
+  - valid_from
+  - valid_to
+  schema: people_v2
+  master_source: engagement_ext
+  key: grade_id
+  id_kind: master_immutable
+  notes: E1 composite with country/currency/valid_from
+- name: people_fact_appraisal
+  columns:
+  - appraisal_id
+  - worker_id
+  - cycle_id
+  - final_score
+  - total_score
+  - self_score
+  - status
+  - submitted_at
+  schema: people_v2
+  master_source: frappe_hr
+  key: appraisal_id
+  id_kind: master_immutable
+  natural_key: Appraisal.name
+- name: people_fact_training_participation
+  columns:
+  - worker_id
+  - training_event_id
+  - resource_id
+  - attendance
+  - status
+  - hours
+  - grade
+  - event_start
+  schema: people_v2
+  master_source: frappe_hr
+  key: training_event_id
+  id_kind: master_immutable
+  notes: grain worker+event
+- name: people_fact_worker_skill
+  columns:
+  - worker_id
+  - skill_id
+  - proficiency
+  - evaluation_date
+  - source_skill_map
+  schema: people_v2
+  master_source: frappe_hr
+  key: skill_id
+  id_kind: master_immutable
+  notes: grain worker+skill
+- name: people_ref_job_skill_target
+  columns:
+  - job_id
+  - skill_id
+  - target_proficiency
+  - onet_importance
+  schema: people_v2
+  master_source: onet
+  key: skill_id
+  id_kind: master_immutable
+  notes: grain job+skill
+- name: people_dim_requisition
+  columns:
+  - requisition_id
+  - gh_job_id
+  - gh_opening_id
+  - job_id
+  - org_id
+  - location_id
+  - hiring_manager_person_id
+  - recruiter_person_id
+  - opened_at
+  - closed_at
+  - status
+  - close_reason
+  - hired_application_id
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: requisition_id
+  id_kind: master_immutable
+  natural_key: opening.id
+- name: people_dim_candidate
+  columns:
+  - candidate_id
+  - gh_candidate_id
+  - person_id
+  - created_at
+  - first_source_id
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: candidate_id
+  id_kind: master_immutable
+  natural_key: candidate.id
+- name: people_fact_application
+  columns:
+  - application_id
+  - candidate_id
+  - requisition_id
+  - applied_at
+  - status
+  - rejected_at
+  - hired_at
+  - source_id
+  - referrer_person_id
+  - rejection_reason_id
+  - rejection_type
+  - current_stage_id
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: application_id
+  id_kind: master_immutable
+  natural_key: application.id
+- name: people_evt_application_stage
+  columns:
+  - application_id
+  - stage_id
+  - entered_at
+  - exited_at
+  - is_current
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: application_id
+  id_kind: master_immutable
+  notes: grain application+stage+entered_at
+- name: people_fact_interview
+  columns:
+  - interview_id
+  - application_id
+  - stage_id
+  - start_at
+  - end_at
+  - status
+  - interviewer_person_ids
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: interview_id
+  id_kind: master_immutable
+  natural_key: interview.id
+- name: people_fact_scorecard
+  columns:
+  - scorecard_id
+  - application_id
+  - interview_id
+  - submitted_by_person_id
+  - submitted_at
+  - overall_recommendation
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: scorecard_id
+  id_kind: master_immutable
+  natural_key: scorecard.id
+- name: people_fact_offer
+  columns:
+  - offer_id
+  - version
+  - application_id
+  - requisition_id
+  - created_at
+  - sent_at
+  - resolved_at
+  - starts_at
+  - status
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: offer_id
+  id_kind: master_immutable
+  natural_key: offer.id
+- name: people_dim_recruiter
+  columns:
+  - person_id
+  - specialization
+  - supported_region
+  - supported_job_family
+  - valid_from
+  - valid_to
+  schema: people_v2
+  master_source: canonical
+  key: person_id
+  id_kind: surrogate
+  notes: E4; person via T8
+- name: people_fact_survey_score_restricted
+  columns:
+  - worker_id
+  - wave_id
+  - dimension
+  - score_mean
+  - items_answered
+  schema: people_v2
+  master_source: engagement_ext
+  key: worker_id
+  id_kind: master_immutable
+  notes: grain worker+wave+dimension
+- name: people_fact_candidate_demographic_restricted
+  columns:
+  - application_id
+  - question_id
+  - answer_option_id
+  - free_form_text
+  - submitted_at
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: application_id
+  id_kind: master_immutable
+  notes: application grain; no person/worker
+- name: people_fact_candidate_eeoc_restricted
+  columns:
+  - application_id
+  - race
+  - gender
+  - veteran_status
+  - disability_status
+  - submitted_at
+  schema: people_v2
+  master_source: greenhouse_v3
+  key: application_id
+  id_kind: master_immutable
+  notes: application grain; no person/worker
+- name: people_ref_city
+  columns:
+  - city
+  - country
+  - region
+  schema: people_v2
+  master_source: engagement_ext
+  key: city
+  id_kind: master_immutable
+  notes: E3
+- name: people_ref_separation_reason_map
+  columns:
+  - raw_reason
+  - termination_category
+  schema: people_v2
+  master_source: engagement_ext
+  key: raw_reason
+  id_kind: master_immutable
+  notes: E6

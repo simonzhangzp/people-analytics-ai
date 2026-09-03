@@ -1,0 +1,39 @@
+canonical_version: people_v2
+gate: 1
+note: Generated calendar. Not sourced from HRIS or ATS.
+source_contract:
+  rules: calendar
+fields:
+- canonical_table: people_dim_date
+  canonical_field: date
+  source_system: canonical
+  source_object: people_dim_date
+  transformation: generate date spine covering backfill through today
+  nullable: false
+  data_type: date
+  effective_date_logic: date
+  provenance: CANONICAL_KEY
+  business_definition: Calendar date.
+  source_field: null
+- canonical_table: people_dim_date
+  canonical_field: month_end
+  source_system: canonical
+  source_object: people_dim_date
+  transformation: last day of month containing date
+  nullable: false
+  data_type: date
+  effective_date_logic: date
+  provenance: DERIVED
+  business_definition: Month-end of this date.
+  source_field: date
+- canonical_table: people_dim_date
+  canonical_field: is_month_end
+  source_system: canonical
+  source_object: people_dim_date
+  transformation: date = month_end
+  nullable: false
+  data_type: boolean
+  effective_date_logic: date
+  provenance: DERIVED
+  business_definition: True on month-end rows.
+  source_field: date

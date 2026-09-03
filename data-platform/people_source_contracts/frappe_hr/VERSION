@@ -1,0 +1,10 @@
+{
+  "product": "Frappe HR (hrms)",
+  "tag": "v16.15.0",
+  "commit": "1924234884731e389ecc4e5500653fcd59666911",
+  "repository": "https://github.com/frappe/hrms",
+  "erpnext_tag": "v16.0.0",
+  "erpnext_repository": "https://github.com/frappe/erpnext",
+  "frappe_framework": ">=16.0.0,<17.0.0",
+  "note": "Employee, Department, Designation, and Branch live in ERPNext v16. HRMS get_custom_fields() overlays Employee.employment_type and Employee.grade (and other HR fields). Effective Employee schema = employee.json + custom_fields.json. Payroll DocTypes live in frappe/hrms v16 (not erpnext/payroll). Transfer/Promotion child rows are DocType Employee Property History. Training Event/Result employee children are Training Event Employee and Training Result Employee. Employment Type is hrms/hr/doctype/employment_type."
+}

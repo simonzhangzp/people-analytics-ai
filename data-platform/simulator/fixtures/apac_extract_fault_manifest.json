@@ -1,0 +1,30 @@
+{
+  "extract_id": "ext-frappe-employee-2026-08-14",
+  "run_id": "run-2026-08-14",
+  "source_system": "frappe_hr",
+  "source_object": "Employee",
+  "extract_date": "2026-08-14",
+  "mode": "incremental",
+  "control_total": 20,
+  "rows_received": 14,
+  "status": "success",
+  "scenario_ids": [
+    "apac_hris_feed_incomplete"
+  ],
+  "received_names": [
+    "HR-EMP-AMER-000",
+    "HR-EMP-AMER-001",
+    "HR-EMP-AMER-002",
+    "HR-EMP-AMER-003",
+    "HR-EMP-AMER-004",
+    "HR-EMP-AMER-005",
+    "HR-EMP-AMER-006",
+    "HR-EMP-AMER-007",
+    "HR-EMP-AMER-008",
+    "HR-EMP-AMER-009",
+    "HR-EMP-APAC-000",
+    "HR-EMP-APAC-001",
+    "HR-EMP-APAC-002",
+    "HR-EMP-APAC-003"
+  ]
+}

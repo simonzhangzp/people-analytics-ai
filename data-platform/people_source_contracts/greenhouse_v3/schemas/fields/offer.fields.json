@@ -1,0 +1,100 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "offer",
+  "harvest_path_hint": "/v3/offers",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "format": null,
+      "description": "Revision number of this offer within its application. Greenhouse creates a new offer row (incrementing `version`) whenever a tracked field on an existing offer changes \u2014 typically `starts_on`, `opening_id`, or a custom field configured to trigger a new version. Pair with `current_only=true` to filter the list endpoint down to the latest version per application."
+    },
+    {
+      "name": "application_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the application this offer is extended on. Every offer belongs to exactly one application; the offer is voided if the application is rejected or deleted."
+    },
+    {
+      "name": "job_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the job this offer's application is on."
+    },
+    {
+      "name": "candidate_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the candidate (person) receiving this offer. Resolved through the offer's application."
+    },
+    {
+      "name": "opening_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the specific opening this offer is being extended for. `null` when the offer has not yet been linked to an opening."
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "format": null,
+      "description": "Lifecycle status of the offer. `Created` for offers still being drafted or pending approval, `Accepted` once the candidate accepts, `Rejected` if declined or withdrawn, and `Deprecated` for superseded prior versions (a new offer version replaces an earlier one with this status)."
+    },
+    {
+      "name": "starts_on",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "Candidate's proposed start date, in ISO 8601 (YYYY-MM-DD). `null` when no start date has been set on the offer."
+    },
+    {
+      "name": "sent_on",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "Date the offer was sent to the candidate, in ISO 8601 (YYYY-MM-DD). `null` until the offer has been sent."
+    },
+    {
+      "name": "resolved_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the offer was resolved (`Accepted` or `Rejected`), in ISO 8601. Date updates submitted through `PATCH /v3/offers/{id}` are normalized to noon UTC on the supplied date. `null` while the offer is still `Created` or has been superseded as `Deprecated` without a resolution."
+    },
+    {
+      "name": "custom_fields",
+      "type": [
+        "object",
+        "null"
+      ],
+      "format": null,
+      "description": null
+    }
+  ]
+}

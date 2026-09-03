@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:frappe_hr:Employee Separation
+info:
+  title: Employee Separation
+  version: 1.0.0
+  description: BR-DQ-001.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/frappe_hr/Employee_Separation/extract_date={date}/run_id={id}/
+schema:
+- name: Employee Separation
+  physicalType: parquet
+  physicalName: people_bronze/frappe_hr/Employee Separation
+  primaryKey:
+  - name
+  description: BR-DQ-001.
+extract:
+  mode: incremental
+  cadence: daily
+  key: name
+  control_total_source: count of submitted Employee Separation
+  watermark: modified
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

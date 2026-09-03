@@ -1,0 +1,100 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "job_interview",
+  "harvest_path_hint": "/v3/job_interviews",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "job_interview_stage_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the `job_interview_stage` this slot belongs to (the section of the job's interview plan, e.g. \"Onsite\")."
+    },
+    {
+      "name": "job_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the job whose interview plan this slot is defined on."
+    },
+    {
+      "name": "sort_order",
+      "type": "integer",
+      "format": null,
+      "description": "Position of this slot within its `job_interview_stage`, ascending. The first interview in the stage is `1`."
+    },
+    {
+      "name": "scheduling_type",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "How the slot is fulfilled when a candidate hits the stage. `needs_scheduling` is a calendared interview that coordinators book against candidate availability; `take_home_test` is an asynchronous test sent through Greenhouse; `offer` is the offer step; `none` is a feedback-only slot (no scheduling). `null` for legacy steps with no scheduling type set."
+    },
+    {
+      "name": "duration",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Default length of the interview in minutes, used to seed the scheduler. `null` if not set on the slot."
+    },
+    {
+      "name": "summary",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Candidate-facing summary copied from the interview's default Interview Prep when the slot was added to the job. Snapshot only \u2014 edits made later in the job's Interview Kit are not reflected here; use the Interview Kits endpoint for the live value."
+    },
+    {
+      "name": "instructions",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Interviewer-facing instructions copied from the interview's default Interview Prep when the slot was added to the job. Snapshot only \u2014 edits made later in the job's Interview Kit are not reflected here; use the Interview Kits endpoint for the live value."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "format": null,
+      "description": "Name of the interview slot as it appears on the job's interview plan (e.g. \"Recruiter Phone Screen\", \"Hiring Manager Interview\")."
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "format": null,
+      "description": "Whether the slot is on the job's current interview plan. Inactive slots are retained for historical interviews that were scheduled against them but are not used for new applications."
+    },
+    {
+      "name": "require_scorecard",
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "format": null,
+      "description": "Whether interviewers must submit a scorecard for interviews scheduled against this slot. Only meaningful for `needs_scheduling` and `take_home_test` slots; `null` for `none` and `offer` slots, which never collect scorecards."
+    }
+  ]
+}

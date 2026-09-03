@@ -1,0 +1,91 @@
+# People Analytics data platform — storage contract
+#
+# Object storage = durable raw + history.
+# Server = compute + orchestration.
+# Supabase = serving + governance. Never the data lake.
+#
+# Website queries must hit serving marts. Do not scan lake files on page load.
+# Every People object and lake folder starts with people.
+
+layers:
+  lake:
+    role: durable_raw_and_history
+    location: server_filesystem
+    recommended_path: /home/edgeai/people-lake
+    local_dev_path: data-platform/lake
+    budget_gb:
+      seed: 8
+      year_1: 15
+      year_3: 30
+    formats:
+      - parquet
+      - jsonl.gz
+    contains:
+      - people_bronze/people_hris
+      - people_bronze/people_ats
+      - people_bronze/people_lms
+      - people_bronze/people_onet
+      - people_bronze/people_bls
+      - people_bronze/people_microsoft_learn
+      - people_silver
+      - people_gold
+      - people_archive
+      - people_logs
+      - people_metadata
+    never_served_to_website: true
+
+  compute:
+    role: orchestration_and_transform
+    location: hetzner_edgeai
+    notes: 20 vCPU, 62 GiB RAM, 367 GB free as of 2026-08-30. No Docker installed.
+    working_set_gb: 15
+    isolate_from:
+      - /home/edgeai/quantreview-backend
+      - /home/edgeai/quantreview-state
+
+  serving:
+    role: curated_marts_and_governance
+    location: supabase_postgres
+    project_name: PeopleAnalyticsAI.net
+    project_ref: zapmigfrtnwnkmezjefx
+    project_policy: dedicated_people_project
+    compute: micro
+    disk_quota_bytes: 8589934592
+    naming: people_prefix
+    schema: people_v2
+    blocked_project_refs:
+      - fyvivwgyisrtmehzjqlv
+      - kgxbomcmgkwlmzyevqjw
+    v1_live_until_cutover:
+      project_name: quantreview-staging
+      project_ref: kgxbomcmgkwlmzyevqjw
+      note: public.people_* stays; empty people_v2 on staging is cleaned in step 9
+    leftover_quantreview_public_tables: true
+    leftover_size_note: QuantReview leftovers remain on staging public only
+    budget_gb:
+      seed: 4
+      year_1: 6
+      year_3: 6
+    hot_window_months: 12
+    grain: aggregate_slices_not_employee_month
+    contains:
+      - people_metric_definition
+      - people_source_freshness
+      - people_data_quality_incident
+      - people_api_usage
+      - people_dim_*
+      - people_mart_*
+      - people_workspaces
+    forbids:
+      - raw JSON payloads
+      - employee event ledgers
+      - survey free-text rows
+      - job description bodies
+      - unprefixed People table names
+
+shared_supabase_snapshot_2026_08_30:
+  project_ref: fyvivwgyisrtmehzjqlv
+  database_bytes: 1328901267
+  largest_table: panorama_daily
+  people_workbench_bytes: 900000
+  remaining_if_pro_8gb_bytes: 6862588293

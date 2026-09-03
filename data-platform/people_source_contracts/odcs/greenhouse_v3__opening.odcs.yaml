@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:greenhouse_v3:opening
+info:
+  title: opening
+  version: 1.0.0
+  description: Requisition grain.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/greenhouse_v3/opening/extract_date={date}/run_id={id}/
+schema:
+- name: opening
+  physicalType: parquet
+  physicalName: people_bronze/greenhouse_v3/opening
+  primaryKey:
+  - id
+  description: Requisition grain.
+extract:
+  mode: incremental_plus_weekly_full
+  cadence: daily
+  key: id
+  control_total_source: Harvest list total
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

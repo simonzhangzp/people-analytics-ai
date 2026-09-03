@@ -1,0 +1,70 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "eeoc",
+  "harvest_path_hint": "/v3/eeocs",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "application_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the application this EEOC response is attached to. Each application has at most one EEOC response."
+    },
+    {
+      "name": "candidate_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the candidate (person) who submitted this response \u2014 the application's owner."
+    },
+    {
+      "name": "gender",
+      "type": "object",
+      "format": null,
+      "description": "Self-identified gender. `id` and `description` are `null` when the candidate skipped the question. The fixed enum values for `description` are `Male`, `Female`, and `Decline To Self Identify`."
+    },
+    {
+      "name": "race",
+      "type": "object",
+      "format": null,
+      "description": "Self-identified race or ethnicity. `id` and `description` are `null` when the candidate skipped the question. The fixed enum values for `description` are `American Indian or Alaskan Native`, `Asian`, `Black or African American`, `Hispanic or Latino`, `White`, `Native Hawaiian or Other Pacific Islander`, `Two or More Races`, and `Decline To Self Identify`."
+    },
+    {
+      "name": "veteran_status",
+      "type": "object",
+      "format": null,
+      "description": "Self-identified protected-veteran status under VEVRAA. `id` and `description` are `null` when the candidate skipped the question. The fixed enum values for `description` are `I am not a protected veteran`, `I identify as one or more of the classifications of a protected veteran`, and `I don't wish to answer`."
+    },
+    {
+      "name": "disability_status",
+      "type": "object",
+      "format": null,
+      "description": "Self-identified disability status under Section 503. `id` and `description` are `null` when the candidate skipped the question. The fixed enum values for `description` are `Yes, I have a disability, or have had one in the past`, `No, I do not have a disability and have not had one in the past`, and `I do not want to answer`."
+    },
+    {
+      "name": "submitted_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the candidate submitted the EEOC questionnaire, in ISO 8601. `null` while the questionnaire has been requested but not yet responded to."
+    }
+  ]
+}

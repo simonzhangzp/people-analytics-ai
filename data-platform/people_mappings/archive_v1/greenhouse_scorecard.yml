@@ -1,0 +1,84 @@
+canonical_entity: people_silver_scorecard
+source_contract:
+  source_system: greenhouse_v3
+  source_object: scorecards
+  harvest_path: /v3/scorecards
+  pin:
+    api: Harvest v3
+    schema: people_source_contracts/greenhouse_v3/schemas/fields/scorecard.fields.json
+bronze_tables:
+  - people_bronze_greenhouse_scorecard
+  - people_bronze_greenhouse_scorecard_question
+  - people_bronze_greenhouse_scorecard_question_answer
+fields:
+  - canonical_field: source_scorecard_id
+    source_system: greenhouse_v3
+    source_object: scorecards
+    source_field: id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: submitted_at / created_at
+    business_definition: One scorecard per interviewer on an interview kit.
+
+  - canonical_field: interviewer_user_id
+    source_system: greenhouse_v3
+    source_object: scorecards
+    source_field: interviewer_id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: Greenhouse user who interviewed. Crosswalk to Frappe employee via people_identity_crosswalk.
+
+  - canonical_field: submitter_user_id
+    source_system: greenhouse_v3
+    source_object: scorecards
+    source_field: submitter_id
+    transformation: identity
+    nullable: false
+    data_type: integer
+    effective_date_logic: n/a
+    business_definition: User who submitted. May differ from interviewer_id.
+
+  - canonical_field: interviewed_at
+    source_system: greenhouse_v3
+    source_object: scorecards
+    source_field: interviewed_at
+    transformation: identity
+    nullable: true
+    data_type: timestamptz
+    effective_date_logic: interviewed_at
+    business_definition: Interview timestamp.
+
+  - canonical_field: candidate_rating
+    source_system: greenhouse_v3
+    source_object: scorecards
+    source_field: candidate_rating
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: submitted
+    business_definition: strong_no / no / yes / strong_yes / no_decision.
+
+  - canonical_field: status
+    source_system: greenhouse_v3
+    source_object: scorecards
+    source_field: status
+    transformation: identity
+    nullable: false
+    data_type: text
+    effective_date_logic: current
+    business_definition: draft or complete. Only complete scorecards count in analysis.
+
+questions:
+  source_object: scorecard_questions
+  harvest_path: /v3/scorecard_questions
+  canonical_entity: people_silver_scorecard_question
+  note: Questions belong to interview kits. Answers are a separate resource.
+
+answers:
+  source_object: scorecard_question_answers
+  harvest_path: /v3/scorecard_question_answers
+  canonical_entity: people_silver_scorecard_answer
+  note: Preserve answer_type grain (text / yes_no / single_select / multi_select). Do not flatten onto scorecard.

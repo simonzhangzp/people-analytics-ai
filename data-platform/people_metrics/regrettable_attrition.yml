@@ -1,0 +1,16 @@
+metric_id: regrettable_attrition_rate
+status: certified
+grain: people_snap_worker_month
+numerator:
+  rule: BR-RET-002
+  params: [threshold, missing_appraisal, scale]
+  requires_category:
+    rule: BR-RET-001
+    value: voluntary
+denominator:
+  rule: BR-WF-001
+  param: certified_population
+  aggregator: average_headcount
+sandbox:
+  rule_kind: parametric
+  rpc: people_get_metric_sandbox

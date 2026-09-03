@@ -1,0 +1,27 @@
+apiVersion: v3.0.2
+kind: DataContract
+id: urn:people:bronze:engagement_ext:survey_wave
+info:
+  title: survey_wave
+  version: 1.0.0
+  description: E5.
+servers:
+- server: people_bronze
+  type: s3
+  path: people_bronze/engagement_ext/survey_wave/extract_date={date}/run_id={id}/
+schema:
+- name: survey_wave
+  physicalType: parquet
+  physicalName: people_bronze/engagement_ext/survey_wave
+  primaryKey:
+  - wave_id
+  description: E5.
+extract:
+  mode: full
+  cadence: per_wave
+  key: wave_id
+  control_total_source: count of waves
+  watermark: updated_at
+slaProperties:
+  freshnessHours: 24
+piiClassification: internal

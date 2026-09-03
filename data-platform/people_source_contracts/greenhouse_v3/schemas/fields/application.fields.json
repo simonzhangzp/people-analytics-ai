@@ -1,0 +1,202 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "application",
+  "harvest_path_hint": "/v3/applications",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "agency_note_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the note created when the candidate was submitted by an agency, or `null` if the application did not come through an agency."
+    },
+    {
+      "name": "candidate_id",
+      "type": "integer",
+      "format": null,
+      "description": "Id of the candidate (person) this application belongs to."
+    },
+    {
+      "name": "coordinator_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the user assigned as coordinator on the application's job, or `null` when unassigned."
+    },
+    {
+      "name": "job_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the job this application is on. `null` for jobless prospect applications."
+    },
+    {
+      "name": "job_post_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the job post the candidate applied through, or `null` if the application was created internally rather than from a posted role."
+    },
+    {
+      "name": "recruiter_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the user assigned as recruiter on the application's job, or `null` when unassigned."
+    },
+    {
+      "name": "referrer_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the referrer who credited this application, or `null` if there was no referral. References a referrer, not a Greenhouse user."
+    },
+    {
+      "name": "rejection_reason_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the rejection reason selected for the application. References a `/v3/rejection_reasons` row scoped to the organization. `null` when the application was rejected without a reason, or has not been rejected."
+    },
+    {
+      "name": "source_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the source the application is attributed to (e.g. a job board, an event, an employee referral source). `null` if no source is set."
+    },
+    {
+      "name": "stage_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the interview stage the candidate is currently in for this application. `null` for prospect applications and applications in a terminal state."
+    },
+    {
+      "name": "job_interview_stage_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the job interview stage definition (see `GET /v3/job_interview_stages`) the candidate is currently in for this application. `null` for prospect applications and applications in a terminal state."
+    },
+    {
+      "name": "stage_name",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Display name of the candidate's current interview stage on this application."
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "format": null,
+      "description": "Lifecycle status of the application. `in_process` for active candidates, `rejected` for rejected applications, `hired` once an offer is closed and the hire endpoint has fired, and `converted` for prospect applications that have been promoted to a candidate application via `convert_to_candidate`."
+    },
+    {
+      "name": "needs_decision",
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "format": null,
+      "description": "`true` when the application is waiting on a hiring-team decision (scorecard completion, advance/reject, etc.) in its current stage."
+    },
+    {
+      "name": "prospect",
+      "type": "boolean",
+      "format": null,
+      "description": "`true` for prospect applications (sourced candidates not yet attached to a single job), `false` for candidate applications on a specific job."
+    },
+    {
+      "name": "rejected_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the application was rejected, in ISO 8601. `null` for applications that have not been rejected."
+    },
+    {
+      "name": "last_activity_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp of the most recent activity on this application (notes, emails, stage changes, etc.), in ISO 8601."
+    },
+    {
+      "name": "location_address",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Free-form location string captured on the application (typically from the job post's location question)."
+    },
+    {
+      "name": "answers",
+      "type": [
+        "array",
+        "null"
+      ],
+      "format": null,
+      "description": "Free-text answers the candidate provided on the job post application form. Each entry pairs the question text with the candidate's answer."
+    },
+    {
+      "name": "prospective_job_ids",
+      "type": "array",
+      "format": null,
+      "description": "For prospect applications, the ids of jobs the prospect is being considered for. Empty for non-prospect applications and for jobless prospects."
+    },
+    {
+      "name": "custom_fields",
+      "type": [
+        "object",
+        "null"
+      ],
+      "format": null,
+      "description": null
+    }
+  ]
+}

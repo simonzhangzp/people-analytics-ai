@@ -1,0 +1,58 @@
+{
+  "transaction": "T3",
+  "employee_promotion": {
+    "doctype": "Employee Promotion",
+    "name": "HR-EMP-PRO-0001",
+    "employee": "HR-EMP-000100",
+    "promotion_date": "2026-04-08",
+    "docstatus": 1,
+    "promotion_details": [
+      {
+        "doctype": "Employee Property History",
+        "property": "Designation",
+        "fieldname": "designation",
+        "current": "Software Developer",
+        "new": "Sales Manager"
+      },
+      {
+        "doctype": "Employee Property History",
+        "property": "Grade",
+        "fieldname": "grade",
+        "current": "G5",
+        "new": "G6"
+      }
+    ]
+  },
+  "salary_structure_assignment": {
+    "doctype": "Salary Structure Assignment",
+    "name": "HR-SSA-000102",
+    "employee": "HR-EMP-000100",
+    "from_date": "2026-04-08",
+    "base": 165000,
+    "variable": 20000,
+    "currency": "USD",
+    "grade": "G6",
+    "salary_structure": "GT-PROF-USD",
+    "docstatus": 1
+  },
+  "employee": {
+    "doctype": "Employee",
+    "name": "HR-EMP-000100",
+    "employee_name": "Worker 000100",
+    "status": "Active",
+    "date_of_joining": "2020-01-06",
+    "department": "Engineering - Platform",
+    "designation": "Sales Manager",
+    "grade": "G6",
+    "branch": "APAC-SIN",
+    "employment_type": "Regular",
+    "reports_to": null,
+    "relieving_date": null,
+    "reason_for_leaving": null,
+    "gender": "Female",
+    "date_of_birth": "1990-01-15",
+    "docstatus": 0,
+    "creation": "2020-01-06T12:00:00Z",
+    "modified": "2020-01-06T12:00:00Z"
+  }
+}

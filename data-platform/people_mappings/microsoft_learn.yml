@@ -1,0 +1,96 @@
+canonical_version: people_v2
+gate: 1
+note: 'Catalog keys actually extracted: uid/id/url, title, levels, products. duration_minutes and roles[] are [Learn schema
+  gap].'
+source_contract:
+  pin: people_source_contracts/microsoft_learn/VERSION
+  connector: people_ingestion/people_learn.py
+fields:
+- canonical_table: people_dim_learning_resource
+  canonical_field: resource_id
+  source_system: microsoft_learn
+  source_object: catalog
+  transformation: coalesce(uid, id, url)
+  nullable: false
+  data_type: text
+  effective_date_logic: last_modified
+  provenance: SOURCE_NATIVE
+  business_definition: Catalog identity.
+  source_field: uid
+- canonical_table: people_dim_learning_resource
+  canonical_field: source
+  source_system: microsoft_learn
+  source_object: catalog
+  transformation: literal microsoft_learn
+  nullable: false
+  data_type: text
+  effective_date_logic: last_modified
+  provenance: CANONICAL_KEY
+  business_definition: External catalog.
+  source_field: null
+- canonical_table: people_dim_learning_resource
+  canonical_field: title
+  source_system: microsoft_learn
+  source_object: catalog
+  transformation: coalesce(title, name)
+  nullable: false
+  data_type: text
+  effective_date_logic: last_modified
+  provenance: SOURCE_NATIVE
+  business_definition: Catalog title.
+  source_field: title
+- canonical_table: people_dim_learning_resource
+  canonical_field: url
+  source_system: microsoft_learn
+  source_object: catalog
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: last_modified
+  provenance: SOURCE_NATIVE
+  business_definition: Catalog url.
+  source_field: url
+- canonical_table: people_dim_learning_resource
+  canonical_field: level
+  source_system: microsoft_learn
+  source_object: catalog
+  transformation: join levels[] or scalar level
+  nullable: true
+  data_type: text
+  effective_date_logic: last_modified
+  provenance: SOURCE_NATIVE
+  business_definition: Catalog levels.
+  source_field: levels
+- canonical_table: people_dim_learning_resource
+  canonical_field: duration_minutes
+  source_system: microsoft_learn
+  source_object: catalog
+  transformation: null — not in current catalog extract [Learn schema gap]
+  nullable: true
+  data_type: integer
+  effective_date_logic: last_modified
+  provenance: SOURCE_GAP
+  business_definition: Do not invent duration_minutes.
+  source_field: null
+- canonical_table: people_dim_learning_resource
+  canonical_field: roles
+  source_system: microsoft_learn
+  source_object: catalog
+  transformation: null — not in current catalog extract [Learn schema gap]
+  nullable: true
+  data_type: text[]
+  effective_date_logic: last_modified
+  provenance: SOURCE_GAP
+  business_definition: Do not invent roles[].
+  source_field: null
+- canonical_table: people_dim_learning_resource
+  canonical_field: products
+  source_system: microsoft_learn
+  source_object: catalog
+  transformation: identity array
+  nullable: true
+  data_type: text[]
+  effective_date_logic: last_modified
+  provenance: SOURCE_NATIVE
+  business_definition: Catalog products.
+  source_field: products

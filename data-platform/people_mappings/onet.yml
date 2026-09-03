@@ -1,0 +1,39 @@
+canonical_version: people_v2
+gate: 1
+note: 'trust: data_only. Feeds job/skill crosswalks and people_ref_job_skill_target.'
+source_contract:
+  pin: db_31_0_text.zip
+fields:
+- canonical_table: people_xw_job
+  canonical_field: onet_soc_code
+  source_system: onet
+  source_object: Occupation Data.txt
+  transformation: strip trailing .00
+  nullable: true
+  data_type: text
+  effective_date_logic: current
+  provenance: SOURCE_NATIVE
+  business_definition: SOC code.
+  source_field: O*NET-SOC Code
+- canonical_table: people_dim_job
+  canonical_field: job_name
+  source_system: onet
+  source_object: Occupation Data.txt
+  transformation: used only to validate the constructed Designation map; canonical job_name remains Designation.designation_name
+  nullable: true
+  data_type: text
+  effective_date_logic: current
+  provenance: SOURCE_NATIVE
+  business_definition: O*NET title for QA.
+  source_field: Title
+- canonical_table: people_xw_skill
+  canonical_field: onet_element_id
+  source_system: onet
+  source_object: Essential Skills.txt
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: current
+  provenance: SOURCE_NATIVE
+  business_definition: O*NET element id.
+  source_field: Element ID

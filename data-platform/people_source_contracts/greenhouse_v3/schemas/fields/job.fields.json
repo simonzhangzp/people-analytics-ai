@@ -1,0 +1,124 @@
+{
+  "source_system": "greenhouse_v3",
+  "source_object": "job",
+  "harvest_path_hint": "/v3/jobs",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "format": null,
+      "description": null
+    },
+    {
+      "name": "created_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "updated_at",
+      "type": "string",
+      "format": "date-time",
+      "description": null
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "format": null,
+      "description": "Internal job title shown to the hiring team in Greenhouse (e.g. `Senior Backend Engineer`). Distinct from the external-facing title on each `job_post`."
+    },
+    {
+      "name": "requisition_id",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Partner-supplied external identifier for the requisition (e.g. an HRIS or ATS code). Free-form string, not unique across the organization, and `null` when no external id has been set."
+    },
+    {
+      "name": "notes",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": null,
+      "description": "Internal HTML notes about the job, surfaced to the hiring team in the Greenhouse UI. Not exposed on public job posts."
+    },
+    {
+      "name": "confidential",
+      "type": "boolean",
+      "format": null,
+      "description": "If `true`, the job is restricted to users explicitly granted access on the Hiring Team. The legacy Confidential Jobs feature has been sunset \u2014 this flag cannot be set on new jobs and is preserved for jobs that already had it enabled."
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "format": null,
+      "description": "Lifecycle status of the job. `draft` while it is being scaffolded, `open` once it has at least one open opening, and `closed` after every opening is closed. A job moves to `closed` automatically when its last open opening is closed via `PATCH /v3/openings/{id}`."
+    },
+    {
+      "name": "opened_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the job first transitioned to `open`, in ISO 8601. `null` while the job is still in `draft`."
+    },
+    {
+      "name": "closed_at",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp the job most recently transitioned to `closed`, in ISO 8601. `null` for jobs that are still `open` or `draft`."
+    },
+    {
+      "name": "is_template",
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "format": null,
+      "description": "If `true`, this job is a template used as the source for new jobs rather than a real requisition. Templates do not accept applications; reference them via `template_job_id` on `POST /v3/jobs`."
+    },
+    {
+      "name": "copied_from_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the job (typically a template) this job was copied from on creation. `null` when the job was not created from another job."
+    },
+    {
+      "name": "department_id",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": null,
+      "description": "Id of the department this job is assigned to. `null` when no department is set."
+    },
+    {
+      "name": "office_ids",
+      "type": [
+        "array",
+        "null"
+      ],
+      "format": null,
+      "description": "Ids of the offices this job is assigned to. A job can span multiple offices; empty array or `null` when no offices are set."
+    },
+    {
+      "name": "custom_fields",
+      "type": [
+        "object",
+        "null"
+      ],
+      "format": null,
+      "description": null
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+canonical_version: people_v2
+gate: 1
+note: people_meta_attribute rows that must exist before Silver. SOURCE_GAP columns are listed here so they are not invented later.
+fields:
+  - canonical_table: people_dim_learning_resource
+    canonical_field: duration_minutes
+    provenance: SOURCE_GAP
+    nullable: true
+    simulator_may_fill: false
+    metric_may_depend: false
+    sensitivity: internal
+    pii_class: none
+    business_definition: Microsoft Learn catalog extract has no duration_minutes. Internal Training Event duration is derived from start_time/end_time, not this gap column for Learn rows.
+  - canonical_table: people_dim_learning_resource
+    canonical_field: roles
+    provenance: SOURCE_GAP
+    nullable: true
+    simulator_may_fill: false
+    metric_may_depend: false
+    sensitivity: internal
+    pii_class: none
+    business_definition: Microsoft Learn catalog extract has no roles[]. Training Event has no roles array.

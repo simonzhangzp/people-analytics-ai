@@ -1,0 +1,221 @@
+canonical_version: people_v2
+gate: 1
+note: Participation grain is Training Event Employee + Training Result Employee. Hours/grade live on the result child, not
+  the event child.
+source_contract:
+  pin:
+  - doctypes/training_event.json
+  - doctypes/training_event_employee.json
+  - doctypes/training_result.json
+  - doctypes/training_result_employee.json
+fields:
+- canonical_table: people_dim_learning_resource
+  canonical_field: resource_id
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: start_time
+  provenance: CANONICAL_KEY
+  business_definition: Internal resource = Training Event.name.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_dim_learning_resource
+  canonical_field: source
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: literal internal
+  nullable: false
+  data_type: text
+  effective_date_logic: start_time
+  provenance: CANONICAL_KEY
+  business_definition: internal vs microsoft_learn.
+  source_field: null
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_dim_learning_resource
+  canonical_field: title
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: start_time
+  provenance: SOURCE_NATIVE
+  business_definition: Event name.
+  source_field: event_name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_dim_learning_resource
+  canonical_field: url
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: null for internal events
+  nullable: true
+  data_type: text
+  effective_date_logic: start_time
+  provenance: SOURCE_GAP
+  business_definition: Training Event has no URL field.
+  source_field: null
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_dim_learning_resource
+  canonical_field: level
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: start_time
+  provenance: SOURCE_NATIVE
+  business_definition: Beginner | Intermediate | Advance.
+  source_field: level
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_dim_learning_resource
+  canonical_field: duration_minutes
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: extract(epoch from end_time-start_time)/60
+  nullable: true
+  data_type: integer
+  effective_date_logic: start_time
+  provenance: DERIVED
+  business_definition: Duration from event window. Not a native minutes field.
+  source_fields:
+  - start_time
+  - end_time
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_dim_learning_resource
+  canonical_field: roles
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: null; no roles[] on Training Event
+  nullable: true
+  data_type: text[]
+  effective_date_logic: start_time
+  provenance: SOURCE_GAP
+  business_definition: No roles array on the DocType.
+  source_field: null
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_dim_learning_resource
+  canonical_field: products
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: wrap course as a one-element array when present
+  nullable: true
+  data_type: text[]
+  effective_date_logic: start_time
+  provenance: DERIVED
+  business_definition: Course name as product tag.
+  source_field: course
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_training_participation
+  canonical_field: worker_id
+  source_system: frappe_hr
+  source_object: Training Event Employee
+  transformation: identity
+  nullable: false
+  data_type: text
+  effective_date_logic: event_start
+  provenance: SOURCE_NESTED
+  business_definition: Employee on the event child.
+  source_field: employee
+  source_filter: Training Event.docstatus = 1
+  reversal: parent docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_training_participation
+  canonical_field: training_event_id
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: parent of Training Event Employee
+  nullable: false
+  data_type: text
+  effective_date_logic: start_time
+  provenance: SOURCE_NATIVE
+  business_definition: Training Event.name.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_training_participation
+  canonical_field: resource_id
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: same as training_event_id for internal events
+  nullable: false
+  data_type: text
+  effective_date_logic: start_time
+  provenance: CANONICAL_KEY
+  business_definition: Learning resource key.
+  source_field: name
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_training_participation
+  canonical_field: attendance
+  source_system: frappe_hr
+  source_object: Training Event Employee
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: start_time
+  provenance: SOURCE_NESTED
+  business_definition: Present | Absent.
+  source_field: attendance
+  source_filter: Training Event.docstatus = 1
+  reversal: parent docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_training_participation
+  canonical_field: status
+  source_system: frappe_hr
+  source_object: Training Event Employee
+  transformation: identity
+  nullable: true
+  data_type: text
+  effective_date_logic: start_time
+  provenance: SOURCE_NESTED
+  business_definition: Open | Invited | Completed | Feedback Submitted.
+  source_field: status
+  source_filter: Training Event.docstatus = 1
+  reversal: parent docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_training_participation
+  canonical_field: hours
+  source_system: frappe_hr
+  source_object: Training Result Employee
+  transformation: join result child on employee + training_event
+  nullable: true
+  data_type: numeric
+  effective_date_logic: end_time
+  provenance: SOURCE_NESTED
+  business_definition: Hours from Training Result Employee.
+  source_field: hours
+  source_filter: Training Result.docstatus = 1
+  reversal: parent docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_training_participation
+  canonical_field: grade
+  source_system: frappe_hr
+  source_object: Training Result Employee
+  transformation: join result child on employee + training_event
+  nullable: true
+  data_type: text
+  effective_date_logic: end_time
+  provenance: SOURCE_NESTED
+  business_definition: Grade from Training Result Employee.
+  source_field: grade
+  source_filter: Training Result.docstatus = 1
+  reversal: parent docstatus = 2 emits a reversal event (BR-DQ-001)
+- canonical_table: people_fact_training_participation
+  canonical_field: event_start
+  source_system: frappe_hr
+  source_object: Training Event
+  transformation: identity
+  nullable: false
+  data_type: timestamptz
+  effective_date_logic: start_time
+  provenance: SOURCE_NATIVE
+  business_definition: Event start.
+  source_field: start_time
+  source_filter: docstatus = 1
+  reversal: docstatus = 2 emits a reversal event (BR-DQ-001)
