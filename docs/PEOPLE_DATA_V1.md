@@ -13,7 +13,8 @@ JSON：`data-platform/simulator/fixtures/rehearsal_1p00/report.json`、`publish_
 | 项 | 值 |
 | --- | --- |
 | seed | `20260301` |
-| 回填当时 `simulator_code_sha` | `4668c2c2d59ddd7365b5dffb9dfdebc48614cde2` |
+| tag `data-v1` commit | `32c89f7b0838e0a687194763bd2469697627df67` |
+| 回填当时 `simulator_code_sha`（HEAD 于 lake 闸门） | `4668c2c2d59ddd7365b5dffb9dfdebc48614cde2` |
 | baseline sha256 | `e3ee34e26d64cb3a439f2c5457d33090c3ae218190af8956bdb4de8b81928e25` |
 | Case 3 scenario | `engineering_apac_attrition_rise` v2 |
 | gold snap_worker_month sha256 | `a1de36711be6eac2aef4509a01a0b60fb52f48f908c531aec9a84b5c26c6f137` |
