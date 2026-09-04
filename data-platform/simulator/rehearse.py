@@ -188,6 +188,11 @@ def main() -> int:
             "q8_ending_target": "Keep public target 50k certified; hiring controller replaces attrition plus linear growth from opening stock.",
         },
     }
+    from pipeline.lineage import run_lineage, write_manifest
+
+    lineage = run_lineage(SEED, gold)
+    write_manifest(OUT / "gold_sha256.json", lineage.get("gold_sha256") or {})
+    report["lineage"] = lineage
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "report.json").write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     logs = LAKE / "people_logs" / PREFIX

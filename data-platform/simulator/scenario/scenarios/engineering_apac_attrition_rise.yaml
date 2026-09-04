@@ -35,5 +35,6 @@ correlated_signals:
       tenure_months: [0, 36]
     effect:
       manager_change_annual_multiplier: 3.0
-    note: Correlation only. Same slice and window as the pay lag.
+      mechanism: reorg_t7
+    note: Correlation only. Reorg-driven T7 manager change (reports_to extract diff, change_reason=reorg). Does not terminate the manager.
 narrative: "Case 3: APAC Engineering 0–3y voluntary hazard doubles after a 3-month linear ramp. Engineering overall trailing-3m ≥ +2pp by closed form. Correlated (not causal): APAC Eng 0–3y compa-ratio lag and clustered manager changes from 2025Q4."

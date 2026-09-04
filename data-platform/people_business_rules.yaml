@@ -279,3 +279,14 @@ rules:
         - people_fact_scorecard
         - people_dim_candidate
       yaml_flag: window_aligned
+  BR-DQ-006:
+    domain: quality
+    kind: structural
+    statement: >
+      At each certified month-end, every certified worker's manager_worker_id
+      is either null (exactly one CEO) or a certified worker. Interns and
+      other non-certified statuses cannot be managers of certified workers.
+    params:
+      orphan_manager_at_month_end: 0
+      ceo_count: 1
+      as_of: month_end

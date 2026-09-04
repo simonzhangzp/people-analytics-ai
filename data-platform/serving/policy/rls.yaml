@@ -1,0 +1,16 @@
+schema: people_v2
+# RLS is re-applied after every staging rename swap. Policies match architecture §9.3.
+mart_org_path:
+  using: >
+    current_setting('people.role', true) in ('people_analyst','external_viewer')
+    or string_to_array(nullif(current_setting('people.org_scope', true), ''), ',')::ltree[] @> org_path
+identity_present:
+  using: current_setting('people.role', true) is not null
+restricted_mart:
+  using: >
+    current_setting('people.role', true) in ('people_analyst')
+    and current_setting('people.sensitivity_max', true) in ('confidential','restricted')
+    and (
+      current_setting('people.role', true) = 'people_analyst'
+      or string_to_array(nullif(current_setting('people.org_scope', true), ''), ',')::ltree[] @> org_path
+    )

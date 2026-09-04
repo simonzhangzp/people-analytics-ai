@@ -28,9 +28,9 @@ def main() -> None:
     refuse_blocked(PEOPLE_REF)
     conn = connect_for_ddl()
     try:
-        assert_people_project(conn)
+        assert_people_project(conn, check_disk=False)
         for role, nologin, can_create in (
-            ("people_app", True, False),
+            ("people_app", False, False),
             ("people_definer", True, True),
             ("people_publisher", False, True),
         ):

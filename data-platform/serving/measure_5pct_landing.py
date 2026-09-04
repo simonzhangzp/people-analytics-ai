@@ -229,6 +229,13 @@ def _load_table(conn, table: str, path: Path, relkind: str) -> int:
             cur.execute(f"drop table people_v2.{table} cascade")
             cur.execute(f"alter table people_v2.{staging} rename to {table}")
         conn.commit()
+        try:
+            from apply_policy import apply_table  # noqa: E402
+
+            apply_table(conn, table)
+        except Exception as exc:
+            print("policy_reapply_failed", table, type(exc).__name__, exc, flush=True)
+            raise
         return total
     except Exception:
         conn.rollback()

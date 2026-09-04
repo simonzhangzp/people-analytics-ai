@@ -268,4 +268,42 @@ def run_gold_dq(con: duckdb.DuckDBPyConnection, *, backfill: bool = True) -> lis
             "every evt_worker_change on the five attributes must match a hist value switch",
         )
     )
+
+    as_of = "DATE '2026-08-31'"
+    orphan = con.execute(
+        f"""
+        SELECT count(*) FROM people_snap_worker_month s
+        WHERE s.month_end = {as_of} AND s.is_certified AND s.manager_worker_id IS NOT NULL
+          AND NOT EXISTS (
+            SELECT 1 FROM people_snap_worker_month m
+            WHERE m.month_end = {as_of} AND m.worker_id = s.manager_worker_id AND m.is_certified
+          )
+        """
+    ).fetchone()[0]
+    tests.append(
+        _row(
+            "orphan_manager_at_month_end",
+            "gold",
+            orphan == 0,
+            orphan,
+            0,
+            "certified worker manager must be certified (BR-DQ-006)",
+        )
+    )
+    ceo = con.execute(
+        f"""
+        SELECT count(*) FROM people_snap_worker_month
+        WHERE month_end = {as_of} AND is_certified AND manager_worker_id IS NULL
+        """
+    ).fetchone()[0]
+    tests.append(_row("certified_ceo_count", "gold", ceo == 1, ceo, 1, "exactly one certified root CEO"))
+    span_max = con.execute(
+        f"""
+        SELECT max(direct_report_count) FROM people_snap_worker_month
+        WHERE month_end = {as_of} AND is_manager AND is_certified
+        """
+    ).fetchone()[0]
+    tests.append(
+        _row("span_max_le_15", "gold", int(span_max or 0) <= 15, span_max, "<=15", "SPAN_HI cap")
+    )
     return tests

@@ -9,8 +9,8 @@ numerator:
 min_cell: 10
 sensitivity: confidential
 expected_range:
-- 0.15
-- 0.85
+- 0.3
+- 0.8
 sources:
 - people_snap_worker_month
 - people_fact_appraisal

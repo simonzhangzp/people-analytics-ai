@@ -429,6 +429,8 @@ tables:
     type: text
   - name: source_object
     type: text
+  - name: change_reason
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: event_id

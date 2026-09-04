@@ -145,6 +145,51 @@ def connect_for_ddl():
         return connect(port=5432)
 
 
+def load_app_password() -> str | None:
+    return _env_value("PEOPLE_APP_PASSWORD")
+
+
+def ensure_people_app_password() -> str:
+    existing = load_app_password()
+    if existing:
+        return existing
+    import secrets
+
+    password = secrets.token_urlsafe(24)
+    with EDGE_ENV.open("a", encoding="utf-8") as fh:
+        fh.write(f"\nPEOPLE_APP_PASSWORD={password}\n")
+    print("wrote_PEOPLE_APP_PASSWORD_to_env")
+    return password
+
+
+def connect_app(port: int = 6543):
+    password = ensure_people_app_password()
+    if not password:
+        raise SystemExit("Set PEOPLE_APP_PASSWORD in env.")
+    last = None
+    user = f"people_app.{PEOPLE_REF}"
+    for host in _pooler_hosts():
+        try:
+            kwargs = _connect_kwargs(host, port, user)
+            kwargs["password"] = password
+            conn = psycopg.connect(**kwargs)
+            conn.autocommit = True
+            return conn
+        except Exception as exc:
+            last = exc
+            continue
+    raise SystemExit(f"refused: people_app pooler connect failed ({last})")
+
+
+def enable_people_app_login(conn) -> bool:
+    password = ensure_people_app_password()
+    with conn.cursor() as cur:
+        cur.execute("alter role people_app with login password %s", [password])
+    conn.commit()
+    print("people_app_login_ok")
+    return True
+
+
 def connect_publisher(port: int = 5432):
     password = load_publisher_password()
     if not password:
@@ -251,7 +296,7 @@ def assert_disk_budget(
     return {**occ, "quota_bytes": quota, "expected_delta_bytes": expected, "projected_bytes": projected, "allowed_bytes": allowed}
 
 
-def assert_people_project(conn: psycopg.Connection) -> str:
+def assert_people_project(conn: psycopg.Connection, *, check_disk: bool = True) -> str:
     assert_people_ref(PEOPLE_REF)
     with conn.cursor() as cur:
         cur.execute("select current_user")
@@ -269,7 +314,8 @@ def assert_people_project(conn: psycopg.Connection) -> str:
     people_v2_bytes = _schema_bytes(conn, "people_v2")
     print("public_schema_bytes", public_bytes)
     print("people_v2_schema_bytes", people_v2_bytes)
-    assert_disk_budget(conn, include_expected_backfill=False)
+    if check_disk:
+        assert_disk_budget(conn, include_expected_backfill=False)
     return user
 
 

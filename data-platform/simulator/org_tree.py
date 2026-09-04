@@ -132,20 +132,72 @@ def _nest_managers(leader: dict, mid: list[dict], level: int) -> list[dict]:
     return leaves
 
 
+def _promote_ic_for_capacity(
+    active: list[dict],
+    mgrs: list[dict],
+    span_counts: dict[str, int],
+) -> dict | None:
+    """Turn an existing IC report into a manager so new reports need not exceed SPAN_HI."""
+    donors = sorted(mgrs, key=lambda b: (-span_counts.get(b["worker_id"], 0), b["worker_id"]))
+    for donor in donors:
+        if int(donor.get("org_level") or 0) >= MAX_LEVEL - 1:
+            continue
+        ics = [
+            x
+            for x in active
+            if x.get("reports_to") == donor["worker_id"]
+            and x.get("org_role") == "ic"
+            and _can_manage(x)
+            and int(x.get("org_level") or 0) < MAX_LEVEL
+        ]
+        if not ics:
+            continue
+        promo = sorted(ics, key=lambda x: x["worker_id"])[0]
+        promo["org_role"] = "manager"
+        mgrs.append(promo)
+        span_counts[promo["worker_id"]] = 0
+        return promo
+    return None
+
+
 def _attach_ics(bosses: list[dict], ics: list[dict]) -> None:
     if not bosses:
         return
     counts = {b["worker_id"]: 0 for b in bosses}
-    caps = {b["worker_id"]: hash_lognormal_span(b["worker_id"]) for b in bosses}
+    caps = {b["worker_id"]: min(SPAN_HI, hash_lognormal_span(b["worker_id"])) for b in bosses}
+    reports: dict[str, list[dict]] = {b["worker_id"]: [] for b in bosses}
+
+    def under(cap_map: dict[str, int]) -> list[dict]:
+        return [b for b in bosses if counts[b["worker_id"]] < cap_map[b["worker_id"]]]
+
     for ic in ics:
-        ordered = sorted(bosses, key=lambda b: hash_uniform(f"{ic['worker_id']}|{b['worker_id']}"))
-        chosen = next((b for b in ordered if counts[b["worker_id"]] < caps[b["worker_id"]]), None)
-        if chosen is None:
-            chosen = min(bosses, key=lambda b: counts[b["worker_id"]])
+        available = under(caps) or [b for b in bosses if counts[b["worker_id"]] < SPAN_HI]
+        if not available:
+            donor = max(bosses, key=lambda b: (counts[b["worker_id"]], b["worker_id"]))
+            children = [
+                c
+                for c in reports.get(donor["worker_id"], [])
+                if c.get("org_role") == "ic"
+                and _can_manage(c)
+                and int(c.get("org_level") or 0) < MAX_LEVEL
+            ]
+            if children and int(donor.get("org_level") or 0) < MAX_LEVEL - 1:
+                promo = children[-1]
+                promo["org_role"] = "manager"
+                bosses.append(promo)
+                counts[promo["worker_id"]] = 0
+                caps[promo["worker_id"]] = min(SPAN_HI, hash_lognormal_span(promo["worker_id"]))
+                reports[promo["worker_id"]] = []
+                available = [promo]
+            else:
+                available = [b for b in bosses if counts[b["worker_id"]] < SPAN_HI] or bosses
+        ordered = sorted(available, key=lambda b: hash_uniform(f"{ic['worker_id']}|{b['worker_id']}"))
+        chosen = next((b for b in ordered if counts[b["worker_id"]] < SPAN_HI), available[0])
         ic["reports_to"] = chosen["worker_id"]
         ic["org_role"] = "ic"
         ic["org_level"] = min(MAX_LEVEL, (chosen.get("org_level") or 1) + 1)
         counts[chosen["worker_id"]] += 1
+        reports.setdefault(chosen["worker_id"], []).append(ic)
 
 
 def build_company_tree(workers: list[dict], dept_by_family: dict[str, str], exec_family: str = "Exec") -> str:
@@ -222,18 +274,25 @@ def place_hire(
         if mgr:
             span_counts[mgr] = span_counts.get(mgr, 0) + 1
     if (not intern) and n_mgr / n < MANAGER_SHARE:
-        boss = min(
-            mgrs,
-            key=lambda b: (span_counts.get(b["worker_id"], 0), b["worker_id"]),
-        )
-        w["org_role"] = "manager"
-        w["reports_to"] = boss["worker_id"]
-        w["org_level"] = min(MAX_LEVEL - 1, (boss.get("org_level") or 1) + 1)
-        return
+        under_mgr = [b for b in mgrs if span_counts.get(b["worker_id"], 0) < SPAN_HI]
+        if under_mgr:
+            boss = min(under_mgr, key=lambda b: (span_counts.get(b["worker_id"], 0), b["worker_id"]))
+            w["org_role"] = "manager"
+            w["reports_to"] = boss["worker_id"]
+            w["org_level"] = min(MAX_LEVEL - 1, (boss.get("org_level") or 1) + 1)
+            return
+        _promote_ic_for_capacity(active, mgrs, span_counts)
     w["org_role"] = "ic"
     under = [b for b in mgrs if span_counts.get(b["worker_id"], 0) < SPAN_HI]
-    pool_boss = under or mgrs
-    boss = min(pool_boss, key=lambda b: (span_counts.get(b["worker_id"], 0), hash_uniform(f"{w['worker_id']}|{b['worker_id']}")))
+    if not under:
+        promo = _promote_ic_for_capacity(active, mgrs, span_counts)
+        under = [promo] if promo is not None else [b for b in mgrs if span_counts.get(b["worker_id"], 0) < SPAN_HI]
+    if not under:
+        w["org_role"] = "ic"
+        w["org_level"] = 1 if ceo_id else 0
+        w["reports_to"] = ceo_id
+        return
+    boss = min(under, key=lambda b: (span_counts.get(b["worker_id"], 0), hash_uniform(f"{w['worker_id']}|{b['worker_id']}")))
     w["reports_to"] = boss["worker_id"]
     w["org_level"] = min(MAX_LEVEL, (boss.get("org_level") or 1) + 1)
 

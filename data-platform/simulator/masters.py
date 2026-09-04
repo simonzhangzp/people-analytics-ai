@@ -150,7 +150,9 @@ def bronze_masters(state: dict) -> dict[str, list[dict]]:
     hiring_managers = []
     seen_hm: set[tuple[int, int]] = set()
     hm_ids: set[int] = set()
-    recruiter_ids: set[int] = set(range(201, 225))
+    recruiter_ids: set[int] = set()
+    rec_n = int((baseline.get("recruiting") or {}).get("recruiter_count") or 110)
+    recruiter_ids.update(range(201, 201 + rec_n))
     for opening in openings:
         hm = int(opening.get("hiring_manager_id") or 0)
         job_id = int(opening["job_id"])

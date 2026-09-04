@@ -66,7 +66,13 @@ def build_events_and_gold(con) -> None:
             CAST(ph.new AS VARCHAR) AS new_value,
             CAST(ph.current AS VARCHAR) AS old_canonical_id,
             CAST(ph.new AS VARCHAR) AS new_canonical_id,
-            ph.parenttype AS source_object
+            ph.parenttype AS source_object,
+            CASE
+              WHEN ph.change_reason IN ('reorg', 'transfer', 'manager_departure') THEN ph.change_reason
+              WHEN ph.parenttype = 'Employee Transfer' THEN 'transfer'
+              WHEN ph.parenttype = 'Employee Promotion' THEN 'transfer'
+              ELSE NULL
+            END AS change_reason
           FROM bronze_property_history ph
           LEFT JOIN bronze_promotion p
             ON p.name = ph.parent AND ph.parenttype = 'Employee Promotion'
@@ -100,37 +106,39 @@ def build_events_and_gold(con) -> None:
             branch, lag(branch) OVER w AS prev_branch,
             reports_to, lag(reports_to) OVER w AS prev_reports_to,
             employment_type, lag(employment_type) OVER w AS prev_employment_type,
-            status, lag(status) OVER w AS prev_status
+            status, lag(status) OVER w AS prev_status,
+            change_reason
           FROM covering_emp
           WINDOW w AS (PARTITION BY name ORDER BY CAST(modified_date AS DATE), emit_seq)
         ),
         extract_raw AS (
           SELECT worker_id, event_date, 'department' AS property,
-                 CAST(prev_department AS VARCHAR) AS old_value, CAST(department AS VARCHAR) AS new_value
+                 CAST(prev_department AS VARCHAR) AS old_value, CAST(department AS VARCHAR) AS new_value,
+                 CAST(NULL AS VARCHAR) AS change_reason
           FROM emp_lag WHERE rn > 1 AND prev_department IS DISTINCT FROM department
           UNION ALL
           SELECT worker_id, event_date, 'designation',
-                 CAST(prev_designation AS VARCHAR), CAST(designation AS VARCHAR)
+                 CAST(prev_designation AS VARCHAR), CAST(designation AS VARCHAR), NULL
           FROM emp_lag WHERE rn > 1 AND prev_designation IS DISTINCT FROM designation
           UNION ALL
           SELECT worker_id, event_date, 'grade',
-                 CAST(prev_grade AS VARCHAR), CAST(grade AS VARCHAR)
+                 CAST(prev_grade AS VARCHAR), CAST(grade AS VARCHAR), NULL
           FROM emp_lag WHERE rn > 1 AND prev_grade IS DISTINCT FROM grade
           UNION ALL
           SELECT worker_id, event_date, 'branch',
-                 CAST(prev_branch AS VARCHAR), CAST(branch AS VARCHAR)
+                 CAST(prev_branch AS VARCHAR), CAST(branch AS VARCHAR), NULL
           FROM emp_lag WHERE rn > 1 AND prev_branch IS DISTINCT FROM branch
           UNION ALL
           SELECT worker_id, event_date, 'reports_to',
-                 CAST(prev_reports_to AS VARCHAR), CAST(reports_to AS VARCHAR)
+                 CAST(prev_reports_to AS VARCHAR), CAST(reports_to AS VARCHAR), change_reason
           FROM emp_lag WHERE rn > 1 AND prev_reports_to IS DISTINCT FROM reports_to
           UNION ALL
           SELECT worker_id, event_date, 'employment_type',
-                 CAST(prev_employment_type AS VARCHAR), CAST(employment_type AS VARCHAR)
+                 CAST(prev_employment_type AS VARCHAR), CAST(employment_type AS VARCHAR), NULL
           FROM emp_lag WHERE rn > 1 AND prev_employment_type IS DISTINCT FROM employment_type
           UNION ALL
           SELECT worker_id, event_date, 'status',
-                 CAST(prev_status AS VARCHAR), CAST(status AS VARCHAR)
+                 CAST(prev_status AS VARCHAR), CAST(status AS VARCHAR), NULL
           FROM emp_lag WHERE rn > 1 AND prev_status IS DISTINCT FROM status
         ),
         extract_diff AS (
@@ -143,7 +151,13 @@ def build_events_and_gold(con) -> None:
             e.new_value,
             e.old_value AS old_canonical_id,
             e.new_value AS new_canonical_id,
-            'Employee (extract diff)' AS source_object
+            'Employee (extract diff)' AS source_object,
+            CASE
+              WHEN e.property = 'reports_to' AND e.change_reason IN ('reorg', 'transfer', 'manager_departure')
+                THEN e.change_reason
+              WHEN e.property = 'reports_to' THEN 'reorg'
+              ELSE NULL
+            END AS change_reason
           FROM extract_raw e
           WHERE NOT EXISTS (
             SELECT 1 FROM ph
@@ -217,7 +231,13 @@ def build_events_and_gold(con) -> None:
           coalesce(r.new_value, h.new_value) AS new_value,
           coalesce(r.old_canonical_id, h.old_value) AS old_canonical_id,
           coalesce(r.new_canonical_id, h.new_value) AS new_canonical_id,
-          coalesce(r.source_object, 'Employee (extract diff)') AS source_object
+          coalesce(r.source_object, 'Employee (extract diff)') AS source_object,
+          CASE
+            WHEN r.change_reason IN ('reorg', 'transfer', 'manager_departure') THEN r.change_reason
+            WHEN h.property = 'reports_to' AND r.source_object LIKE 'Employee Transfer%' THEN 'transfer'
+            WHEN h.property = 'reports_to' THEN coalesce(r.change_reason, 'reorg')
+            ELSE r.change_reason
+          END AS change_reason
         FROM hist_sw h
         LEFT JOIN raw r
           ON r.worker_id = h.worker_id AND r.event_date = h.event_date AND r.property = h.property
@@ -239,27 +259,19 @@ def build_events_and_gold(con) -> None:
           ch.event_date,
           CAST(ch.event_date AS TIMESTAMP),
           'frappe_hr',
-          'Employee (extract diff)',
+          ch.source_object,
           ch.worker_id,
           NULL
         FROM people_evt_worker_change ch
         JOIN people_dim_worker w ON w.worker_id = ch.worker_id
         WHERE ch.property = 'reports_to'
-          AND ch.source_object = 'Employee (extract diff)'
-          AND ch.old_value IS NOT NULL
-          AND EXISTS (
-            SELECT 1 FROM people_hist_worker_attr h
-            WHERE h.worker_id = ch.old_value
-              AND h.valid_from <= ch.event_date
-              AND (h.valid_to IS NULL OR h.valid_to > ch.event_date)
-              AND h.status IN ('Active', 'Suspended')
-              AND h.employment_type IN ('Full-time', 'Part-time', 'Probation')
-          )
+          AND ch.change_reason IN ('reorg', 'transfer', 'manager_departure')
+          AND ch.old_value IS DISTINCT FROM ch.new_value
           AND NOT EXISTS (
             SELECT 1 FROM people_evt_worker e
             WHERE e.worker_id = ch.worker_id
               AND e.event_date = ch.event_date
-              AND e.event_type IN ('promotion', 'transfer')
+              AND e.event_type = 'manager_change'
           );
         """
     )
@@ -279,7 +291,17 @@ def build_events_and_gold(con) -> None:
         CREATE OR REPLACE VIEW people_evt_transfer AS
         SELECT event_id AS transfer_id, worker_id, event_date FROM people_evt_worker WHERE event_type = 'transfer';
         CREATE OR REPLACE VIEW people_evt_manager_change AS
-        SELECT worker_id, event_date FROM people_evt_worker WHERE event_type = 'manager_change';
+        SELECT
+          w.event_id,
+          w.worker_id,
+          w.event_date,
+          c.change_reason
+        FROM people_evt_worker w
+        LEFT JOIN people_evt_worker_change c
+          ON c.worker_id = w.worker_id
+         AND c.event_date = w.event_date
+         AND c.property = 'reports_to'
+        WHERE w.event_type = 'manager_change';
         CREATE OR REPLACE VIEW people_fact_separation AS
         SELECT name, employee, boarding_begins_on, boarding_status, docstatus
         FROM bronze_separation WHERE docstatus = 1;
@@ -776,7 +798,7 @@ def build_events_and_gold(con) -> None:
         )
         SELECT
           month_end, org_id, org_path, job_family,
-          avg(coverage_ratio) AS coverage_ratio
+          round(avg(coverage_ratio), 12) AS coverage_ratio
         FROM worker_cov
         GROUP BY 1,2,3,4;
 

@@ -1,0 +1,27 @@
+{
+  "as_of": "2026-08-31",
+  "source": "rehearsal_1p00 gold/silver parquet",
+  "rows": [
+    {"metric_id": "applications_per_opening", "value": 123.20841268526952, "expected_range": [60, 250], "in_range": true},
+    {"metric_id": "average_headcount", "value": 48437.083333333336, "expected_range": [30000, 55000], "in_range": true},
+    {"metric_id": "compa_ratio_median", "value": 0.98, "expected_range": [0.7, 1.3], "in_range": true},
+    {"metric_id": "engagement_score", "value": 3.665744565531, "expected_range": [2.5, 4.5], "in_range": true},
+    {"metric_id": "headcount", "value": 49823, "expected_range": [40000, 60000], "in_range": true},
+    {"metric_id": "hires", "value": 10261, "expected_range": [5000, 25000], "in_range": true},
+    {"metric_id": "internal_mobility_rate", "value": 0.051200440433896204, "expected_range": [0.02, 0.2], "in_range": true},
+    {"metric_id": "involuntary_attrition_rate", "value": 0.026240225722371804, "expected_range": [0.01, 0.1], "in_range": true},
+    {"metric_id": "manager_turnover_rate", "value": 0.14174058136471415, "expected_range": [0.08, 0.22], "in_range": true},
+    {"metric_id": "offer_acceptance_rate", "value": 0.8414551480003013, "expected_range": [0.5, 0.95], "in_range": true},
+    {"metric_id": "promotion_rate", "value": 0.08297361697735034, "expected_range": [0.04, 0.14], "in_range": true},
+    {"metric_id": "quality_of_hire", "value": 0.5262887260573339, "expected_range": [0.3, 0.8], "in_range": true},
+    {"metric_id": "recruiter_load", "value": 7.945454545454545, "expected_range": [5, 30], "in_range": true},
+    {"metric_id": "regrettable_attrition_rate", "value": 0.03400287314299478, "expected_range": [0.0, 0.12], "in_range": true},
+    {"metric_id": "rehires", "value": 228, "expected_range": [0, 3000], "in_range": true},
+    {"metric_id": "skill_coverage", "value": 0.571801464121, "expected_range": [0.3, 0.95], "in_range": true},
+    {"metric_id": "span_of_control", "value": 8.467369136641741, "expected_range": [5, 10], "in_range": true},
+    {"metric_id": "time_in_stage_hours", "value": 96.0, "expected_range": [48, 720], "in_range": true},
+    {"metric_id": "time_to_fill_days", "value": 33.0, "expected_range": [10, 90], "in_range": true},
+    {"metric_id": "training_hours_per_worker", "value": 20.409362661184, "expected_range": [8, 60], "in_range": true},
+    {"metric_id": "voluntary_attrition_rate", "value": 0.13956249086013642, "expected_range": [0.08, 0.22], "in_range": true}
+  ]
+}

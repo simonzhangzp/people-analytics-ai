@@ -1,6 +1,6 @@
 -- people_v2 metric RPCs. Default window is trailing-12m annualized for rates.
 -- Optional p_grain = 'month' is the as-of month (rates still annualized ×12).
--- No people_app LOGIN.
+-- people_app LOGIN is applied in 024 after policy verify.
 
 create or replace function people_v2.people_latest_month()
 returns date
@@ -310,5 +310,5 @@ begin
 end;
 $$;
 
-grant execute on function people_v2.people_latest_month() to people_publisher, people_definer;
-grant execute on function people_v2.people_get_metric(text, date, text) to people_publisher, people_definer;
+grant execute on function people_v2.people_latest_month() to people_publisher, people_definer, people_app;
+grant execute on function people_v2.people_get_metric(text, date, text) to people_publisher, people_definer, people_app;

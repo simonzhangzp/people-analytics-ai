@@ -33,7 +33,7 @@ def org_tree_stats(con) -> dict:
           SELECT s.worker_id, s.manager_worker_id, c.depth + 1
           FROM people_snap_worker_month s
           JOIN chain c ON s.manager_worker_id = c.worker_id
-          WHERE s.month_end = {as_of} AND s.is_certified AND c.depth < 8
+          WHERE s.month_end = {as_of} AND s.is_certified AND c.depth < 16
         )
         SELECT depth, count(*) AS n
         FROM chain
@@ -51,6 +51,22 @@ def org_tree_stats(con) -> dict:
         """
     ).fetchone()[0]
     n_mgr = int(span[3] or 0)
+    ceo = con.execute(
+        f"""
+        SELECT count(*) FROM people_snap_worker_month
+        WHERE month_end = {as_of} AND is_certified AND manager_worker_id IS NULL
+        """
+    ).fetchone()[0]
+    orphan = con.execute(
+        f"""
+        SELECT count(*) FROM people_snap_worker_month s
+        WHERE s.month_end = {as_of} AND s.is_certified AND s.manager_worker_id IS NOT NULL
+          AND NOT EXISTS (
+            SELECT 1 FROM people_snap_worker_month m
+            WHERE m.month_end = {as_of} AND m.worker_id = s.manager_worker_id AND m.is_certified
+          )
+        """
+    ).fetchone()[0]
     return {
         "span_mean": round(float(span[0] or 0), 4),
         "span_min": int(span[1] or 0),
@@ -59,6 +75,8 @@ def org_tree_stats(con) -> dict:
         "is_manager_share": round(n_mgr / hc, 4) if hc else 0,
         "level_counts": {str(int(r.depth)): int(r.n) for r in depths.itertuples()},
         "max_depth": int(depths["depth"].max()) if len(depths) else 0,
+        "ceo_count": int(ceo or 0),
+        "orphan_manager_at_month_end": int(orphan or 0),
         "skill_coverage": round(float(skill or 0), 4),
         "recruiter_load": round(float(open_req or 0), 4),
     }
@@ -457,6 +475,58 @@ def case_signals(con) -> dict:
         GROUP BY 1
         """
     ).fetchdf()
+    mgr_reorg = con.execute(
+        """
+        WITH snap AS (
+          SELECT worker_id, region, job_family, tenure_band
+          FROM people_snap_worker_month
+          WHERE month_end = DATE '2026-08-31' AND is_certified
+        ),
+        chg AS (
+          SELECT worker_id, count(*) AS n
+          FROM people_evt_manager_change
+          WHERE event_date >= DATE '2025-10-01'
+            AND coalesce(change_reason, 'reorg') = 'reorg'
+            AND event_date <> last_day(event_date)
+          GROUP BY 1
+        )
+        SELECT
+          CASE WHEN s.region = 'APAC' AND s.job_family = 'Engineering' AND s.tenure_band IN ('<1y','1–3y')
+               THEN 'slice' ELSE 'control' END AS grp,
+          count(*) AS n_workers,
+          coalesce(sum(c.n), 0) AS manager_changes_since_2025q4
+        FROM snap s
+        LEFT JOIN chg c ON c.worker_id = s.worker_id
+        GROUP BY 1
+        """
+    ).fetchdf()
+    mgr_reason = con.execute(
+        """
+        WITH snap AS (
+          SELECT worker_id, region, job_family, tenure_band
+          FROM people_snap_worker_month
+          WHERE month_end = DATE '2026-08-31' AND is_certified
+        )
+        SELECT
+          CASE WHEN s.region = 'APAC' AND s.job_family = 'Engineering' AND s.tenure_band IN ('<1y','1–3y')
+               THEN 'slice' ELSE 'control' END AS grp,
+          coalesce(c.change_reason, 'unknown') AS change_reason,
+          count(*) AS n
+        FROM people_evt_manager_change c
+        JOIN snap s ON s.worker_id = c.worker_id
+        WHERE c.event_date >= DATE '2025-10-01'
+        GROUP BY 1, 2
+        ORDER BY 1, 2
+        """
+    ).fetchdf()
+    counts = con.execute(
+        """
+        SELECT coalesce(change_reason, 'unknown') AS change_reason, count(*) AS n
+        FROM people_evt_manager_change
+        GROUP BY 1
+        ORDER BY 1
+        """
+    ).fetchdf()
     return {
         "case3_compa_ratio": [
             {"group": r.grp, "median_compa": round(float(r.median_compa), 4), "n": int(r.n)}
@@ -470,6 +540,22 @@ def case_signals(con) -> dict:
                 "changes_per_worker": round(float(r.manager_changes_since_2025q4) / r.n_workers, 4) if r.n_workers else 0,
             }
             for r in mgr.itertuples()
+        ],
+        "case3_manager_change_reorg": [
+            {
+                "group": r.grp,
+                "n_workers": int(r.n_workers),
+                "manager_changes_since_2025q4": int(r.manager_changes_since_2025q4),
+                "changes_per_worker": round(float(r.manager_changes_since_2025q4) / r.n_workers, 4) if r.n_workers else 0,
+            }
+            for r in mgr_reorg.itertuples()
+        ],
+        "case3_manager_change_by_reason": [
+            {"group": r.grp, "change_reason": str(r.change_reason), "n": int(r.n)}
+            for r in mgr_reason.itertuples()
+        ],
+        "manager_change_counts": [
+            {"change_reason": str(r.change_reason), "n": int(r.n)} for r in counts.itertuples()
         ],
         "case4_scorecard_delay": [
             {
@@ -519,4 +605,95 @@ def engineering_trailing_3m(con) -> dict:
         "voluntary_terms": int(terms or 0),
         "person_months": int(person_months or 0),
         "annualized": round(float(annualized), 4),
+    }
+
+
+def case3_term_decomposition(con) -> dict:
+    """Partition Engineering trailing-3m voluntary terms: slice hazard / manager leaver / other."""
+    rows = con.execute(
+        """
+        WITH terms AS (
+          SELECT
+            s.worker_id,
+            s.month_end,
+            s.region,
+            s.job_family,
+            s.tenure_band,
+            s.is_manager,
+            s.manager_worker_id,
+            CASE
+              WHEN s.region = 'APAC' AND s.job_family = 'Engineering'
+                   AND s.tenure_band IN ('<1y', '1–3y') THEN 1 ELSE 0
+            END AS in_slice
+          FROM people_snap_worker_month s
+          WHERE s.job_family = 'Engineering'
+            AND s.month_end BETWEEN DATE '2026-06-30' AND DATE '2026-08-31'
+            AND s.terminated_in_month
+            AND s.termination_category = 'voluntary'
+        )
+        SELECT
+          count(*) AS total,
+          count(*) FILTER (WHERE in_slice = 1) AS slice_hazard,
+          count(*) FILTER (WHERE in_slice = 0 AND is_manager) AS manager_departure,
+          count(*) FILTER (WHERE in_slice = 0 AND NOT is_manager) AS other
+        FROM terms
+        """
+    ).fetchone()
+    total, slice_h, mgr, other = [int(x or 0) for x in rows]
+    return {
+        "window": "2026-06..2026-08",
+        "job_family": "Engineering",
+        "voluntary_terms": total,
+        "slice_hazard": slice_h,
+        "manager_departure": mgr,
+        "other": other,
+        "parts_sum": slice_h + mgr + other,
+    }
+
+
+def littles_law_reconcile(con) -> dict:
+    as_of = "DATE '2026-08-31'"
+    open_n = con.execute(
+        f"""
+        SELECT count(*) FROM people_dim_requisition
+        WHERE (closed_at IS NULL OR CAST(closed_at AS DATE) > {as_of})
+          AND CAST(opened_at AS DATE) <= {as_of}
+        """
+    ).fetchone()[0]
+    hires_12m = con.execute(
+        """
+        SELECT count(*) FROM people_snap_worker_month
+        WHERE hired_in_month AND is_certified AND via_t1
+          AND month_end <= DATE '2026-08-31' AND month_end > DATE '2026-08-31' - INTERVAL 12 MONTH
+        """
+    ).fetchone()[0]
+    ttf_days = con.execute(
+        """
+        SELECT quantile_cont(date_diff('day', CAST(opened_at AS TIMESTAMP), CAST(closed_at AS TIMESTAMP)), 0.5)
+        FROM people_dim_requisition
+        WHERE close_reason_id = 1
+          AND CAST(closed_at AS DATE) <= DATE '2026-08-31'
+          AND CAST(closed_at AS DATE) > DATE '2026-08-31' - INTERVAL 12 MONTH
+        """
+    ).fetchone()[0]
+    monthly = (hires_12m / 12.0) if hires_12m else 0.0
+    ttf_m = (float(ttf_days) / 30.44) if ttf_days else 0.0
+    expected = monthly * ttf_m
+    rec_n = con.execute(
+        f"SELECT count(DISTINCT recruiter_user_id) FROM people_snap_recruiter_month WHERE month_end = {as_of}"
+    ).fetchone()[0]
+    load = con.execute(
+        f"SELECT coalesce(avg(open_requisitions),0) FROM people_snap_recruiter_month WHERE month_end = {as_of}"
+    ).fetchone()[0]
+    return {
+        "open_requisitions": int(open_n or 0),
+        "trailing_12m_hires": int(hires_12m or 0),
+        "monthly_hires": round(monthly, 2),
+        "ttf_p50_days": round(float(ttf_days or 0), 2),
+        "ttf_months": round(ttf_m, 4),
+        "expected_open": round(expected, 1),
+        "abs_gap": round(abs((open_n or 0) - expected), 1),
+        "rel_gap": round(abs((open_n or 0) - expected) / expected, 4) if expected else None,
+        "n_recruiters": int(rec_n or 0),
+        "recruiter_load": round(float(load or 0), 4),
     }

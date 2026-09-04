@@ -1,0 +1,39 @@
+schema: people_v2
+roles:
+  people_app:
+    login: true
+    bypassrls: false
+    privileges:
+      schema_usage: true
+      schema_create: false
+  people_definer:
+    login: false
+    privileges:
+      schema_usage: true
+      schema_create: true
+  people_publisher:
+    login: true
+    privileges:
+      schema_usage: true
+      schema_create: true
+table_classes:
+  people_app_select:
+    prefixes: [people_mart_, people_dim_, people_xw_, people_ref_]
+    exact:
+      - people_metric
+      - people_metric_version
+      - people_metric_health
+      - people_lineage
+      - people_business_rule
+      - people_serving_pointer
+      - people_policy_demo_identity
+    exclude_suffix: _restricted
+  people_app_execute:
+    - people_latest_month
+    - people_assert_identity
+    - people_get_metric
+    - people_get_metric_for
+    - people_get_metric_breakdown
+  no_select_people_app:
+    prefixes: [people_snap_, people_evt_, people_fact_, people_hist_]
+    suffix: _restricted

@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from org_tree import MANAGER_SHARE, MAX_LEVEL, build_company_tree, place_hire, tree_stats
+from org_tree import MANAGER_SHARE, MAX_LEVEL, SPAN_HI, build_company_tree, place_hire, tree_stats
 
 
 def _workers(n: int, mix: dict[str, float]) -> list[dict]:
@@ -43,6 +43,7 @@ class OrgTreeTests(unittest.TestCase):
         self.assertGreaterEqual(stats["is_manager_share"], 0.10)
         self.assertLessEqual(stats["is_manager_share"], 0.15)
         self.assertLessEqual(stats["max_level"], MAX_LEVEL)
+        self.assertLessEqual(stats["span_max"], SPAN_HI)
         ceo_row = next(w for w in workers if w["worker_id"] == ceo)
         self.assertIsNone(ceo_row["reports_to"])
         self.assertAlmostEqual(MANAGER_SHARE, 0.12)
@@ -92,6 +93,31 @@ class OrgTreeTests(unittest.TestCase):
             place_hire(workers, w, dept, ceo)
         elapsed = time.perf_counter() - t0
         self.assertLess(elapsed, 2.0, f"place_hire 250 hires took {elapsed:.2f}s")
+        stats = tree_stats(workers)
+        self.assertLessEqual(stats["span_max"], SPAN_HI)
+
+    def test_span_cap_holds_on_dense_dept(self) -> None:
+        dept = {
+            "Engineering": "Engineering - Platform",
+            "Sales": "Sales - Enterprise",
+            "Exec": "Office of the CEO",
+            "Other": "Operations - Core",
+        }
+        workers = _workers(5000, {"Engineering": 0.5, "Sales": 0.15, "Exec": 0.02, "Other": 0.33})
+        ceo = build_company_tree(workers, dept)
+        for i in range(400):
+            w = {
+                "worker_id": f"HR-EMP-H{i:06d}",
+                "job_family": "Engineering",
+                "termination_date": None,
+                "reports_to": None,
+            }
+            workers.append(w)
+            place_hire(workers, w, dept, ceo)
+        stats = tree_stats(workers)
+        self.assertLessEqual(stats["span_max"], SPAN_HI)
+        self.assertGreaterEqual(stats["span_mean"], 5.0)
+        self.assertLessEqual(stats["span_mean"], 9.0)
 
 
 if __name__ == "__main__":

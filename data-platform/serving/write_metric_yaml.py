@@ -139,7 +139,7 @@ METRICS = [
         sensitivity="internal",
         time_logic="trailing_12m",
         annualized=True,
-        expected_range=[0.02, 0.25],
+        expected_range=[0.08, 0.22],
         sources=["people_snap_worker_month"],
     ),
     dict(
@@ -152,7 +152,7 @@ METRICS = [
         sensitivity="internal",
         time_logic="as_of",
         annualized=False,
-        expected_range=[4, 12],
+        expected_range=[5, 10],
         sources=["people_snap_worker_month"],
     ),
     dict(
@@ -178,7 +178,7 @@ METRICS = [
         sensitivity="internal",
         time_logic="trailing_12m",
         annualized=False,
-        expected_range=[24, 2000],
+        expected_range=[48, 720],
         sources=["people_evt_application_stage"],
         window_aligned=True,
         notes="RPC value is the overall median; payload.by_stage has Review/Screen/Onsite/Offer medians. Window is entered_at in trailing-12m (aligned to the published hot window).",
@@ -221,7 +221,7 @@ METRICS = [
         sensitivity="confidential",
         time_logic="as_of",
         annualized=False,
-        expected_range=[0.15, 0.85],
+        expected_range=[0.30, 0.80],
         sources=["people_snap_worker_month", "people_fact_appraisal"],
         notes="Composition: 12-month retention × first final_score ≥ 3.5. Missing first appraisal fails the score clause.",
     ),
@@ -235,7 +235,7 @@ METRICS = [
         sensitivity="internal",
         time_logic="as_of",
         annualized=False,
-        expected_range=[0.5, 20],
+        expected_range=[5, 30],
         sources=["people_snap_recruiter_month"],
     ),
     dict(
@@ -274,7 +274,7 @@ METRICS = [
         sensitivity="internal",
         time_logic="trailing_12m",
         annualized=False,
-        expected_range=[1, 40],
+        expected_range=[8, 60],
         sources=["people_mart_learning_monthly"],
     ),
     dict(

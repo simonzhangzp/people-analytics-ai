@@ -11,6 +11,8 @@ METRICS = ROOT / "people_metrics"
 RULES = ROOT / "people_business_rules.yaml"
 ODCS_INDEX = ROOT / "people_source_contracts" / "odcs" / "INDEX.yaml"
 
+from pipeline.lineage import run_lineage  # noqa: E402
+
 
 def load_meta(conn) -> None:
     with conn.cursor() as cur:
@@ -166,16 +168,30 @@ def load_serving_control(conn) -> None:
     prior = case2.get("prior_full") or {}
     fault = case2.get("fault") or {}
     replay = fault.get("replay") or {}
+    lineage = report.get("lineage") or run_lineage(int(report.get("seed") or 20260301))
+    sha = lineage.get("simulator_code_sha")
+    seed = str(lineage.get("seed") or report.get("seed") or "20260301")
+    scen = json.dumps(lineage.get("scenario_versions") or {})
+    base = lineage.get("baseline_sha")
     with conn.cursor() as cur:
         cur.execute(
             """
-            insert into people_v2.people_serving_run (run_id, started_at, finished_at, certified, notes)
+            insert into people_v2.people_serving_run
+              (run_id, started_at, finished_at, certified, notes,
+               simulator_code_sha, seed, scenario_versions, baseline_sha)
             values
-              (%s, timestamptz '2026-08-07 00:00:00+00', timestamptz '2026-08-07 01:00:00+00', true, 'prior full extract'),
-              (%s, timestamptz '2026-08-14 00:00:00+00', timestamptz '2026-08-14 01:00:00+00', false, 'isolated APAC incomplete extract')
-            on conflict (run_id) do update set certified = excluded.certified, notes = excluded.notes
+              (%s, timestamptz '2026-08-07 00:00:00+00', timestamptz '2026-08-07 01:00:00+00', true, 'prior full extract', %s, %s, %s::jsonb, %s),
+              (%s, timestamptz '2026-08-14 00:00:00+00', timestamptz '2026-08-14 01:00:00+00', false, 'isolated APAC incomplete extract', %s, %s, %s::jsonb, %s)
+            on conflict (run_id) do update set certified = excluded.certified, notes = excluded.notes,
+              simulator_code_sha = excluded.simulator_code_sha, seed = excluded.seed,
+              scenario_versions = excluded.scenario_versions, baseline_sha = excluded.baseline_sha
             """,
-            [f"run-{prior.get('extract_date') or '2026-08-07'}", f"run-{fault.get('extract_date') or '2026-08-14'}"],
+            [
+                f"run-{prior.get('extract_date') or '2026-08-07'}",
+                sha, seed, scen, base,
+                f"run-{fault.get('extract_date') or '2026-08-14'}",
+                sha, seed, scen, base,
+            ],
         )
         cur.execute(
             """

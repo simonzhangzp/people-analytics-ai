@@ -22,7 +22,7 @@ from people_refs import PEOPLE_REF, refuse_blocked  # noqa: E402
 
 GOLD = ROOT / "lake" / "people_gold" / "rehearsal_1p00"
 SILVER = ROOT / "lake" / "people_silver" / "rehearsal_1p00"
-REPORT = ROOT / "simulator" / "fixtures" / "rehearsal_1p00" / "parity_6c.json"
+REPORT = ROOT / "simulator" / "fixtures" / "rehearsal_1p00" / "parity_data_v1.json"
 AS_OF = date(2026, 8, 31)
 WIN = "DATE '2026-08-31' - INTERVAL 12 MONTH"
 

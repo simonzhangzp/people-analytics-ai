@@ -1,0 +1,26 @@
+# Demo identities for step 7. org_scope is ltree text; not taken from RPC arguments.
+identities:
+  - identity_id: demo-external-viewer
+    role: external_viewer
+    org_scope: []
+    sensitivity_max: internal
+    grain_max: aggregate
+    label: Site visitor
+  - identity_id: demo-leader-engineering
+    role: leader
+    org_scope: [GlobalTech]
+    sensitivity_max: confidential
+    grain_max: aggregate
+    label: Engineering leader (org rollup)
+  - identity_id: demo-hrbp
+    role: hrbp
+    org_scope: [GlobalTech]
+    sensitivity_max: confidential
+    grain_max: aggregate
+    label: HRBP
+  - identity_id: demo-people-analyst
+    role: people_analyst
+    org_scope: [GlobalTech]
+    sensitivity_max: restricted
+    grain_max: aggregate
+    label: People analyst

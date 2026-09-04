@@ -26,10 +26,23 @@ if str(ROOT) not in sys.path:
 from case3_closed_form import expected_rates
 from emit_bronze import emit_bronze, emit_case2_extracts
 from engine import END, START, WorldEngine
-from pipeline.coverage import case_signals, coverage_matrix, engineering_trailing_3m, funnel_distribution
+from pipeline.coverage import (
+    case3_term_decomposition,
+    case_signals,
+    coverage_matrix,
+    engineering_trailing_3m,
+    funnel_distribution,
+    littles_law_reconcile,
+)
 from pipeline.dq import run_gold_dq
 from pipeline.landing_estimate import parquet_sizes
+from pipeline.lineage import run_lineage, write_manifest
 from pipeline.transform import transform
+
+try:
+    import duckdb
+except ImportError:  # pragma: no cover
+    duckdb = None
 
 LAKE = DP / "lake"
 SCALE = 1.0
@@ -97,6 +110,30 @@ def _rebuild_from_bronze(prefix: str) -> tuple[dict, object]:
     return _state_from_bronze(prefix), con
 
 
+def _connect_lake(prefix: str):
+    """Open existing silver+gold parquet (gold wins on name clash). Does not resimulate."""
+    if duckdb is None:
+        raise SystemExit("duckdb required for --resume-from-lakes")
+    gold = LAKE / "people_gold" / prefix
+    silver = LAKE / "people_silver" / prefix
+    if not gold.exists() or not silver.exists():
+        raise SystemExit(f"missing lake for {prefix}: {silver} / {gold}")
+    spill = LAKE / "_duckdb_spill"
+    spill.mkdir(parents=True, exist_ok=True)
+    spill_q = spill.resolve().as_posix().replace("'", "''")
+    con = duckdb.connect()
+    con.execute(f"SET temp_directory='{spill_q}'")
+    con.execute("SET memory_limit='20GB'")
+    n = 0
+    for folder in (silver, gold):
+        for path in sorted(folder.glob("people_*.parquet")):
+            q = path.resolve().as_posix().replace("'", "''")
+            con.execute(f"CREATE OR REPLACE VIEW {path.stem} AS SELECT * FROM read_parquet('{q}')")
+            n += 1
+    print("connected_lake", prefix, "tables", n, flush=True)
+    return con
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if "--from-report" in argv:
@@ -110,7 +147,11 @@ def main(argv: list[str] | None = None) -> int:
     except Exception:
         pass
     print("scale", SCALE, "seed", SEED, "publish", False, flush=True)
-    if "--from-bronze" in argv:
+    resume = "--resume-from-lakes" in argv
+    if resume:
+        print("resume_from_lakes", PREFIX, CONTROL_PREFIX, flush=True)
+        state, con = _state_from_bronze(PREFIX), _connect_lake(PREFIX)
+    elif "--from-bronze" in argv:
         state, con = _rebuild_from_bronze(PREFIX)
     else:
         state, con = _run_world(PREFIX, True)
@@ -155,26 +196,47 @@ def main(argv: list[str] | None = None) -> int:
         print("blocking_case4_tail", case4_ttf, case4_age)
         return 1
     org = coverage.get("org_tree") or {}
+    blocking: list[str] = []
     span_mean = float(org.get("span_mean") or 0)
     mgr_share = float(org.get("is_manager_share") or 0)
     max_depth = int(org.get("max_depth") or 0)
     if not (5.0 <= span_mean <= 9.0):
         print("blocking_span_of_control", org)
-        return 1
+        blocking.append("span_of_control")
     if not (0.10 <= mgr_share <= 0.15):
         print("blocking_is_manager_share", org)
-        return 1
+        blocking.append("is_manager_share")
     if max_depth > 8:
         print("blocking_org_depth", org)
+        blocking.append("org_depth")
+    if int(org.get("orphan_manager_at_month_end") or 0) != 0:
+        print("blocking_orphan_manager", org)
+        blocking.append("orphan_manager")
+    if int(org.get("ceo_count") or 0) != 1:
+        print("blocking_ceo_count", org)
+        blocking.append("ceo_count")
+    if int(org.get("span_max") or 0) > 15:
+        print("blocking_span_max", org)
+        blocking.append("span_max")
+    tree_keys = {
+        "span_of_control",
+        "is_manager_share",
+        "org_depth",
+        "orphan_manager",
+        "ceo_count",
+        "span_max",
+    }
+    if any(item in tree_keys for item in blocking):
+        print("blocking_tree_skip_nocase3", blocking)
         return 1
-    mgr_rows = {r["group"]: r for r in (signals.get("case3_manager_change") or [])}
+    mgr_rows = {r["group"]: r for r in (signals.get("case3_manager_change_reorg") or signals.get("case3_manager_change") or [])}
     if "slice" in mgr_rows and "control" in mgr_rows:
         ctrl = float(mgr_rows["control"].get("changes_per_worker") or 0)
         slc = float(mgr_rows["slice"].get("changes_per_worker") or 0)
         ratio = (slc / ctrl) if ctrl else 0.0
         if not (2.0 <= ratio <= 4.0):
             print("blocking_case3_manager_change_ratio", ratio, mgr_rows)
-            return 1
+            blocking.append("case3_manager_change_reorg")
     certified_0807 = con.execute(
         """
         SELECT count(*) FROM people_hist_worker_attr h
@@ -189,10 +251,27 @@ def main(argv: list[str] | None = None) -> int:
     extracts = emit_case2_extracts(state, LAKE, PREFIX, FAULT_DAY, PRIOR_FULL, certified_0807)
     case3_with = engineering_trailing_3m(con)
     print("case3_control_start")
-    _, con_ctrl = _run_world(CONTROL_PREFIX, False)
+    if resume or "--control-from-lakes" in argv:
+        con_ctrl = _connect_lake(CONTROL_PREFIX)
+    elif "--from-bronze" in argv:
+        _, con_ctrl = _rebuild_from_bronze(CONTROL_PREFIX)
+    else:
+        _, con_ctrl = _run_world(CONTROL_PREFIX, False)
     case3_without = engineering_trailing_3m(con_ctrl)
     closed = expected_rates()
     measured_delta_pp = round((case3_with["annualized"] - case3_without["annualized"]) * 100, 2)
+    closed_delta = float(closed["engineering_overall"]["delta_pp"])
+    delta_gap = round(abs(measured_delta_pp - closed_delta), 2)
+    if delta_gap > 0.5:
+        print("blocking_case3_closed_form_gap", measured_delta_pp, closed_delta, delta_gap)
+        blocking.append("case3_closed_form")
+    decomp = case3_term_decomposition(con)
+    littles = littles_law_reconcile(con)
+    if littles.get("rel_gap") is not None and littles["rel_gap"] > 0.5:
+        print("blocking_littles_law", littles)
+        blocking.append("littles_law")
+    lineage = run_lineage(SEED, LAKE / "people_gold" / PREFIX)
+    write_manifest(OUT / "gold_sha256.json", lineage.get("gold_sha256") or {})
     bronze_sizes = parquet_sizes(LAKE / "people_bronze" / PREFIX)
     silver_sizes = parquet_sizes(LAKE / "people_silver" / PREFIX)
     gold_sizes = parquet_sizes(LAKE / "people_gold" / PREFIX)
@@ -221,8 +300,13 @@ def main(argv: list[str] | None = None) -> int:
             "without_scenario": case3_without,
             "delta_pp": measured_delta_pp,
             "closed_form_delta_pp": closed["engineering_overall"]["delta_pp"],
+            "abs_gap_pp": delta_gap,
         },
         "case3_closed_form": closed,
+        "case3_term_decomposition": decomp,
+        "littles_law": littles,
+        "lineage": lineage,
+        "blocking": blocking,
         "parquet_bytes": {"bronze": bronze_sizes, "silver": silver_sizes, "gold": gold_sizes},
         "control_prefix": CONTROL_PREFIX,
         "control_prefix_role": "case3_control_only_not_serving",
@@ -235,8 +319,11 @@ def main(argv: list[str] | None = None) -> int:
     (logs / "report.json").write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     _write_markdown(report)
     print("scale", SCALE, "ending", report["ending_certified_headcount"], "hires", hires, "accepted", accepted)
-    print("ttf_ratio", ttf_ratio, "case3_delta_pp", measured_delta_pp)
+    print("ttf_ratio", ttf_ratio, "case3_delta_pp", measured_delta_pp, "blocking", blocking)
     print("wrote", OUT / "report.json")
+    if blocking:
+        print("blocking_failed", blocking)
+        return 1
     return 0
 
 
@@ -285,10 +372,10 @@ def _write_markdown(report: dict) -> Path:
         return int(sum(int(v) for v in d.values()))
 
     lines = [
-        "# 全量 5 年 lake 回填报告（scale=1.0，不 publish）",
+        "# 全量 5 年 lake 回填报告（data-v1，scale=1.0）",
         "",
-        "**Stop.** 步骤 5 第二段 lake 回填已完成。未 publish，未建 Postgres Silver/Gold DDL，未改线上站。"
-        "全量 gold 在 lake：`people_bronze/rehearsal_1p00/`、`people_silver/rehearsal_1p00/`、`people_gold/rehearsal_1p00/`。",
+        "**Stop.** simulator 已冻结为 tag `data-v1`。GATE 3 前不再改 simulator。serving 仅 PeopleAnalyticsAI.net。",
+        "全量 gold 在 lake：`people_bronze/rehearsal_1p00/`、`people_silver/rehearsal_1p00/`、`people_gold/rehearsal_1p00/`（不进 git）。",
         "",
         "JSON：`data-platform/simulator/fixtures/rehearsal_1p00/report.json`",
         "",
@@ -403,6 +490,16 @@ def _write_markdown(report: dict) -> Path:
         f"| 无 scenario | **{c3['without_scenario']['annualized']}** | {c3['without_scenario']['person_months']:,} | {c3['without_scenario']['voluntary_terms']:,} |",
         f"| 实测 delta | **+{c3['delta_pp']} pp** | | |",
         f"| 闭式 delta | **+{c3['closed_form_delta_pp']:.2f} pp** | | |",
+        f"| |实测−闭式| | **{c3.get('abs_gap_pp')} pp**（闸 ≤0.5） | | |",
+        "",
+        "D2 自愿离职分解（Engineering trailing-3m，有 scenario）：",
+        "",
+        "| 桶 | n |",
+        "| --- | ---: |",
+        f"| slice hazard | {(report.get('case3_term_decomposition') or {}).get('slice_hazard')} |",
+        f"| manager_departure | {(report.get('case3_term_decomposition') or {}).get('manager_departure')} |",
+        f"| other | {(report.get('case3_term_decomposition') or {}).get('other')} |",
+        f"| 合计 | {(report.get('case3_term_decomposition') or {}).get('voluntary_terms')} |",
         "",
         "闭式 Engineering：0.1334 → 0.1574。切片相关信号（gold，非因果）："
         f"compa {c3_compa.get('slice', {}).get('median_compa')} vs {c3_compa.get('control', {}).get('median_compa')}"
@@ -442,7 +539,9 @@ def _write_markdown(report: dict) -> Path:
         "",
         f"As-of 2026-08-31 certified：span_of_control 均值 **{float(org.get('span_mean') or 0):.2f}**"
         f"（门槛 5–9）；is_manager **{float(org.get('is_manager_share') or 0):.2%}**"
-        f"（门槛 10–15%）；max_depth **{org.get('max_depth')}**（≤7）。",
+        f"（门槛 10–15%）；max_depth **{org.get('max_depth')}**（≤8）；"
+        f"span_max **{org.get('span_max')}**（≤15）；orphan **{org.get('orphan_manager_at_month_end')}**；"
+        f"CEO 根 **{org.get('ceo_count')}**。",
         "",
         "| 层级 depth | n |",
         "| --- | ---: |",

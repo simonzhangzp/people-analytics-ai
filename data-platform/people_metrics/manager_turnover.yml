@@ -9,8 +9,8 @@ numerator:
 min_cell: 5
 sensitivity: internal
 expected_range:
-- 0.02
-- 0.25
+- 0.08
+- 0.22
 sources:
 - people_snap_worker_month
 window_aligned: false

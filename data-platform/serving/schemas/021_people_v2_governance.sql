@@ -102,6 +102,11 @@ create table if not exists people_v2.people_serving_run (
   notes text
 );
 
+alter table people_v2.people_serving_run add column if not exists simulator_code_sha text;
+alter table people_v2.people_serving_run add column if not exists seed text;
+alter table people_v2.people_serving_run add column if not exists scenario_versions jsonb;
+alter table people_v2.people_serving_run add column if not exists baseline_sha text;
+
 create table if not exists people_v2.people_serving_pointer (
   pointer_id text primary key,
   as_of date,

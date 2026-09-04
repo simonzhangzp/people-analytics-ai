@@ -98,8 +98,11 @@ def build_canonical_layer(con, bronze: Path) -> None:
         con,
         "bronze_property_history",
         bronze / "frappe_hr" / "Employee_Property_History",
-        "SELECT NULL::VARCHAR AS parent, NULL::VARCHAR AS parenttype, NULL::INTEGER AS idx, NULL::VARCHAR AS property, NULL::VARCHAR AS fieldname, NULL::VARCHAR AS current, NULL::VARCHAR AS new, NULL::VARCHAR AS employee, NULL::VARCHAR AS event_date WHERE 1=0",
+        "SELECT NULL::VARCHAR AS parent, NULL::VARCHAR AS parenttype, NULL::INTEGER AS idx, NULL::VARCHAR AS property, NULL::VARCHAR AS fieldname, NULL::VARCHAR AS current, NULL::VARCHAR AS new, NULL::VARCHAR AS employee, NULL::VARCHAR AS event_date, NULL::VARCHAR AS change_reason WHERE 1=0",
     )
+    ph_cols = {r[0] for r in con.execute("DESCRIBE bronze_property_history").fetchall()}
+    if "change_reason" not in ph_cols:
+        con.execute("ALTER TABLE bronze_property_history ADD COLUMN change_reason VARCHAR")
     _load_parquet(
         con,
         "bronze_user",

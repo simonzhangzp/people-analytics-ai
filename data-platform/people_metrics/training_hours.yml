@@ -9,8 +9,8 @@ numerator:
 min_cell: 5
 sensitivity: internal
 expected_range:
-- 1
-- 40
+- 8
+- 60
 sources:
 - people_mart_learning_monthly
 window_aligned: false

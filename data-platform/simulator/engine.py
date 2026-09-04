@@ -11,7 +11,7 @@ from pathlib import Path
 from business_rules import e6_category, in_certified_headcount, tenure_band
 from funnel import cancelled_openings_for_hires, lognormal_count, lognormal_days
 from ids import person_id, utc
-from org_tree import MAX_LEVEL, build_company_tree, manager_candidates, place_hire
+from org_tree import MAX_LEVEL, SPAN_HI, SPAN_MEDIAN, build_company_tree, hash_uniform, manager_candidates, place_hire
 from transactions import t1_hire_instance
 from world import load_baseline
 
@@ -54,12 +54,8 @@ BAND_MID = {
 SOURCE_IDS = {"inbound": 1, "referral": 2, "sourced": 3, "internal": 4}
 STAGE_IDS = {"Application Review": 1, "Phone Screen": 2, "Onsite": 3, "Offer": 4}
 RECRUITER_USER_MIN = 201
-RECRUITER_USER_N = 24
 REGIONS = ("AMER", "EMEA", "APAC")
-
-
-def recruiter_user_id(opening_id: int) -> int:
-    return RECRUITER_USER_MIN + (int(opening_id) % RECRUITER_USER_N)
+CHANGE_REASONS = ("reorg", "transfer", "manager_departure")
 
 
 def hash_pick(key: str, items: list):
@@ -72,6 +68,22 @@ def hash_pick(key: str, items: list):
 def accompany_reports_to(worker_id: str, day: date) -> bool:
     digest = hashlib.md5(f"{worker_id}|{day.isoformat()}|reports_to".encode("utf-8")).digest()[0]
     return digest < 51
+
+
+def recruiter_id_for(family: str, region: str, opening_id: int, n_recruiters: int) -> int:
+    """Assign every opening a recruiter in the org × region × job_family cell."""
+    families = list(JOB_BY_FAMILY)
+    n = max(1, int(n_recruiters))
+    fi = families.index(family) if family in families else 0
+    ri = list(REGIONS).index(region) if region in REGIONS else 0
+    n_cells = len(families) * len(REGIONS)
+    cell = fi * len(REGIONS) + ri
+    start = RECRUITER_USER_MIN + (cell * n) // n_cells
+    end = RECRUITER_USER_MIN + ((cell + 1) * n) // n_cells
+    if end <= start:
+        end = start + 1
+    pool = list(range(start, end))
+    return int(hash_pick(f"{opening_id}|rec|{family}|{region}", pool))
 
 
 SKILLS = {
@@ -179,9 +191,11 @@ class WorldEngine:
         self.accept_p = 0.85
         self.rehire_rate = float(pop["rehire_rate"])
         self.rec = self.baseline["recruiting"]
+        self.n_recruiters = max(1, int(round(int(self.rec.get("recruiter_count") or 110) * self.scale)))
         self.promo_m = annual_to_monthly(float(self.baseline["movement"]["promotion_annual"]))
         self.transfer_m = annual_to_monthly(float(self.baseline["movement"]["transfer_annual"]))
         self.mgr_m = annual_to_monthly(float(self.baseline["movement"]["standalone_manager_change_annual"]))
+        self._span_counts: dict[str, int] = {}
         self.slow_hms = [101, 102, 103]
         for sig in self.case4.get("correlated_signals") or []:
             ids = ((sig.get("target") or {}).get("hiring_manager_ids")) or []
@@ -256,7 +270,25 @@ class WorldEngine:
         status = w["status"] if w["termination_date"] is None or w["termination_date"] > as_of else "Left"
         return in_certified_headcount(status, w["employment_type"], w["hire_date"], w["termination_date"], as_of)
 
+    def _recruiter_id(self, family: str, region: str, opening_id: int) -> int:
+        return recruiter_id_for(family, region, opening_id, self.n_recruiters)
+
+    def _hash01(self, key: str) -> float:
+        return hash_uniform(key)
+
+    def _certified_managers(self, day: date) -> dict[str, dict]:
+        return {
+            w["worker_id"]: w
+            for w in self.workers
+            if self._certified(w, day) and w.get("employment_type") != "Intern"
+        }
+
     def _emit_employee(self, w: dict, modified: date) -> None:
+        prev_i = self._last_emp_idx.get(w["worker_id"])
+        if prev_i is not None:
+            prev_d = date.fromisoformat(self.employee_versions[prev_i]["modified_date"])
+            if modified < prev_d:
+                modified = prev_d
         self._employee_emit_seq += 1
         row = {
             "name": w["worker_id"],
@@ -276,12 +308,12 @@ class WorldEngine:
             "is_rehire": w["is_rehire"],
             "via_t1": w["via_t1"],
             "hired_via_application_id": w.get("hired_via_application_id"),
+            "change_reason": w.pop("_change_reason", None),
             "modified": utc(modified),
             "modified_date": modified.isoformat(),
             "emit_seq": self._employee_emit_seq,
             "docstatus": 0,
         }
-        prev_i = self._last_emp_idx.get(w["worker_id"])
         if prev_i is not None and self.employee_versions[prev_i].get("modified_date") == modified.isoformat():
             self.employee_versions[prev_i] = row
             return
@@ -503,6 +535,7 @@ class WorldEngine:
         current,
         new,
         idx: int,
+        change_reason: str | None = None,
     ) -> dict:
         return {
             "parent": parent,
@@ -514,22 +547,27 @@ class WorldEngine:
             "new": new,
             "employee": employee,
             "event_date": day.isoformat(),
+            "change_reason": change_reason,
         }
 
     def _hash_new_manager(self, w: dict, day: date) -> str | None:
         dept = DEPT_BY_FAMILY[w["job_family"]]
-        pool = self._org_by_dept.get(dept) or [
+        pool = [
             x
-            for x in self.workers
-            if x.get("termination_date") is None and DEPT_BY_FAMILY[x["job_family"]] == dept
+            for x in (self._org_by_dept.get(dept) or self.workers)
+            if x.get("termination_date") is None
+            and DEPT_BY_FAMILY[x["job_family"]] == dept
+            and self._certified(x, day)
         ]
         cands = manager_candidates(
             self.workers, w, DEPT_BY_FAMILY, pool=pool, children=self._org_children
         )
-        picked = hash_pick(f"{w['worker_id']}|{day.isoformat()}|mgr", cands)
+        under = [c for c in cands if self._span_counts.get(c, 0) < SPAN_HI]
+        use = under or cands
+        picked = hash_pick(f"{w['worker_id']}|{day.isoformat()}|mgr", use)
         if picked and picked != w.get("reports_to"):
             return picked
-        rest = [c for c in cands if c != w.get("reports_to")]
+        rest = [c for c in use if c != w.get("reports_to")]
         return hash_pick(f"{w['worker_id']}|{day.isoformat()}|mgr2", rest)
 
     def _place_in_tree(self, w: dict) -> None:
@@ -567,63 +605,350 @@ class WorldEngine:
         self._org_children = children
         self._org_by_dept = by_dept
         self._org_by_id = by_id
+        self._span_counts = {wid: len(ch) for wid, ch in children.items()}
+
+    def _pick_manager(self, w: dict, day: date, cands: list[dict]) -> dict | None:
+        pool = [c for c in cands if c["worker_id"] != w["worker_id"]]
+        if not pool:
+            return None
+        under = [c for c in pool if self._span_counts.get(c["worker_id"], 0) < SPAN_HI]
+        if not under:
+            return None
+        return hash_pick(f"{w['worker_id']}|{day.isoformat()}|mgrpick", under)
 
     def _reassign_reports(self, old: dict, day: date) -> None:
-        dept = DEPT_BY_FAMILY[old["job_family"]]
-        pool = self._org_by_dept.get(dept) or self.workers
+        living = self._certified_managers(day)
         cands = [
             x
-            for x in pool
+            for x in self.workers
             if x["worker_id"] != old["worker_id"]
-            and x.get("termination_date") is None
+            and x["worker_id"] in living
             and x.get("org_role") in ("leader", "manager")
-            and x.get("employment_type") != "Intern"
-            and x.get("status") == "Active"
+            and int(x.get("org_level") or 0) < MAX_LEVEL
         ]
-        if not cands:
-            cands = [
-                x
-                for x in self.workers
-                if x["worker_id"] != old["worker_id"]
-                and x.get("termination_date") is None
-                and x.get("org_role") in ("leader", "manager")
-                and x.get("employment_type") != "Intern"
-                and x.get("status") == "Active"
-            ]
         if old["worker_id"] == self.ceo_id and cands:
             suc = cands[0]
             suc["reports_to"] = None
             suc["org_role"] = "leader"
             suc["org_level"] = 0
+            suc["_change_reason"] = "manager_departure"
             self.ceo_id = suc["worker_id"]
             self._emit_employee(suc, day)
+        if not cands and self.ceo_id in living:
+            cands = [living[self.ceo_id]]
         if not cands:
             return
         reports = [
             x
-            for x in pool
+            for x in self.workers
             if x.get("reports_to") == old["worker_id"] and x.get("termination_date") is None
         ]
         for x in reports:
-            new_mgr = hash_pick(f"{x['worker_id']}|reassign|{day.isoformat()}", cands)
+            new_mgr = self._pick_manager(x, day, cands)
+            if new_mgr is None:
+                open_cands = [c for c in cands if self._span_counts.get(c["worker_id"], 0) < SPAN_HI]
+                new_mgr = open_cands[0] if open_cands else (cands[0] if cands else None)
             if not new_mgr or new_mgr["worker_id"] == x["worker_id"]:
-                continue
-            if self.ceo_id and new_mgr["worker_id"] == self.ceo_id and x["worker_id"] == self.ceo_id:
+                if self.ceo_id and self.ceo_id != x["worker_id"]:
+                    x["reports_to"] = self.ceo_id
+                    x["_change_reason"] = "manager_departure"
+                    self._span_counts[self.ceo_id] = self._span_counts.get(self.ceo_id, 0) + 1
+                    self._emit_employee(x, day)
                 continue
             x["reports_to"] = new_mgr["worker_id"]
+            x["_change_reason"] = "manager_departure"
+            self._span_counts[new_mgr["worker_id"]] = self._span_counts.get(new_mgr["worker_id"], 0) + 1
             self._emit_employee(x, day)
 
     def _living_managers(self) -> dict[str, dict]:
-        return {
-            w["worker_id"]: w
+        return self._certified_managers(END)
+
+    def _certified_reports(self, day: date) -> dict[str, list[dict]]:
+        out: dict[str, list[dict]] = {}
+        for w in self.workers:
+            if w["worker_id"] == self.ceo_id:
+                continue
+            if not self._certified(w, day):
+                continue
+            mgr = w.get("reports_to")
+            if mgr:
+                out.setdefault(mgr, []).append(w)
+        return out
+
+    def _certified_depths(self, day: date) -> dict[str, int]:
+        living = {w["worker_id"]: w for w in self.workers if self._certified(w, day)}
+        children: dict[str, list[str]] = {}
+        for w in living.values():
+            mgr = w.get("reports_to")
+            if mgr:
+                children.setdefault(mgr, []).append(w["worker_id"])
+        depths: dict[str, int] = {}
+        if self.ceo_id not in living:
+            return depths
+        stack = [self.ceo_id]
+        depths[self.ceo_id] = 0
+        i = 0
+        while i < len(stack):
+            nid = stack[i]
+            i += 1
+            d = depths[nid]
+            for cid in children.get(nid, []):
+                if cid in depths or cid not in living:
+                    continue
+                depths[cid] = d + 1
+                stack.append(cid)
+        return depths
+
+    def _capacity_manager_ids(
+        self,
+        day: date,
+        depths: dict[str, int],
+        reports: dict[str, list[dict]],
+        *,
+        exclude: set[str],
+    ) -> list[str]:
+        max_mgr_depth = 7
+        out: list[str] = []
+        fallback: list[str] = []
+        for w in self.workers:
+            if not self._certified(w, day):
+                continue
+            wid = w["worker_id"]
+            if wid in exclude:
+                continue
+            if depths.get(wid, 99) > max_mgr_depth:
+                continue
+            if len(reports.get(wid, [])) >= SPAN_HI:
+                continue
+            fallback.append(wid)
+            if w.get("org_role") in ("leader", "manager") or wid == self.ceo_id:
+                out.append(wid)
+        return out or fallback
+
+    def _promote_shallow_ic(
+        self, day: date, depths: dict[str, int], reports: dict[str, list[dict]]
+    ) -> str | None:
+        cands = [
+            w
             for w in self.workers
-            if w.get("termination_date") is None
-            and w.get("status") in ("Active", "Suspended")
-            and w.get("employment_type") in ("Full-time", "Part-time", "Probation")
-        }
+            if self._certified(w, day)
+            and w.get("org_role") == "ic"
+            and w.get("employment_type") != "Intern"
+            and 1 <= depths.get(w["worker_id"], 99) <= 7
+        ]
+        if not cands:
+            return None
+        promo = sorted(cands, key=lambda x: (depths.get(x["worker_id"], 99), x["worker_id"]))[0]
+        promo["org_role"] = "manager"
+        promo["_change_reason"] = "reorg"
+        self._emit_employee(promo, day)
+        reports.setdefault(promo["worker_id"], [])
+        return promo["worker_id"]
+
+    def _move_report(self, w: dict, new_mgr: str, day: date, reason: str) -> None:
+        if not new_mgr or new_mgr == w["worker_id"] or new_mgr == w.get("reports_to"):
+            return
+        w["reports_to"] = new_mgr
+        w["_change_reason"] = reason
+        self._emit_employee(w, day)
+
+    def _split_over_span(
+        self,
+        mgr_id: str,
+        reps: list[dict],
+        day: date,
+        depths: dict[str, int],
+        reports: dict[str, list[dict]],
+    ) -> None:
+        ordered = sorted(reps, key=lambda x: x["worker_id"])
+        if len(ordered) <= SPAN_HI:
+            return
+        for x in ordered[SPAN_HI:]:
+            targets = self._capacity_manager_ids(
+                day, depths, reports, exclude={x["worker_id"], mgr_id}
+            )
+            if not targets:
+                promo = self._promote_shallow_ic(day, depths, reports)
+                if promo:
+                    targets = [promo]
+            if not targets:
+                continue
+            new_mgr = min(
+                targets,
+                key=lambda t: (len(reports.get(t, [])), depths.get(t, 99), t),
+            )
+            self._move_report(x, new_mgr, day, "reorg")
+            reports[mgr_id] = [r for r in reports.get(mgr_id, []) if r["worker_id"] != x["worker_id"]]
+            reports.setdefault(new_mgr, []).append(x)
+            depths[x["worker_id"]] = depths.get(new_mgr, 0) + 1
+
+    def _rebalance_tree(self, day: date) -> None:
+        for _ in range(4):
+            depths = self._certified_depths(day)
+            reports = self._certified_reports(day)
+            span_n = {mgr: len(reps) for mgr, reps in reports.items()}
+            cap = self._capacity_manager_ids(day, depths, reports, exclude=set())
+            by_id = {w["worker_id"]: w for w in self.workers}
+            hc = sum(1 for w in self.workers if self._certified(w, day))
+            n_mgr = sum(1 for n in span_n.values() if n > 0)
+            moved = False
+
+            def take_target(exclude: set[str]) -> str | None:
+                nonlocal cap, n_mgr
+                soft = int(round(SPAN_MEDIAN))
+                share = (n_mgr / hc) if hc else 0.0
+
+                def usable_below(limit: int) -> list[str]:
+                    return [
+                        t
+                        for t in cap
+                        if t not in exclude
+                        and span_n.get(t, 0) < limit
+                        and depths.get(t, 99) <= 7
+                    ]
+
+                under_soft = usable_below(soft)
+                if under_soft:
+                    return min(under_soft, key=lambda t: (depths.get(t, 99), span_n.get(t, 0), t))
+                if share < 0.13:
+                    promo = self._promote_shallow_ic(day, depths, reports)
+                    if promo:
+                        cap.append(promo)
+                        span_n.setdefault(promo, 0)
+                        pw = by_id[promo]
+                        depths[promo] = depths.get(pw.get("reports_to") or "", 0) + 1
+                        return promo
+                under_hi = usable_below(SPAN_HI)
+                if under_hi:
+                    return min(under_hi, key=lambda t: (depths.get(t, 99), span_n.get(t, 0), t))
+                promo = self._promote_shallow_ic(day, depths, reports)
+                if not promo:
+                    return None
+                cap.append(promo)
+                span_n.setdefault(promo, 0)
+                pw = by_id[promo]
+                depths[promo] = depths.get(pw.get("reports_to") or "", 0) + 1
+                return promo
+
+            def apply_move(w: dict, new_mgr: str, old: str | None) -> None:
+                nonlocal cap, n_mgr
+                self._move_report(w, new_mgr, day, "reorg")
+                if old:
+                    prev = span_n.get(old, 1)
+                    span_n[old] = max(0, prev - 1)
+                    if prev > 0 and span_n[old] == 0:
+                        n_mgr = max(0, n_mgr - 1)
+                    if span_n[old] < SPAN_HI and old not in cap and depths.get(old, 99) <= 7:
+                        cap.append(old)
+                prev_new = span_n.get(new_mgr, 0)
+                span_n[new_mgr] = prev_new + 1
+                if prev_new == 0:
+                    n_mgr += 1
+                if span_n[new_mgr] >= SPAN_HI:
+                    cap = [c for c in cap if c != new_mgr]
+                depths[w["worker_id"]] = depths.get(new_mgr, 0) + 1
+
+            for w in self.workers:
+                if not self._certified(w, day) or w["worker_id"] == self.ceo_id:
+                    continue
+                if depths.get(w["worker_id"], 99) <= 8:
+                    continue
+                new_mgr = take_target({w["worker_id"]})
+                if not new_mgr:
+                    continue
+                apply_move(w, new_mgr, w.get("reports_to"))
+                moved = True
+
+            overs = {mgr for mgr, n in span_n.items() if n > SPAN_HI}
+            if overs:
+                by_mgr: dict[str, list[dict]] = {}
+                for w in self.workers:
+                    if not self._certified(w, day):
+                        continue
+                    mgr = w.get("reports_to")
+                    if mgr in overs:
+                        by_mgr.setdefault(mgr, []).append(w)
+                for mgr_id, reps in by_mgr.items():
+                    extras = sorted(reps, key=lambda x: x["worker_id"])[SPAN_HI:]
+                    for x in extras:
+                        new_mgr = take_target({x["worker_id"], mgr_id})
+                        if not new_mgr:
+                            continue
+                        apply_move(x, new_mgr, mgr_id)
+                        moved = True
+            keep = max(5, int(round(SPAN_MEDIAN)))
+            mean = (sum(span_n.values()) / n_mgr) if n_mgr else 0.0
+            share_now = (n_mgr / hc) if hc else 0.0
+            high = {mgr for mgr, n in span_n.items() if n > keep} if (mean > 9.0 or share_now < 0.10) else set()
+            if high:
+                by_high: dict[str, list[dict]] = {}
+                for w in self.workers:
+                    if not self._certified(w, day):
+                        continue
+                    mgr = w.get("reports_to")
+                    if mgr in high:
+                        by_high.setdefault(mgr, []).append(w)
+                for mgr_id, reps in by_high.items():
+                    extras = sorted(reps, key=lambda x: x["worker_id"])[keep:]
+                    for x in extras:
+                        new_mgr = take_target({x["worker_id"], mgr_id})
+                        if not new_mgr:
+                            continue
+                        apply_move(x, new_mgr, mgr_id)
+                        moved = True
+            if not moved:
+                break
+            self._rebuild_org_index()
+
+    def _clip_depth(self, day: date) -> None:
+        depths = self._certified_depths(day)
+        reports = self._certified_reports(day)
+        d1 = [
+            wid
+            for wid, dpth in depths.items()
+            if dpth == 1 and len(reports.get(wid, [])) < SPAN_HI
+        ]
+        for w in self.workers:
+            if not self._certified(w, day) or w["worker_id"] == self.ceo_id:
+                continue
+            if depths.get(w["worker_id"], 99) <= 8:
+                continue
+            if d1:
+                tgt = min(d1, key=lambda t: (len(reports.get(t, [])), t))
+            else:
+                tgt = self.ceo_id
+            if not tgt or tgt == w["worker_id"]:
+                continue
+            old = w.get("reports_to")
+            self._move_report(w, tgt, day, "reorg")
+            if old:
+                reports[old] = [r for r in reports.get(old, []) if r["worker_id"] != w["worker_id"]]
+            reports.setdefault(tgt, []).append(w)
+            if len(reports.get(tgt, [])) >= SPAN_HI:
+                d1 = [x for x in d1 if x != tgt]
+        self._rebuild_org_index()
+
+    def _sync_employee_if_stale(self, w: dict, day: date) -> None:
+        idx = self._last_emp_idx.get(w["worker_id"])
+        if idx is None:
+            self._emit_employee(w, day)
+            return
+        last = self.employee_versions[idx]
+        status = (
+            "Left"
+            if w.get("termination_date") is not None and w["termination_date"] <= day
+            else w["status"]
+        )
+        if (
+            last.get("reports_to") != w.get("reports_to")
+            or last.get("status") != status
+            or last.get("employment_type") != w["employment_type"]
+            or last.get("grade") != w.get("grade")
+        ):
+            self._emit_employee(w, day)
 
     def _repair_org(self, day: date) -> None:
-        living = self._living_managers()
+        living = self._certified_managers(day)
         if self.ceo_id not in living:
             suc = next(iter(living.values()), None)
             if suc is None:
@@ -631,30 +956,64 @@ class WorldEngine:
             suc["reports_to"] = None
             suc["org_role"] = "leader"
             suc["org_level"] = 0
+            suc["_change_reason"] = "manager_departure"
             self.ceo_id = suc["worker_id"]
             self._emit_employee(suc, day)
-            living = self._living_managers()
+            living = self._certified_managers(day)
         ceo = living.get(self.ceo_id)
         if ceo is not None and ceo.get("reports_to") is not None:
             ceo["reports_to"] = None
+            ceo["_change_reason"] = "reorg"
             self._emit_employee(ceo, day)
         for w in self.workers:
-            if w.get("termination_date") is not None or w["worker_id"] == self.ceo_id:
+            if w.get("termination_date") is not None:
+                continue
+            if not self._certified(w, day):
+                continue
+            if w["worker_id"] == self.ceo_id:
+                if w.get("reports_to") is not None:
+                    w["reports_to"] = None
+                    w["_change_reason"] = "reorg"
+                    self._emit_employee(w, day)
                 continue
             mgr = w.get("reports_to")
             boss = living.get(mgr) if mgr else None
+            reason = None
             if boss is not None and int(boss.get("org_level") or 0) >= MAX_LEVEL:
                 w["reports_to"] = boss.get("reports_to") or self.ceo_id
+                reason = "reorg"
+            elif mgr in living and mgr != w["worker_id"]:
+                pass
+            else:
+                new_mgr = self._hash_new_manager(w, day) or self.ceo_id
+                if new_mgr and new_mgr != mgr:
+                    w["reports_to"] = new_mgr
+                    boss = living.get(new_mgr)
+                    w["org_level"] = min(MAX_LEVEL, ((boss.get("org_level") or 0) + 1) if boss else 1)
+                    reason = "manager_departure" if mgr and mgr not in living else "reorg"
+            if reason:
+                w["_change_reason"] = reason
                 self._emit_employee(w, day)
+        extra_roots = [
+            w
+            for w in self.workers
+            if self._certified(w, day)
+            and w["worker_id"] != self.ceo_id
+            and not w.get("reports_to")
+        ]
+        for w in extra_roots:
+            w["reports_to"] = self.ceo_id
+            w["_change_reason"] = "reorg"
+            self._emit_employee(w, day)
+        self._rebuild_org_index()
+        self._rebalance_tree(day)
+        self._clip_depth(day)
+        for w in self.workers:
+            if w.get("hire_date") and w["hire_date"] > day:
                 continue
-            if mgr in living and mgr != w["worker_id"]:
+            if w.get("termination_date") is not None and w["termination_date"] < day:
                 continue
-            new_mgr = self._hash_new_manager(w, day) or self.ceo_id
-            if new_mgr and new_mgr != mgr:
-                w["reports_to"] = new_mgr
-                boss = living.get(new_mgr)
-                w["org_level"] = min(MAX_LEVEL, ((boss.get("org_level") or 0) + 1) if boss else 1)
-                self._emit_employee(w, day)
+            self._sync_employee_if_stale(w, day)
         self._rebuild_org_index()
 
     def _business_day(self, month_start: date, me: date, w: dict) -> date:
@@ -710,7 +1069,9 @@ class WorldEngine:
         opened: date,
         close_day: date,
         hired_app: bool,
+        region: str | None = None,
     ) -> None:
+        region = region or REGIONS[opening_id % len(REGIONS)]
         self.next_cand += 1
         cand_id = self.next_cand
         self.next_app += 1
@@ -764,7 +1125,7 @@ class WorldEngine:
                 "status": last_status,
                 "created_at": utc(created),
                 "job_interview_stage_id": last_stage_id,
-                "recruiter_id": recruiter_user_id(opening_id),
+                "recruiter_id": self._recruiter_id(family, region, opening_id),
                 "source_id": SOURCE_IDS[source],
                 "source_name": source,
                 "opening_id": opening_id,
@@ -799,6 +1160,7 @@ class WorldEngine:
                 opened=opened,
                 close_day=hire_day,
                 hired_app=False,
+                region=w["region"],
             )
         version = 1
         hired = False
@@ -834,7 +1196,7 @@ class WorldEngine:
             app["source_id"] = SOURCE_IDS["referral"] if accept else SOURCE_IDS[self._source()]
             app["source_name"] = "referral" if accept else "inbound"
             app["opening_id"] = opening_id
-            app["recruiter_id"] = recruiter_user_id(opening_id)
+            app["recruiter_id"] = self._recruiter_id(w["job_family"], w["region"], opening_id)
             app["hired_at"] = utc(hire_day) if accept else None
             app["rejected_at"] = None if accept else utc(hire_day)
             app["rejection_reason_id"] = 1 if accept else 10
@@ -844,7 +1206,7 @@ class WorldEngine:
             last_opening_row = bundle["opening"]
             last_opening_row["hiring_manager_id"] = hm
             last_opening_row["job_family"] = w["job_family"]
-            last_opening_row["recruiter_id"] = recruiter_user_id(opening_id)
+            last_opening_row["recruiter_id"] = self._recruiter_id(w["job_family"], w["region"], opening_id)
             last_opening_row["region"] = w["region"]
             created = date.fromisoformat(app["created_at"][:10])
             cursor = created
@@ -874,7 +1236,7 @@ class WorldEngine:
         last_opening_row["opened_at"] = utc(opened)
         last_opening_row["hiring_manager_id"] = hm
         last_opening_row["job_family"] = w["job_family"]
-        last_opening_row["recruiter_id"] = recruiter_user_id(opening_id)
+        last_opening_row["recruiter_id"] = self._recruiter_id(w["job_family"], w["region"], opening_id)
         last_opening_row["region"] = w["region"]
         self.openings.append(last_opening_row)
 
@@ -909,7 +1271,7 @@ class WorldEngine:
                 "close_reason_id": 99,
                 "hiring_manager_id": hm,
                 "job_family": family,
-                "recruiter_id": recruiter_user_id(opening_id),
+                "recruiter_id": self._recruiter_id(family, REGIONS[opening_id % len(REGIONS)], opening_id),
                 "region": REGIONS[opening_id % len(REGIONS)],
             }
         )
@@ -992,7 +1354,7 @@ class WorldEngine:
                 if sig.get("id") == "manager_change_cluster":
                     mgr_m = self.mgr_m * float((sig.get("effect") or {}).get("manager_change_annual_multiplier") or 3.0)
                     break
-        if self.rng.random() < self.promo_m:
+        if self._hash01(f"{w['worker_id']}|promo|{me.isoformat()}") < self.promo_m:
             grades = FAMILY_GRADES[w["job_family"]]
             idx = grades.index(w["grade"]) if w["grade"] in grades else 0
             old_grade = w["grade"]
@@ -1023,14 +1385,22 @@ class WorldEngine:
                     w["reports_to"] = new_mgr
                     self.property_history.append(
                         self._ph(
-                            promo_name, "Employee Promotion", w["worker_id"], day, "reports_to", old_mgr, new_mgr, ph_idx
+                            promo_name,
+                            "Employee Promotion",
+                            w["worker_id"],
+                            day,
+                            "reports_to",
+                            old_mgr,
+                            new_mgr,
+                            ph_idx,
+                            change_reason="transfer",
                         )
                     )
             w["grade"] = new_grade
             self._emit_ssa(w, day, new_grade)
             self._emit_employee(w, day)
             return
-        if self.rng.random() < self.transfer_m and w.get("org_role") == "ic":
+        if self._hash01(f"{w['worker_id']}|xfer|{me.isoformat()}") < self.transfer_m and w.get("org_role") == "ic":
             day = self._business_day(month_start, me, w)
             xfer_name = f"HR-EMP-TRN-{self.next_transfer:06d}"
             self.transfers.append(
@@ -1074,20 +1444,34 @@ class WorldEngine:
             if new_mgr and new_mgr != old_mgr:
                 w["reports_to"] = new_mgr
                 self.property_history.append(
-                    self._ph(xfer_name, "Employee Transfer", w["worker_id"], day, "reports_to", old_mgr, new_mgr, ph_idx)
+                    self._ph(
+                        xfer_name,
+                        "Employee Transfer",
+                        w["worker_id"],
+                        day,
+                        "reports_to",
+                        old_mgr,
+                        new_mgr,
+                        ph_idx,
+                        change_reason="transfer",
+                    )
                 )
             boss = next((x for x in self.workers if x["worker_id"] == w.get("reports_to")), None)
             w["org_role"] = "ic"
-            w["org_level"] = min(7, ((boss.get("org_level") or 1) + 1) if boss else 2)
+            w["org_level"] = min(MAX_LEVEL, ((boss.get("org_level") or 1) + 1) if boss else 2)
             self._emit_employee(w, day)
             return
-        if self.rng.random() < mgr_m:
-            day = self._business_day(month_start, me, w)
+        if self._hash01(f"{w['worker_id']}|t7|{me.isoformat()}") < mgr_m:
+            day = month_start + timedelta(days=int(self._hash01(f"{w['worker_id']}|t7day|{me.isoformat()}") * me.day))
+            day = max(day, w["hire_date"])
             new_mgr = self._hash_new_manager(w, day)
             if not new_mgr:
                 return
             current = w.get("reports_to")
+            if new_mgr == current:
+                return
             w["reports_to"] = new_mgr
+            w["_change_reason"] = "reorg"
             self.manager_changes.append(
                 {
                     "employee": w["worker_id"],
@@ -1097,6 +1481,7 @@ class WorldEngine:
                     "region": w["region"],
                     "job_family": w["job_family"],
                     "tenure_band": tenure_band(w["hire_date"], day),
+                    "change_reason": "reorg",
                 }
             )
             self._emit_employee(w, day)
@@ -1168,8 +1553,11 @@ class WorldEngine:
             self.next_apr += 1
 
     def _maybe_training(self, month_start: date, me: date) -> None:
-        annual = float(self.baseline["learning"]["training_events_per_year"])
+        learn = self.baseline["learning"]
+        annual = float(learn.get("training_events_per_year") or 9000)
         n = max(1, int(round(annual * self.scale / 12.0)))
+        attendee_n = int(learn.get("attendees_per_event") or 22)
+        hours_choices = learn.get("hours_choices") or [4, 5, 6]
         active = [w for w in self.workers if w["termination_date"] is None or w["termination_date"] > month_start]
         if not active:
             return
@@ -1178,14 +1566,14 @@ class WorldEngine:
             event_name = f"HR-TRN-EVT-{self.next_trn:06d}"
             result_name = f"HR-TRN-RES-{self.next_trn:06d}"
             self.next_trn += 1
-            hours = float(self.rng.choice([2, 4, 8]))
+            hours = float(self.rng.choice(list(hours_choices)))
             self.training_events.append(
                 {
                     "doctype": "Training Event",
                     "name": event_name,
                     "event_name": "Internal course",
                     "start_time": utc(day, 9),
-                    "end_time": utc(day, 9 + int(hours)),
+                    "end_time": utc(day, 9 + int(max(1, hours))),
                     "level": "Intermediate",
                     "course": "GlobalTech Academy",
                     "docstatus": 1,
@@ -1199,7 +1587,7 @@ class WorldEngine:
                     "docstatus": 1,
                 }
             )
-            attendees = self.rng.sample(active, k=min(15, len(active)))
+            attendees = self.rng.sample(active, k=min(attendee_n, len(active)))
             for w in attendees:
                 self.training_event_employees.append(
                     {
@@ -1284,17 +1672,23 @@ class WorldEngine:
             rows.clear()
 
     def _emit_open_pipeline(self) -> None:
-        """Leave a few requisitions still open at END so as-of recruiter_load is non-zero."""
+        """Stock open reqs so as-of open ≈ monthly hires × TTF months (Little's law)."""
+        ttf_days = float((self.rec.get("time_to_fill_lognormal") or {}).get("median_days") or 32)
+        ttf_months = ttf_days / 30.44
+        n_months = max(1, (END.year - START.year) * 12 + END.month - START.month)
+        monthly_hires = max(1.0, self.cumulative_hires / n_months)
+        n_open = max(self.n_recruiters, int(round(monthly_hires * ttf_months)))
         families = list(JOB_BY_FAMILY)
-        for i in range(RECRUITER_USER_N * 4):
+        for i in range(n_open):
             family = hash_pick(f"openpipe|{i}|fam", families)
+            region = hash_pick(f"openpipe|{i}|reg", list(REGIONS))
             job_id = self.next_job
             self.next_job += 1
             opening_id = self.next_opening
             self.next_opening += 1
-            opened = END - timedelta(days=7 + (i % 40))
+            opened = END - timedelta(days=7 + (i % max(1, int(ttf_days))))
             hm = self._hm_for(family, END)
-            n_apps = max(8, self._n_apps(family) // 4)
+            n_apps = max(4, self._n_apps(family) // 8)
             for _ in range(n_apps):
                 self._walk_crowd_app(
                     job_id=job_id,
@@ -1304,6 +1698,7 @@ class WorldEngine:
                     opened=opened,
                     close_day=END,
                     hired_app=False,
+                    region=region,
                 )
             self.openings.append(
                 {
@@ -1316,8 +1711,8 @@ class WorldEngine:
                     "close_reason_id": None,
                     "hiring_manager_id": hm,
                     "job_family": family,
-                    "recruiter_id": recruiter_user_id(opening_id),
-                    "region": REGIONS[opening_id % len(REGIONS)],
+                    "recruiter_id": self._recruiter_id(family, region, opening_id),
+                    "region": region,
                 }
             )
 
@@ -1364,38 +1759,47 @@ class WorldEngine:
                 if w["termination_date"] is not None or w["hire_date"] > me:
                     continue
                 haz = self._hazard_m(w, me)
-                if self.rng.random() < haz:
-                    term_day = month_start + timedelta(days=self.rng.randint(0, me.day - 1))
-                    reason = "Resignation - Better opportunity" if self.rng.random() < 0.7 else "Resignation - Personal"
+                wid = w["worker_id"]
+                if self._hash01(f"{wid}|vol|{me.isoformat()}") < haz:
+                    term_day = month_start + timedelta(
+                        days=int(self._hash01(f"{wid}|vol_day|{me.isoformat()}") * me.day)
+                    )
+                    reason = (
+                        "Resignation - Better opportunity"
+                        if self._hash01(f"{wid}|vol_reason|{me.isoformat()}") < 0.7
+                        else "Resignation - Personal"
+                    )
                     self._terminate(w, max(term_day, w["hire_date"]), reason)
                     continue
-                if self.rng.random() < self.invol_m:
-                    term_day = month_start + timedelta(days=self.rng.randint(0, me.day - 1))
+                if self._hash01(f"{wid}|invol|{me.isoformat()}") < self.invol_m:
+                    term_day = month_start + timedelta(
+                        days=int(self._hash01(f"{wid}|invol_day|{me.isoformat()}") * me.day)
+                    )
                     self._terminate(w, max(term_day, w["hire_date"]), "Termination - Performance")
                     continue
                 if w["employment_type"] == "Intern":
                     months_ten = (me.year - w["hire_date"].year) * 12 + me.month - w["hire_date"].month
-                    if months_ten >= 12 and self.rng.random() < 0.25:
+                    if months_ten >= 12 and self._hash01(f"{wid}|intern_ft|{me.isoformat()}") < 0.25:
                         w["employment_type"] = "Full-time"
                         self._emit_employee(w, me)
                         continue
                 rolled = False
-                if w["status"] == "Active" and self.rng.random() < 0.001:
+                if w["status"] == "Active" and self._hash01(f"{wid}|inactive|{me.isoformat()}") < 0.001:
                     w["status"] = "Inactive"
                     self._emit_employee(w, me)
                     self._reassign_reports(w, me)
                     rolled = True
-                elif w["status"] == "Inactive" and self.rng.random() < 0.4:
+                elif w["status"] == "Inactive" and self._hash01(f"{wid}|reactivate|{me.isoformat()}") < 0.4:
                     w["status"] = "Active"
                     self._emit_employee(w, me)
                     rolled = True
                 if rolled:
                     continue
-                if w["status"] == "Active" and self.rng.random() < 0.0015:
+                if w["status"] == "Active" and self._hash01(f"{wid}|susp|{me.isoformat()}") < 0.0015:
                     w["status"] = "Suspended"
                     self._emit_employee(w, me)
                     continue
-                if w["status"] == "Suspended" and self.rng.random() < 0.5:
+                if w["status"] == "Suspended" and self._hash01(f"{wid}|unsusp|{me.isoformat()}") < 0.5:
                     w["status"] = "Active"
                     self._emit_employee(w, me)
                     continue

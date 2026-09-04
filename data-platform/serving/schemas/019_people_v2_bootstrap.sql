@@ -4,7 +4,7 @@
 -- Do not specify SUPERUSER/NOSUPERUSER or BYPASSRLS/NOBYPASSRLS: those
 -- clauses require a superuser, and the postgres role is not one.
 -- New roles default to NOSUPERUSER and NOBYPASSRLS.
--- people_app stays NOLOGIN until step 7. people_publisher is LOGIN for Hetzner publish.
+-- people_app LOGIN is enabled in step 7 (024) using PEOPLE_APP_PASSWORD.
 -- Data API must not expose people_v2: revoke from anon / authenticated / service_role.
 
 create schema if not exists people_v2;

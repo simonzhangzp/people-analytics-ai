@@ -56,7 +56,18 @@ def _load_parquet(con: duckdb.DuckDBPyConnection, table: str, directory: Path, e
 def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnection:
     silver.mkdir(parents=True, exist_ok=True)
     gold.mkdir(parents=True, exist_ok=True)
-    con = duckdb.connect(database=":memory:")
+    spill = gold.parent.parent / "_duckdb_spill"
+    spill.mkdir(parents=True, exist_ok=True)
+    db_path = gold / "_transform.duckdb"
+    if db_path.exists():
+        db_path.unlink()
+    con = duckdb.connect(database=str(db_path))
+    con.execute(f"SET temp_directory='{_q(spill)}'")
+    con.execute("SET memory_limit='20GB'")
+    try:
+        con.execute("SET max_temp_directory_size='400GB'")
+    except Exception:
+        pass
     emp = _q(bronze / "frappe_hr" / "Employee" / "part.parquet")
     sep = _q(bronze / "frappe_hr" / "Employee_Separation" / "part.parquet")
 
@@ -96,6 +107,9 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
         con.execute("ALTER TABLE bronze_employee RENAME COLUMN file_row_number TO emit_seq")
     elif "file_row_number" in emp_cols:
         con.execute("ALTER TABLE bronze_employee DROP COLUMN file_row_number")
+    emp_cols = {r[0] for r in con.execute("DESCRIBE bronze_employee").fetchall()}
+    if "change_reason" not in emp_cols:
+        con.execute("ALTER TABLE bronze_employee ADD COLUMN change_reason VARCHAR")
     _load_parquet(
         con,
         "bronze_offer",

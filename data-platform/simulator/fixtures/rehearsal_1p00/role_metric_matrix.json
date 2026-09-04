@@ -1,0 +1,677 @@
+{
+  "rows": [
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "applications_per_opening",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 123.20841268526952
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "average_headcount",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 48437.083333333336
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "compa_ratio_median",
+      "denied": true,
+      "expect_deny": true,
+      "ok": true,
+      "value": null
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "engagement_score",
+      "denied": true,
+      "expect_deny": true,
+      "ok": true,
+      "value": null
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "headcount",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 49823
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "hires",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 10261
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "internal_mobility_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.051200440433896204
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "involuntary_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.026240225722371807
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "manager_turnover_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.14174058136471415
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "offer_acceptance_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.8414551480003013
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "promotion_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.08297361697735034
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "quality_of_hire",
+      "denied": true,
+      "expect_deny": true,
+      "ok": true,
+      "value": null
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "recruiter_load",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 7.945454545454545
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "regrettable_attrition_rate",
+      "denied": true,
+      "expect_deny": true,
+      "ok": true,
+      "value": null
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "rehires",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 228
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "skill_coverage",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.571801464121
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "span_of_control",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 8.467369136641741
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "time_in_stage_hours",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 96
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "time_to_fill_days",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 33
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "training_hours_per_worker",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 20.409362661184
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "metric_id": "voluntary_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.13956249086013645
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "applications_per_opening",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 123.20841268526952
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "average_headcount",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 48437.083333333336
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "compa_ratio_median",
+      "denied": true,
+      "expect_deny": true,
+      "ok": true,
+      "value": null
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "engagement_score",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 3.665744565532
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "headcount",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 49823
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "hires",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 10261
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "internal_mobility_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.051200440433896204
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "involuntary_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.026240225722371807
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "manager_turnover_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.14174058136471415
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "offer_acceptance_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.8414551480003013
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "promotion_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.08297361697735034
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "quality_of_hire",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.5262887260573339
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "recruiter_load",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 7.945454545454545
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "regrettable_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.03400287314299478
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "rehires",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 228
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "skill_coverage",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.571801464121
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "span_of_control",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 8.467369136641741
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "time_in_stage_hours",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 96
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "time_to_fill_days",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 33
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "training_hours_per_worker",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 20.409362661184
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "metric_id": "voluntary_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.13956249086013645
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "applications_per_opening",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 123.20841268526952
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "average_headcount",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 48437.083333333336
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "compa_ratio_median",
+      "denied": true,
+      "expect_deny": true,
+      "ok": true,
+      "value": null
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "engagement_score",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 3.665744565532
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "headcount",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 49823
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "hires",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 10261
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "internal_mobility_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.051200440433896204
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "involuntary_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.026240225722371807
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "manager_turnover_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.14174058136471415
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "offer_acceptance_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.8414551480003013
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "promotion_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.08297361697735034
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "quality_of_hire",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.5262887260573339
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "recruiter_load",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 7.945454545454545
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "regrettable_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.03400287314299478
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "rehires",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 228
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "skill_coverage",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.571801464121
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "span_of_control",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 8.467369136641741
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "time_in_stage_hours",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 96
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "time_to_fill_days",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 33
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "training_hours_per_worker",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 20.409362661184
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "metric_id": "voluntary_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.13956249086013645
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "applications_per_opening",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 123.20841268526952
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "average_headcount",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 48437.083333333336
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "compa_ratio_median",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.98
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "engagement_score",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 3.665744565532
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "headcount",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 49823
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "hires",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 10261
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "internal_mobility_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.051200440433896204
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "involuntary_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.026240225722371807
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "manager_turnover_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.14174058136471415
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "offer_acceptance_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.8414551480003013
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "promotion_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.08297361697735034
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "quality_of_hire",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.5262887260573339
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "recruiter_load",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 7.945454545454545
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "regrettable_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.03400287314299478
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "rehires",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 228
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "skill_coverage",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.571801464121
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "span_of_control",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 8.467369136641741
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "time_in_stage_hours",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 96
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "time_to_fill_days",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 33
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "training_hours_per_worker",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 20.409362661184
+    },
+    {
+      "identity_id": "demo-people-analyst",
+      "metric_id": "voluntary_attrition_rate",
+      "denied": false,
+      "expect_deny": false,
+      "ok": true,
+      "value": 0.13956249086013645
+    }
+  ],
+  "failed": []
+}

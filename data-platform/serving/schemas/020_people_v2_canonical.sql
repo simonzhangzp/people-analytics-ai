@@ -205,7 +205,8 @@ create table if not exists people_v2.people_evt_worker_change (
   new_value text,
   old_canonical_id text,
   new_canonical_id text,
-  source_object text
+  source_object text,
+  change_reason text
 );
 
 create table if not exists people_v2.people_hist_worker_attr (
@@ -672,5 +673,9 @@ create or replace view people_v2.people_evt_promotion as
 create or replace view people_v2.people_evt_transfer as
   select event_id as transfer_id, worker_id, event_date from people_v2.people_evt_worker where event_type = 'transfer';
 create or replace view people_v2.people_evt_manager_change as
-  select worker_id, event_date from people_v2.people_evt_worker where event_type = 'manager_change';
+  select w.event_id, w.worker_id, w.event_date, c.change_reason
+  from people_v2.people_evt_worker w
+  left join people_v2.people_evt_worker_change c
+    on c.worker_id = w.worker_id and c.event_date = w.event_date and c.property = 'reports_to'
+  where w.event_type = 'manager_change';
 

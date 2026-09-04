@@ -75,16 +75,27 @@ movement:
   promotion_annual: 0.08
   transfer_annual: 0.06
   standalone_manager_change_annual: 0.05
+org:
+  max_depth: 8
+  span_cap: 15
+  ceo_count: 1
+  orphan_manager_at_month_end: 0
 compensation:
   cycle_month: 4
 performance:
   score_min: 1
   score_max: 5
 learning:
-  training_events_per_year: 1000
+  training_events_per_year: 9000  # ~8–10K events/year
+  attendees_per_event: 22
+  hours_choices: [4, 5, 6]  # mean ~5h × ~4 participations → ~20h/worker/year
+  hours_per_worker_year: 20
+  calibration: ATD State of the Industry 2023–2024 US employer-sponsored learning ~15–25 hours/employee/year; events 3–5 per worker.
 skills:
   per_worker: [5, 12]
 recruiting:
+  recruiter_count: 110
+  recruiter_allocation: org_x_region_x_job_family
   openings_vs_hires_cancel_rate: 0.10
   applications_per_opening: [12, 20]  # superseded; use apps_median_by_family
   apps_median_by_family:
@@ -197,7 +208,7 @@ ops:
   app_pooler_port: 6543
   sslmode: require
   rpc_set_config_is_local: true
-  people_app_login: nologin_until_step_7
+  people_app_login: login_step_7
   people_publisher_login: env_only
   people_v2_user_tables: 0
   people_v2_data_api: revoked
