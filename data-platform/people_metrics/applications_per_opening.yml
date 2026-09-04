@@ -2,10 +2,22 @@ metric_id: applications_per_opening
 status: certified
 grain: people_fact_application
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: trailing_12m
+annualized: false
 numerator:
-  expression: applications / openings
+  expression: applications with applied_at in trailing-12m / requisitions with opened_at
+    in the same window
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 60
+- 250
+sources:
+- people_fact_application
+- people_dim_requisition
+window_aligned: true
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+notes: 'BR-DQ-005: numerator and denominator share the trailing-12m window (applied_at
+  and opened_at).'

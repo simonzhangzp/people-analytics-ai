@@ -151,4 +151,88 @@ def load_meta(conn) -> None:
                     [str(cid), row.get("source_system"), row.get("source_object"), row.get("file")],
                 )
     conn.commit()
+    load_serving_control(conn)
     print("loaded_people_v2_meta")
+
+
+def load_serving_control(conn) -> None:
+    """Case 2 extract 08-07 / 08-14 into serving control tables. Lake facts stay LAKE_ONLY_NEVER."""
+    report_path = ROOT / "simulator" / "fixtures" / "rehearsal_1p00" / "report.json"
+    if not report_path.exists():
+        print("skip_serving_control_missing_report")
+        return
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    case2 = report.get("case2") or {}
+    prior = case2.get("prior_full") or {}
+    fault = case2.get("fault") or {}
+    replay = fault.get("replay") or {}
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            insert into people_v2.people_serving_run (run_id, started_at, finished_at, certified, notes)
+            values
+              (%s, timestamptz '2026-08-07 00:00:00+00', timestamptz '2026-08-07 01:00:00+00', true, 'prior full extract'),
+              (%s, timestamptz '2026-08-14 00:00:00+00', timestamptz '2026-08-14 01:00:00+00', false, 'isolated APAC incomplete extract')
+            on conflict (run_id) do update set certified = excluded.certified, notes = excluded.notes
+            """,
+            [f"run-{prior.get('extract_date') or '2026-08-07'}", f"run-{fault.get('extract_date') or '2026-08-14'}"],
+        )
+        cur.execute(
+            """
+            insert into people_v2.people_serving_pointer (pointer_id, as_of, extract_id, moved, notes)
+            values
+              ('certified_as_of', date '2026-08-07', %s, true, 'prior full succeeded'),
+              ('fault_extract', date '2026-08-14', %s, %s, 'pointer does not move on isolated extract')
+            on conflict (pointer_id) do update set moved = excluded.moved, extract_id = excluded.extract_id
+            """,
+            [
+                f"ext-frappe-employee-{prior.get('extract_date') or '2026-08-07'}",
+                f"ext-frappe-employee-{fault.get('extract_date') or '2026-08-14'}",
+                bool(fault.get("pointer_moved")),
+            ],
+        )
+        cur.execute(
+            """
+            insert into people_v2.people_quality_incident
+              (incident_id, extract_date, source_object, status, isolated, details)
+            values (%s, %s, 'Employee', %s, %s, %s::jsonb)
+            on conflict (incident_id) do update set isolated = excluded.isolated, details = excluded.details
+            """,
+            [
+                f"inc-frappe-employee-{fault.get('extract_date') or '2026-08-14'}",
+                fault.get("extract_date") or "2026-08-14",
+                "isolated" if fault.get("isolated") else "ok",
+                bool(fault.get("isolated")),
+                json.dumps(
+                    {
+                        "control_total": fault.get("control_total"),
+                        "rows_received": fault.get("rows_received"),
+                        "mode": fault.get("mode"),
+                    }
+                ),
+            ],
+        )
+        cur.execute(
+            """
+            insert into people_v2.people_replay_metric_value
+              (replay_id, extract_date, metric_id, value_bad, value_expected)
+            values (%s, %s, %s, %s, %s)
+            on conflict (replay_id) do update set value_bad = excluded.value_bad, value_expected = excluded.value_expected
+            """,
+            [
+                f"replay-headcount-{fault.get('extract_date') or '2026-08-14'}",
+                fault.get("extract_date") or "2026-08-14",
+                replay.get("metric_id") or "headcount",
+                replay.get("value_bad"),
+                replay.get("value_expected"),
+            ],
+        )
+        cur.execute(
+            """
+            insert into people_v2.people_metric_health (metric_id, status, reason)
+            values ('headcount', 'healthy', 'case2 replay: serving pointer held on 2026-08-14 isolated extract')
+            on conflict (metric_id) do update set reason = excluded.reason, as_of = now()
+            """
+        )
+    conn.commit()
+    print("loaded_people_v2_serving_control")

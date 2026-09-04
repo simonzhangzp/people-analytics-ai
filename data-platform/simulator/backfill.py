@@ -12,6 +12,7 @@ import os
 import sys
 from datetime import date
 from pathlib import Path
+import shutil
 
 import pyarrow.parquet as pq
 
@@ -66,6 +67,11 @@ def _roll_forward(dq: list[dict]) -> dict | None:
 
 
 def _run_world(prefix: str, apply_case3: bool) -> tuple[dict, object]:
+    for layer in ("people_bronze", "people_silver", "people_gold"):
+        dest = LAKE / layer / prefix
+        if dest.exists():
+            shutil.rmtree(dest)
+            print("wiped", dest, flush=True)
     engine = WorldEngine(SCALE, SEED, apply_case3=apply_case3, lake=LAKE, prefix=prefix)
     state = engine.simulate()
     bronze = emit_bronze(state, LAKE, prefix)
@@ -148,6 +154,27 @@ def main(argv: list[str] | None = None) -> int:
     if not slow_visible:
         print("blocking_case4_tail", case4_ttf, case4_age)
         return 1
+    org = coverage.get("org_tree") or {}
+    span_mean = float(org.get("span_mean") or 0)
+    mgr_share = float(org.get("is_manager_share") or 0)
+    max_depth = int(org.get("max_depth") or 0)
+    if not (5.0 <= span_mean <= 9.0):
+        print("blocking_span_of_control", org)
+        return 1
+    if not (0.10 <= mgr_share <= 0.15):
+        print("blocking_is_manager_share", org)
+        return 1
+    if max_depth > 8:
+        print("blocking_org_depth", org)
+        return 1
+    mgr_rows = {r["group"]: r for r in (signals.get("case3_manager_change") or [])}
+    if "slice" in mgr_rows and "control" in mgr_rows:
+        ctrl = float(mgr_rows["control"].get("changes_per_worker") or 0)
+        slc = float(mgr_rows["slice"].get("changes_per_worker") or 0)
+        ratio = (slc / ctrl) if ctrl else 0.0
+        if not (2.0 <= ratio <= 4.0):
+            print("blocking_case3_manager_change_ratio", ratio, mgr_rows)
+            return 1
     certified_0807 = con.execute(
         """
         SELECT count(*) FROM people_hist_worker_attr h
@@ -245,6 +272,7 @@ def _write_markdown(report: dict) -> Path:
     mobility = coverage.get("mobility") or {}
     learning = coverage.get("learning") or {}
     skills = coverage.get("skills") or {}
+    org = coverage.get("org_tree") or {}
     gap0 = (skills.get("gap_top") or [{}])[0]
     fault = c2.get("fault") or {}
     prior = c2.get("prior_full") or {}
@@ -409,6 +437,23 @@ def _write_markdown(report: dict) -> Path:
         f"| **skills** | 人均技能 **{skills.get('avg_skills_per_worker')}**。{gap0.get('job_family')} × {gap0.get('skill_id')} gap **{round(float(gap0.get('gap') or 0), 2)}**。 |",
         f"| **engagement** | {len(waves)} 波；response rate {min(rr):.2f}–{max(rr):.2f}。 |" if rr else "| **engagement** | 无波次。 |",
         f"| **recruiting** | 见上。取消率 {float(rec.get('cancel_rate') or 0):.2%}。 |",
+        "",
+        "## 管理树（6c-1）",
+        "",
+        f"As-of 2026-08-31 certified：span_of_control 均值 **{float(org.get('span_mean') or 0):.2f}**"
+        f"（门槛 5–9）；is_manager **{float(org.get('is_manager_share') or 0):.2%}**"
+        f"（门槛 10–15%）；max_depth **{org.get('max_depth')}**（≤7）。",
+        "",
+        "| 层级 depth | n |",
+        "| --- | ---: |",
+    ]
+    levels = org.get("level_counts") or {}
+    for depth in sorted(levels, key=lambda k: int(k)):
+        lines.append(f"| {depth} | {int(levels[depth]):,} |")
+    lines += [
+        "",
+        f"recruiter_load（as-of 人均 open req）**{org.get('recruiter_load')}**；"
+        f"skill_coverage **{org.get('skill_coverage')}**。",
         "",
         "## Parquet 体积（主 gold `rehearsal_1p00`）",
         "",

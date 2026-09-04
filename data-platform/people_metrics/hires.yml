@@ -1,11 +1,21 @@
 metric_id: hires
 status: certified
-grain: people_evt_worker
+grain: people_snap_worker_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: trailing_12m
+annualized: false
 numerator:
-  expression: count hire/rehire in month
+  expression: certified hired_in_month ∧ via_t1 ∧ not is_rehire
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 5000
+- 25000
+sources:
+- people_snap_worker_month
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+notes: External hires only. hires_total = hires + rehires (derived, not a separate
+  RPC).

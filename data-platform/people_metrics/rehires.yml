@@ -1,21 +1,19 @@
-metric_id: average_headcount
+metric_id: rehires
 status: certified
 grain: people_snap_worker_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
 time_logic: trailing_12m
 annualized: false
 numerator:
-  expression: mean of month-end certified headcount
+  expression: certified hired_in_month ∧ is_rehire
 min_cell: 5
 sensitivity: internal
 expected_range:
-- 30000
-- 55000
+- 0
+- 3000
 sources:
 - people_snap_worker_month
 window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
-notes: Default trailing-12m month-end certified mean. grain=month returns that month's
-  certified HC. Attrition denominators reference this metric.

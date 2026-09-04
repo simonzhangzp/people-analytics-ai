@@ -2,12 +2,20 @@ metric_id: involuntary_attrition_rate
 status: certified
 grain: people_snap_worker_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: trailing_12m
+annualized: true
 numerator:
-  expression: terminated_in_month ∧ involuntary
-denominator:
-  expression: average_headcount
+  expression: terminated_in_month ∧ involuntary (sum over window)
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 0.01
+- 0.1
+sources:
+- people_snap_worker_month
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+denominator:
+  expression: average_headcount

@@ -2,10 +2,21 @@ metric_id: time_in_stage_hours
 status: certified
 grain: people_evt_application_stage
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: trailing_12m
+annualized: false
 numerator:
-  expression: median(exited-entered)
+  expression: median hours in each canonical_stage and overall (exited-entered; open
+    stages use entered as both ends)
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 24
+- 2000
+sources:
+- people_evt_application_stage
+window_aligned: true
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+notes: RPC value is the overall median; payload.by_stage has Review/Screen/Onsite/Offer
+  medians. Window is entered_at in trailing-12m (aligned to the published hot window).

@@ -348,7 +348,8 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
           ON r.employee = e.employee AND r.training_event = e.parent;
 
         CREATE TABLE people_fact_worker_skill AS
-        SELECT employee AS worker_id, skill AS skill_id, proficiency,
+        SELECT employee AS worker_id, skill AS skill_id,
+               CAST(greatest(1, round(coalesce(proficiency, 0) * 5)) AS INTEGER) AS proficiency,
                CAST(evaluation_date AS DATE) AS evaluation_date, parent AS source_skill_map, job_family
         FROM bronze_skill;
 
@@ -360,7 +361,15 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
     con.execute(
         f"""
         CREATE TABLE people_hist_worker_attr AS
-        WITH ordered AS (
+        WITH covering AS (
+          SELECT *
+          FROM bronze_employee
+          QUALIFY row_number() OVER (
+            PARTITION BY name, CAST(modified_date AS DATE)
+            ORDER BY emit_seq DESC, modified DESC
+          ) = 1
+        ),
+        ordered AS (
           SELECT
             name AS worker_id,
             person_id,
@@ -379,17 +388,29 @@ def transform(bronze: Path, silver: Path, gold: Path) -> duckdb.DuckDBPyConnecti
             is_rehire,
             via_t1,
             reason_for_leaving,
-            CAST(modified_date AS DATE) AS valid_from,
-            lead(CAST(modified_date AS DATE)) OVER (PARTITION BY name ORDER BY emit_seq, modified_date, modified) AS next_from
-          FROM bronze_employee
+            emit_seq,
+            CAST(modified_date AS DATE) AS raw_from
+          FROM covering
+        ),
+        clamped AS (
+          SELECT
+            worker_id, person_id, hire_date, termination_date, status, employment_type,
+            region, job_family, department, designation, grade, branch, reports_to,
+            hired_via_application_id, is_rehire, via_t1, reason_for_leaving, emit_seq,
+            CASE WHEN raw_from < hire_date THEN hire_date ELSE raw_from END AS valid_from
+          FROM ordered
+        ),
+        collapsed AS (
+          SELECT * FROM clamped
+          QUALIFY row_number() OVER (PARTITION BY worker_id, valid_from ORDER BY emit_seq DESC) = 1
         )
         SELECT
           worker_id, person_id, hire_date, termination_date, status, employment_type,
           region, job_family, department, designation, grade, branch, reports_to,
           hired_via_application_id, is_rehire, via_t1, reason_for_leaving,
-          CASE WHEN valid_from < hire_date THEN hire_date ELSE valid_from END AS valid_from,
-          next_from AS valid_to
-        FROM ordered;
+          valid_from,
+          lead(valid_from) OVER (PARTITION BY worker_id ORDER BY valid_from, emit_seq) AS valid_to
+        FROM collapsed;
 
         CREATE TABLE people_dim_worker AS
         SELECT

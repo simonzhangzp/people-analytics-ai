@@ -15,7 +15,11 @@ def load_baseline(path: Path | None = None) -> dict:
 
 @dataclass
 class TinyWorld:
-    """Deterministic miniature world for T1–T13 tests. Not the 80k backfill."""
+    """Deterministic miniature world for T1–T13 tests. Not the 80k backfill.
+
+    Scale=1.0 management trees (leader → managers → IC, span ~7) live in
+    simulator/engine.py + simulator/org_tree.py, not this fixture.
+    """
 
     seed: int
     company: str = "GlobalTech"

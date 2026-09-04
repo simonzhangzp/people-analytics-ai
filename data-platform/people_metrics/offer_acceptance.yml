@@ -2,10 +2,18 @@ metric_id: offer_acceptance_rate
 status: certified
 grain: people_fact_offer
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: trailing_12m
+annualized: false
 numerator:
-  expression: accepted / resolved
+  expression: accepted / (accepted+rejected) in window
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 0.5
+- 0.95
+sources:
+- people_fact_offer
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric

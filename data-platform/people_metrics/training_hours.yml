@@ -1,13 +1,21 @@
 metric_id: training_hours_per_worker
 status: certified
-grain: people_fact_training_participation
+grain: people_mart_learning_monthly
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: trailing_12m
+annualized: false
 numerator:
-  expression: sum(hours)
-denominator:
-  expression: average_headcount
+  expression: sum(training_hours) over trailing-12m
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 1
+- 40
+sources:
+- people_mart_learning_monthly
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+denominator:
+  expression: average_headcount

@@ -2,12 +2,20 @@ metric_id: internal_mobility_rate
 status: certified
 grain: people_snap_worker_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: trailing_12m
+annualized: true
 numerator:
-  expression: transferred_in_month
-denominator:
-  expression: average_headcount
+  expression: transferred_in_month ∧ is_certified (sum over window)
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 0.02
+- 0.2
+sources:
+- people_snap_worker_month
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+denominator:
+  expression: average_headcount

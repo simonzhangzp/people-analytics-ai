@@ -2,12 +2,24 @@ metric_id: quality_of_hire
 status: certified
 grain: people_snap_worker_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: as_of
+annualized: false
 numerator:
-  expression: 12m retention ∧ first score ≥ 3.5
-denominator:
-  expression: hires 12m ago
+  expression: still certified at as_of AND first appraisal final_score ≥ 3.5
 min_cell: 10
 sensitivity: confidential
+expected_range:
+- 0.15
+- 0.85
+sources:
+- people_snap_worker_month
+- people_fact_appraisal
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+denominator:
+  expression: via_t1 hires whose hire_date is in (as_of-24m, as_of-12m] (12-month
+    retention window has closed)
+notes: 'Composition: 12-month retention × first final_score ≥ 3.5. Missing first appraisal
+  fails the score clause.'

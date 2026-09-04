@@ -249,3 +249,33 @@ rules:
       extract_filter_note: Full extract includes Left. Employed count is derived (BR-WF-001). Absence means the Employee document is missing, not status=Left.
       full_extract_dow: Friday
       other_days_mode: incremental
+  BR-DQ-004:
+    domain: quality
+    kind: structural
+    provenance: DERIVED
+    statement: >
+      Same-calendar-day Employee versions are ordered by emit_seq (synthetic
+      tie-break). The covering SCD2 row is the last emit_seq of that day.
+      Real Frappe corresponds to the Version table / idx, not this simulator
+      column. Certified headcount uses that covering row's status and
+      employment_type (BR-WF-001).
+    params:
+      order: [emit_seq, modified_date, modified]
+      covering: last_of_calendar_day
+      frappe_equivalent: Version.idx
+      attribute_that_flips_certified: status
+  BR-DQ-005:
+    domain: quality
+    kind: structural
+    statement: >
+      A metric that reads a hot-window table (published last 12 months) must
+      set window_aligned: true and use the same trailing-12m window for every
+      input. Serving YAML check is blocking.
+    params:
+      hot_window_tables:
+        - people_fact_application
+        - people_evt_application_stage
+        - people_fact_interview
+        - people_fact_scorecard
+        - people_dim_candidate
+      yaml_flag: window_aligned

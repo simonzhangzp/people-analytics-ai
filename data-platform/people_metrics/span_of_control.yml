@@ -2,12 +2,20 @@ metric_id: span_of_control
 status: certified
 grain: people_snap_worker_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: as_of
+annualized: false
 numerator:
-  expression: direct_report_count
-denominator:
-  expression: managers
+  expression: avg(direct_report_count) among is_manager ∧ is_certified
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 4
+- 12
+sources:
+- people_snap_worker_month
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+denominator:
+  expression: managers

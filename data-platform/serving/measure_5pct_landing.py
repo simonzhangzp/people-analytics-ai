@@ -141,15 +141,34 @@ def _coerce(df: pd.DataFrame, table: str, cols: list[str]) -> pd.DataFrame:
     return subset
 
 
-def _cast_ints(subset: pd.DataFrame, keep: list[str], types: dict[str, tuple[str, str]]) -> pd.DataFrame:
+def _as_bool(v):
+    if v is None or (isinstance(v, float) and pd.isna(v)):
+        return None
+    if isinstance(v, bool):
+        return v
+    s = str(v).strip().lower()
+    if s in {"true", "t", "1", "yes"}:
+        return True
+    if s in {"false", "f", "0", "no", ""}:
+        return False if s != "" else None
+    return None
+
+
+def _cast_pg_types(subset: pd.DataFrame, keep: list[str], types: dict[str, tuple[str, str]]) -> pd.DataFrame:
     int_udt = {"int2", "int4", "int8"}
     int_types = {"smallint", "integer", "bigint"}
+    float_types = {"double precision", "real", "numeric"}
+    float_udt = {"float4", "float8", "numeric"}
     for col in keep:
         if col not in subset.columns:
             continue
         dtype, udt = types[col]
-        if dtype in int_types or udt in int_udt:
+        if dtype == "boolean" or udt == "bool":
+            subset[col] = subset[col].map(_as_bool)
+        elif dtype in int_types or udt in int_udt:
             subset[col] = pd.to_numeric(subset[col], errors="coerce").astype("Int64")
+        elif dtype in float_types or udt in float_udt:
+            subset[col] = pd.to_numeric(subset[col], errors="coerce")
     return subset
 
 
@@ -181,27 +200,42 @@ def _load_table(conn, table: str, path: Path, relkind: str) -> int:
     if not keep:
         print("skip_no_matching_columns", table)
         return 0
-    total = 0
+    staging = f"{table}_staging"
     col_list = ", ".join(keep)
     with conn.cursor() as cur:
         cur.execute("SET statement_timeout = 0")
         cur.execute("SET idle_in_transaction_session_timeout = 0")
+        cur.execute(f"drop table if exists people_v2.{staging} cascade")
+        cur.execute(f"create table people_v2.{staging} (like people_v2.{table} including all)")
     conn.commit()
-    for batch in parquet.iter_batches(columns=keep, batch_size=50_000):
-        subset = _coerce(batch.to_pandas(), table, keep)
-        subset = _cast_ints(subset, keep, types)
-        if subset.empty:
-            continue
-        buf = StringIO()
-        subset.to_csv(buf, index=False, header=False, na_rep="\\N")
+    total = 0
+    try:
+        for batch in parquet.iter_batches(columns=keep, batch_size=50_000):
+            subset = _coerce(batch.to_pandas(), table, keep)
+            subset = _cast_pg_types(subset, keep, types)
+            if subset.empty:
+                continue
+            buf = StringIO()
+            subset.to_csv(buf, index=False, header=False, na_rep="\\N")
+            with conn.cursor() as cur:
+                with cur.copy(
+                    f"COPY people_v2.{staging} ({col_list}) FROM STDIN WITH (FORMAT csv, NULL '\\N')"
+                ) as copy:
+                    copy.write(buf.getvalue())
+            conn.commit()
+            total += len(subset)
         with conn.cursor() as cur:
-            with cur.copy(
-                f"COPY people_v2.{table} ({col_list}) FROM STDIN WITH (FORMAT csv, NULL '\\N')"
-            ) as copy:
-                copy.write(buf.getvalue())
+            cur.execute("SET statement_timeout = 0")
+            cur.execute(f"drop table people_v2.{table} cascade")
+            cur.execute(f"alter table people_v2.{staging} rename to {table}")
         conn.commit()
-        total += len(subset)
-    return total
+        return total
+    except Exception:
+        conn.rollback()
+        with conn.cursor() as cur:
+            cur.execute(f"drop table if exists people_v2.{staging} cascade")
+        conn.commit()
+        raise
 
 
 def _relation_sizes(conn) -> list[dict]:

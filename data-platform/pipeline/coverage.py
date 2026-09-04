@@ -3,6 +3,67 @@ from __future__ import annotations
 """Gold coverage, funnel, and Case 3/4 signal queries for rehearsal reports."""
 
 
+def org_tree_stats(con) -> dict:
+    as_of = "DATE '2026-08-31'"
+    span = con.execute(
+        f"""
+        SELECT
+          avg(direct_report_count) AS span_mean,
+          min(direct_report_count) AS span_min,
+          max(direct_report_count) AS span_max,
+          count(*) AS n_managers
+        FROM people_snap_worker_month
+        WHERE month_end = {as_of} AND is_manager AND is_certified
+        """
+    ).fetchone()
+    hc = con.execute(
+        f"SELECT count(*) FROM people_snap_worker_month WHERE month_end = {as_of} AND is_certified"
+    ).fetchone()[0]
+    depths = con.execute(
+        f"""
+        WITH RECURSIVE chain AS (
+          SELECT worker_id, manager_worker_id, 0 AS depth
+          FROM people_snap_worker_month
+          WHERE month_end = {as_of} AND is_certified
+            AND (manager_worker_id IS NULL OR manager_worker_id NOT IN (
+              SELECT worker_id FROM people_snap_worker_month
+              WHERE month_end = {as_of} AND is_certified
+            ))
+          UNION ALL
+          SELECT s.worker_id, s.manager_worker_id, c.depth + 1
+          FROM people_snap_worker_month s
+          JOIN chain c ON s.manager_worker_id = c.worker_id
+          WHERE s.month_end = {as_of} AND s.is_certified AND c.depth < 8
+        )
+        SELECT depth, count(*) AS n
+        FROM chain
+        GROUP BY 1
+        ORDER BY 1
+        """
+    ).fetchdf()
+    skill = con.execute(
+        f"SELECT avg(coverage_ratio) FROM people_mart_skill_coverage_monthly WHERE month_end = {as_of}"
+    ).fetchone()[0]
+    open_req = con.execute(
+        f"""
+        SELECT coalesce(avg(open_requisitions), 0)
+        FROM people_snap_recruiter_month WHERE month_end = {as_of}
+        """
+    ).fetchone()[0]
+    n_mgr = int(span[3] or 0)
+    return {
+        "span_mean": round(float(span[0] or 0), 4),
+        "span_min": int(span[1] or 0),
+        "span_max": int(span[2] or 0),
+        "n_managers": n_mgr,
+        "is_manager_share": round(n_mgr / hc, 4) if hc else 0,
+        "level_counts": {str(int(r.depth)): int(r.n) for r in depths.itertuples()},
+        "max_depth": int(depths["depth"].max()) if len(depths) else 0,
+        "skill_coverage": round(float(skill or 0), 4),
+        "recruiter_load": round(float(open_req or 0), 4),
+    }
+
+
 def coverage_matrix(con) -> dict:
     ending_hc = con.execute(
         "SELECT count(*) FROM people_snap_worker_month WHERE month_end = DATE '2026-08-31' AND is_certified"
@@ -121,6 +182,7 @@ def coverage_matrix(con) -> dict:
         """
     ).fetchone()
     cancel_rate = (openings[1] / openings[0]) if openings[0] else 0
+    org = org_tree_stats(con)
     return {
         "comp": {
             "ssa_rows": int(ssa_n),
@@ -187,6 +249,7 @@ def coverage_matrix(con) -> dict:
             "cancel_rate": round(float(cancel_rate), 4),
             "baseline_cancel_rate": 0.10,
         },
+        "org_tree": org,
     }
 
 

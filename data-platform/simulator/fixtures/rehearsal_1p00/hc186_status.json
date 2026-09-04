@@ -1,0 +1,23 @@
+{
+  "attribute": "status",
+  "employment_type_same_day_diff": 0,
+  "same_day_multi_worker_days": 837,
+  "same_day_status_diff_days": 441,
+  "first_of_day_certified": 50252,
+  "last_of_day_certified": 49834,
+  "hist_emit_seq_certified": 49834,
+  "certified_flip_first_vs_last": 418,
+  "status_pairs": [
+    {
+      "first_status": "Active",
+      "last_status": "Left",
+      "n": 439
+    },
+    {
+      "first_status": "Active",
+      "last_status": "Suspended",
+      "n": 2
+    }
+  ],
+  "note": "6a unstable same-day order landed between first-of-day and last-of-day; 6b last-of-emit_seq is the certified rule (BR-DQ-004)."
+}

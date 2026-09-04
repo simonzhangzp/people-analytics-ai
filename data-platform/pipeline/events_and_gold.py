@@ -81,11 +81,19 @@ def build_events_and_gold(con) -> None:
             )
             AND (ph.current IS DISTINCT FROM ph.new)
         ),
+        covering_emp AS (
+          SELECT *
+          FROM bronze_employee
+          QUALIFY row_number() OVER (
+            PARTITION BY name, CAST(modified_date AS DATE)
+            ORDER BY emit_seq DESC, modified DESC
+          ) = 1
+        ),
         emp_lag AS (
           SELECT
             name AS worker_id,
             CAST(modified_date AS DATE) AS event_date,
-            row_number() OVER (PARTITION BY name ORDER BY emit_seq, modified_date, modified) AS rn,
+            row_number() OVER (PARTITION BY name ORDER BY CAST(modified_date AS DATE), emit_seq) AS rn,
             department, lag(department) OVER w AS prev_department,
             designation, lag(designation) OVER w AS prev_designation,
             grade, lag(grade) OVER w AS prev_grade,
@@ -93,8 +101,8 @@ def build_events_and_gold(con) -> None:
             reports_to, lag(reports_to) OVER w AS prev_reports_to,
             employment_type, lag(employment_type) OVER w AS prev_employment_type,
             status, lag(status) OVER w AS prev_status
-          FROM bronze_employee
-          WINDOW w AS (PARTITION BY name ORDER BY emit_seq, modified_date, modified)
+          FROM covering_emp
+          WINDOW w AS (PARTITION BY name ORDER BY CAST(modified_date AS DATE), emit_seq)
         ),
         extract_raw AS (
           SELECT worker_id, event_date, 'department' AS property,
@@ -143,10 +151,80 @@ def build_events_and_gold(con) -> None:
               AND ph.event_date = e.event_date
               AND ph.property = e.property
           )
+        ),
+        raw AS (
+          SELECT * FROM ph
+          UNION ALL
+          SELECT * FROM extract_diff
+        ),
+        hist_sw AS (
+          SELECT worker_id, event_date, property, old_value, new_value FROM (
+            SELECT worker_id, valid_from AS event_date, 'department' AS property,
+                   CAST(lag(org_id) OVER w AS VARCHAR) AS old_value,
+                   CAST(org_id AS VARCHAR) AS new_value,
+                   lag(org_id) OVER w AS prev_val, org_id AS cur_val,
+                   row_number() OVER w AS rn
+            FROM people_hist_worker_attr
+            WINDOW w AS (PARTITION BY worker_id ORDER BY valid_from, coalesce(valid_to, DATE '9999-12-31'))
+          ) t WHERE rn > 1 AND prev_val IS DISTINCT FROM cur_val
+          UNION ALL
+          SELECT worker_id, event_date, property, old_value, new_value FROM (
+            SELECT worker_id, valid_from AS event_date, 'designation' AS property,
+                   CAST(lag(job_id) OVER w AS VARCHAR) AS old_value,
+                   CAST(job_id AS VARCHAR) AS new_value,
+                   lag(job_id) OVER w AS prev_val, job_id AS cur_val,
+                   row_number() OVER w AS rn
+            FROM people_hist_worker_attr
+            WINDOW w AS (PARTITION BY worker_id ORDER BY valid_from, coalesce(valid_to, DATE '9999-12-31'))
+          ) t WHERE rn > 1 AND prev_val IS DISTINCT FROM cur_val
+          UNION ALL
+          SELECT worker_id, event_date, property, old_value, new_value FROM (
+            SELECT worker_id, valid_from AS event_date, 'grade' AS property,
+                   CAST(lag(grade_id) OVER w AS VARCHAR) AS old_value,
+                   CAST(grade_id AS VARCHAR) AS new_value,
+                   lag(grade_id) OVER w AS prev_val, grade_id AS cur_val,
+                   row_number() OVER w AS rn
+            FROM people_hist_worker_attr
+            WINDOW w AS (PARTITION BY worker_id ORDER BY valid_from, coalesce(valid_to, DATE '9999-12-31'))
+          ) t WHERE rn > 1 AND prev_val IS DISTINCT FROM cur_val
+          UNION ALL
+          SELECT worker_id, event_date, property, old_value, new_value FROM (
+            SELECT worker_id, valid_from AS event_date, 'branch' AS property,
+                   CAST(lag(location_id) OVER w AS VARCHAR) AS old_value,
+                   CAST(location_id AS VARCHAR) AS new_value,
+                   lag(location_id) OVER w AS prev_val, location_id AS cur_val,
+                   row_number() OVER w AS rn
+            FROM people_hist_worker_attr
+            WINDOW w AS (PARTITION BY worker_id ORDER BY valid_from, coalesce(valid_to, DATE '9999-12-31'))
+          ) t WHERE rn > 1 AND prev_val IS DISTINCT FROM cur_val
+          UNION ALL
+          SELECT worker_id, event_date, property, old_value, new_value FROM (
+            SELECT worker_id, valid_from AS event_date, 'reports_to' AS property,
+                   CAST(lag(manager_worker_id) OVER w AS VARCHAR) AS old_value,
+                   CAST(manager_worker_id AS VARCHAR) AS new_value,
+                   lag(manager_worker_id) OVER w AS prev_val, manager_worker_id AS cur_val,
+                   row_number() OVER w AS rn
+            FROM people_hist_worker_attr
+            WINDOW w AS (PARTITION BY worker_id ORDER BY valid_from, coalesce(valid_to, DATE '9999-12-31'))
+          ) t WHERE rn > 1 AND prev_val IS DISTINCT FROM cur_val
         )
-        SELECT * FROM ph
-        UNION ALL
-        SELECT * FROM extract_diff;
+        SELECT
+          coalesce(r.event_id, 'extract-' || h.worker_id || '-' || CAST(h.event_date AS VARCHAR) || '-' || h.property) AS event_id,
+          h.worker_id,
+          h.event_date,
+          h.property,
+          coalesce(r.old_value, h.old_value) AS old_value,
+          coalesce(r.new_value, h.new_value) AS new_value,
+          coalesce(r.old_canonical_id, h.old_value) AS old_canonical_id,
+          coalesce(r.new_canonical_id, h.new_value) AS new_canonical_id,
+          coalesce(r.source_object, 'Employee (extract diff)') AS source_object
+        FROM hist_sw h
+        LEFT JOIN raw r
+          ON r.worker_id = h.worker_id AND r.event_date = h.event_date AND r.property = h.property
+        QUALIFY row_number() OVER (
+          PARTITION BY h.worker_id, h.event_date, h.property
+          ORDER BY r.event_id NULLS LAST
+        ) = 1;
         """
     )
 
@@ -168,6 +246,15 @@ def build_events_and_gold(con) -> None:
         JOIN people_dim_worker w ON w.worker_id = ch.worker_id
         WHERE ch.property = 'reports_to'
           AND ch.source_object = 'Employee (extract diff)'
+          AND ch.old_value IS NOT NULL
+          AND EXISTS (
+            SELECT 1 FROM people_hist_worker_attr h
+            WHERE h.worker_id = ch.old_value
+              AND h.valid_from <= ch.event_date
+              AND (h.valid_to IS NULL OR h.valid_to > ch.event_date)
+              AND h.status IN ('Active', 'Suspended')
+              AND h.employment_type IN ('Full-time', 'Part-time', 'Probation')
+          )
           AND NOT EXISTS (
             SELECT 1 FROM people_evt_worker e
             WHERE e.worker_id = ch.worker_id
@@ -248,7 +335,8 @@ def build_events_and_gold(con) -> None:
           3 AS target_proficiency,
           3.0 AS onet_importance
         FROM people_xw_job j
-        JOIN people_fact_worker_skill s ON s.job_family = j.job_family;
+        JOIN people_fact_worker_skill s ON s.job_family = j.job_family
+        WHERE s.skill_id IS NOT NULL;
 
         CREATE TABLE people_fact_candidate_eeoc_restricted AS
         SELECT application_id, race, gender, veteran_status, disability_status, CAST(submitted_at AS TIMESTAMP) AS submitted_at
@@ -512,6 +600,7 @@ def build_events_and_gold(con) -> None:
           FROM people_fact_interview i
           JOIN people_fact_application a ON a.application_id = i.application_id
           JOIN people_dim_requisition r ON r.requisition_id = a.requisition_id
+          WHERE r.recruiter_id IS NOT NULL
           GROUP BY 1,2
         ),
         hired AS (
@@ -521,7 +610,7 @@ def build_events_and_gold(con) -> None:
             count(*) AS hires
           FROM people_fact_offer o
           JOIN people_dim_requisition r ON r.requisition_id = o.requisition_id
-          WHERE o.status = 'accepted'
+          WHERE o.status = 'accepted' AND r.recruiter_id IS NOT NULL
           GROUP BY 1,2
         )
         SELECT
@@ -536,7 +625,8 @@ def build_events_and_gold(con) -> None:
           count(*) FILTER (WHERE s.is_open) AS avg_req_load,
           sum(s.applications_active) AS candidate_load
         FROM people_snap_requisition_month s
-        JOIN people_dim_requisition r ON r.requisition_id = s.requisition_id
+        JOIN people_dim_requisition r
+          ON r.requisition_id = s.requisition_id AND r.recruiter_id IS NOT NULL
         LEFT JOIN iv
           ON iv.recruiter_user_id = r.recruiter_id
          AND iv.month_start = date_trunc('month', s.month_end)
@@ -655,17 +745,39 @@ def build_events_and_gold(con) -> None:
         GROUP BY 1;
 
         CREATE OR REPLACE TABLE people_mart_skill_coverage_monthly AS
+        WITH targets AS (
+          SELECT job_id, skill_id, coalesce(target_proficiency, 3) AS target_proficiency
+          FROM people_ref_job_skill_target
+        ),
+        target_n AS (
+          SELECT job_id, count(*) AS n_target
+          FROM targets
+          GROUP BY 1
+          HAVING count(*) > 0
+        ),
+        worker_cov AS (
+          SELECT
+            s.month_end,
+            s.org_id,
+            s.org_path,
+            s.job_family,
+            s.worker_id,
+            count(*) FILTER (
+              WHERE k.skill_id IS NOT NULL
+                AND coalesce(k.proficiency, 0) >= t.target_proficiency
+            ) * 1.0 / tn.n_target AS coverage_ratio
+          FROM people_snap_worker_month s
+          JOIN target_n tn ON tn.job_id = s.job_id
+          JOIN targets t ON t.job_id = s.job_id
+          LEFT JOIN people_fact_worker_skill k
+            ON k.worker_id = s.worker_id AND k.skill_id = t.skill_id
+          WHERE s.is_certified
+          GROUP BY 1,2,3,4,5, tn.n_target
+        )
         SELECT
-          s.month_end,
-          s.org_id,
-          s.org_path,
-          s.job_family,
-          avg(CASE WHEN k.cnt > 0 THEN 1.0 ELSE 0.0 END) AS coverage_ratio
-        FROM people_snap_worker_month s
-        LEFT JOIN (
-          SELECT worker_id, count(*) AS cnt FROM people_fact_worker_skill GROUP BY 1
-        ) k ON k.worker_id = s.worker_id
-        WHERE s.is_certified
+          month_end, org_id, org_path, job_family,
+          avg(coverage_ratio) AS coverage_ratio
+        FROM worker_cov
         GROUP BY 1,2,3,4;
 
         CREATE OR REPLACE TABLE people_mart_engagement_wave AS

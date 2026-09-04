@@ -5,49 +5,323 @@ note: Gold snapshots and marts. Combined with canonical_model.yml for people_v2 
 tables:
 - name: people_snap_worker_month
   key: worker_id
-  columns: [worker_id, person_id, month_end, month_start, org_id, org_path, job_id, job_family, grade_id, level_rank, location_id, country, region, manager_worker_id, employment_type, status, is_certified, hire_date, tenure_band, tenure_months, hired_in_month, terminated_in_month, termination_category, via_t1, is_rehire, promoted_in_month, transferred_in_month, manager_changed_in_month, comp_changed_in_month, is_manager, direct_report_count, is_regrettable]
+  columns:
+  - name: worker_id
+    type: text
+  - name: person_id
+    type: text
+  - name: month_end
+    type: date
+  - name: month_start
+    type: date
+  - name: org_id
+    type: text
+  - name: org_path
+    type: ltree
+  - name: job_id
+    type: text
+  - name: job_family
+    type: text
+  - name: grade_id
+    type: text
+  - name: level_rank
+    type: bigint
+  - name: location_id
+    type: text
+  - name: country
+    type: text
+  - name: region
+    type: text
+  - name: manager_worker_id
+    type: text
+  - name: employment_type
+    type: text
+  - name: status
+    type: text
+  - name: is_certified
+    type: boolean
+  - name: hire_date
+    type: date
+  - name: tenure_band
+    type: text
+  - name: tenure_months
+    type: bigint
+  - name: hired_in_month
+    type: boolean
+  - name: terminated_in_month
+    type: boolean
+  - name: termination_category
+    type: text
+  - name: via_t1
+    type: boolean
+  - name: is_rehire
+    type: boolean
+  - name: promoted_in_month
+    type: boolean
+  - name: transferred_in_month
+    type: boolean
+  - name: manager_changed_in_month
+    type: boolean
+  - name: comp_changed_in_month
+    type: boolean
+  - name: is_manager
+    type: boolean
+  - name: direct_report_count
+    type: bigint
+  - name: is_regrettable
+    type: boolean
 - name: people_snap_requisition_month
   key: requisition_id
-  columns: [month_end, requisition_id, job_family, hiring_manager_id, is_open, days_open, applications_active, offers_outstanding]
+  columns:
+  - name: month_end
+    type: date
+  - name: requisition_id
+    type: bigint
+  - name: job_family
+    type: text
+  - name: hiring_manager_id
+    type: bigint
+  - name: is_open
+    type: boolean
+  - name: days_open
+    type: bigint
+  - name: applications_active
+    type: bigint
+  - name: offers_outstanding
+    type: bigint
 - name: people_snap_recruiter_month
   key: recruiter_user_id
-  columns: [month_end, recruiter_user_id, person_id, open_requisitions, active_applications, interviews_scheduled, offers_sent, hires, avg_req_load, candidate_load]
+  columns:
+  - name: month_end
+    type: date
+  - name: recruiter_user_id
+    type: bigint
+  - name: person_id
+    type: text
+  - name: open_requisitions
+    type: bigint
+  - name: active_applications
+    type: bigint
+  - name: interviews_scheduled
+    type: bigint
+  - name: offers_sent
+    type: bigint
+  - name: hires
+    type: bigint
+  - name: avg_req_load
+    type: bigint
+  - name: candidate_load
+    type: bigint
 - name: people_mart_workforce_monthly
   key: month_end
-  columns: [month_end, org_id, org_path, region, tenure_band, job_family, headcount, hires, terms_vol, terms_invol]
+  columns:
+  - name: month_end
+    type: date
+  - name: org_id
+    type: text
+  - name: org_path
+    type: ltree
+  - name: region
+    type: text
+  - name: tenure_band
+    type: text
+  - name: job_family
+    type: text
+  - name: headcount
+    type: bigint
+  - name: hires
+    type: bigint
+  - name: terms_vol
+    type: bigint
+  - name: terms_invol
+    type: bigint
 - name: people_mart_workforce_monthly_2d
   key: month_end
-  columns: [month_end, org_id, org_path, location_id, region, tenure_band, grain, headcount, hires, terms_vol]
+  columns:
+  - name: month_end
+    type: date
+  - name: org_id
+    type: text
+  - name: org_path
+    type: ltree
+  - name: location_id
+    type: text
+  - name: region
+    type: text
+  - name: tenure_band
+    type: text
+  - name: grain
+    type: text
+  - name: headcount
+    type: bigint
+  - name: hires
+    type: bigint
+  - name: terms_vol
+    type: bigint
 - name: people_mart_mobility_monthly
   key: month_start
-  columns: [month_start, org_id, org_path, promotions, transfers, internal_mobility, manager_changes]
+  columns:
+  - name: month_start
+    type: date
+  - name: org_id
+    type: text
+  - name: org_path
+    type: ltree
+  - name: promotions
+    type: bigint
+  - name: transfers
+    type: bigint
+  - name: internal_mobility
+    type: bigint
+  - name: manager_changes
+    type: bigint
 - name: people_mart_recruiting_monthly
   key: month_start
-  columns: [month_start, offers_accepted, offers_resolved, hires]
+  columns:
+  - name: month_start
+    type: date
+  - name: offers_accepted
+    type: bigint
+  - name: offers_resolved
+    type: bigint
+  - name: hires
+    type: bigint
 - name: people_mart_stage_aging_monthly
   key: month_start
-  columns: [month_start, canonical_stage, org_id, org_path, aging_p50_days]
+  columns:
+  - name: month_start
+    type: date
+  - name: canonical_stage
+    type: text
+  - name: org_id
+    type: text
+  - name: org_path
+    type: ltree
+  - name: aging_p50_days
+    type: double precision
 - name: people_mart_recruiter_load_monthly
   key: month_end
-  columns: [month_end, recruiter_user_id, person_id, open_requisitions, active_applications, interviews_scheduled, offers_sent, hires, avg_req_load, candidate_load]
+  columns:
+  - name: month_end
+    type: date
+  - name: recruiter_user_id
+    type: bigint
+  - name: person_id
+    type: text
+  - name: open_requisitions
+    type: bigint
+  - name: active_applications
+    type: bigint
+  - name: interviews_scheduled
+    type: bigint
+  - name: offers_sent
+    type: bigint
+  - name: hires
+    type: bigint
+  - name: avg_req_load
+    type: bigint
+  - name: candidate_load
+    type: bigint
 - name: people_mart_comp_monthly
   key: month_end
-  columns: [month_end, org_id, org_path, job_family, region, grade_id, n, compa_p25, compa_p50, compa_p75]
+  columns:
+  - name: month_end
+    type: date
+  - name: org_id
+    type: text
+  - name: org_path
+    type: ltree
+  - name: job_family
+    type: text
+  - name: region
+    type: text
+  - name: grade_id
+    type: text
+  - name: n
+    type: bigint
+  - name: compa_p25
+    type: double precision
+  - name: compa_p50
+    type: double precision
+  - name: compa_p75
+    type: double precision
 - name: people_mart_learning_monthly
   key: month_start
-  columns: [month_start, participants, training_hours, completion]
+  columns:
+  - name: month_start
+    type: date
+  - name: participants
+    type: bigint
+  - name: training_hours
+    type: double precision
+  - name: completion
+    type: bigint
 - name: people_mart_skill_coverage_monthly
   key: month_end
-  columns: [month_end, org_id, org_path, job_family, coverage_ratio]
+  columns:
+  - name: month_end
+    type: date
+  - name: org_id
+    type: text
+  - name: org_path
+    type: ltree
+  - name: job_family
+    type: text
+  - name: coverage_ratio
+    type: double precision
 - name: people_mart_engagement_wave
   key: wave_id
-  columns: [wave_id, dimension, org_id, org_path, n, mean, favorable_pct]
+  columns:
+  - name: wave_id
+    type: text
+  - name: dimension
+    type: text
+  - name: org_id
+    type: text
+  - name: org_path
+    type: ltree
+  - name: n
+    type: bigint
+  - name: mean
+    type: double precision
+  - name: favorable_pct
+    type: double precision
 - name: people_mart_source_health_daily
   key: extract_date
-  columns: [extract_date, source_system, source_object, control_total, rows_received, freshness_hours, tests_failed]
+  columns:
+  - name: extract_date
+    type: date
+  - name: source_system
+    type: text
+  - name: source_object
+    type: text
+  - name: control_total
+    type: bigint
+  - name: rows_received
+    type: bigint
+  - name: freshness_hours
+    type: bigint
+  - name: tests_failed
+    type: bigint
 - name: people_mart_applicant_flow
   key: job_family
-  columns: [job_family, race, gender, n]
+  columns:
+  - name: job_family
+    type: text
+  - name: race
+    type: text
+  - name: gender
+    type: text
+  - name: n
+    type: bigint
 - name: people_mart_funnel_monthly
   key: month_start
-  columns: [month_start, source_name, applications, hired]
+  columns:
+  - name: month_start
+    type: date
+  - name: source_name
+    type: text
+  - name: applications
+    type: bigint
+  - name: hired
+    type: bigint

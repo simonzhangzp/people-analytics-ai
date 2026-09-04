@@ -2,12 +2,20 @@ metric_id: regrettable_attrition_rate
 status: certified
 grain: people_snap_worker_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: trailing_12m
+annualized: true
 numerator:
-  expression: is_regrettable
-denominator:
-  expression: average_headcount
+  expression: is_regrettable (sum over window)
 min_cell: 5
 sensitivity: confidential
+expected_range:
+- 0.0
+- 0.12
+sources:
+- people_snap_worker_month
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+denominator:
+  expression: average_headcount

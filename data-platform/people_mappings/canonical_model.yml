@@ -5,14 +5,22 @@ note: Silver column inventory for GATE 1 coverage. Gold/marts are out of scope.
 tables:
 - name: people_xw_identity
   columns:
-  - person_id
-  - worker_id
-  - source_system
-  - source_object
-  - source_id
-  - valid_from
-  - valid_to
-  - match_method
+  - name: person_id
+    type: text
+  - name: worker_id
+    type: text
+  - name: source_system
+    type: text
+  - name: source_object
+    type: text
+  - name: source_id
+    type: text
+  - name: valid_from
+    type: date
+  - name: valid_to
+    type: date
+  - name: match_method
+    type: text
   schema: people_v2
   master_source: canonical
   key: person_id
@@ -20,11 +28,16 @@ tables:
   notes: person_id surrogate; worker_id = Employee.name
 - name: people_xw_org
   columns:
-  - org_id
-  - frappe_department
-  - gh_department_id
-  - valid_from
-  - valid_to
+  - name: org_id
+    type: text
+  - name: frappe_department
+    type: text
+  - name: gh_department_id
+    type: bigint
+  - name: valid_from
+    type: date
+  - name: valid_to
+    type: date
   schema: people_v2
   master_source: frappe_hr
   key: org_id
@@ -32,12 +45,18 @@ tables:
   natural_key: Department.name
 - name: people_xw_location
   columns:
-  - location_id
-  - frappe_branch
-  - gh_office_id
-  - city
-  - country
-  - region
+  - name: location_id
+    type: text
+  - name: frappe_branch
+    type: text
+  - name: gh_office_id
+    type: bigint
+  - name: city
+    type: text
+  - name: country
+    type: text
+  - name: region
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: location_id
@@ -45,10 +64,14 @@ tables:
   natural_key: Branch.name
 - name: people_xw_job
   columns:
-  - job_id
-  - frappe_designation
-  - onet_soc_code
-  - job_family
+  - name: job_id
+    type: text
+  - name: frappe_designation
+    type: text
+  - name: onet_soc_code
+    type: text
+  - name: job_family
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: job_id
@@ -56,9 +79,12 @@ tables:
   natural_key: Designation.name
 - name: people_xw_skill
   columns:
-  - skill_id
-  - frappe_skill
-  - onet_element_id
+  - name: skill_id
+    type: text
+  - name: frappe_skill
+    type: text
+  - name: onet_element_id
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: skill_id
@@ -66,17 +92,28 @@ tables:
   natural_key: Skill.name
 - name: people_dim_org
   columns:
-  - org_id
-  - org_name
-  - parent_org_id
-  - company
-  - is_group
-  - org_path
-  - depth
-  - bg
-  - valid_from
-  - valid_to
-  - is_current
+  - name: org_id
+    type: text
+  - name: org_name
+    type: text
+  - name: parent_org_id
+    type: text
+  - name: company
+    type: text
+  - name: is_group
+    type: boolean
+  - name: org_path
+    type: ltree
+  - name: depth
+    type: bigint
+  - name: bg
+    type: text
+  - name: valid_from
+    type: date
+  - name: valid_to
+    type: date
+  - name: is_current
+    type: boolean
   schema: people_v2
   master_source: frappe_hr
   key: org_id
@@ -84,13 +121,20 @@ tables:
   natural_key: Department.name
 - name: people_dim_job
   columns:
-  - job_id
-  - job_name
-  - onet_soc_code
-  - job_family
-  - valid_from
-  - valid_to
-  - is_current
+  - name: job_id
+    type: text
+  - name: job_name
+    type: text
+  - name: onet_soc_code
+    type: text
+  - name: job_family
+    type: text
+  - name: valid_from
+    type: date
+  - name: valid_to
+    type: date
+  - name: is_current
+    type: boolean
   schema: people_v2
   master_source: frappe_hr
   key: job_id
@@ -98,13 +142,20 @@ tables:
   natural_key: Designation.name
 - name: people_dim_grade
   columns:
-  - grade_id
-  - grade_name
-  - level_rank
-  - default_salary_structure
-  - valid_from
-  - valid_to
-  - is_current
+  - name: grade_id
+    type: text
+  - name: grade_name
+    type: text
+  - name: level_rank
+    type: bigint
+  - name: default_salary_structure
+    type: text
+  - name: valid_from
+    type: date
+  - name: valid_to
+    type: date
+  - name: is_current
+    type: boolean
   schema: people_v2
   master_source: frappe_hr
   key: grade_id
@@ -112,14 +163,22 @@ tables:
   natural_key: Employee Grade.name
 - name: people_dim_location
   columns:
-  - location_id
-  - branch_name
-  - city
-  - country
-  - region
-  - valid_from
-  - valid_to
-  - is_current
+  - name: location_id
+    type: text
+  - name: branch_name
+    type: text
+  - name: city
+    type: text
+  - name: country
+    type: text
+  - name: region
+    type: text
+  - name: valid_from
+    type: date
+  - name: valid_to
+    type: date
+  - name: is_current
+    type: boolean
   schema: people_v2
   master_source: frappe_hr
   key: location_id
@@ -127,20 +186,28 @@ tables:
   natural_key: Branch.name
 - name: people_dim_date
   columns:
-  - date
-  - month_end
-  - is_month_end
+  - name: date
+    type: text
+  - name: month_end
+    type: date
+  - name: is_month_end
+    type: boolean
   schema: people_v2
   master_source: canonical
   key: date
   id_kind: generated
 - name: people_dim_appraisal_cycle
   columns:
-  - cycle_id
-  - cycle_name
-  - start_date
-  - end_date
-  - status
+  - name: cycle_id
+    type: text
+  - name: cycle_name
+    type: text
+  - name: start_date
+    type: date
+  - name: end_date
+    type: date
+  - name: status
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: cycle_id
@@ -148,11 +215,16 @@ tables:
   natural_key: Appraisal Cycle.name
 - name: people_dim_stage
   columns:
-  - stage_id
-  - gh_job_id
-  - stage_name
-  - priority
-  - canonical_stage
+  - name: stage_id
+    type: bigint
+  - name: gh_job_id
+    type: bigint
+  - name: stage_name
+    type: text
+  - name: priority
+    type: text
+  - name: canonical_stage
+    type: text
   schema: people_v2
   master_source: greenhouse_v3
   key: stage_id
@@ -160,9 +232,12 @@ tables:
   natural_key: job_interview_stage.id
 - name: people_dim_source
   columns:
-  - id
-  - name
-  - type
+  - name: id
+    type: text
+  - name: name
+    type: text
+  - name: type
+    type: text
   schema: people_v2
   master_source: greenhouse_v3
   key: id
@@ -170,9 +245,12 @@ tables:
   natural_key: source.id
 - name: people_dim_rejection_reason
   columns:
-  - id
-  - name
-  - type
+  - name: id
+    type: text
+  - name: name
+    type: text
+  - name: type
+    type: text
   schema: people_v2
   master_source: greenhouse_v3
   key: id
@@ -180,10 +258,14 @@ tables:
   natural_key: rejection_reason.id
 - name: people_dim_skill
   columns:
-  - skill_id
-  - skill_name
-  - onet_element_id
-  - element_type
+  - name: skill_id
+    type: text
+  - name: skill_name
+    type: text
+  - name: onet_element_id
+    type: text
+  - name: element_type
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: skill_id
@@ -191,14 +273,22 @@ tables:
   natural_key: Skill.name
 - name: people_dim_learning_resource
   columns:
-  - resource_id
-  - source
-  - title
-  - url
-  - level
-  - duration_minutes
-  - roles
-  - products
+  - name: resource_id
+    type: text
+  - name: source
+    type: text
+  - name: title
+    type: text
+  - name: url
+    type: text
+  - name: level
+    type: text
+  - name: duration_minutes
+    type: double precision
+  - name: roles
+    type: text[]
+  - name: products
+    type: text[]
   schema: people_v2
   master_source: mixed
   key: resource_id
@@ -206,32 +296,46 @@ tables:
   notes: source column distinguishes internal Training Event vs microsoft_learn
 - name: people_dim_survey_wave
   columns:
-  - wave_id
-  - instrument_version
-  - start_date
-  - end_date
-  - target_population
-  - response_rate
+  - name: wave_id
+    type: text
+  - name: instrument_version
+    type: text
+  - name: start_date
+    type: date
+  - name: end_date
+    type: date
+  - name: target_population
+    type: text
+  - name: response_rate
+    type: double precision
   schema: people_v2
   master_source: engagement_ext
   key: wave_id
   id_kind: master_immutable
 - name: people_dim_survey_item
   columns:
-  - item_id
-  - dimension
-  - reverse
-  - prompt
-  - instrument_version
+  - name: item_id
+    type: text
+  - name: dimension
+    type: text
+  - name: reverse
+    type: text
+  - name: prompt
+    type: text
+  - name: instrument_version
+    type: text
   schema: people_v2
   master_source: engagement_ext
   key: item_id
   id_kind: master_immutable
 - name: people_dim_person
   columns:
-  - person_id
-  - first_seen_at
-  - first_seen_source
+  - name: person_id
+    type: text
+  - name: first_seen_at
+    type: timestamptz
+  - name: first_seen_source
+    type: text
   schema: people_v2
   master_source: canonical
   key: person_id
@@ -239,26 +343,40 @@ tables:
   notes: PER-sha1; exception to master-id rule
 - name: people_dim_person_restricted
   columns:
-  - person_id
-  - full_name
-  - gender
-  - date_of_birth
+  - name: person_id
+    type: text
+  - name: full_name
+    type: text
+  - name: gender
+    type: text
+  - name: date_of_birth
+    type: text
   schema: people_v2
   master_source: canonical
   key: person_id
   id_kind: surrogate
 - name: people_dim_worker
   columns:
-  - worker_id
-  - person_id
-  - frappe_employee
-  - hire_date
-  - termination_date
-  - termination_reason_raw
-  - termination_category
-  - employment_type
-  - is_rehire
-  - hired_via_application_id
+  - name: worker_id
+    type: text
+  - name: person_id
+    type: text
+  - name: frappe_employee
+    type: text
+  - name: hire_date
+    type: date
+  - name: termination_date
+    type: date
+  - name: termination_reason_raw
+    type: text
+  - name: termination_category
+    type: text
+  - name: employment_type
+    type: text
+  - name: is_rehire
+    type: boolean
+  - name: hired_via_application_id
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: worker_id
@@ -266,16 +384,26 @@ tables:
   natural_key: Employee.name
 - name: people_evt_worker
   columns:
-  - event_id
-  - worker_id
-  - person_id
-  - event_type
-  - event_date
-  - recorded_at
-  - source_system
-  - source_object
-  - source_id
-  - extract_id
+  - name: event_id
+    type: text
+  - name: worker_id
+    type: text
+  - name: person_id
+    type: text
+  - name: event_type
+    type: text
+  - name: event_date
+    type: date
+  - name: recorded_at
+    type: timestamptz
+  - name: source_system
+    type: text
+  - name: source_object
+    type: text
+  - name: source_id
+    type: text
+  - name: extract_id
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: event_id
@@ -283,15 +411,24 @@ tables:
   natural_key: source document name
 - name: people_evt_worker_change
   columns:
-  - event_id
-  - worker_id
-  - event_date
-  - property
-  - old_value
-  - new_value
-  - old_canonical_id
-  - new_canonical_id
-  - source_object
+  - name: event_id
+    type: text
+  - name: worker_id
+    type: text
+  - name: event_date
+    type: date
+  - name: property
+    type: text
+  - name: old_value
+    type: text
+  - name: new_value
+    type: text
+  - name: old_canonical_id
+    type: text
+  - name: new_canonical_id
+    type: text
+  - name: source_object
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: event_id
@@ -299,17 +436,28 @@ tables:
   natural_key: parent event_id + property
 - name: people_hist_worker_attr
   columns:
-  - worker_id
-  - valid_from
-  - valid_to
-  - org_id
-  - job_id
-  - grade_id
-  - location_id
-  - manager_worker_id
-  - employment_type
-  - status
-  - source_event_id
+  - name: worker_id
+    type: text
+  - name: valid_from
+    type: date
+  - name: valid_to
+    type: date
+  - name: org_id
+    type: text
+  - name: job_id
+    type: text
+  - name: grade_id
+    type: text
+  - name: location_id
+    type: text
+  - name: manager_worker_id
+    type: text
+  - name: employment_type
+    type: text
+  - name: status
+    type: text
+  - name: source_event_id
+    type: text
   schema: people_v2
   master_source: canonical
   key: worker_id
@@ -317,15 +465,24 @@ tables:
   notes: interval grain worker_id+valid_from; rebuilt BR-WF-008
 - name: people_fact_comp_assignment_restricted
   columns:
-  - comp_assignment_id
-  - worker_id
-  - from_date
-  - to_date
-  - salary_structure
-  - base
-  - variable
-  - currency
-  - source_ssa
+  - name: comp_assignment_id
+    type: bigint
+  - name: worker_id
+    type: text
+  - name: from_date
+    type: date
+  - name: to_date
+    type: date
+  - name: salary_structure
+    type: text
+  - name: base
+    type: double precision
+  - name: variable
+    type: double precision
+  - name: currency
+    type: text
+  - name: source_ssa
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: comp_assignment_id
@@ -333,14 +490,22 @@ tables:
   natural_key: Salary Structure Assignment.name
 - name: people_ref_comp_band
   columns:
-  - grade_id
-  - country
-  - currency
-  - band_min
-  - band_mid
-  - band_max
-  - valid_from
-  - valid_to
+  - name: grade_id
+    type: text
+  - name: country
+    type: text
+  - name: currency
+    type: text
+  - name: band_min
+    type: double precision
+  - name: band_mid
+    type: double precision
+  - name: band_max
+    type: double precision
+  - name: valid_from
+    type: date
+  - name: valid_to
+    type: date
   schema: people_v2
   master_source: engagement_ext
   key: grade_id
@@ -348,14 +513,22 @@ tables:
   notes: E1 composite with country/currency/valid_from
 - name: people_fact_appraisal
   columns:
-  - appraisal_id
-  - worker_id
-  - cycle_id
-  - final_score
-  - total_score
-  - self_score
-  - status
-  - submitted_at
+  - name: appraisal_id
+    type: text
+  - name: worker_id
+    type: text
+  - name: cycle_id
+    type: text
+  - name: final_score
+    type: double precision
+  - name: total_score
+    type: double precision
+  - name: self_score
+    type: double precision
+  - name: status
+    type: text
+  - name: submitted_at
+    type: timestamptz
   schema: people_v2
   master_source: frappe_hr
   key: appraisal_id
@@ -363,14 +536,22 @@ tables:
   natural_key: Appraisal.name
 - name: people_fact_training_participation
   columns:
-  - worker_id
-  - training_event_id
-  - resource_id
-  - attendance
-  - status
-  - hours
-  - grade
-  - event_start
+  - name: worker_id
+    type: text
+  - name: training_event_id
+    type: bigint
+  - name: resource_id
+    type: text
+  - name: attendance
+    type: text
+  - name: status
+    type: text
+  - name: hours
+    type: double precision
+  - name: grade
+    type: text
+  - name: event_start
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: training_event_id
@@ -378,11 +559,16 @@ tables:
   notes: grain worker+event
 - name: people_fact_worker_skill
   columns:
-  - worker_id
-  - skill_id
-  - proficiency
-  - evaluation_date
-  - source_skill_map
+  - name: worker_id
+    type: text
+  - name: skill_id
+    type: text
+  - name: proficiency
+    type: bigint
+  - name: evaluation_date
+    type: date
+  - name: source_skill_map
+    type: text
   schema: people_v2
   master_source: frappe_hr
   key: skill_id
@@ -390,10 +576,14 @@ tables:
   notes: grain worker+skill
 - name: people_ref_job_skill_target
   columns:
-  - job_id
-  - skill_id
-  - target_proficiency
-  - onet_importance
+  - name: job_id
+    type: text
+  - name: skill_id
+    type: text
+  - name: target_proficiency
+    type: bigint
+  - name: onet_importance
+    type: double precision
   schema: people_v2
   master_source: onet
   key: skill_id
@@ -401,19 +591,32 @@ tables:
   notes: grain job+skill
 - name: people_dim_requisition
   columns:
-  - requisition_id
-  - gh_job_id
-  - gh_opening_id
-  - job_id
-  - org_id
-  - location_id
-  - hiring_manager_person_id
-  - recruiter_person_id
-  - opened_at
-  - closed_at
-  - status
-  - close_reason
-  - hired_application_id
+  - name: requisition_id
+    type: bigint
+  - name: gh_job_id
+    type: bigint
+  - name: gh_opening_id
+    type: bigint
+  - name: job_id
+    type: text
+  - name: org_id
+    type: text
+  - name: location_id
+    type: text
+  - name: hiring_manager_person_id
+    type: text
+  - name: recruiter_person_id
+    type: text
+  - name: opened_at
+    type: timestamptz
+  - name: closed_at
+    type: timestamptz
+  - name: status
+    type: text
+  - name: close_reason
+    type: text
+  - name: hired_application_id
+    type: text
   schema: people_v2
   master_source: greenhouse_v3
   key: requisition_id
@@ -421,11 +624,16 @@ tables:
   natural_key: opening.id
 - name: people_dim_candidate
   columns:
-  - candidate_id
-  - gh_candidate_id
-  - person_id
-  - created_at
-  - first_source_id
+  - name: candidate_id
+    type: bigint
+  - name: gh_candidate_id
+    type: bigint
+  - name: person_id
+    type: text
+  - name: created_at
+    type: timestamptz
+  - name: first_source_id
+    type: text
   schema: people_v2
   master_source: greenhouse_v3
   key: candidate_id
@@ -433,18 +641,30 @@ tables:
   natural_key: candidate.id
 - name: people_fact_application
   columns:
-  - application_id
-  - candidate_id
-  - requisition_id
-  - applied_at
-  - status
-  - rejected_at
-  - hired_at
-  - source_id
-  - referrer_person_id
-  - rejection_reason_id
-  - rejection_type
-  - current_stage_id
+  - name: application_id
+    type: bigint
+  - name: candidate_id
+    type: bigint
+  - name: requisition_id
+    type: bigint
+  - name: applied_at
+    type: timestamptz
+  - name: status
+    type: text
+  - name: rejected_at
+    type: timestamptz
+  - name: hired_at
+    type: timestamptz
+  - name: source_id
+    type: bigint
+  - name: referrer_person_id
+    type: text
+  - name: rejection_reason_id
+    type: bigint
+  - name: rejection_type
+    type: text
+  - name: current_stage_id
+    type: text
   schema: people_v2
   master_source: greenhouse_v3
   key: application_id
@@ -452,11 +672,18 @@ tables:
   natural_key: application.id
 - name: people_evt_application_stage
   columns:
-  - application_id
-  - stage_id
-  - entered_at
-  - exited_at
-  - is_current
+  - name: application_id
+    type: bigint
+  - name: stage_id
+    type: bigint
+  - name: entered_at
+    type: timestamptz
+  - name: exited_at
+    type: timestamptz
+  - name: is_current
+    type: boolean
+  - name: canonical_stage
+    type: text
   schema: people_v2
   master_source: greenhouse_v3
   key: application_id
@@ -464,13 +691,20 @@ tables:
   notes: grain application+stage+entered_at
 - name: people_fact_interview
   columns:
-  - interview_id
-  - application_id
-  - stage_id
-  - start_at
-  - end_at
-  - status
-  - interviewer_person_ids
+  - name: interview_id
+    type: bigint
+  - name: application_id
+    type: bigint
+  - name: stage_id
+    type: bigint
+  - name: start_at
+    type: timestamptz
+  - name: end_at
+    type: timestamptz
+  - name: status
+    type: text
+  - name: interviewer_person_ids
+    type: text[]
   schema: people_v2
   master_source: greenhouse_v3
   key: interview_id
@@ -478,12 +712,18 @@ tables:
   natural_key: interview.id
 - name: people_fact_scorecard
   columns:
-  - scorecard_id
-  - application_id
-  - interview_id
-  - submitted_by_person_id
-  - submitted_at
-  - overall_recommendation
+  - name: scorecard_id
+    type: bigint
+  - name: application_id
+    type: bigint
+  - name: interview_id
+    type: bigint
+  - name: submitted_by_person_id
+    type: text
+  - name: submitted_at
+    type: timestamptz
+  - name: overall_recommendation
+    type: text
   schema: people_v2
   master_source: greenhouse_v3
   key: scorecard_id
@@ -491,15 +731,24 @@ tables:
   natural_key: scorecard.id
 - name: people_fact_offer
   columns:
-  - offer_id
-  - version
-  - application_id
-  - requisition_id
-  - created_at
-  - sent_at
-  - resolved_at
-  - starts_at
-  - status
+  - name: offer_id
+    type: bigint
+  - name: version
+    type: bigint
+  - name: application_id
+    type: bigint
+  - name: requisition_id
+    type: bigint
+  - name: created_at
+    type: timestamptz
+  - name: sent_at
+    type: timestamptz
+  - name: resolved_at
+    type: timestamptz
+  - name: starts_at
+    type: timestamptz
+  - name: status
+    type: text
   schema: people_v2
   master_source: greenhouse_v3
   key: offer_id
@@ -507,12 +756,18 @@ tables:
   natural_key: offer.id
 - name: people_dim_recruiter
   columns:
-  - person_id
-  - specialization
-  - supported_region
-  - supported_job_family
-  - valid_from
-  - valid_to
+  - name: person_id
+    type: text
+  - name: specialization
+    type: text
+  - name: supported_region
+    type: text
+  - name: supported_job_family
+    type: text
+  - name: valid_from
+    type: date
+  - name: valid_to
+    type: date
   schema: people_v2
   master_source: canonical
   key: person_id
@@ -520,11 +775,16 @@ tables:
   notes: E4; person via T8
 - name: people_fact_survey_score_restricted
   columns:
-  - worker_id
-  - wave_id
-  - dimension
-  - score_mean
-  - items_answered
+  - name: worker_id
+    type: text
+  - name: wave_id
+    type: text
+  - name: dimension
+    type: text
+  - name: score_mean
+    type: double precision
+  - name: items_answered
+    type: bigint
   schema: people_v2
   master_source: engagement_ext
   key: worker_id
@@ -532,11 +792,16 @@ tables:
   notes: grain worker+wave+dimension
 - name: people_fact_candidate_demographic_restricted
   columns:
-  - application_id
-  - question_id
-  - answer_option_id
-  - free_form_text
-  - submitted_at
+  - name: application_id
+    type: bigint
+  - name: question_id
+    type: text
+  - name: answer_option_id
+    type: text
+  - name: free_form_text
+    type: text
+  - name: submitted_at
+    type: timestamptz
   schema: people_v2
   master_source: greenhouse_v3
   key: application_id
@@ -545,12 +810,18 @@ tables:
   notes: application grain; lake-only. Serving consumes people_mart_applicant_flow (min cell 10).
 - name: people_fact_candidate_eeoc_restricted
   columns:
-  - application_id
-  - race
-  - gender
-  - veteran_status
-  - disability_status
-  - submitted_at
+  - name: application_id
+    type: bigint
+  - name: race
+    type: text
+  - name: gender
+    type: text
+  - name: veteran_status
+    type: text
+  - name: disability_status
+    type: text
+  - name: submitted_at
+    type: timestamptz
   schema: people_v2
   master_source: greenhouse_v3
   key: application_id
@@ -559,9 +830,12 @@ tables:
   notes: application grain; lake-only. Serving consumes people_mart_applicant_flow (min cell 10).
 - name: people_ref_city
   columns:
-  - city
-  - country
-  - region
+  - name: city
+    type: text
+  - name: country
+    type: text
+  - name: region
+    type: text
   schema: people_v2
   master_source: engagement_ext
   key: city
@@ -569,8 +843,10 @@ tables:
   notes: E3
 - name: people_ref_separation_reason_map
   columns:
-  - raw_reason
-  - termination_category
+  - name: raw_reason
+    type: text
+  - name: termination_category
+    type: text
   schema: people_v2
   master_source: engagement_ext
   key: raw_reason

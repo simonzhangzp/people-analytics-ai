@@ -13,7 +13,7 @@ if str(ROOT) not in sys.path:
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from apply import assert_disk_budget, assert_people_project, connect_publisher, disk_occupied  # noqa: E402
-from generate_people_v2_ddl import OUT as DDL_PATH, render  # noqa: E402
+from generate_people_v2_ddl import OUT as DDL_PATH, event_views, render  # noqa: E402
 from measure_5pct_landing import (  # noqa: E402
     LAKE_ONLY_NEVER,
     _drop_people_v2_user_objects,
@@ -25,7 +25,7 @@ from people_refs import PEOPLE_REF, refuse_blocked  # noqa: E402
 
 SILVER = ROOT / "lake" / "people_silver" / "rehearsal_1p00"
 GOLD = ROOT / "lake" / "people_gold" / "rehearsal_1p00"
-REPORT = ROOT / "simulator" / "fixtures" / "rehearsal_1p00" / "publish_6b.json"
+REPORT = ROOT / "simulator" / "fixtures" / "rehearsal_1p00" / "publish_6c.json"
 GOV = ROOT / "serving" / "schemas" / "021_people_v2_governance.sql"
 RPC = ROOT / "serving" / "schemas" / "022_people_v2_rpcs.sql"
 
@@ -90,6 +90,7 @@ def main() -> int:
             }
             records.append(rec)
             print("publish_segment_ok", rec, flush=True)
+        _exec_script(conn, event_views())
         _exec_script(conn, GOV.read_text(encoding="utf-8"))
         from load_people_v2_meta import load_meta  # noqa: E402
 

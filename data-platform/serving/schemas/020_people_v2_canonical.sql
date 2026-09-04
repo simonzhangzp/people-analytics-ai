@@ -1,5 +1,5 @@
 -- people_v2 silver/gold tables generated from canonical_model.yml + gold_model.yml.
--- Do not reverse-engineer from parquet. Dedicated People project only.
+-- Column types are the YAML `type` field. Do not infer from parquet or ALTER after load.
 -- Schema/extension come from 019_people_v2_bootstrap.sql.
 
 create table if not exists people_v2.people_xw_identity (
@@ -103,7 +103,7 @@ create table if not exists people_v2.people_dim_appraisal_cycle (
 );
 
 create table if not exists people_v2.people_dim_stage (
-  stage_id text,
+  stage_id bigint,
   gh_job_id bigint,
   stage_name text,
   priority text,
@@ -223,13 +223,13 @@ create table if not exists people_v2.people_hist_worker_attr (
 );
 
 create table if not exists people_v2.people_fact_comp_assignment_restricted (
-  comp_assignment_id text,
+  comp_assignment_id bigint,
   worker_id text,
   from_date date,
   to_date date,
   salary_structure text,
-  base bigint,
-  variable bigint,
+  base double precision,
+  variable double precision,
   currency text,
   source_ssa text
 );
@@ -238,9 +238,9 @@ create table if not exists people_v2.people_ref_comp_band (
   grade_id text,
   country text,
   currency text,
-  band_min bigint,
-  band_mid bigint,
-  band_max bigint,
+  band_min double precision,
+  band_mid double precision,
+  band_max double precision,
   valid_from date,
   valid_to date
 );
@@ -258,7 +258,7 @@ create table if not exists people_v2.people_fact_appraisal (
 
 create table if not exists people_v2.people_fact_training_participation (
   worker_id text,
-  training_event_id text,
+  training_event_id bigint,
   resource_id text,
   attendance text,
   status text,
@@ -270,7 +270,7 @@ create table if not exists people_v2.people_fact_training_participation (
 create table if not exists people_v2.people_fact_worker_skill (
   worker_id text,
   skill_id text,
-  proficiency text,
+  proficiency bigint,
   evaluation_date date,
   source_skill_map text
 );
@@ -278,12 +278,12 @@ create table if not exists people_v2.people_fact_worker_skill (
 create table if not exists people_v2.people_ref_job_skill_target (
   job_id text,
   skill_id text,
-  target_proficiency text,
-  onet_importance text
+  target_proficiency bigint,
+  onet_importance double precision
 );
 
 create table if not exists people_v2.people_dim_requisition (
-  requisition_id text,
+  requisition_id bigint,
   gh_job_id bigint,
   gh_opening_id bigint,
   job_id text,
@@ -299,7 +299,7 @@ create table if not exists people_v2.people_dim_requisition (
 );
 
 create table if not exists people_v2.people_dim_candidate (
-  candidate_id text,
+  candidate_id bigint,
   gh_candidate_id bigint,
   person_id text,
   created_at timestamptz,
@@ -307,32 +307,33 @@ create table if not exists people_v2.people_dim_candidate (
 );
 
 create table if not exists people_v2.people_fact_application (
-  application_id text,
-  candidate_id text,
-  requisition_id text,
+  application_id bigint,
+  candidate_id bigint,
+  requisition_id bigint,
   applied_at timestamptz,
   status text,
   rejected_at timestamptz,
   hired_at timestamptz,
-  source_id text,
+  source_id bigint,
   referrer_person_id text,
-  rejection_reason_id text,
+  rejection_reason_id bigint,
   rejection_type text,
   current_stage_id text
 );
 
 create table if not exists people_v2.people_evt_application_stage (
-  application_id text,
-  stage_id text,
+  application_id bigint,
+  stage_id bigint,
   entered_at timestamptz,
   exited_at timestamptz,
-  is_current boolean
+  is_current boolean,
+  canonical_stage text
 );
 
 create table if not exists people_v2.people_fact_interview (
-  interview_id text,
-  application_id text,
-  stage_id text,
+  interview_id bigint,
+  application_id bigint,
+  stage_id bigint,
   start_at timestamptz,
   end_at timestamptz,
   status text,
@@ -340,19 +341,19 @@ create table if not exists people_v2.people_fact_interview (
 );
 
 create table if not exists people_v2.people_fact_scorecard (
-  scorecard_id text,
-  application_id text,
-  interview_id text,
+  scorecard_id bigint,
+  application_id bigint,
+  interview_id bigint,
   submitted_by_person_id text,
   submitted_at timestamptz,
   overall_recommendation text
 );
 
 create table if not exists people_v2.people_fact_offer (
-  offer_id text,
-  version text,
-  application_id text,
-  requisition_id text,
+  offer_id bigint,
+  version bigint,
+  application_id bigint,
+  requisition_id bigint,
   created_at timestamptz,
   sent_at timestamptz,
   resolved_at timestamptz,
@@ -374,7 +375,7 @@ create table if not exists people_v2.people_fact_survey_score_restricted (
   wave_id text,
   dimension text,
   score_mean double precision,
-  items_answered text
+  items_answered bigint
 );
 
 create table if not exists people_v2.people_ref_city (
@@ -408,7 +409,7 @@ create table if not exists people_v2.people_snap_worker_month (
   is_certified boolean,
   hire_date date,
   tenure_band text,
-  tenure_months text,
+  tenure_months bigint,
   hired_in_month boolean,
   terminated_in_month boolean,
   termination_category text,
@@ -425,26 +426,26 @@ create table if not exists people_v2.people_snap_worker_month (
 
 create table if not exists people_v2.people_snap_requisition_month (
   month_end date,
-  requisition_id text,
+  requisition_id bigint,
   job_family text,
-  hiring_manager_id text,
+  hiring_manager_id bigint,
   is_open boolean,
-  days_open text,
-  applications_active text,
-  offers_outstanding text
+  days_open bigint,
+  applications_active bigint,
+  offers_outstanding bigint
 );
 
 create table if not exists people_v2.people_snap_recruiter_month (
   month_end date,
-  recruiter_user_id text,
+  recruiter_user_id bigint,
   person_id text,
   open_requisitions bigint,
-  active_applications text,
-  interviews_scheduled text,
-  offers_sent text,
+  active_applications bigint,
+  interviews_scheduled bigint,
+  offers_sent bigint,
   hires bigint,
-  avg_req_load double precision,
-  candidate_load text
+  avg_req_load bigint,
+  candidate_load bigint
 );
 
 create table if not exists people_v2.people_mart_workforce_monthly (
@@ -456,8 +457,8 @@ create table if not exists people_v2.people_mart_workforce_monthly (
   job_family text,
   headcount bigint,
   hires bigint,
-  terms_vol text,
-  terms_invol text
+  terms_vol bigint,
+  terms_invol bigint
 );
 
 create table if not exists people_v2.people_mart_workforce_monthly_2d (
@@ -470,23 +471,23 @@ create table if not exists people_v2.people_mart_workforce_monthly_2d (
   grain text,
   headcount bigint,
   hires bigint,
-  terms_vol text
+  terms_vol bigint
 );
 
 create table if not exists people_v2.people_mart_mobility_monthly (
   month_start date,
   org_id text,
   org_path ltree,
-  promotions text,
-  transfers text,
-  internal_mobility text,
-  manager_changes text
+  promotions bigint,
+  transfers bigint,
+  internal_mobility bigint,
+  manager_changes bigint
 );
 
 create table if not exists people_v2.people_mart_recruiting_monthly (
   month_start date,
-  offers_accepted text,
-  offers_resolved text,
+  offers_accepted bigint,
+  offers_resolved bigint,
   hires bigint
 );
 
@@ -500,15 +501,15 @@ create table if not exists people_v2.people_mart_stage_aging_monthly (
 
 create table if not exists people_v2.people_mart_recruiter_load_monthly (
   month_end date,
-  recruiter_user_id text,
+  recruiter_user_id bigint,
   person_id text,
   open_requisitions bigint,
-  active_applications text,
-  interviews_scheduled text,
-  offers_sent text,
+  active_applications bigint,
+  interviews_scheduled bigint,
+  offers_sent bigint,
   hires bigint,
-  avg_req_load double precision,
-  candidate_load text
+  avg_req_load bigint,
+  candidate_load bigint
 );
 
 create table if not exists people_v2.people_mart_comp_monthly (
@@ -526,9 +527,9 @@ create table if not exists people_v2.people_mart_comp_monthly (
 
 create table if not exists people_v2.people_mart_learning_monthly (
   month_start date,
-  participants text,
+  participants bigint,
   training_hours double precision,
-  completion text
+  completion bigint
 );
 
 create table if not exists people_v2.people_mart_skill_coverage_monthly (
@@ -555,8 +556,8 @@ create table if not exists people_v2.people_mart_source_health_daily (
   source_object text,
   control_total bigint,
   rows_received bigint,
-  freshness_hours double precision,
-  tests_failed text
+  freshness_hours bigint,
+  tests_failed bigint
 );
 
 create table if not exists people_v2.people_mart_applicant_flow (
@@ -570,7 +571,7 @@ create table if not exists people_v2.people_mart_funnel_monthly (
   month_start date,
   source_name text,
   applications bigint,
-  hired text
+  hired bigint
 );
 
 -- indexes

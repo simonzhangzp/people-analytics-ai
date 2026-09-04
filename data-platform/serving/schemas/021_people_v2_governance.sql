@@ -101,3 +101,28 @@ create table if not exists people_v2.people_serving_run (
   certified boolean,
   notes text
 );
+
+create table if not exists people_v2.people_serving_pointer (
+  pointer_id text primary key,
+  as_of date,
+  extract_id text,
+  moved boolean,
+  notes text
+);
+
+create table if not exists people_v2.people_quality_incident (
+  incident_id text primary key,
+  extract_date date,
+  source_object text,
+  status text,
+  isolated boolean,
+  details jsonb
+);
+
+create table if not exists people_v2.people_replay_metric_value (
+  replay_id text primary key,
+  extract_date date,
+  metric_id text,
+  value_bad numeric,
+  value_expected numeric
+);

@@ -1,0 +1,239 @@
+{
+  "ref": "zapmigfrtnwnkmezjefx",
+  "as_of": "2026-08-31",
+  "rows": [
+    {
+      "metric_id": "applications_per_opening",
+      "parquet": 130.64812662076366,
+      "rpc": 130.64812662076366,
+      "match": true,
+      "expected_range": [
+        60,
+        250
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "average_headcount",
+      "parquet": 48615.333333333336,
+      "rpc": 48615.333333333336,
+      "match": true,
+      "expected_range": [
+        30000,
+        55000
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "compa_ratio_median",
+      "parquet": 0.98,
+      "rpc": 0.98,
+      "match": true,
+      "expected_range": [
+        0.7,
+        1.3
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "engagement_score",
+      "parquet": 3.666569251287,
+      "rpc": 3.666569251288,
+      "match": true,
+      "expected_range": [
+        2.5,
+        4.5
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "headcount",
+      "parquet": 50033,
+      "rpc": 50033,
+      "match": true,
+      "expected_range": [
+        40000,
+        60000
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "hires",
+      "parquet": 10259,
+      "rpc": 10259,
+      "match": true,
+      "expected_range": [
+        5000,
+        25000
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "internal_mobility_rate",
+      "parquet": 0.05237030840749832,
+      "rpc": 0.05237030840749832,
+      "match": true,
+      "expected_range": [
+        0.02,
+        0.2
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "involuntary_attrition_rate",
+      "parquet": 0.02614401491984696,
+      "rpc": 0.026144014919846963,
+      "match": true,
+      "expected_range": [
+        0.01,
+        0.1
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "manager_turnover_rate",
+      "parquet": 0.1571598842159033,
+      "rpc": 0.1571598842159033,
+      "match": true,
+      "expected_range": [
+        0.02,
+        0.25
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "offer_acceptance_rate",
+      "parquet": 0.8431164097501709,
+      "rpc": 0.8431164097501709,
+      "match": true,
+      "expected_range": [
+        0.5,
+        0.95
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "promotion_rate",
+      "parquet": 0.07997476790587331,
+      "rpc": 0.07997476790587332,
+      "match": true,
+      "expected_range": [
+        0.04,
+        0.14
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "quality_of_hire",
+      "parquet": 0.5271711528694769,
+      "rpc": 0.5271711528694769,
+      "match": true,
+      "expected_range": [
+        0.15,
+        0.85
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "recruiter_load",
+      "parquet": 4.0,
+      "rpc": 4.0,
+      "match": true,
+      "expected_range": [
+        0.5,
+        20
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "regrettable_attrition_rate",
+      "parquet": 0.03420731456467781,
+      "rpc": 0.034207314564677814,
+      "match": true,
+      "expected_range": [
+        0.0,
+        0.12
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "rehires",
+      "parquet": 203,
+      "rpc": 203,
+      "match": true,
+      "expected_range": [
+        0,
+        3000
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "skill_coverage",
+      "parquet": 0.5740408520275502,
+      "rpc": 0.57404085202755,
+      "match": true,
+      "expected_range": [
+        0.3,
+        0.95
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "span_of_control",
+      "parquet": 8.267638290824776,
+      "rpc": 8.267638290824776,
+      "match": true,
+      "expected_range": [
+        4,
+        12
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "time_in_stage_hours",
+      "parquet": 96.0,
+      "rpc": 96,
+      "match": true,
+      "expected_range": [
+        24,
+        2000
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "time_to_fill_days",
+      "parquet": 33.0,
+      "rpc": 33,
+      "match": true,
+      "expected_range": [
+        10,
+        90
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "training_hours_per_worker",
+      "parquet": 1.435966704606,
+      "rpc": 1.435966704606,
+      "match": true,
+      "expected_range": [
+        1,
+        40
+      ],
+      "in_range": true
+    },
+    {
+      "metric_id": "voluntary_attrition_rate",
+      "parquet": 0.13678811897480903,
+      "rpc": 0.13678811897480905,
+      "match": true,
+      "expected_range": [
+        0.08,
+        0.22
+      ],
+      "in_range": true
+    }
+  ],
+  "failed": [],
+  "range_failed": []
+}

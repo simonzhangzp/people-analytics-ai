@@ -2,12 +2,20 @@ metric_id: recruiter_load
 status: certified
 grain: people_snap_recruiter_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: as_of
+annualized: false
 numerator:
-  expression: open_requisitions
-denominator:
-  expression: recruiters
+  expression: avg(open_requisitions) at as_of month (is_open × recruiter_id)
 min_cell: 3
 sensitivity: internal
+expected_range:
+- 0.5
+- 20
+sources:
+- people_snap_recruiter_month
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+denominator:
+  expression: recruiters

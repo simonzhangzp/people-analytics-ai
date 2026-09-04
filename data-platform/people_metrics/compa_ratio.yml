@@ -2,10 +2,19 @@ metric_id: compa_ratio_median
 status: certified
 grain: people_fact_comp_assignment_restricted
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: as_of
+annualized: false
 numerator:
-  expression: median(base/band_mid)
+  expression: median(base / band_mid) for certified workers as-of
 min_cell: 10
 sensitivity: restricted
+expected_range:
+- 0.7
+- 1.3
+sources:
+- people_fact_comp_assignment_restricted
+- people_ref_comp_band
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric

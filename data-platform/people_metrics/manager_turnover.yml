@@ -2,12 +2,20 @@ metric_id: manager_turnover_rate
 status: certified
 grain: people_snap_worker_month
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: trailing_12m
+annualized: true
 numerator:
-  expression: terminated ∧ is_manager
-denominator:
-  expression: avg managers
+  expression: terminated_in_month and (is_manager or was manager in the prior month)
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 0.02
+- 0.25
+sources:
+- people_snap_worker_month
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+denominator:
+  expression: trailing-12m mean of certified managers

@@ -2,10 +2,18 @@ metric_id: engagement_score
 status: certified
 grain: people_fact_survey_score_restricted
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: as_of
+annualized: false
 numerator:
   expression: mean(score_mean)
 min_cell: 5
 sensitivity: confidential
+expected_range:
+- 2.5
+- 4.5
+sources:
+- people_fact_survey_score_restricted
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric

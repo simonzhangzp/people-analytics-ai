@@ -1,11 +1,27 @@
 metric_id: skill_coverage
 status: certified
-grain: people_fact_worker_skill
+grain: people_mart_skill_coverage_monthly
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: as_of
+annualized: false
 numerator:
-  expression: workers with skills / workers
+  expression: mean over workers of (held target skills meeting coalesce(target_proficiency,
+    3) / n_target)
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 0.3
+- 0.95
+sources:
+- people_mart_skill_coverage_monthly
+- people_ref_job_skill_target
+- people_fact_worker_skill
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
+denominator:
+  expression: certified workers whose job_id has at least one people_ref_job_skill_target
+    row
+notes: Workers with no target skills are excluded from the denominator. Empty target_proficiency
+  coalesces to 3.

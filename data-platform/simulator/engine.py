@@ -11,6 +11,7 @@ from pathlib import Path
 from business_rules import e6_category, in_certified_headcount, tenure_band
 from funnel import cancelled_openings_for_hires, lognormal_count, lognormal_days
 from ids import person_id, utc
+from org_tree import MAX_LEVEL, build_company_tree, manager_candidates, place_hire
 from transactions import t1_hire_instance
 from world import load_baseline
 
@@ -187,7 +188,12 @@ class WorldEngine:
             if ids:
                 self.slow_hms = [int(x) for x in ids]
         self.workers: list[dict] = []
+        self.ceo_id: str | None = None
+        self._org_children: dict[str, list[str]] = {}
+        self._org_by_dept: dict[str, list[dict]] = {}
+        self._org_by_id: dict[str, dict] = {}
         self.employee_versions: list[dict] = []
+        self._last_emp_idx: dict[str, int] = {}
         self.separations: list[dict] = []
         self.offers: list[dict] = []
         self.applications: list[dict] = []
@@ -252,31 +258,35 @@ class WorldEngine:
 
     def _emit_employee(self, w: dict, modified: date) -> None:
         self._employee_emit_seq += 1
-        self.employee_versions.append(
-            {
-                "name": w["worker_id"],
-                "status": w["status"],
-                "date_of_joining": w["hire_date"].isoformat(),
-                "relieving_date": w["termination_date"].isoformat() if w["termination_date"] else None,
-                "reason_for_leaving": w["reason"],
-                "employment_type": w["employment_type"],
-                "department": DEPT_BY_FAMILY[w["job_family"]],
-                "designation": JOB_BY_FAMILY[w["job_family"]],
-                "grade": w["grade"],
-                "reports_to": w.get("reports_to"),
-                "branch": BRANCH[w["region"]],
-                "branch_region": w["region"],
-                "job_family": w["job_family"],
-                "person_id": w["person_id"],
-                "is_rehire": w["is_rehire"],
-                "via_t1": w["via_t1"],
-                "hired_via_application_id": w.get("hired_via_application_id"),
-                "modified": utc(modified),
-                "modified_date": modified.isoformat(),
-                "emit_seq": self._employee_emit_seq,
-                "docstatus": 0,
-            }
-        )
+        row = {
+            "name": w["worker_id"],
+            "status": w["status"],
+            "date_of_joining": w["hire_date"].isoformat(),
+            "relieving_date": w["termination_date"].isoformat() if w["termination_date"] else None,
+            "reason_for_leaving": w["reason"],
+            "employment_type": w["employment_type"],
+            "department": DEPT_BY_FAMILY[w["job_family"]],
+            "designation": JOB_BY_FAMILY[w["job_family"]],
+            "grade": w["grade"],
+            "reports_to": w.get("reports_to"),
+            "branch": BRANCH[w["region"]],
+            "branch_region": w["region"],
+            "job_family": w["job_family"],
+            "person_id": w["person_id"],
+            "is_rehire": w["is_rehire"],
+            "via_t1": w["via_t1"],
+            "hired_via_application_id": w.get("hired_via_application_id"),
+            "modified": utc(modified),
+            "modified_date": modified.isoformat(),
+            "emit_seq": self._employee_emit_seq,
+            "docstatus": 0,
+        }
+        prev_i = self._last_emp_idx.get(w["worker_id"])
+        if prev_i is not None and self.employee_versions[prev_i].get("modified_date") == modified.isoformat():
+            self.employee_versions[prev_i] = row
+            return
+        self._last_emp_idx[w["worker_id"]] = len(self.employee_versions)
+        self.employee_versions.append(row)
 
     def _compa_ratio(self, w: dict, as_of: date) -> float:
         control = 0.98
@@ -507,12 +517,145 @@ class WorldEngine:
         }
 
     def _hash_new_manager(self, w: dict, day: date) -> str | None:
-        peers = [
-            x["worker_id"]
+        dept = DEPT_BY_FAMILY[w["job_family"]]
+        pool = self._org_by_dept.get(dept) or [
+            x
             for x in self.workers
-            if x["region"] == w["region"] and x["worker_id"] != w["worker_id"]
+            if x.get("termination_date") is None and DEPT_BY_FAMILY[x["job_family"]] == dept
         ]
-        return hash_pick(f"{w['worker_id']}|{day.isoformat()}|mgr", peers)
+        cands = manager_candidates(
+            self.workers, w, DEPT_BY_FAMILY, pool=pool, children=self._org_children
+        )
+        picked = hash_pick(f"{w['worker_id']}|{day.isoformat()}|mgr", cands)
+        if picked and picked != w.get("reports_to"):
+            return picked
+        rest = [c for c in cands if c != w.get("reports_to")]
+        return hash_pick(f"{w['worker_id']}|{day.isoformat()}|mgr2", rest)
+
+    def _place_in_tree(self, w: dict) -> None:
+        dept = DEPT_BY_FAMILY[w["job_family"]]
+        pool = self._org_by_dept.setdefault(dept, [])
+        place_hire(self.workers, w, DEPT_BY_FAMILY, self.ceo_id, pool=pool)
+        pool.append(w)
+        self._org_by_id[w["worker_id"]] = w
+        mgr = w.get("reports_to")
+        if mgr:
+            self._org_children.setdefault(mgr, []).append(w["worker_id"])
+
+    def _rewrite_last_employee(self, w: dict) -> None:
+        for row in reversed(self.employee_versions):
+            if row["name"] == w["worker_id"]:
+                row["reports_to"] = w.get("reports_to")
+                row["department"] = DEPT_BY_FAMILY[w["job_family"]]
+                row["designation"] = JOB_BY_FAMILY[w["job_family"]]
+                row["job_family"] = w["job_family"]
+                break
+
+    def _rebuild_org_index(self) -> None:
+        children: dict[str, list[str]] = {}
+        by_dept: dict[str, list[dict]] = {}
+        by_id: dict[str, dict] = {}
+        for w in self.workers:
+            by_id[w["worker_id"]] = w
+            if w.get("termination_date") is not None:
+                continue
+            dept = DEPT_BY_FAMILY[w["job_family"]]
+            by_dept.setdefault(dept, []).append(w)
+            mgr = w.get("reports_to")
+            if mgr:
+                children.setdefault(mgr, []).append(w["worker_id"])
+        self._org_children = children
+        self._org_by_dept = by_dept
+        self._org_by_id = by_id
+
+    def _reassign_reports(self, old: dict, day: date) -> None:
+        dept = DEPT_BY_FAMILY[old["job_family"]]
+        pool = self._org_by_dept.get(dept) or self.workers
+        cands = [
+            x
+            for x in pool
+            if x["worker_id"] != old["worker_id"]
+            and x.get("termination_date") is None
+            and x.get("org_role") in ("leader", "manager")
+            and x.get("employment_type") != "Intern"
+            and x.get("status") == "Active"
+        ]
+        if not cands:
+            cands = [
+                x
+                for x in self.workers
+                if x["worker_id"] != old["worker_id"]
+                and x.get("termination_date") is None
+                and x.get("org_role") in ("leader", "manager")
+                and x.get("employment_type") != "Intern"
+                and x.get("status") == "Active"
+            ]
+        if old["worker_id"] == self.ceo_id and cands:
+            suc = cands[0]
+            suc["reports_to"] = None
+            suc["org_role"] = "leader"
+            suc["org_level"] = 0
+            self.ceo_id = suc["worker_id"]
+            self._emit_employee(suc, day)
+        if not cands:
+            return
+        reports = [
+            x
+            for x in pool
+            if x.get("reports_to") == old["worker_id"] and x.get("termination_date") is None
+        ]
+        for x in reports:
+            new_mgr = hash_pick(f"{x['worker_id']}|reassign|{day.isoformat()}", cands)
+            if not new_mgr or new_mgr["worker_id"] == x["worker_id"]:
+                continue
+            if self.ceo_id and new_mgr["worker_id"] == self.ceo_id and x["worker_id"] == self.ceo_id:
+                continue
+            x["reports_to"] = new_mgr["worker_id"]
+            self._emit_employee(x, day)
+
+    def _living_managers(self) -> dict[str, dict]:
+        return {
+            w["worker_id"]: w
+            for w in self.workers
+            if w.get("termination_date") is None
+            and w.get("status") in ("Active", "Suspended")
+            and w.get("employment_type") in ("Full-time", "Part-time", "Probation")
+        }
+
+    def _repair_org(self, day: date) -> None:
+        living = self._living_managers()
+        if self.ceo_id not in living:
+            suc = next(iter(living.values()), None)
+            if suc is None:
+                return
+            suc["reports_to"] = None
+            suc["org_role"] = "leader"
+            suc["org_level"] = 0
+            self.ceo_id = suc["worker_id"]
+            self._emit_employee(suc, day)
+            living = self._living_managers()
+        ceo = living.get(self.ceo_id)
+        if ceo is not None and ceo.get("reports_to") is not None:
+            ceo["reports_to"] = None
+            self._emit_employee(ceo, day)
+        for w in self.workers:
+            if w.get("termination_date") is not None or w["worker_id"] == self.ceo_id:
+                continue
+            mgr = w.get("reports_to")
+            boss = living.get(mgr) if mgr else None
+            if boss is not None and int(boss.get("org_level") or 0) >= MAX_LEVEL:
+                w["reports_to"] = boss.get("reports_to") or self.ceo_id
+                self._emit_employee(w, day)
+                continue
+            if mgr in living and mgr != w["worker_id"]:
+                continue
+            new_mgr = self._hash_new_manager(w, day) or self.ceo_id
+            if new_mgr and new_mgr != mgr:
+                w["reports_to"] = new_mgr
+                boss = living.get(new_mgr)
+                w["org_level"] = min(MAX_LEVEL, ((boss.get("org_level") or 0) + 1) if boss else 1)
+                self._emit_employee(w, day)
+        self._rebuild_org_index()
 
     def _business_day(self, month_start: date, me: date, w: dict) -> date:
         day = month_start + timedelta(days=self.rng.randint(0, me.day - 1))
@@ -777,9 +920,7 @@ class WorldEngine:
             prior = self.left_pool.pop(0)
             person = prior["person_id"]
         w = self._new_person_worker(hire_day, person=person, is_rehire=is_rehire, via_t1=True)
-        peers = [x for x in self.workers if x["region"] == w["region"] and x["worker_id"] != w["worker_id"]]
-        if peers:
-            w["reports_to"] = peers[self.rng.randrange(len(peers))]["worker_id"]
+        self._place_in_tree(w)
         self._t1_fill_opening(hire_day, w)
         self._emit_employee(w, hire_day)
         self._emit_ssa(w, hire_day)
@@ -787,25 +928,19 @@ class WorldEngine:
         return w
 
     def _assign_managers(self) -> None:
-        by_region: dict[str, list[dict]] = {}
+        self.ceo_id = build_company_tree(self.workers, DEPT_BY_FAMILY)
+        last_by_name = {}
+        for row in self.employee_versions:
+            last_by_name[row["name"]] = row
         for w in self.workers:
-            by_region.setdefault(w["region"], []).append(w)
-        for region, rows in by_region.items():
-            execs = [w for w in rows if w["job_family"] == "Exec"] or rows[: max(1, len(rows) // 40)]
-            for w in rows:
-                if w in execs:
-                    w["reports_to"] = None
-                    continue
-                mgr = execs[self.rng.randrange(len(execs))]
-                if mgr["worker_id"] == w["worker_id"] and len(rows) > 1:
-                    mgr = rows[0] if rows[0]["worker_id"] != w["worker_id"] else rows[1]
-                w["reports_to"] = mgr["worker_id"]
-        for w in self.workers:
-            # rewrite last employee version reports_to
-            for row in reversed(self.employee_versions):
-                if row["name"] == w["worker_id"]:
-                    row["reports_to"] = w["reports_to"]
-                    break
+            row = last_by_name.get(w["worker_id"])
+            if row is None:
+                continue
+            row["reports_to"] = w.get("reports_to")
+            row["department"] = DEPT_BY_FAMILY[w["job_family"]]
+            row["designation"] = JOB_BY_FAMILY[w["job_family"]]
+            row["job_family"] = w["job_family"]
+        self._rebuild_org_index()
 
     def seed_opening_stock(self) -> None:
         pop = self.baseline["population"]
@@ -823,6 +958,7 @@ class WorldEngine:
             self._emit_skills(w, hire)
         self._assign_managers()
         self.opening_certified = sum(1 for w in self.workers if self._certified(w, START))
+        print("seed_opening_stock", len(self.workers), "certified", self.opening_certified, flush=True)
 
     def _terminate(self, w: dict, day: date, reason: str) -> None:
         w["termination_date"] = max(day, w["hire_date"])
@@ -831,6 +967,7 @@ class WorldEngine:
         w["status"] = "Left"
         self.left_pool.append(w)
         self._emit_employee(w, day)
+        self._reassign_reports(w, day)
         self.separations.append(
             {
                 "doctype": "Employee Separation",
@@ -845,6 +982,8 @@ class WorldEngine:
 
     def _maybe_mobility(self, w: dict, month_start: date, me: date) -> None:
         if w["status"] != "Active":
+            return
+        if w["worker_id"] == self.ceo_id:
             return
         mgr_m = self.mgr_m
         if me >= COMPA_FROM and in_case3_slice(w, me, self.case3):
@@ -891,7 +1030,7 @@ class WorldEngine:
             self._emit_ssa(w, day, new_grade)
             self._emit_employee(w, day)
             return
-        if self.rng.random() < self.transfer_m:
+        if self.rng.random() < self.transfer_m and w.get("org_role") == "ic":
             day = self._business_day(month_start, me, w)
             xfer_name = f"HR-EMP-TRN-{self.next_transfer:06d}"
             self.transfers.append(
@@ -904,22 +1043,49 @@ class WorldEngine:
                 }
             )
             self.next_transfer += 1
-            if accompany_reports_to(w["worker_id"], day):
-                old_mgr = w.get("reports_to")
-                new_mgr = self._hash_new_manager(w, day)
-                if new_mgr and new_mgr != old_mgr:
-                    w["reports_to"] = new_mgr
-                    self.property_history.append(
-                        self._ph(xfer_name, "Employee Transfer", w["worker_id"], day, "reports_to", old_mgr, new_mgr, 1)
-                    )
+            families = [f for f in FAMILY_GRADES if f != w["job_family"]]
+            new_family = hash_pick(f"{w['worker_id']}|{day.isoformat()}|xfer_fam", families)
+            old_dept = DEPT_BY_FAMILY[w["job_family"]]
+            old_desig = JOB_BY_FAMILY[w["job_family"]]
+            old_mgr = w.get("reports_to")
+            w["job_family"] = new_family
+            new_dept = DEPT_BY_FAMILY[new_family]
+            new_desig = JOB_BY_FAMILY[new_family]
+            new_mgr = self._hash_new_manager(w, day)
+            if not new_mgr:
+                leaders = [
+                    x["worker_id"]
+                    for x in self.workers
+                    if x.get("termination_date") is None
+                    and DEPT_BY_FAMILY[x["job_family"]] == new_dept
+                    and x.get("org_role") == "leader"
+                    and x["worker_id"] != w["worker_id"]
+                ]
+                new_mgr = leaders[0] if leaders else self.ceo_id
+            ph_idx = 1
+            self.property_history.append(
+                self._ph(xfer_name, "Employee Transfer", w["worker_id"], day, "department", old_dept, new_dept, ph_idx)
+            )
+            ph_idx += 1
+            self.property_history.append(
+                self._ph(xfer_name, "Employee Transfer", w["worker_id"], day, "designation", old_desig, new_desig, ph_idx)
+            )
+            ph_idx += 1
+            if new_mgr and new_mgr != old_mgr:
+                w["reports_to"] = new_mgr
+                self.property_history.append(
+                    self._ph(xfer_name, "Employee Transfer", w["worker_id"], day, "reports_to", old_mgr, new_mgr, ph_idx)
+                )
+            boss = next((x for x in self.workers if x["worker_id"] == w.get("reports_to")), None)
+            w["org_role"] = "ic"
+            w["org_level"] = min(7, ((boss.get("org_level") or 1) + 1) if boss else 2)
             self._emit_employee(w, day)
             return
         if self.rng.random() < mgr_m:
             day = self._business_day(month_start, me, w)
-            peers = [x for x in self.workers if x["region"] == w["region"] and x["worker_id"] != w["worker_id"]]
-            if not peers:
+            new_mgr = self._hash_new_manager(w, day)
+            if not new_mgr:
                 return
-            new_mgr = peers[self.rng.randrange(len(peers))]["worker_id"]
             current = w.get("reports_to")
             w["reports_to"] = new_mgr
             self.manager_changes.append(
@@ -1117,10 +1283,49 @@ class WorldEngine:
             write_rows(root / rel / f"month={tag}" / "part.parquet", rows)
             rows.clear()
 
+    def _emit_open_pipeline(self) -> None:
+        """Leave a few requisitions still open at END so as-of recruiter_load is non-zero."""
+        families = list(JOB_BY_FAMILY)
+        for i in range(RECRUITER_USER_N * 4):
+            family = hash_pick(f"openpipe|{i}|fam", families)
+            job_id = self.next_job
+            self.next_job += 1
+            opening_id = self.next_opening
+            self.next_opening += 1
+            opened = END - timedelta(days=7 + (i % 40))
+            hm = self._hm_for(family, END)
+            n_apps = max(8, self._n_apps(family) // 4)
+            for _ in range(n_apps):
+                self._walk_crowd_app(
+                    job_id=job_id,
+                    opening_id=opening_id,
+                    family=family,
+                    hm=hm,
+                    opened=opened,
+                    close_day=END,
+                    hired_app=False,
+                )
+            self.openings.append(
+                {
+                    "id": opening_id,
+                    "job_id": job_id,
+                    "open": True,
+                    "opened_at": utc(opened),
+                    "closed_at": None,
+                    "application_id": None,
+                    "close_reason_id": None,
+                    "hiring_manager_id": hm,
+                    "job_family": family,
+                    "recruiter_id": recruiter_user_id(opening_id),
+                    "region": REGIONS[opening_id % len(REGIONS)],
+                }
+            )
+
     def simulate(self) -> dict:
         months = month_ends(START, END)
         self.seed_opening_stock()
         for i, me in enumerate(months):
+            self._rebuild_org_index()
             month_start = date(me.year, me.month, 1)
             certified_now = sum(1 for w in self.workers if self._certified(w, month_start - timedelta(days=1) if month_start > START else START))
             if i == 0:
@@ -1135,10 +1340,16 @@ class WorldEngine:
                     continue
                 expected_terms += self._hazard_m(w, me)
             n_hire = max(0, int(round(target - certified_now + expected_terms)))
+            print(
+                f"sim_month {me.isoformat()} workers={len(self.workers)} n_hire={n_hire}",
+                flush=True,
+            )
             for _ in range(n_hire):
                 hire_day = month_start + timedelta(days=self.rng.randint(0, me.day - 1))
                 is_rehire = bool(self.left_pool) and self.rng.random() < self.rehire_rate
                 self._hire_via_t1(hire_day, is_rehire=is_rehire)
+            print(f"sim_month_hires_done {me.isoformat()}", flush=True)
+            self._rebuild_org_index()
             self.cumulative_hires += n_hire
             want_cancel = cancelled_openings_for_hires(self.cumulative_hires, float(self.rec["openings_vs_hires_cancel_rate"]))
             for _ in range(max(0, want_cancel - self.cumulative_cancelled)):
@@ -1172,6 +1383,7 @@ class WorldEngine:
                 if w["status"] == "Active" and self.rng.random() < 0.001:
                     w["status"] = "Inactive"
                     self._emit_employee(w, me)
+                    self._reassign_reports(w, me)
                     rolled = True
                 elif w["status"] == "Inactive" and self.rng.random() < 0.4:
                     w["status"] = "Active"
@@ -1188,7 +1400,10 @@ class WorldEngine:
                     self._emit_employee(w, me)
                     continue
                 self._maybe_mobility(w, month_start, me)
+            self._repair_org(me)
             self._flush_recruiting(me)
+            print(f"sim_month_flushed {me.isoformat()}", flush=True)
+        self._emit_open_pipeline()
         accepted = self.accepted_offer_count
         window_hires = [w for w in self.workers if w["via_t1"]]
         return {

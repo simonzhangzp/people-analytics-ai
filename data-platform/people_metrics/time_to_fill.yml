@@ -2,10 +2,18 @@ metric_id: time_to_fill_days
 status: certified
 grain: people_dim_requisition
 architecture: docs/PEOPLE_DATA_ARCHITECTURE.md#8
+time_logic: trailing_12m
+annualized: false
 numerator:
-  expression: median(closed-opened) filled
+  expression: median(closed_at - opened_at) where close_reason=hired
 min_cell: 5
 sensitivity: internal
+expected_range:
+- 10
+- 90
+sources:
+- people_dim_requisition
+window_aligned: false
 sandbox:
   rule_kind: parametric
   rpc: people_v2.people_get_metric
