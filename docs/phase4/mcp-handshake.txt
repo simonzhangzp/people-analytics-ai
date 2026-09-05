@@ -1,0 +1,14 @@
+﻿initialize.serverInfo={"name":"people-mcp","version":"1.0.0"}
+initialize.protocol=2025-03-26
+tools.count=15
+tools.names=list_metrics,get_metric,get_metric_trend,get_metric_breakdown,get_metric_definition,list_entities,describe_entity,get_join_paths,get_glossary_term,get_lineage,get_source_health,get_quality_tests,get_quality_incidents,get_serving_snapshot,get_skill_coverage
+ask.tier=1
+ask.headline=Certified workers as of month-end. Employment type and status follow BR-WF certified rules. Window is the as-of month, not a trailing average.
+connect.has_disclaimer=True
+connect.has_skill_coverage=True
+
+get_metric.headcount.engineering={"unit":"count","as_of":"2026-08-31","value":15954,"denied":false,"window":"month","by_stage":null,"metric_id":"headcount","annualized":false,"identity_id":"demo-external-viewer","metric_version":1,"quality_status":"healthy","health_reason"
+identity_id_rejected=identity_id is not accepted on people-mcp. Token maps to demo-external-viewer.
+incident.headline=This is a data issue, not a workforce change. Headcount in this replay is blocked and must not be treated as certified.
+incident.quality=blocked
+incident.tier=1

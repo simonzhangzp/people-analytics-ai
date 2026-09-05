@@ -61,6 +61,12 @@ export function SiteFooter() {
           <Link href="/architecture" className="hover:text-[#2f4fa9]">
             Architecture
           </Link>
+          <Link href="/connect" className="hover:text-[#2f4fa9]">
+            Connect via MCP
+          </Link>
+          <Link href="/dataset" className="hover:text-[#2f4fa9]">
+            Dataset
+          </Link>
           <Link href="/lab" className="hover:text-[#2f4fa9]">
             Lab
           </Link>

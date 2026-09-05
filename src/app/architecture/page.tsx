@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
+import { pageMetadata } from "@/lib/site-metadata";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Architecture",
-  description: "Enterprise People Data & AI platform layers, from source systems to governed serving and bounded AI tools.",
-};
+  description:
+    "Enterprise People Data & AI platform layers, from source contracts through quality tests, the metric registry, lineage, and governed serving RPCs.",
+  path: "/architecture",
+});
 
 const LAYERS = [
   ["Sources", "Synthetic HRIS, ATS, LMS, performance, compensation and engagement, plus public O*NET, BLS and Microsoft Learn."],
@@ -31,9 +34,8 @@ export default function ArchitecturePage() {
           </h1>
           <p className="mt-5 text-[16px] leading-7 text-[#536177]">
             The recruiter demo is a serving layer over a People data platform.
-            Object storage holds history. Hetzner runs the pipeline. Supabase
-            serves governed marts. QuantReview leftovers in the shared staging
-            schema are left unprefixed and untouched.
+            Object storage holds history. A scheduled pipeline builds the lake and
+            publishes governed marts to a serving database.
           </p>
         </section>
 
@@ -58,8 +60,8 @@ export default function ArchitecturePage() {
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             {[
               ["Object / lake storage", "people_bronze, people_silver, people_gold on the People lake. Durable raw and history. Never queried by the website."],
-              ["Hetzner compute", "Daily pipeline, quality tests, gold rebuild, and incident replay extract. Isolated from QuantReview paths."],
-              ["Supabase serving", "quantreview-staging project, people_ prefix only. Metric registry, marts, RPCs, and snapshot context."],
+              ["Scheduled compute", "Daily pipeline, quality tests, gold rebuild, and incident replay extract."],
+              ["Serving database", "people_v2 marts and people_get_* RPCs. Pages call serving functions; they do not scan lake files."],
             ].map(([title, copy]) => (
               <article key={title}>
                 <h2 className="text-[14px] font-semibold text-[#1c2b44]">{title}</h2>
@@ -67,6 +69,37 @@ export default function ArchitecturePage() {
               </article>
             ))}
           </div>
+        </section>
+
+        <section className="surface p-6" data-testid="transfer-lineage">
+          <p className="eyebrow">Phase 0 evidence · Employee Transfer</p>
+          <p className="mt-3 max-w-3xl text-[14px] leading-6 text-[#546277]">
+            One source document is mapped, canonicalized, then used in a certified metric. The website
+            never scans lake files; it calls people_get_metric_for.
+          </p>
+          <ol className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+            {[
+              ["Employee Transfer", "frappe_hr.Employee Transfer"],
+              ["Mapping", "people_mappings/frappe_employee_transfer.yml"],
+              ["Canonical event", "people_evt_transfer"],
+              ["Certified metric", "people_metric.internal_mobility_rate"],
+            ].map(([label, table], index) => (
+              <li key={label} className="flex items-center gap-2 text-[13px] font-semibold text-[#1c2b44]">
+                {index > 0 ? <span className="hidden text-[#9aa7b8] sm:inline">→</span> : null}
+                <span className="rounded-[6px] border border-[#d2e8dc] bg-[#eaf5ef] px-3 py-2">
+                  {label}
+                  <span className="mt-1 block text-[10px] font-medium text-[#667085]">{table}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-4 text-[13px]">
+            <Link href="/dataset" className="font-semibold text-[#3157c9]">
+              Dataset page
+            </Link>
+            {" · "}
+            synthetic GlobalTech, not a real company.
+          </p>
         </section>
 
         <section className="surface p-6">
@@ -79,7 +112,11 @@ export default function ArchitecturePage() {
         </section>
 
         <p className="text-[13px] text-[#667085]">
-          Earlier file-upload experiments live in the{" "}
+          Connect a desktop client through the{" "}
+          <Link href="/connect" className="font-semibold text-[#3157c9]">
+            MCP endpoint
+          </Link>
+          . Earlier file-upload experiments live in the{" "}
           <Link href="/lab" className="font-semibold text-[#3157c9]">
             Lab
           </Link>

@@ -1,14 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { CASE_FOLLOW_UPS, type PeopleAskAnswer, type PeopleDemoCase } from "@/lib/people/ask";
+import { CASE_FOLLOW_UPS, type PeopleAskAnswer, type PeopleDemoCase } from "@/lib/people/ask-types";
 import { QualityBadge } from "./format";
 
-export function FollowUpAsk({ demoCase }: { demoCase: PeopleDemoCase }) {
+export function FollowUpAsk({
+  demoCase,
+  identityId,
+}: {
+  demoCase: PeopleDemoCase;
+  identityId?: string;
+}) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<PeopleAskAnswer | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showTrace, setShowTrace] = useState(false);
+  const [showCritic, setShowCritic] = useState(false);
   const chips = CASE_FOLLOW_UPS[demoCase];
 
   async function ask(next: string) {
@@ -16,12 +24,18 @@ export function FollowUpAsk({ demoCase }: { demoCase: PeopleDemoCase }) {
     if (!trimmed) return;
     setBusy(true);
     setError(null);
+    setShowTrace(false);
+    setShowCritic(false);
     setQuestion(trimmed);
     try {
       const response = await fetch("/api/people/ask", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question: trimmed, caseId: demoCase }),
+        body: JSON.stringify({
+          question: trimmed,
+          caseId: demoCase,
+          identityId: identityId ?? undefined,
+        }),
       });
       const payload = (await response.json()) as PeopleAskAnswer & {
         error?: { message?: string };
@@ -38,6 +52,9 @@ export function FollowUpAsk({ demoCase }: { demoCase: PeopleDemoCase }) {
       setBusy(false);
     }
   }
+
+  const withheld = Boolean(answer?.withheld || answer?.error_state === "critic");
+  const rpcError = answer?.error_state === "rpc";
 
   return (
     <section className="mt-10 border-t border-[#e3e7ed] pt-8">
@@ -83,28 +100,90 @@ export function FollowUpAsk({ demoCase }: { demoCase: PeopleDemoCase }) {
       </div>
       {error ? <p className="mt-4 text-[13px] text-[#934646]">{error}</p> : null}
       {answer ? (
-        <div className="surface mt-5 p-4" data-testid="people-ai-answer">
+        <div
+          className="surface mt-5 p-4"
+          data-testid="people-ai-answer"
+          data-error-state={answer.error_state ?? ""}
+          data-tier={String(answer.tier ?? "")}
+        >
           <div className="flex items-center gap-2">
-            <QualityBadge status={answer.quality_status} />
+            <QualityBadge status={withheld ? "withheld" : rpcError ? "error" : answer.quality_status} />
           </div>
-          <h3 className="mt-2 text-[15px] font-semibold text-[#1c2b44]">{answer.headline}</h3>
-          <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[#738097]">Facts</p>
-          <ul className="mt-1 space-y-1 text-[13px] leading-6 text-[#3e4c61]">
-            {answer.facts.map((fact) => (
-              <li key={fact}>{fact}</li>
-            ))}
-          </ul>
-          {answer.interpretation.length ? (
+          <h3
+            className="mt-2 text-[15px] font-semibold text-[#1c2b44]"
+            data-testid="people-ai-headline"
+          >
+            {answer.headline}
+          </h3>
+          {rpcError ? (
+            <p className="mt-3 text-[13px] leading-6 text-[#934646]" data-testid="people-ai-rpc-error">
+              Serving lookup failed. No substitute numbers were generated.
+            </p>
+          ) : null}
+          {withheld ? (
+            <div className="mt-3" data-testid="people-ai-critic">
+              <button
+                type="button"
+                className="text-[12px] font-semibold text-[#3157c9]"
+                onClick={() => setShowCritic((value) => !value)}
+              >
+                {showCritic ? "Hide critic failures" : "Show critic failures"}
+              </button>
+              {showCritic && answer.critic?.failures?.length ? (
+                <ul className="mt-2 space-y-1 text-[13px] leading-6 text-[#934646]">
+                  {answer.critic.failures.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : (
             <>
-              <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[#738097]">
-                Interpretation
-              </p>
-              <ul className="mt-1 space-y-1 text-[13px] leading-6 text-[#546277]">
-                {answer.interpretation.map((item) => (
+              <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[#738097]">Facts</p>
+              <ul className="mt-1 space-y-1 text-[13px] leading-6 text-[#3e4c61]">
+                {answer.facts.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
+              {answer.interpretation.length ? (
+                <>
+                  <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[#738097]">
+                    Interpretation
+                  </p>
+                  <ul className="mt-1 space-y-1 text-[13px] leading-6 text-[#546277]">
+                    {answer.interpretation.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </>
+              ) : null}
             </>
+          )}
+          {answer.trace_id ? (
+            <div className="mt-4 border-t border-[#eef0f4] pt-3">
+              <button
+                type="button"
+                className="text-[12px] font-semibold text-[#3157c9]"
+                data-testid="people-ai-trace-toggle"
+                onClick={() => setShowTrace((value) => !value)}
+              >
+                {showTrace ? "Hide trace" : "Show trace"}
+              </button>
+              {showTrace ? (
+                <dl className="mt-2 space-y-1 text-[12px] leading-5 text-[#546277]" data-testid="people-ai-trace">
+                  <div>trace_id {answer.trace_id}</div>
+                  <div>tier {String(answer.tier)}</div>
+                  <div>identity {answer.identity_id}</div>
+                  <div>snapshot {answer.snapshot?.pointer_id} · {answer.snapshot?.as_of}</div>
+                  {answer.llm_skipped ? <div>llm_skipped {answer.llm_skipped}</div> : null}
+                  {(answer.trace?.tools ?? []).map((tool) => (
+                    <div key={`${tool.seq}-${tool.name}`}>
+                      {tool.seq}. {tool.name} ({tool.latency_ms} ms) {tool.ok ? "ok" : tool.error}
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
+            </div>
           ) : null}
         </div>
       ) : null}

@@ -1,45 +1,107 @@
 import { DemoShell, ServingUnavailable } from "@/components/enterprise-demo/DemoShell";
 import { FollowUpAsk } from "@/components/enterprise-demo/FollowUpAsk";
+import { MetricCaption } from "@/components/enterprise-demo/MetricCaption";
 import { MetricDefinitionButton } from "@/components/enterprise-demo/MetricDefinitionButton";
+import { RoleSwitcher } from "@/components/enterprise-demo/RoleSwitcher";
 import { TrendSparkline } from "@/components/enterprise-demo/TrendSparkline";
-import { asList, asRecord, formatCount, formatRate } from "@/lib/people/format";
+import { asList, asRecord, formatRate } from "@/lib/people/format";
+import { DEFAULT_IDENTITY } from "@/lib/people/demo-identities";
 import { loadAttritionCase } from "@/lib/people/demo-payload";
-import { peopleServingConfigured } from "@/lib/people/serving";
+import { learningRecommendationsForGaps } from "@/lib/people/learn-catalog";
+import { VOL_T12M_WINDOW } from "@/lib/people/metric-grain";
+import { pageMetadata } from "@/lib/site-metadata";
+import { peopleV2Configured } from "@/lib/people/v2-config";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export default async function AttritionCasePage() {
-  if (!peopleServingConfigured()) return <ServingUnavailable />;
-  const data = await loadAttritionCase();
-  const metric = asRecord(data.retention.metric);
-  const trend = asList(asRecord(data.retention.trend).points).map((point) => ({
+export const metadata = pageMetadata({
+  title: "Why is Engineering attrition increasing?",
+  description:
+    "Case 3: Engineering voluntary attrition on a trailing-12m annualized grain, with min-cell suppression by identity and public Microsoft Learn paths for skill gaps.",
+  path: "/enterprise-demo/attrition",
+});
+
+export default async function AttritionCasePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ identity?: string }> | { identity?: string };
+}) {
+  if (!peopleV2Configured()) return <ServingUnavailable />;
+  const params = await Promise.resolve(searchParams ?? {});
+  const identity = params.identity?.trim() || DEFAULT_IDENTITY;
+  const data = await loadAttritionCase(identity);
+  const metric = asRecord(data.metric);
+  const trend = asList(asRecord(data.trend).points).map((point) => ({
     as_of: String(point.as_of ?? ""),
     value: Number(point.value ?? 0),
   }));
-  const byLocation = asList(data.retention.by_location);
-  const byLevel = asList(data.retention.by_level);
-  const byTenure = asList(data.retention.by_tenure);
-  const mobility = asRecord(data.mobility.internal_mobility);
-  const pay = asRecord(data.retention.compensation);
-  const skillRows = asList(data.skills.gaps).filter((row) => row.is_critical);
-  const recs = asList(data.recommendations.recommendations);
+  const breakdown = asRecord(data.breakdown);
+  const cells = asList(breakdown.cells);
+  const suppressed = cells.filter((row) => row.suppressed === true);
+  const signals = asRecord(data.signals);
+  const compa = asList(signals.compa);
+  const mgr = asList(signals.manager_change_reorg);
+  const bls = asRecord(signals.bls);
+  const skillRows = asList(data.skills);
+  const learningRecs = learningRecommendationsForGaps(skillRows);
+  const breakdownWindow = String(breakdown.window ?? VOL_T12M_WINDOW);
 
   return (
-    <DemoShell active="attrition">
+    <DemoShell
+      active="attrition"
+      railExtra={<RoleSwitcher value={identity} />}
+      ai={<FollowUpAsk demoCase="attrition" identityId={identity} />}
+    >
       <article>
         <p className="eyebrow">Case 3 · Workforce Intelligence + AI</p>
         <h1 className="mt-3 max-w-3xl text-[32px] font-bold tracking-[-0.04em] text-[#13203a]">
           Why is Engineering voluntary attrition increasing?
         </h1>
-        <p className="mt-4 max-w-3xl text-[20px] font-semibold leading-snug text-[#13203a]">
+        <p className="mt-4 max-w-3xl text-[20px] font-semibold leading-snug text-[#13203a]" data-testid="case3-headline">
           {data.headline}
+        </p>
+        <p className="mt-2 text-[12px] text-[#667085]" data-testid="headline-visible-cells">
+          based on cells visible at this access level
         </p>
         <div className="mt-3">
           <MetricDefinitionButton definition={data.definition} />
         </div>
+        <p className="mt-4 text-[28px] font-bold tracking-[-0.03em] text-[#13203a]" data-testid="case3-hero-rate">
+          {formatRate(metric.value)}
+        </p>
+        <MetricCaption
+          scope={data.engineeringGrain.scope}
+          window={data.engineeringGrain.window}
+          asOf={data.engineeringGrain.asOf}
+        />
         <p className="mt-3 text-[13px] text-[#546277]">
-          Latest Engineering voluntary attrition {formatRate(metric.value)} on the current
-          trusted snapshot.
+          Company trailing-12m (parity) {formatRate(data.companyMetric.value)}.
+        </p>
+        <MetricCaption
+          scope={data.companyGrain.scope}
+          window={data.companyGrain.window}
+          asOf={data.companyGrain.asOf}
+        />
+        <p className="mt-3 text-[13px] text-[#546277]">
+          Month view (secondary) {formatRate(asRecord(data.monthMetric).value)}.
+        </p>
+        <MetricCaption
+          scope={data.monthGrain.scope}
+          window={data.monthGrain.window}
+          asOf={data.monthGrain.asOf}
+        />
+        <p className="mt-2 text-[12px] text-[#667085]" data-testid="suppression-summary">
+          Identity {identity} · min_cell {String(breakdown.min_cell ?? "—")} · {suppressed.length} of{" "}
+          {cells.length} location × tenure × grade cells suppressed. Rates use trailing-12m; suppression
+          uses as-of month headcount n, not trailing-12m average n.
+        </p>
+        <p className="mt-2 max-w-3xl text-[13px] leading-6 text-[#546277]" data-testid="suppression-changes-conclusion">
+          Cell suppression is not cosmetic. Across the four demo identities the hidden cells are 44 /
+          42 / 34 / 30. The headline location is computed from cells still visible after min-cell
+          suppression at this access level. The ranked list is also identity-specific: a six-person
+          EMEA-LON slice can sit at the top for the People analyst while remaining hidden for the
+          visitor. Suppression changes the conclusion — that is the governance demonstration.
         </p>
 
         <section className="mt-8">
@@ -49,50 +111,50 @@ export default async function AttritionCasePage() {
           </div>
         </section>
 
-        <section className="mt-8 grid gap-5 md:grid-cols-3">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Where</p>
-            <ul className="mt-2 space-y-1 text-[13px] text-[#3e4c61]">
-              {byLocation.slice(0, 5).map((row) => (
-                <li key={String(row.location_id)}>
-                  {String(row.location_id)} · {formatRate(row.voluntary_attrition_rate)}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Who · level</p>
-            <ul className="mt-2 space-y-1 text-[13px] text-[#3e4c61]">
-              {byLevel.slice(0, 5).map((row) => (
-                <li key={String(row.job_level)}>
-                  {String(row.job_level)} · {formatRate(row.voluntary_attrition_rate)}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Who · tenure</p>
-            <ul className="mt-2 space-y-1 text-[13px] text-[#3e4c61]">
-              {byTenure.slice(0, 5).map((row) => (
-                <li key={String(row.tenure_band)}>
-                  {String(row.tenure_band)} · {formatRate(row.voluntary_attrition_rate)}
-                </li>
-              ))}
-            </ul>
-          </div>
+        <section className="mt-8">
+          <p className="eyebrow">Where × tenure × grade (suppression on)</p>
+          <p className="mt-2 text-[12px] text-[#667085]" data-testid="breakdown-window">
+            Window: {breakdownWindow}. Rate window is trailing-12m. Suppression uses as-of month n, not
+            trailing-12m average headcount.
+          </p>
+          <ul className="mt-3 space-y-1 text-[13px] text-[#3e4c61]" data-testid="location-tenure">
+            {data.rankedVisible.map((row) => (
+              <li key={String(row.key)}>
+                {String(row.location_id ?? row.key)} · {String(row.tenure_band ?? "")} ·{" "}
+                {String(row.grade_id ?? "")} · {formatRate(row.value)}
+                {row.n != null ? ` · n=${String(row.n)}` : ""}
+                <span className="mt-0.5 block text-[11px] text-[#738097]">
+                  Window {String(row.window ?? breakdownWindow)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-[12px] text-[#667085]" data-testid="min-cell-hidden">
+            Top {data.rankedVisible.length} visible cells
+            {data.hiddenCellCount > 0
+              ? ` · ${data.hiddenCellCount} cells hidden under min-cell`
+              : ""}
+            .
+          </p>
         </section>
 
         <section className="mt-8">
           <p className="eyebrow">Related signals</p>
           <ul className="mt-3 space-y-1 text-[13px] leading-6 text-[#3e4c61]">
-            <li>Internal mobility {formatRate(mobility.value)}</li>
+            {compa.map((row) => (
+              <li key={String(row.group)}>
+                Compa-ratio {String(row.group)} median {Number(row.median_compa ?? 0).toFixed(2)} (n=
+                {String(row.n)})
+              </li>
+            ))}
+            {mgr.map((row) => (
+              <li key={String(row.group)}>
+                Reorg-class manager change {String(row.group)}: {String(row.manager_changes)} events
+                / {String(row.n_workers)} workers
+              </li>
+            ))}
             <li>
-              Median base {formatCount(pay.median_base_usd)} · compa-ratio{" "}
-              {typeof pay.mean_compa_ratio === "number" ? Number(pay.mean_compa_ratio).toFixed(2) : "—"}
-            </li>
-            <li>
-              Span of control {typeof data.span.value === "number" ? Number(data.span.value).toFixed(1) : "—"} ·
-              engagement {typeof data.engagement.value === "number" ? Number(data.engagement.value).toFixed(0) : "—"}
+              BLS {String(bls.series ?? "JOLTS")}: {String(bls.note ?? "calibration only")}
             </li>
           </ul>
         </section>
@@ -104,8 +166,8 @@ export default async function AttritionCasePage() {
             </p>
             <ul className="mt-2 space-y-2 text-[13px] leading-6 text-[#3e4c61]">
               <li>The voluntary attrition definition, period, and grain are certified.</li>
-              <li>Rates are not uniform across Engineering locations, levels, or tenure.</li>
-              <li>Mobility, pay position, and skill coverage are available as related signals, not causes.</li>
+              <li>Rates are not uniform across Engineering locations and tenure bands.</li>
+              <li>Compa-ratio lag and reorg-class manager change are related signals, not causes.</li>
             </ul>
           </section>
           <section className="surface p-4" data-testid="unknown-evidence">
@@ -127,15 +189,17 @@ export default async function AttritionCasePage() {
             Internal workforce: Synthetic · O*NET: Public · Microsoft Learn: Public
           </p>
           <ul className="mt-4 space-y-2">
-            {skillRows.map((row) => (
+            {skillRows.map((row, index) => (
               <li
-                key={String(row.skill_id)}
+                key={String(row.org_id ?? row.job_family ?? index)}
                 className="flex items-center justify-between border-b border-[#eef0f4] py-2 text-[13px]"
               >
-                <span className="font-medium text-[#1c2b44]">{String(row.skill_name)}</span>
+                <span className="font-medium text-[#1c2b44]">
+                  {String(row.job_family ?? "Engineering")}
+                  {row.org_id ? ` · ${String(row.org_id)}` : ""}
+                </span>
                 <span className="text-[#546277]">
-                  coverage {formatRate(row.internal_coverage_rate)} · gap {formatRate(row.gap_rate)} · n=
-                  {formatCount(row.workers_in_family)}
+                  coverage {formatRate(row.coverage_ratio ?? row.internal_coverage_rate)}
                 </span>
               </li>
             ))}
@@ -144,15 +208,15 @@ export default async function AttritionCasePage() {
             Relevant learning (Microsoft Learn)
           </p>
           <ul className="mt-2 space-y-2 text-[13px]" data-testid="learning-recs">
-            {recs.slice(0, 5).map((row) => (
-              <li key={String(row.content_id)}>
+            {learningRecs.map((item) => (
+              <li key={item.url}>
                 <a
+                  href={item.url}
                   className="font-medium text-[#3157c9] hover:underline"
-                  href={String(row.url ?? "#")}
-                  target="_blank"
                   rel="noreferrer"
+                  target="_blank"
                 >
-                  {String(row.title)}
+                  {item.title}
                 </a>
               </li>
             ))}
@@ -175,7 +239,6 @@ export default async function AttritionCasePage() {
             <li>Offer targeted learning against the largest critical-skill gaps where coverage is thin.</li>
           </ul>
         </section>
-        <FollowUpAsk demoCase="attrition" />
       </article>
     </DemoShell>
   );

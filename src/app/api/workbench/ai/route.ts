@@ -6,6 +6,7 @@ import {
 } from "@/lib/ai/route-guard";
 import { workbenchAIRequestSchema } from "@/lib/ai/schemas";
 import { executeWorkbenchAITask } from "@/lib/ai/tasks";
+import { completeLlmBudget, gatePublicLlm } from "@/lib/people/agent/budget";
 
 export const runtime = "nodejs";
 
@@ -31,6 +32,17 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   try {
+    const site = await gatePublicLlm(request, "lab_workbench_ai");
+    if (!site.allowed) {
+      const result = await executeWorkbenchAITask(
+        parsed.data,
+        deterministicOnlyProvider({
+          code: "quota_exceeded",
+          message: "Site LLM budget is exhausted; deterministic fallback was used.",
+        }),
+      );
+      return jsonResponse(result);
+    }
     const access = await resolveLiveAIAccess(request);
     const result =
       access.status === "live"
@@ -39,6 +51,13 @@ export async function POST(request: Request): Promise<Response> {
             parsed.data,
             deterministicOnlyProvider(access.warning),
           );
+    if (site.callId) {
+      await completeLlmBudget({
+        callId: site.callId,
+        ok: access.status === "live",
+        model: "deepseek-chat",
+      });
+    }
     return jsonResponse(result);
   } catch {
     return jsonResponse(

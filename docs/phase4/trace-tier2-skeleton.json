@@ -1,0 +1,13 @@
+{
+  "trace_id": "sample-tier2-skeleton",
+  "tier": 2,
+  "llm_skipped": "per_ip_daily",
+  "llm_calls": 0,
+  "observed": {
+    "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0%, concentrated primarily in APAC-SIN.",
+    "facts": [
+      "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31."
+    ]
+  },
+  "note": "Budget skip keeps the same observed numbers as a successful skeleton run. User sees no error."
+}

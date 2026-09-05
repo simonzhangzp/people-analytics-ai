@@ -3,10 +3,17 @@
 import { Badge } from "@/components/ui/badge";
 
 export function QualityBadge({ status }: { status?: string | null }) {
-  if (status === "unhealthy") {
+  if (status === "unhealthy" || status === "blocked" || status === "degraded") {
     return (
       <Badge variant="danger" data-testid="quality-unhealthy">
-        Not trusted
+        {status === "blocked" ? "Blocked" : status === "degraded" ? "Degraded" : "Not trusted"}
+      </Badge>
+    );
+  }
+  if (status === "withheld" || status === "error") {
+    return (
+      <Badge variant="danger" data-testid="quality-unhealthy">
+        {status === "withheld" ? "Withheld" : "Serving error"}
       </Badge>
     );
   }

@@ -5,6 +5,7 @@ import {
   readGuardedAIJson,
   resolveLiveAIAccess,
 } from "@/lib/ai/route-guard";
+import { completeLlmBudget, gatePublicLlm } from "@/lib/people/agent/budget";
 import type { MetricProposal, StrategyAnalysis, StrategyIntent } from "@/types/strategy";
 import { z } from "zod";
 
@@ -184,8 +185,23 @@ export async function POST(request: Request) {
     statement,
   });
 
+  const site = await gatePublicLlm(request, "lab_strategy_analyze");
+  if (!site.allowed) {
+    return jsonResponse({
+      brief: fallback,
+      source: "catalog",
+      warning: {
+        code: "quota_exceeded",
+        message: "Site LLM budget is exhausted; the catalog fallback was used.",
+      },
+    });
+  }
+
   const access = await resolveLiveAIAccess(request);
   if (access.status === "blocked") {
+    if (site.callId) {
+      await completeLlmBudget({ callId: site.callId, ok: false, model: "deepseek-chat" });
+    }
     return jsonResponse({
       brief: fallback,
       source: "catalog",
@@ -199,6 +215,9 @@ export async function POST(request: Request) {
     statement || fallback.statement,
   );
   if (!remote) {
+    if (site.callId) {
+      await completeLlmBudget({ callId: site.callId, ok: false, model: "deepseek-chat" });
+    }
     return jsonResponse({
       brief: fallback,
       source: "catalog",
@@ -208,6 +227,10 @@ export async function POST(request: Request) {
           "DeepSeek could not complete the Strategy proposal; the catalog fallback was used.",
       },
     });
+  }
+
+  if (site.callId) {
+    await completeLlmBudget({ callId: site.callId, ok: true, model: "deepseek-chat" });
   }
 
   const analysis: StrategyAnalysis = {

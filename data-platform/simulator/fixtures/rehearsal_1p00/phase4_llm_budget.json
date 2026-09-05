@@ -1,0 +1,17 @@
+{
+  "daily_fourth_blocked": {
+    "allowed": false,
+    "call_id": null,
+    "remaining": {
+      "per_ip_daily": 0,
+      "site_rolling_30d": 47,
+      "per_ip_rolling_30d": 7
+    },
+    "blocked_by": "per_ip_daily",
+    "max_tokens_per_call": 1024
+  },
+  "site_blocked": "site_rolling_30d",
+  "concurrent_allowed": 3,
+  "concurrent_blocked": 7,
+  "ok": true
+}

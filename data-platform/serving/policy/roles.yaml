@@ -27,6 +27,11 @@ table_classes:
       - people_business_rule
       - people_serving_pointer
       - people_policy_demo_identity
+      - people_quality_result
+      - people_quality_test
+      - people_serving_run
+      - people_quality_incident
+      - people_replay_metric_value
     exclude_suffix: _restricted
   people_app_execute:
     - people_latest_month
@@ -34,6 +39,22 @@ table_classes:
     - people_get_metric
     - people_get_metric_for
     - people_get_metric_breakdown
+    - people_get_metric_trend
+    - people_get_case3_signals
+    - people_try_consume_llm
+    - people_complete_llm_call
+    - people_write_agent_trace
+    - people_write_agent_tool_call
+    - people_log_catalog_access
+    - people_list_entities
+    - people_describe_entity
+    - people_get_join_paths
+    - people_get_skill_coverage_for
   no_select_people_app:
     prefixes: [people_snap_, people_evt_, people_fact_, people_hist_]
     suffix: _restricted
+    exact:
+      - people_dim_person
+      - people_dim_worker
+      - people_dim_candidate
+      - people_xw_identity
