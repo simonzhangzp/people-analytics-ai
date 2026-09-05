@@ -15,14 +15,14 @@
       "44 of 104 location × tenure × grade cells hidden (min_cell 50; n is as-of month headcount, not trailing-12m average)."
     ],
     "hypotheses": [
-      "Location concentration is an observed association after suppression. It does not by itself prove a cause.",
+      "Location concentration is an observed association after suppression. It does not by itself prove why people left.",
       "Read the visible location ranking before treating any one site as a company-wide problem."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "861a16a7-cf3d-4961-9873-229e07555801"
+    "trace_id": "86396bc1-d414-49ff-9109-4ac6eac3a0bf"
   },
   {
     "identity": "demo-external-viewer",
@@ -38,14 +38,14 @@
       "44 of 104 location × tenure × grade cells hidden (min_cell 50; n is as-of month headcount, not trailing-12m average). Hidden cells are not evidence for a company-wide action."
     ],
     "hypotheses": [
-      "Pull the APAC-SIN / <1y Engineering file that remains visible after min_cell 50: manager changes, hiring mix, and whether the rate is new or persistent.",
+      "Pull the highest-rate visible Engineering location file: manager changes, hiring mix, and whether the rate is new or persistent.",
       "Do not use the APAC HRIS replay, or any hidden cell, as the brief for a company-wide retention program."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "c75ff170-9559-4f03-aeb4-143091f11d33"
+    "trace_id": "2326ff18-888e-44aa-ae7f-a47f6ec7f857"
   },
   {
     "identity": "demo-external-viewer",
@@ -65,13 +65,13 @@
       "No cells hidden at this grain (min_cell 50)."
     ],
     "hypotheses": [
-      "Tenure differences are associations after suppression. They are not a claim that tenure causes quits."
+      "Tenure differences are associations after suppression. They are not a causal claim."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "d0364eb3-8a68-49b1-9940-470c62ea9b36"
+    "trace_id": "e39c760f-e550-4413-a496-4b2160a6500e"
   },
   {
     "identity": "demo-external-viewer",
@@ -90,7 +90,7 @@
     "tools_used": [
       "get_metric"
     ],
-    "trace_id": "08384444-0a0f-446c-b00f-807e8d9e47d8"
+    "trace_id": "50cd29c0-bd05-4ce9-ac27-fd5ed6b0cbc6"
   },
   {
     "identity": "demo-external-viewer",
@@ -110,7 +110,7 @@
     "tools_used": [
       "get_skill_coverage"
     ],
-    "trace_id": "0523ba4e-6b45-4147-9ba2-a83e7c782fcf"
+    "trace_id": "f8f261cf-d2df-4911-9753-81aeca3f8d51"
   },
   {
     "identity": "demo-external-viewer",
@@ -119,17 +119,20 @@
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Voluntary terminations in the trailing 12 months divided by average certified headcount, annualized. Month grain is a secondary view.",
+    "headline": "Voluntary terminations in the trailing 12 months divided by average certified headcount. Month grain is a secondary annualized view.",
     "facts": [
       "Owner: People Analytics",
-      "Formula: terminated_in_month ∧ voluntary (sum over window) / average certified headcount",
-      "Version 1. Certified snapshot as-of 2026-08-31. min_cell does not apply to a definition lookup."
+      "Formula: voluntary_terms / average certified headcount",
+      "Formula SQL: select count(*) filter (where terminated_in_month and termination_category = 'voluntary') * 1.0 / nullif(avg_hc, 0) from people_snap_worker_month where month_end <= as_of and month_end > win_start and (job_fam is null or job_family = job_fam)",
+      "Certified snapshot as-of 2026-08-31. Cell-size suppression does not apply to a definition lookup."
     ],
-    "hypotheses": [],
+    "hypotheses": [
+      "This is the certified wording. It does not change the published Engineering figure."
+    ],
     "tools_used": [
       "get_metric_definition"
     ],
-    "trace_id": "30b8d9af-06ea-4709-9118-9af4e93841be"
+    "trace_id": "5b1bf4f0-f474-4c10-a23e-cd000b5408aa"
   },
   {
     "identity": "demo-leader-engineering",
@@ -147,14 +150,14 @@
       "42 of 104 location × tenure × grade cells hidden (min_cell 20; n is as-of month headcount, not trailing-12m average)."
     ],
     "hypotheses": [
-      "Location concentration is an observed association after suppression. It does not by itself prove a cause.",
+      "Location concentration is an observed association after suppression. It does not by itself prove why people left.",
       "Read the visible location ranking before treating any one site as a company-wide problem."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "aeccd5fa-fbe5-4a46-a540-06e679856a08"
+    "trace_id": "c633afe6-f6b7-4f22-909a-6b81f5fa14fd"
   },
   {
     "identity": "demo-leader-engineering",
@@ -170,14 +173,14 @@
       "42 of 104 location × tenure × grade cells hidden (min_cell 20; n is as-of month headcount, not trailing-12m average). Hidden cells are not evidence for a company-wide action."
     ],
     "hypotheses": [
-      "Pull the APAC-SIN / <1y Engineering file that remains visible after min_cell 20: manager changes, hiring mix, and whether the rate is new or persistent.",
+      "Pull the highest-rate visible Engineering location file: manager changes, hiring mix, and whether the rate is new or persistent.",
       "Do not use the APAC HRIS replay, or any hidden cell, as the brief for a company-wide retention program."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "b0c7b252-2560-4d45-9893-546086fba163"
+    "trace_id": "90379444-22e0-495c-8172-4ef1c92cb197"
   },
   {
     "identity": "demo-leader-engineering",
@@ -197,13 +200,13 @@
       "No cells hidden at this grain (min_cell 20)."
     ],
     "hypotheses": [
-      "Tenure differences are associations after suppression. They are not a claim that tenure causes quits."
+      "Tenure differences are associations after suppression. They are not a causal claim."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "eda0729c-bc93-45b3-bd12-abf4113fcaa0"
+    "trace_id": "618e8046-1491-4901-9f65-24abcb11e78a"
   },
   {
     "identity": "demo-leader-engineering",
@@ -222,7 +225,7 @@
     "tools_used": [
       "get_metric"
     ],
-    "trace_id": "236808b3-d087-4158-aba6-6b7573d0d385"
+    "trace_id": "56592348-0287-45f1-9bde-14c728fa1823"
   },
   {
     "identity": "demo-leader-engineering",
@@ -242,7 +245,7 @@
     "tools_used": [
       "get_skill_coverage"
     ],
-    "trace_id": "67969faf-c174-4e9f-9636-9d0e096a816c"
+    "trace_id": "662bb1b8-ffc8-4bf6-9302-0bc2965020be"
   },
   {
     "identity": "demo-leader-engineering",
@@ -251,17 +254,20 @@
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Voluntary terminations in the trailing 12 months divided by average certified headcount, annualized. Month grain is a secondary view.",
+    "headline": "Voluntary terminations in the trailing 12 months divided by average certified headcount. Month grain is a secondary annualized view.",
     "facts": [
       "Owner: People Analytics",
-      "Formula: terminated_in_month ∧ voluntary (sum over window) / average certified headcount",
-      "Version 1. Certified snapshot as-of 2026-08-31. min_cell does not apply to a definition lookup."
+      "Formula: voluntary_terms / average certified headcount",
+      "Formula SQL: select count(*) filter (where terminated_in_month and termination_category = 'voluntary') * 1.0 / nullif(avg_hc, 0) from people_snap_worker_month where month_end <= as_of and month_end > win_start and (job_fam is null or job_family = job_fam)",
+      "Certified snapshot as-of 2026-08-31. Cell-size suppression does not apply to a definition lookup."
     ],
-    "hypotheses": [],
+    "hypotheses": [
+      "This is the certified wording. It does not change the published Engineering figure."
+    ],
     "tools_used": [
       "get_metric_definition"
     ],
-    "trace_id": "59fb451e-8681-42cf-a2e7-b12fd075c77b"
+    "trace_id": "b1c63b74-ffa6-47b8-acf2-f2e3a162d923"
   },
   {
     "identity": "demo-hrbp",
@@ -279,14 +285,14 @@
       "34 of 104 location × tenure × grade cells hidden (min_cell 10; n is as-of month headcount, not trailing-12m average)."
     ],
     "hypotheses": [
-      "Location concentration is an observed association after suppression. It does not by itself prove a cause.",
+      "Location concentration is an observed association after suppression. It does not by itself prove why people left.",
       "Read the visible location ranking before treating any one site as a company-wide problem."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "bf0ff741-5acb-4e3f-b5aa-f4b47115888b"
+    "trace_id": "9662f0e9-5678-4799-99da-d6e12b7b7ac4"
   },
   {
     "identity": "demo-hrbp",
@@ -302,14 +308,14 @@
       "34 of 104 location × tenure × grade cells hidden (min_cell 10; n is as-of month headcount, not trailing-12m average). Hidden cells are not evidence for a company-wide action."
     ],
     "hypotheses": [
-      "Pull the APAC-SIN / <1y Engineering file that remains visible after min_cell 10: manager changes, hiring mix, and whether the rate is new or persistent.",
+      "Pull the highest-rate visible Engineering location file: manager changes, hiring mix, and whether the rate is new or persistent.",
       "Do not use the APAC HRIS replay, or any hidden cell, as the brief for a company-wide retention program."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "4064cb28-cbd0-42ba-a24b-3a787aa08749"
+    "trace_id": "6cafe053-365c-4ffc-874c-383272b3ffed"
   },
   {
     "identity": "demo-hrbp",
@@ -329,13 +335,13 @@
       "No cells hidden at this grain (min_cell 10)."
     ],
     "hypotheses": [
-      "Tenure differences are associations after suppression. They are not a claim that tenure causes quits."
+      "Tenure differences are associations after suppression. They are not a causal claim."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "f9785b9b-a473-4a75-b110-c9fedb9edd8a"
+    "trace_id": "22ffb7ee-8b3f-4d2b-a45a-aac0c2da6c24"
   },
   {
     "identity": "demo-hrbp",
@@ -354,7 +360,7 @@
     "tools_used": [
       "get_metric"
     ],
-    "trace_id": "15785db9-ad31-4e7b-89d3-e1ffb1ffd0a5"
+    "trace_id": "b4db9bb0-8a57-4d60-9f86-d02b976680de"
   },
   {
     "identity": "demo-hrbp",
@@ -374,7 +380,7 @@
     "tools_used": [
       "get_skill_coverage"
     ],
-    "trace_id": "1775be97-a133-4e0b-9864-02c0806a7d71"
+    "trace_id": "94ad8048-d4c0-4488-9c5e-fdf31e8a6510"
   },
   {
     "identity": "demo-hrbp",
@@ -383,17 +389,20 @@
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Voluntary terminations in the trailing 12 months divided by average certified headcount, annualized. Month grain is a secondary view.",
+    "headline": "Voluntary terminations in the trailing 12 months divided by average certified headcount. Month grain is a secondary annualized view.",
     "facts": [
       "Owner: People Analytics",
-      "Formula: terminated_in_month ∧ voluntary (sum over window) / average certified headcount",
-      "Version 1. Certified snapshot as-of 2026-08-31. min_cell does not apply to a definition lookup."
+      "Formula: voluntary_terms / average certified headcount",
+      "Formula SQL: select count(*) filter (where terminated_in_month and termination_category = 'voluntary') * 1.0 / nullif(avg_hc, 0) from people_snap_worker_month where month_end <= as_of and month_end > win_start and (job_fam is null or job_family = job_fam)",
+      "Certified snapshot as-of 2026-08-31. Cell-size suppression does not apply to a definition lookup."
     ],
-    "hypotheses": [],
+    "hypotheses": [
+      "This is the certified wording. It does not change the published Engineering figure."
+    ],
     "tools_used": [
       "get_metric_definition"
     ],
-    "trace_id": "fe3c6789-18c0-4dcf-a582-e6ae4f99a9aa"
+    "trace_id": "245c7618-7cae-4df5-a539-72b0aed2c3b7"
   },
   {
     "identity": "demo-people-analyst",
@@ -411,14 +420,14 @@
       "30 of 104 location × tenure × grade cells hidden (min_cell 5; n is as-of month headcount, not trailing-12m average)."
     ],
     "hypotheses": [
-      "Location concentration is an observed association after suppression. It does not by itself prove a cause.",
+      "Location concentration is an observed association after suppression. It does not by itself prove why people left.",
       "Read the visible location ranking before treating any one site as a company-wide problem."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "878c2721-f8c5-4324-b272-96f673d2b11b"
+    "trace_id": "81396dd2-bc0a-4970-8467-2c87c32e96bb"
   },
   {
     "identity": "demo-people-analyst",
@@ -434,14 +443,14 @@
       "30 of 104 location × tenure × grade cells hidden (min_cell 5; n is as-of month headcount, not trailing-12m average). Hidden cells are not evidence for a company-wide action."
     ],
     "hypotheses": [
-      "Pull the APAC-SIN / <1y Engineering file that remains visible after min_cell 5: manager changes, hiring mix, and whether the rate is new or persistent.",
+      "Pull the highest-rate visible Engineering location file: manager changes, hiring mix, and whether the rate is new or persistent.",
       "Do not use the APAC HRIS replay, or any hidden cell, as the brief for a company-wide retention program."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "b63aff03-8342-4e67-9b0d-5c4d8070154c"
+    "trace_id": "a8f754ee-4b62-48df-afad-42044a6e1320"
   },
   {
     "identity": "demo-people-analyst",
@@ -461,13 +470,13 @@
       "No cells hidden at this grain (min_cell 5)."
     ],
     "hypotheses": [
-      "Tenure differences are associations after suppression. They are not a claim that tenure causes quits."
+      "Tenure differences are associations after suppression. They are not a causal claim."
     ],
     "tools_used": [
       "get_metric",
       "get_metric_breakdown"
     ],
-    "trace_id": "e4c68ef3-247b-4fdb-baa8-3315d9d3e625"
+    "trace_id": "37c59a6d-a59f-44d5-aa2a-77914e3a7ff4"
   },
   {
     "identity": "demo-people-analyst",
@@ -486,7 +495,7 @@
     "tools_used": [
       "get_metric"
     ],
-    "trace_id": "ab195a66-f070-4543-b196-bdf9ad3c815d"
+    "trace_id": "6bf27a75-6cff-4be9-8ff8-138018e18cf0"
   },
   {
     "identity": "demo-people-analyst",
@@ -506,7 +515,7 @@
     "tools_used": [
       "get_skill_coverage"
     ],
-    "trace_id": "8ee44c18-6bbc-4769-a1f4-45cae2239ea8"
+    "trace_id": "d9efb822-a8b8-4426-8fe7-f7f0972542e2"
   },
   {
     "identity": "demo-people-analyst",
@@ -515,16 +524,19 @@
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Voluntary terminations in the trailing 12 months divided by average certified headcount, annualized. Month grain is a secondary view.",
+    "headline": "Voluntary terminations in the trailing 12 months divided by average certified headcount. Month grain is a secondary annualized view.",
     "facts": [
       "Owner: People Analytics",
-      "Formula: terminated_in_month ∧ voluntary (sum over window) / average certified headcount",
-      "Version 1. Certified snapshot as-of 2026-08-31. min_cell does not apply to a definition lookup."
+      "Formula: voluntary_terms / average certified headcount",
+      "Formula SQL: select count(*) filter (where terminated_in_month and termination_category = 'voluntary') * 1.0 / nullif(avg_hc, 0) from people_snap_worker_month where month_end <= as_of and month_end > win_start and (job_fam is null or job_family = job_fam)",
+      "Certified snapshot as-of 2026-08-31. Cell-size suppression does not apply to a definition lookup."
     ],
-    "hypotheses": [],
+    "hypotheses": [
+      "This is the certified wording. It does not change the published Engineering figure."
+    ],
     "tools_used": [
       "get_metric_definition"
     ],
-    "trace_id": "e21110ca-f62f-4d86-be7b-d207dada6556"
+    "trace_id": "1c2d83fe-a53d-48e4-838d-dd7497e80cf7"
   }
 ]

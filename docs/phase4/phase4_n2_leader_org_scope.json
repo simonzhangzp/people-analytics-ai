@@ -10,23 +10,25 @@
   ],
   "evidence": [
     {
+      "as_of": "2026-08-31",
       "value": null,
       "denied": true,
       "reason": "org_scope",
       "metric_id": "compa_ratio_median",
+      "job_family": "Sales",
       "identity_id": "demo-leader-engineering",
+      "metric_min_cell": 10,
+      "identity_min_cell": 20,
       "metric_version": 1,
       "quality_status": "healthy",
-      "health_reason": "v1 published",
-      "asOf": "",
-      "as_of": ""
+      "health_reason": "v1 published"
     },
     {
       "metric_id": "compa_ratio_median",
       "grain_table": "people_fact_comp_assignment_restricted",
       "numerator": "median(base / band_mid) for certified workers as-of",
-      "denominator": null,
-      "min_cell": 10,
+      "denominator": "certified workers with a current assignment and grade band as-of",
+      "metric_min_cell": 10,
       "sensitivity": "confidential",
       "status": "certified",
       "yaml_path": "people_metrics/compa_ratio.yml",
@@ -34,12 +36,12 @@
       "annualized": false,
       "time_logic": "month (as-of)",
       "window": "month (as-of)",
-      "business_definition": "median(base / band_mid) for certified workers as-of",
-      "formula": "median(base / band_mid) for certified workers as-of",
-      "formula_sql": "median(base / band_mid) for certified workers as-of",
+      "business_definition": "Median of base pay divided by grade-band midpoint among certified workers with a current assignment as-of month-end.",
+      "formula": "percentile_cont(0.5) of (base / band_mid)",
+      "formula_sql": "select percentile_cont(0.5) within group (order by c.base * 1.0 / nullif(b.band_mid, 0)) from people_snap_worker_month s join people_hist_worker_attr h on h.worker_id = s.worker_id and h.valid_from <= s.month_end and (h.valid_to is null or h.valid_to > s.month_end) join people_fact_comp_assignment_restricted c on c.worker_id = s.worker_id and c.from_date <= s.month_end and (c.to_date is null or c.to_date >= s.month_end) join people_ref_comp_band b on b.grade_id = h.grade_id where s.month_end = as_of and s.is_certified",
       "version": 1,
       "quality_status": "healthy"
     }
   ],
-  "trace_id": "0169ab1a-d61d-47ee-b729-f927b8a1b1a2"
+  "trace_id": "2e757d4c-680f-4541-a21d-69f90f9dcd88"
 }

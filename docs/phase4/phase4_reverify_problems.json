@@ -1,51 +1,184 @@
 [
   {
+    "id": "S3",
+    "status": "closed",
+    "summary": "dataset freshness: The dataset is frozen at data-v1 (as-of 2026-08-31).",
+    "evidence": "docs/phase4/p1-s3-freshness-card.png",
+    "blocking": false
+  },
+  {
+    "id": "S3",
+    "status": "open",
+    "summary": "FRESHNESS card still lacks Last serving check / streak=3; wait for 9/6 UTC cron. Do not fake ok=false before that date.",
+    "evidence": "docs/phase4/p1-s3-freshness-card.png",
+    "blocking": true
+  },
+  {
+    "id": "B3",
+    "status": "closed",
+    "summary": "headline: Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). The month view is 17.9%, up 1.9 pp from 2026-07. Concentrated in APAC-SIN among cells visible at this access level.",
+    "evidence": "docs/phase4/p1-b3-headline.png",
+    "blocking": true
+  },
+  {
+    "id": "small-july",
+    "status": "closed",
+    "summary": "July month line: 2026-07: 16.0% (as_of 2026-07-31)",
+    "evidence": "docs/phase4/p1-b3-headline.png",
+    "blocking": true
+  },
+  {
+    "id": "S2",
+    "status": "closed",
+    "summary": "axis note: Y-axis starts at 13.7%, not 0. Unit: trailing-12m annualized rate.",
+    "evidence": "docs/phase4/p1-s2-chart.png",
+    "blocking": true
+  },
+  {
+    "id": "small-ticks",
+    "status": "open",
+    "summary": "full-series ticks: ",
+    "evidence": "docs/phase4/p1-s2-chart.png",
+    "blocking": false
+  },
+  {
+    "id": "static-six-person",
+    "status": "closed",
+    "summary": "Cell suppression is not cosmetic. Across the four demo identities the hidden cells are 44 / 42 / 34 / 30. The headline location is computed from cells still visible after min-cell suppression at this access level. At People analyst min_cell",
+    "evidence": "src/app/enterprise-demo/attrition/page.tsx",
+    "blocking": true
+  },
+  {
+    "id": "B1",
+    "status": "closed",
+    "summary": "visitor has no compa medians",
+    "evidence": "p1-b1-visitor-chip04-signals.png",
+    "blocking": true
+  },
+  {
+    "id": "B1-gate",
+    "status": "closed",
+    "summary": "visitor gate copy",
+    "evidence": "related-signals",
+    "blocking": true
+  },
+  {
     "id": "N1",
     "status": "closed",
-    "summary": "Locations headlines use identity_label and the matching min_cell (site visitor 50 / Engineering leader 20 / HRBP 10 / People analyst 5). No non-visitor row names visitor.",
-    "evidence": "docs/phase4/phase4_chip_api.json",
+    "summary": "visitor locations headline has 'site visitor min_cell 50'",
+    "evidence": "Among cells visible at site visitor min_cell 50, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.1%).",
+    "blocking": true
+  },
+  {
+    "id": "S1",
+    "status": "closed",
+    "summary": "tenure hidden fact: –5y: 14.6%.\nTenure 5–10y: 11.6%.\nTenure 10y+: 8.1%.\nNo cells hidden at this grain (min_cell 50).\nTenure differences are associations after suppression. They are not a causal claim.",
+    "evidence": "e39c760f-e550-4413-a496-4b2160a6500e",
     "blocking": true
   },
   {
     "id": "N2",
     "status": "closed",
-    "summary": "Visitor chip-04 uses the deny template with site visitor. Leader/HRBP/analyst receive Engineering median 0.98 with n=15954. Leader Sales compensation is denied with reason org_scope.",
-    "evidence": "docs/phase4/phase4_chip_api.json; docs/phase4/phase4_n2_leader_org_scope.json",
+    "summary": "visitor chip-04 deny template",
+    "evidence": "Compensation positioning is not available to site visitor. No substitute number is shown.",
+    "blocking": true
+  },
+  {
+    "id": "N1",
+    "status": "closed",
+    "summary": "leader locations headline has 'Engineering leader min_cell 20'",
+    "evidence": "Among cells visible at Engineering leader min_cell 20, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.1%).",
+    "blocking": true
+  },
+  {
+    "id": "N2",
+    "status": "closed",
+    "summary": "leader chip-04 allowed with n",
+    "evidence": "Engineering median compa-ratio is 0.98 (n=15954 Engineering certified workers) as of 2026-08-31.",
+    "blocking": true
+  },
+  {
+    "id": "N1",
+    "status": "closed",
+    "summary": "hrbp locations headline has 'HRBP min_cell 10'",
+    "evidence": "Among cells visible at HRBP min_cell 10, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.0%).",
+    "blocking": true
+  },
+  {
+    "id": "N2",
+    "status": "closed",
+    "summary": "hrbp chip-04 allowed with n",
+    "evidence": "Engineering median compa-ratio is 0.98 (n=15954 Engineering certified workers) as of 2026-08-31.",
+    "blocking": true
+  },
+  {
+    "id": "N1",
+    "status": "closed",
+    "summary": "analyst locations headline has 'People analyst min_cell 5'",
+    "evidence": "Among cells visible at People analyst min_cell 5, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.0%).",
+    "blocking": true
+  },
+  {
+    "id": "N2",
+    "status": "closed",
+    "summary": "analyst chip-04 allowed with n",
+    "evidence": "Engineering median compa-ratio is 0.98 (n=15954 Engineering certified workers) as of 2026-08-31.",
+    "blocking": true
+  },
+  {
+    "id": "N2-org-scope",
+    "status": "closed",
+    "summary": "leader Sales compensation: Compensation positioning is not available to Engineering leader. No substitute number is shown.",
+    "evidence": "2e757d4c-680f-4541-a21d-69f90f9dcd88",
+    "blocking": true
+  },
+  {
+    "id": "C2",
+    "status": "closed",
+    "summary": "leader company compensation: Compensation positioning is not available to Engineering leader. No substitute number is shown. as_of=2026-08-31",
+    "evidence": "7b76ce1c-ed49-4f47-b0e7-a02349cac9ca",
+    "blocking": true
+  },
+  {
+    "id": "F3",
+    "status": "closed",
+    "summary": "budget copy: The free-form demo has reached today's limit for this network. The six prepared questions below still work.",
+    "evidence": "docs/phase4/p1-f3-budget.png",
     "blocking": true
   },
   {
     "id": "N3",
     "status": "closed",
-    "summary": "This file uses the required schema and lists every cover leftover. Empty array is not used while S3 remains open.",
+    "summary": "problems.json uses the schema and lists every cover item; empty array is forbidden while S3 remains open.",
     "evidence": "docs/phase4/PHASE4_VERIFY.md",
     "blocking": true
   },
   {
     "id": "B2-a",
     "status": "closed",
-    "summary": "Full response diff: headline and facts and tools match; hypotheses differ. Planner rewrites hypotheses only. E1 scores llm_invocation and tool sequence, not headline/facts equality.",
-    "evidence": "docs/phase4/phase4_llm_invocation_matrix.json#b2a_diff",
+    "summary": "Planner rewrites hypotheses only. Full response fields are in the matrix b2a_diff. E1 scores hypotheses (non-empty / no digits / no causal verbs) plus llm_invocation and tool sequence; it does not score headline/facts equality.",
+    "evidence": "docs/phase4/phase4_llm_invocation_matrix.json",
     "blocking": true
   },
   {
     "id": "B2-b",
     "status": "closed",
-    "summary": "failure_reason is the classified enum. A thrown ReferenceError is internal_code_error, not upstream_*. Stack type+frame stay in telemetry only.",
-    "evidence": "src/lib/people/agent/identity-copy.test.ts; docs/phase4/phase4_llm_invocation_matrix.json attempted_failed",
+    "summary": "failure_reason enum includes internal_code_error; ReferenceError unit test asserts that class.",
+    "evidence": "src/lib/people/agent/identity-copy.test.ts",
     "blocking": true
   },
   {
-    "id": "S3",
-    "status": "open",
-    "summary": "FRESHNESS card still shows frozen-at-data-v1 only. Last serving check / streak=3 and the deliberate ok=false fallback wait for the 9/6 UTC cron. Do not fake ok=false on production before that date.",
-    "evidence": "docs/phase4/p1-s3-freshness-card.png",
-    "blocking": true
-  },
-  {
-    "id": "F1",
+    "id": "N1",
     "status": "closed",
-    "summary": "Annotated tags phase4-p1-v1 and phase4-p1-v2 are pushed with this delivery. Production alias is dpl_4haWuzB5v5QgvgZPQcWmLsArJwoa.",
-    "evidence": "git ls-remote --tags origin refs/tags/phase4-p1-v2; dpl_4haWuzB5v5QgvgZPQcWmLsArJwoa",
+    "summary": "24-grid locations headlines use each identity_label and matching min_cell.",
+    "evidence": "docs/phase4/phase4_chip_api.json",
+    "blocking": true
+  },
+  {
+    "id": "N2",
+    "status": "closed",
+    "summary": "chip-04 uses identity_label; leader/HRBP/analyst Engineering median allowed; leader Sales deny recorded.",
+    "evidence": "docs/phase4/phase4_n2_leader_org_scope.json",
     "blocking": true
   }
 ]
