@@ -51,6 +51,7 @@ const COVER_IDS = new Set([
   "S3",
   "F1",
   "F3",
+  "C2",
   "static-six-person",
   "small-july",
 ]);
@@ -286,6 +287,35 @@ await writeFile(
   )}\n`,
 );
 
+const COMPANY_COMPA = "What is company compensation?";
+const companyAsk = await askApi("demo-leader-engineering", COMPANY_COMPA);
+const companyPayload = companyAsk.payload;
+const companyDeny = (companyPayload?.evidence ?? []).some(
+  (row) => row?.denied === true && row?.reason === "org_scope" && String(row?.as_of ?? "").length >= 10,
+);
+note(
+  Boolean(companyAsk.ok && companyDeny && !VISITOR_WORD.test(textBlob(companyPayload))),
+  "C2",
+  `leader company compensation: ${companyPayload.headline} as_of=${(companyPayload?.evidence ?? []).find((row) => row?.denied)?.as_of ?? ""}`,
+  companyPayload.trace_id,
+);
+await writeFile(
+  path.join(OUT, "phase4_c2_ask.json"),
+  `${JSON.stringify(
+    {
+      question: COMPANY_COMPA,
+      identity_id: "demo-leader-engineering",
+      headline: companyPayload.headline,
+      facts: companyPayload.facts,
+      hypotheses: companyPayload.hypotheses,
+      evidence: companyPayload.evidence,
+      trace_id: companyPayload.trace_id,
+    },
+    null,
+    2,
+  )}\n`,
+);
+
 await page.goto(`${BASE}/enterprise-demo/attrition`, { waitUntil: "domcontentloaded" });
 await page.getByTestId("case3-headline").waitFor({ timeout: 45_000 });
 let freeform = await askApi("demo-external-viewer", FREEFORM);
@@ -358,6 +388,10 @@ if (freeform.payload?.llm_invocation === "skipped_by_budget" || /skipped_by_budg
   await page.screenshot({ path: path.join(OUT, "p1-freeform-attempted-ok.png"), fullPage: true });
 }
 
+await page.goto(`${BASE}/architecture`, { waitUntil: "domcontentloaded" });
+await page.getByTestId("b2a-facts-deterministic").waitFor({ timeout: 45_000 });
+await page.screenshot({ path: path.join(OUT, "p1-architecture-b2a.png"), fullPage: true });
+
 await browser.close();
 
 problem(
@@ -369,7 +403,7 @@ problem(
 problem(
   "B2-a",
   "closed",
-  "Planner rewrites hypotheses only. Full response fields are in the matrix b2a_diff. E1 will score llm_invocation and tool sequence, not headline/facts equality.",
+  "Planner rewrites hypotheses only. Full response fields are in the matrix b2a_diff. E1 scores hypotheses (non-empty / no digits / no causal verbs) plus llm_invocation and tool sequence; it does not score headline/facts equality.",
   "docs/phase4/phase4_llm_invocation_matrix.json",
 );
 problem(

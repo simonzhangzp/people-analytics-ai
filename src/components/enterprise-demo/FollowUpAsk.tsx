@@ -167,6 +167,11 @@ export function FollowUpAsk({
           )}
           {answer.trace_id ? (
             <div className="mt-4 border-t border-[#eef0f4] pt-3">
+              <p className="text-[12px] leading-5 text-[#546277]" data-testid="people-ai-trace-b2a">
+                Facts stay on the SQL path. The model only rewrites hypotheses.
+                attempted_ok and attempted_failed share headline, facts, and tools —
+                see Architecture (b2a_diff).
+              </p>
               <button
                 type="button"
                 className="text-[12px] font-semibold text-[#3157c9]"

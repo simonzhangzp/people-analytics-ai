@@ -1,0 +1,149 @@
+[
+  {
+    "metric_id": "applications_per_opening",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": "requisitions opened in the same window"
+  },
+  {
+    "metric_id": "average_headcount",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": null
+  },
+  {
+    "metric_id": "compa_ratio_median",
+    "sensitivity": "confidential",
+    "allow_company_level": false,
+    "metric_min_cell": 10,
+    "denominator": "certified workers with a current assignment and grade band as-of"
+  },
+  {
+    "metric_id": "engagement_score",
+    "sensitivity": "confidential",
+    "allow_company_level": false,
+    "metric_min_cell": 5,
+    "denominator": null
+  },
+  {
+    "metric_id": "headcount",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": null
+  },
+  {
+    "metric_id": "hires",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": null
+  },
+  {
+    "metric_id": "internal_mobility_rate",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": "average_headcount"
+  },
+  {
+    "metric_id": "involuntary_attrition_rate",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": "average_headcount"
+  },
+  {
+    "metric_id": "manager_turnover_rate",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": "trailing-12m mean of certified managers"
+  },
+  {
+    "metric_id": "offer_acceptance_rate",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": "accepted + rejected offers in window"
+  },
+  {
+    "metric_id": "promotion_rate",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": "average_headcount"
+  },
+  {
+    "metric_id": "quality_of_hire",
+    "sensitivity": "confidential",
+    "allow_company_level": false,
+    "metric_min_cell": 10,
+    "denominator": "via_t1 hires whose hire_date is in (as_of-24m, as_of-12m] (12-month retention window has closed)"
+  },
+  {
+    "metric_id": "recruiter_load",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 3,
+    "denominator": "recruiters"
+  },
+  {
+    "metric_id": "regrettable_attrition_rate",
+    "sensitivity": "confidential",
+    "allow_company_level": false,
+    "metric_min_cell": 5,
+    "denominator": "average_headcount"
+  },
+  {
+    "metric_id": "rehires",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": null
+  },
+  {
+    "metric_id": "skill_coverage",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": "certified workers whose job_id has at least one people_ref_job_skill_target row"
+  },
+  {
+    "metric_id": "span_of_control",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": "managers"
+  },
+  {
+    "metric_id": "time_in_stage_hours",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": null
+  },
+  {
+    "metric_id": "time_to_fill_days",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": null
+  },
+  {
+    "metric_id": "training_hours_per_worker",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": "average_headcount"
+  },
+  {
+    "metric_id": "voluntary_attrition_rate",
+    "sensitivity": "internal",
+    "allow_company_level": true,
+    "metric_min_cell": 5,
+    "denominator": "average_headcount"
+  }
+]

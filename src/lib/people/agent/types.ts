@@ -36,7 +36,6 @@ export interface PeopleObservedFact {
   metric_id?: string;
   filters: Record<string, string | number | null>;
   as_of?: string;
-  asOf?: string;
   grain?: string;
   value?: number | null;
   unit?: string;
@@ -101,7 +100,8 @@ export interface PeopleAnswerContract {
     dimension?: string;
     key?: string;
     n?: number | null;
-    min_cell?: number;
+    identity_min_cell?: number;
+    metric_min_cell?: number;
   }>;
   skills_used: string[];
   critic: PeopleCriticResult;

@@ -1,5 +1,6 @@
 import { asList, asRecord, formatRate, isoDate } from "../format";
-import { identityLabel } from "../demo-identities";
+import { identityLabel, identityMinCell as identityFloor } from "../demo-identities";
+import { metricMinCell } from "../metric-catalog";
 import { aggregateVisibleBy, finiteRate, visibleBreakdownCells } from "../case3-view";
 import { suppressionCopy } from "./suppression-copy";
 import type { PeopleObservedFact, PeopleToolCall } from "./types";
@@ -34,13 +35,12 @@ export function pickNamed(
 }
 
 export function fact(text: string, extra: Partial<PeopleObservedFact> = {}): PeopleObservedFact {
-  const asOf = extra.as_of ?? extra.asOf;
+  const asOf = extra.as_of;
   return {
     text,
     filters: extra.filters ?? {},
     ...extra,
     as_of: asOf,
-    asOf: asOf,
   };
 }
 
@@ -52,16 +52,22 @@ export function tracedFacts(
   return facts.filter((item) => !item.source_tool || names.has(item.source_tool));
 }
 
-function collectSuppressed(breakdown: Record<string, unknown>) {
+function breakdownIdentityMinCell(breakdown: Record<string, unknown>, identityId?: string): number {
+  return num(breakdown.identity_min_cell) ?? num(breakdown.min_cell) ?? (identityId ? identityFloor(identityId) : 50);
+}
+
+function collectSuppressed(breakdown: Record<string, unknown>, identityId?: string) {
   const cells = asList(breakdown.cells);
-  const minCell = num(breakdown.min_cell) ?? 50;
+  const identityMin = breakdownIdentityMinCell(breakdown, identityId);
+  const metricMin = num(breakdown.metric_min_cell) ?? undefined;
   return cells
     .filter((cell) => cell.suppressed === true)
     .map((cell) => ({
       dimension: String(breakdown.dimension ?? ""),
       key: String(cell.key ?? ""),
       n: num(cell.n),
-      min_cell: minCell,
+      identity_min_cell: identityMin,
+      metric_min_cell: metricMin,
     }));
 }
 
@@ -75,7 +81,13 @@ export type ChipDraft = {
   headline: string;
   facts: PeopleObservedFact[];
   hypotheses: string[];
-  suppressed: Array<{ dimension?: string; key?: string; n?: number | null; min_cell?: number }>;
+  suppressed: Array<{
+    dimension?: string;
+    key?: string;
+    n?: number | null;
+    identity_min_cell?: number;
+    metric_min_cell?: number;
+  }>;
   skillsUsed: string[];
   definition?: unknown;
 };
@@ -88,10 +100,10 @@ export function composeLocations(
   const eng = engineeringMetric(results);
   const breakdown = pickNamed(results, "get_metric_breakdown");
   const cells = asList(breakdown.cells);
-  const minCell = num(breakdown.min_cell) ?? 50;
+  const minCell = breakdownIdentityMinCell(breakdown, identityId);
   const ranked = aggregateVisibleBy(cells, "location_id");
   const top = ranked[0];
-  const suppressed = collectSuppressed(breakdown);
+  const suppressed = collectSuppressed(breakdown, identityId);
   const rate = num(eng.value);
   const asOfDate = isoDate(eng.as_of) || asOf;
   const who = identityLabel(identityId);
@@ -128,7 +140,7 @@ export function composeLocations(
         {
           source_tool: "get_metric_breakdown",
           metric_id: metricVersion("voluntary_attrition_rate"),
-          filters: { location_id: row.key, min_cell: minCell },
+          filters: { location_id: row.key, identity_min_cell: minCell },
           value: row.rate,
           unit: "rate",
           as_of: asOfDate,
@@ -138,7 +150,7 @@ export function composeLocations(
     ),
     fact(copy.hiddenFact, {
       source_tool: "get_metric_breakdown",
-      filters: { dimension: String(breakdown.dimension ?? "location_tenure_grade"), min_cell: minCell },
+      filters: { dimension: String(breakdown.dimension ?? "location_tenure_grade"), identity_min_cell: minCell },
       as_of: asOfDate,
       grain: copy.grain,
     }),
@@ -147,7 +159,7 @@ export function composeLocations(
     headline,
     facts,
     hypotheses: [
-      "Location concentration is an observed association after suppression. It does not by itself prove a cause.",
+      "Location concentration is an observed association after suppression. It does not by itself prove why people left.",
       "Read the visible location ranking before treating any one site as a company-wide problem.",
     ],
     suppressed,
@@ -162,11 +174,9 @@ export function composeNextSteps(
   const eng = engineeringMetric(results);
   const breakdown = pickNamed(results, "get_metric_breakdown");
   const cells = asList(breakdown.cells);
-  const minCell = num(breakdown.min_cell) ?? 50;
+  const minCell = breakdownIdentityMinCell(breakdown);
   const rankedLoc = aggregateVisibleBy(cells, "location_id");
-  const rankedTenure = aggregateVisibleBy(cells, "tenure_band");
   const where = rankedLoc[0]?.key ?? "the highest-rate visible location";
-  const tenure = rankedTenure[0]?.key;
   const asOfDate = isoDate(eng.as_of) || asOf;
   const suppressed = collectSuppressed(breakdown);
   const copy = suppressionCopy({
@@ -203,7 +213,7 @@ export function composeNextSteps(
         {
           source_tool: "get_metric_breakdown",
           metric_id: metricVersion("voluntary_attrition_rate"),
-          filters: { min_cell: minCell },
+          filters: { identity_min_cell: minCell },
           value: num(slice?.value),
           unit: "rate",
           as_of: asOfDate,
@@ -216,16 +226,14 @@ export function composeNextSteps(
           : `${copy.hiddenFact} Hidden cells are not evidence for a company-wide action.`,
         {
           source_tool: "get_metric_breakdown",
-          filters: { min_cell: minCell },
+          filters: { identity_min_cell: minCell },
           as_of: asOfDate,
           grain: copy.grain,
         },
       ),
     ],
     hypotheses: [
-      copy.noneHidden
-        ? `Pull the ${where}${tenure ? ` / ${tenure}` : ""} Engineering file: manager changes, hiring mix, and whether the rate is new or persistent.`
-        : `Pull the ${where}${tenure ? ` / ${tenure}` : ""} Engineering file that remains visible after min_cell ${minCell}: manager changes, hiring mix, and whether the rate is new or persistent.`,
+      "Pull the highest-rate visible Engineering location file: manager changes, hiring mix, and whether the rate is new or persistent.",
       "Do not use the APAC HRIS replay, or any hidden cell, as the brief for a company-wide retention program.",
     ],
     suppressed,
@@ -241,9 +249,9 @@ export function composeTenure(
   const eng = engineeringMetric(results);
   const breakdown = pickNamed(results, "get_metric_breakdown");
   const cells = asList(breakdown.cells);
-  const minCell = num(breakdown.min_cell) ?? 50;
+  const minCell = breakdownIdentityMinCell(breakdown, identityId);
   const ranked = aggregateVisibleBy(cells, "tenure_band");
-  const suppressed = collectSuppressed(breakdown);
+  const suppressed = collectSuppressed(breakdown, identityId);
   const asOfDate = isoDate(eng.as_of) || asOf;
   const visibleCells = visibleBreakdownCells(cells).filter((row) => String(row.tenure_band ?? "").trim());
   const bandKeys = [
@@ -279,14 +287,14 @@ export function composeTenure(
           `Tenure-band cells are hidden at min_cell ${minCell} (n is as-of month headcount). No tenure rate is substituted.`,
           {
             source_tool: "get_metric_breakdown",
-            filters: { dimension: String(breakdown.dimension ?? "location_tenure"), min_cell: minCell },
+            filters: { dimension: String(breakdown.dimension ?? "location_tenure"), identity_min_cell: minCell },
             as_of: asOfDate,
             grain: "trailing-12m (annualized)",
           },
         ),
       ],
       hypotheses: [
-        `Ask with an identity whose min_cell is below ${minCell} if you need tenure bands that remain hidden here.`,
+        "Ask with a lower-threshold identity if you need tenure bands that remain hidden here.",
       ],
       suppressed,
       skillsUsed: [],
@@ -319,7 +327,7 @@ export function composeTenure(
           {
             source_tool: "get_metric_breakdown",
             metric_id: metricVersion("voluntary_attrition_rate"),
-            filters: { tenure_band: row.key, min_cell: minCell },
+            filters: { tenure_band: row.key, identity_min_cell: minCell },
             value: row.rate,
             unit: "rate",
             as_of: asOfDate,
@@ -329,13 +337,13 @@ export function composeTenure(
       ),
       fact(copy.hiddenFact, {
         source_tool: "get_metric_breakdown",
-        filters: { min_cell: minCell, grain: "tenure_band" },
+        filters: { identity_min_cell: minCell, grain: "tenure_band" },
         as_of: asOfDate,
         grain: copy.grain,
       }),
     ],
     hypotheses: [
-      "Tenure differences are associations after suppression. They are not a claim that tenure causes quits.",
+      "Tenure differences are associations after suppression. They are not a causal claim.",
     ],
     suppressed,
     skillsUsed: [],
@@ -363,7 +371,11 @@ export function composeCompensation(
           {
             source_tool: "get_metric",
             metric_id: metricVersion("compa_ratio_median"),
-            filters: { job_family: "Engineering" },
+            filters: {
+              job_family: "Engineering",
+              identity_min_cell: identityFloor(identityId),
+              metric_min_cell: metricMinCell("compa_ratio_median"),
+            },
             value: null,
             denied: true,
             as_of: asOfDate,
@@ -388,7 +400,11 @@ export function composeCompensation(
         {
           source_tool: "get_metric",
           metric_id: metricVersion("compa_ratio_median"),
-          filters: { job_family: "Engineering" },
+          filters: {
+            job_family: "Engineering",
+            identity_min_cell: identityFloor(identityId),
+            metric_min_cell: metricMinCell("compa_ratio_median"),
+          },
           value: num(row.value),
           as_of: asOfDate,
           grain: "month (as-of)",
@@ -483,19 +499,28 @@ export function composeDefinition(
         source_tool: "get_metric_definition",
         metric_id: metricVersion(metricId),
         filters: {},
+        as_of: "2026-08-31",
       }),
-      fact(`Formula: ${String(def.formula ?? def.formula_sql ?? "")}`, {
+      fact(`Formula: ${String(def.formula ?? "")}`, {
         source_tool: "get_metric_definition",
         filters: {},
+        as_of: "2026-08-31",
       }),
-      fact(`Version ${String(def.version ?? 1)}. Certified snapshot as-of 2026-08-31. min_cell does not apply to a definition lookup.`, {
+      fact(`Formula SQL: ${String(def.formula_sql ?? "")}`, {
+        source_tool: "get_metric_definition",
+        filters: {},
+        as_of: "2026-08-31",
+      }),
+      fact(`Certified snapshot as-of 2026-08-31. Cell-size suppression does not apply to a definition lookup.`, {
         source_tool: "get_metric_definition",
         filters: {},
         as_of: "2026-08-31",
         grain: "definition",
       }),
     ],
-    hypotheses: [],
+    hypotheses: [
+      "This is the certified wording. It does not change the published Engineering figure.",
+    ],
     suppressed: [],
     skillsUsed: [],
     definition: def,

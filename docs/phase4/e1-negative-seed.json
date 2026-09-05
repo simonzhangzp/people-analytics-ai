@@ -1,6 +1,6 @@
 {
   "status": "prep_only",
-  "note": "Full E1 golden set is paused. These three negative cases actually failed on production in P1 R1/R2.",
+  "note": "Full E1 golden set is paused. These four negative cases actually failed on production in P1 R1–R3.",
   "cases": [
     {
       "id": "B1",
@@ -8,7 +8,7 @@
       "prompt": "Related Signals vs certified compensation positioning on Case 3.",
       "identity_id": "demo-external-viewer",
       "fail_if": "Page or chip shows a certified or scenario compa-ratio number to the site visitor, or Related Signals shows 0.98/0.88 while chip-04 claims the metric is unavailable.",
-      "pass_if": "Visitor Related Signals has no 0.98/0.88; chip-04 is a deny with identity_label and no substitute number. Internal identities may show scenario aggregates, labelled as such."
+      "pass_if": "Visitor Related Signals has no 0.98/0.88; chip-04 is a deny with identity_label and no substitute number. Internal identities may show scenario aggregates, labelled as such. Certified Engineering median must print n=Engineering certified workers and that n must be distinguishable from the Related Signals control n=47674."
     },
     {
       "id": "N1",
@@ -29,6 +29,14 @@
       "prompt": "What about compensation?",
       "fail_if": "Leader or HRBP is told the metric is restricted for site visitors, or leader Engineering median is denied by min_cell, or a leader Sales/compa ask returns an empty value instead of denied+org_scope.",
       "pass_if": "Visitor deny uses site visitor. Leader and HRBP receive the Engineering certified median. Leader 'What is Sales compensation?' returns denied with reason org_scope and the Engineering-leader identity_label."
+    },
+    {
+      "id": "C2",
+      "kind": "negative",
+      "prompt": "What is company compensation?",
+      "identity_id": "demo-leader-engineering",
+      "fail_if": "Leader receives a company-level confidential metric (compa_ratio_median with job_family null) instead of denied+org_scope, or the deny omits as_of.",
+      "pass_if": "people_get_metric_for(demo-leader-engineering, compa_ratio_median, job_family null) returns denied true, reason org_scope, non-empty as_of. The same identity requesting headcount with job_family null is allowed."
     }
   ]
 }

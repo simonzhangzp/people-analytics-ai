@@ -86,16 +86,16 @@ export default async function AttritionCasePage({
         <p className="mt-3 text-[13px] text-[#546277]">
           Month view (secondary) {formatRate(asRecord(data.monthMetric).value)}.
         </p>
-        {data.priorAsOf ? (
-          <p className="text-[13px] text-[#546277]" data-testid="case3-prior-month">
-            {data.priorAsOf.slice(0, 7)}: {formatRate(data.prior)}
-          </p>
-        ) : null}
         <MetricCaption
           scope={data.monthGrain.scope}
           window={data.monthGrain.window}
           asOf={data.monthGrain.asOf}
         />
+        {data.priorAsOf ? (
+          <p className="text-[13px] text-[#546277]" data-testid="case3-prior-month">
+            {data.priorAsOf.slice(0, 7)}: {formatRate(data.prior)} (as_of {data.priorAsOf})
+          </p>
+        ) : null}
         <p className="mt-2 text-[12px] text-[#667085]" data-testid="suppression-summary">
           Identity {identity} · min_cell {String(breakdown.min_cell ?? "—")} · {suppressed.length} of{" "}
           {cells.length} location × tenure × grade cells suppressed. Rates use trailing-12m; suppression

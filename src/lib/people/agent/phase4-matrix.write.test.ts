@@ -102,7 +102,7 @@ describe.skipIf(process.env.PHASE4_WRITE_MATRIX !== "1")("phase4 llm_invocation 
       tools_equal: JSON.stringify(failed.tools_used) === JSON.stringify(ok.tools_used),
       attempted_ok_hypotheses: ok.hypotheses,
       attempted_failed_hypotheses: failed.hypotheses,
-      note: "Planner rewrites hypotheses wording only. E1 scores llm_invocation and tool sequence, not headline/facts equality.",
+      note: "Planner rewrites hypotheses wording only. E1 scores hypotheses (non-empty, no digits, no causal verbs) plus llm_invocation and tool sequence. E1 does not score headline/facts equality.",
     };
     writeFileSync(OUT, `${JSON.stringify(current, null, 2)}\n`);
   });

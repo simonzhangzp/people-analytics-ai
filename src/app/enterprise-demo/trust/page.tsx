@@ -153,7 +153,10 @@ export default async function TrustCasePage({
               {String(asRecord(data.definition).business_definition)}
             </p>
             <p className="mt-2 font-mono text-[11px] text-[#3e4c61]">
-              {String(asRecord(data.definition).formula ?? asRecord(data.definition).formula_sql)}
+              {String(asRecord(data.definition).formula ?? "—")}
+            </p>
+            <p className="mt-1 font-mono text-[11px] text-[#3e4c61]">
+              SQL: {String(asRecord(data.definition).formula_sql ?? "—")}
             </p>
           </section>
           <section className="surface p-4" data-testid="quality-tests">

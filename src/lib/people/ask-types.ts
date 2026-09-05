@@ -50,7 +50,12 @@ export interface PeopleAskAnswer {
     facts: Array<{ text: string; metric_id?: string; value?: number | null }>;
   };
   hypotheses?: string[];
-  suppressed_cells?: Array<{ key?: string; n?: number | null; min_cell?: number }>;
+  suppressed_cells?: Array<{
+    key?: string;
+    n?: number | null;
+    identity_min_cell?: number;
+    metric_min_cell?: number;
+  }>;
   skills_used?: string[];
   critic?: { ok: boolean; failures: string[] };
   error_state?: "rpc" | "critic" | null;

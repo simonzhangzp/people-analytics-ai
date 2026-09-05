@@ -19,7 +19,7 @@ const LAYERS = [
   ["Lineage / Freshness / Governance", "people_dataset_lineage, source health, and people_serving_snapshot separate current trusted state from incident replay."],
   ["Serving RPC Layer", "people_get_* functions. Arithmetic stays in Postgres."],
   ["Workforce Intelligence", "Retention, skill coverage and related signals over certified metrics."],
-  ["People AI Tools", "A bounded tool list over the same RPCs. Not generic NL-to-SQL. The run-time planner rewrites hypotheses wording only; headlines, facts, and tool calls stay on the SQL/compose path. Eval of attempted_ok vs attempted_failed scores llm_invocation and the tool sequence, not headline text."],
+  ["People AI Tools", "A bounded tool list over the same RPCs. Not generic NL-to-SQL. Facts stay on the SQL/compose path. The run-time planner rewrites hypotheses wording only. attempted_ok vs attempted_failed share headline, facts, and tools (b2a_diff). E1 scores hypotheses for emptiness, digits, and causal verbs, plus llm_invocation and the tool sequence."],
 ];
 
 export default function ArchitecturePage() {
@@ -36,6 +36,20 @@ export default function ArchitecturePage() {
             The recruiter demo is a serving layer over a People data platform.
             Object storage holds history. A scheduled pipeline builds the lake and
             publishes governed marts to a serving database.
+          </p>
+        </section>
+
+        <section className="surface p-6" data-testid="b2a-facts-deterministic">
+          <p className="eyebrow">Facts vs model</p>
+          <h2 className="mt-3 text-[18px] font-semibold text-[#1c2b44]">
+            Facts are deterministic. The model only rewrites hypotheses.
+          </h2>
+          <p className="mt-3 max-w-3xl text-[14px] leading-6 text-[#546277]">
+            Headline, facts, and tool sequence are composed from SQL. If the LLM
+            call is attempted_ok or attempted_failed, those three stay the same;
+            only hypotheses wording may change. That equality is the b2a_diff
+            evidence. Eval still scores hypotheses for emptiness, digits, and causal verbs —
+            it does not score headline/facts by text similarity.
           </p>
         </section>
 

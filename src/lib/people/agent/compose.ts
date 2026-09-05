@@ -25,8 +25,9 @@ import {
   pickNamed,
   tracedFacts,
 } from "./compose-playbooks";
-import { identityLabel } from "../demo-identities";
+import { identityLabel, identityMinCell } from "../demo-identities";
 import { resolveLlmInvocation } from "./llm-invocation";
+import { scoreHypotheses } from "./hypotheses-eval";
 
 function pickMetric(results: unknown[], metricId?: string, jobFamily?: string | null): Record<string, unknown> {
   for (const item of results) {
@@ -221,7 +222,7 @@ export function composeAnswerContract(input: {
           dimension: String(breakdown.dimension ?? "location_tenure_grade"),
           key: String(cell.key ?? ""),
           n: num(cell.n),
-          min_cell: num(breakdown.min_cell) ?? undefined,
+          identity_min_cell: num(breakdown.identity_min_cell) ?? num(breakdown.min_cell) ?? undefined,
         });
       }
     }
@@ -251,15 +252,17 @@ export function composeAnswerContract(input: {
         value: engValue,
         unit: String(eng.unit ?? "rate"),
         as_of: grain.as_of,
-        asOf: grain.asOf,
         grain: grain.window,
         denied: eng.denied === true,
       }),
     );
     observedFacts.push(
-      fact(`${suppressed.length} cells suppressed at min_cell ${String(breakdown.min_cell ?? 50)} (n is as-of month headcount).`, {
+      fact(`${suppressed.length} cells suppressed at identity_min_cell ${String(breakdown.identity_min_cell ?? breakdown.min_cell ?? 50)} (n is as-of month headcount).`, {
         source_tool: "get_metric_breakdown",
-        filters: { dimension: String(breakdown.dimension ?? ""), min_cell: num(breakdown.min_cell) },
+        filters: {
+          dimension: String(breakdown.dimension ?? ""),
+          identity_min_cell: num(breakdown.identity_min_cell) ?? num(breakdown.min_cell),
+        },
       }),
     );
     const skills = pickNamed(results, "get_skill_coverage");
@@ -276,7 +279,7 @@ export function composeAnswerContract(input: {
         }),
       );
     }
-    hypotheses.push("Location, tenure, and level concentrations are observed associations. They do not by themselves prove a cause.");
+    hypotheses.push("Location, tenure, and level concentrations are observed associations. They do not by themselves prove why people left.");
     hypotheses.push("Investigate the highest-rate visible Engineering slices before a company-wide program.");
   } else {
     const metric = pickNamed(results, "get_metric");
@@ -295,11 +298,13 @@ export function composeAnswerContract(input: {
           {
             source_tool: "get_metric",
             metric_id: metricVersion(metricId),
-            filters: { job_family: plan.job_family ?? null },
+            filters: {
+              job_family: plan.job_family ?? null,
+              identity_min_cell: identityMinCell(identityId),
+            },
             value: null,
             denied: true,
             as_of: metricAsOf,
-            asOf: metricAsOf,
             grain: "month (as-of)",
           },
         ),
@@ -321,7 +326,6 @@ export function composeAnswerContract(input: {
           value: metric.denied === true ? null : num(metric.value),
           unit: String(metric.unit ?? ""),
           as_of: metricAsOf,
-          asOf: metricAsOf,
           denied: metric.denied === true,
         }),
       );
@@ -350,12 +354,11 @@ export function composeAnswerContract(input: {
 
   const skeletonHypotheses = [...hypotheses];
   const allowLlmHypotheses = plan.playbook === "attrition_explore" && Boolean(input.hypotheses?.length);
-  const allowedDigits = new Set(numbersInObserved(headline, observedFacts));
   const candidate = allowLlmHypotheses ? input.hypotheses ?? skeletonHypotheses : skeletonHypotheses;
-  const safeHypotheses = candidate.filter((line) =>
-    numbersInText(line).every((digit) => allowedDigits.has(digit)),
+  const finalHypotheses = sanitizeHypotheses(
+    candidate,
+    observedFacts.map((item) => item.text),
   );
-  const finalHypotheses = safeHypotheses.length ? safeHypotheses : skeletonHypotheses;
   const llm = resolveLlmInvocation({
     llmEligible: plan.llmEligible,
     llmCalls: input.llmCalls ?? 0,
@@ -409,21 +412,14 @@ function formatRateSafe(value: unknown): string {
   return `${(n * 100).toFixed(1)}%`;
 }
 
-function numbersInText(text: string): string[] {
-  return text.match(/\d+(?:\.\d+)?/g) ?? [];
-}
-
-function numbersInObserved(headline: string, facts: PeopleObservedFact[]): Set<string> {
-  const set = new Set<string>();
-  for (const token of numbersInText(headline)) set.add(token);
-  for (const item of facts) {
-    for (const token of numbersInText(item.text)) set.add(token);
-    if (item.value != null) {
-      for (const token of numbersInText(String(item.value)) ) set.add(token);
-      for (const token of numbersInText((item.value * 100).toFixed(1))) set.add(token);
-    }
-  }
-  return set;
+function sanitizeHypotheses(lines: string[], facts: string[]): string[] {
+  const trimmed = lines.map((row) => row.trim()).filter(Boolean);
+  if (scoreHypotheses({ hypotheses: trimmed, facts }).ok) return trimmed;
+  const kept = trimmed.filter((line) => scoreHypotheses({ hypotheses: [line], facts }).ok);
+  if (kept.length) return kept;
+  return [
+    "Observed associations are not a causal claim. They do not replace the certified figures in the facts.",
+  ];
 }
 
 export { healthStatus };

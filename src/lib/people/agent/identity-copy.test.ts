@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { CASE_FOLLOW_UPS } from "../ask-types";
 import { DEMO_IDENTITIES, foreignIdentityMentions, identityLabel } from "../demo-identities";
 import { composeAnswerContract } from "./compose";
+import { scoreHypotheses } from "./hypotheses-eval";
 import { classifyPlannerFailure, resolveLlmInvocation } from "./llm-invocation";
 import { routePeopleQuestion } from "./router";
 
@@ -106,6 +107,11 @@ describe("compose identity_label", () => {
         });
         const text = blob(answer);
         expect(foreignIdentityMentions(text, row.identity_id), `${row.identity_id} ${chip}`).toEqual([]);
+        expect(
+          scoreHypotheses({ hypotheses: answer.hypotheses, facts: answer.facts, headline: answer.headline }).ok,
+          `${row.identity_id} ${chip} hypotheses`,
+        ).toBe(true);
+        expect(JSON.stringify(answer.observed.facts).includes('"asOf"')).toBe(false);
         if (plan.playbook === "locations") {
           expect(answer.headline).toContain(identityLabel(row.identity_id));
         }
@@ -165,6 +171,39 @@ describe("compose identity_label", () => {
     expect(foreignIdentityMentions(`${answer.headline}\n${answer.facts.join("\n")}`, "demo-leader-engineering")).toEqual(
       [],
     );
+  });
+
+  it("denies leader company-level confidential with org_scope and a dated as_of", () => {
+    const plan = routePeopleQuestion("What is company compensation?");
+    expect(plan.playbook).toBe("metric_value");
+    expect(plan.job_family).toBeNull();
+    expect(plan.metric_id).toBe("compa_ratio_median");
+    const answer = composeAnswerContract({
+      question: "What is company compensation?",
+      identityId: "demo-leader-engineering",
+      traceId: "44444444-4444-4444-8444-444444444444",
+      plan,
+      tools: plan.tools,
+      results: [
+        {
+          call: plan.tools[0],
+          ok: true,
+          result: {
+            denied: true,
+            reason: "org_scope",
+            metric_id: "compa_ratio_median",
+            as_of: "2026-08-31",
+            identity_min_cell: 20,
+            metric_min_cell: 10,
+          },
+        },
+      ],
+    });
+    expect(answer.headline).toMatch(/Engineering leader/);
+    expect(answer.facts.join(" ")).toMatch(/org_scope/);
+    expect(answer.observed.facts[0]?.as_of).toBe("2026-08-31");
+    expect(JSON.stringify(answer.observed.facts).includes('"asOf"')).toBe(false);
+    expect(answer.observed.facts[0]?.filters).toMatchObject({ identity_min_cell: 20 });
   });
 });
 

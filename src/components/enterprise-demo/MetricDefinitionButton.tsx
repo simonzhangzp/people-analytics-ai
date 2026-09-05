@@ -56,7 +56,11 @@ export function MetricDefinitionButton({
           </div>
           <div>
             <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Formula</dt>
-            <dd className="mt-1 font-mono text-[12px]">{String(def.formula ?? def.formula_sql ?? "—")}</dd>
+            <dd className="mt-1 font-mono text-[12px]">{String(def.formula ?? "—")}</dd>
+          </div>
+          <div>
+            <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Formula SQL</dt>
+            <dd className="mt-1 font-mono text-[12px]">{String(def.formula_sql ?? "—")}</dd>
           </div>
           <div>
             <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Population</dt>

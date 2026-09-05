@@ -35,6 +35,20 @@ export function identityLabel(identityId: string): string {
   );
 }
 
+/** Identity-level suppression floor. Distinct from YAML metric_min_cell. */
+export function identityMinCell(identityId: string): number {
+  switch (identityId) {
+    case "demo-leader-engineering":
+      return 20;
+    case "demo-hrbp":
+      return 10;
+    case "demo-people-analyst":
+      return 5;
+    default:
+      return 50;
+  }
+}
+
 export function identityShowsCompaRatio(identityId: string): boolean {
   return identityId !== "demo-external-viewer";
 }

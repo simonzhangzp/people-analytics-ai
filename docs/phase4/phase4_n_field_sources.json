@@ -1,0 +1,29 @@
+{
+  "as_of": "2026-08-31",
+  "sources": [
+    {
+      "ui": "chip-04 certified n (n=… Engineering certified workers)",
+      "field": "people_get_metric_for → payload.n",
+      "sql": "count(*) from people_snap_worker_month where month_end = as_of and is_certified and (job_family matches)",
+      "not": "not voluntary_attrition_rate or any rate/ratio"
+    },
+    {
+      "ui": "Case 3 breakdown cell n",
+      "field": "people_get_metric_breakdown cells[].n",
+      "sql": "as-of month certified headcount in that location×tenure×grade cell",
+      "not": "not trailing-12m average headcount"
+    },
+    {
+      "ui": "Related Signals compa n",
+      "field": "people_get_case3_signals CTE compa count(*)",
+      "sql": "certified workers with a current assignment and grade band, grouped control vs slice",
+      "not": "company control ~47674 is not Engineering certified n=15954"
+    },
+    {
+      "ui": "manager-change n_workers",
+      "field": "people_get_case3_signals n_workers",
+      "sql": "count(*) on people_snap_worker_month for that slice",
+      "not": "not a rate"
+    }
+  ]
+}

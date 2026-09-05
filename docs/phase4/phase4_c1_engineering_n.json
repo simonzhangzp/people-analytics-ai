@@ -1,0 +1,24 @@
+{
+  "query": "select count(*) from people_v2.people_snap_worker_month where month_end = '2026-08-31' and is_certified and job_family = 'Engineering'",
+  "engineering_certified_n": 15954,
+  "company_certified_n": 49823,
+  "people_get_metric_headcount_engineering": {
+    "unit": "count",
+    "as_of": "2026-08-31",
+    "value": 15954,
+    "window": "month",
+    "by_stage": null,
+    "metric_id": "headcount",
+    "annualized": false
+  },
+  "july_engineering_month_voluntary_attrition_rate": {
+    "unit": "rate",
+    "as_of": "2026-07-31",
+    "value": 0.15953844224256866,
+    "window": "month",
+    "by_stage": null,
+    "metric_id": "voluntary_attrition_rate",
+    "annualized": true
+  },
+  "coincidence_note": "July Engineering month voluntary_attrition_rate is ~0.15954. 0.15954 * 100000 \u2248 15954. That is a coincidence. chip-04 n is count(*) of certified Engineering worker-month rows, the same grain as Engineering Headcount."
+}

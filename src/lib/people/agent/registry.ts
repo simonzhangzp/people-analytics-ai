@@ -1,6 +1,8 @@
 import "server-only";
 
 import { asList, asRecord, isoDate } from "../format";
+import { identityMinCell } from "../demo-identities";
+import { metricMinCell } from "../metric-catalog";
 import { MICROSOFT_LEARN_CATALOG } from "../learn-catalog";
 import {
   peopleDescribeEntity,
@@ -134,14 +136,18 @@ export async function executeRegistryTool(input: {
           jobFamily,
         });
         const health = await peopleGetHealth(metricId);
-        const merged = {
+        const asOf = isoDate(payload.as_of) || isoDate(payload.asOf) || "2026-08-31";
+        const merged: Record<string, unknown> = {
           ...payload,
           metric_version: 1,
           quality_status: String(health.status ?? "unknown"),
           health_reason: health.reason ?? null,
-          asOf: isoDate(payload.as_of) || isoDate(payload.asOf),
-          as_of: isoDate(payload.as_of) || isoDate(payload.asOf),
+          as_of: asOf,
+          identity_min_cell: Number(payload.identity_min_cell) || identityMinCell(identityId),
+          metric_min_cell: Number(payload.metric_min_cell) || metricMinCell(metricId),
         };
+        delete merged.asOf;
+        delete merged.min_cell;
         return { ok: true, result: merged, summary: summarize(merged), rpc: "people_get_metric_for" };
       }
       case "get_metric_trend": {
@@ -157,7 +163,15 @@ export async function executeRegistryTool(input: {
         const payload = await peopleGetMetricBreakdown(identityId, metricId, dimension ?? "tenure_band", {
           jobFamily,
         });
-        return { ok: true, result: payload, summary: summarize(payload), rpc: "people_get_metric_breakdown" };
+        const mapped: Record<string, unknown> = {
+          ...payload,
+          identity_min_cell: Number(payload.identity_min_cell) || identityMinCell(identityId),
+          metric_min_cell: Number(payload.metric_min_cell) || metricMinCell(metricId),
+          as_of: isoDate(payload.as_of) || isoDate(payload.asOf) || "2026-08-31",
+        };
+        delete mapped.asOf;
+        delete mapped.min_cell;
+        return { ok: true, result: mapped, summary: summarize(mapped), rpc: "people_get_metric_breakdown" };
       }
       case "get_metric_definition": {
         if (!metricId) return { ok: false, error: "metric_id is required", rpc: "people_metric" };

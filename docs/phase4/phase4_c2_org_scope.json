@@ -1,0 +1,52 @@
+{
+  "leader_headcount_job_family_null": {
+    "n": 49823,
+    "unit": "count",
+    "as_of": "2026-08-31",
+    "value": 49823,
+    "denied": false,
+    "window": "month",
+    "by_stage": null,
+    "metric_id": "headcount",
+    "annualized": false,
+    "identity_id": "demo-leader-engineering",
+    "metric_min_cell": 5,
+    "identity_min_cell": 20
+  },
+  "leader_compa_job_family_null": {
+    "as_of": "2026-08-31",
+    "value": null,
+    "denied": true,
+    "reason": "org_scope",
+    "metric_id": "compa_ratio_median",
+    "job_family": null,
+    "identity_id": "demo-leader-engineering",
+    "metric_min_cell": 10,
+    "identity_min_cell": 20
+  },
+  "leader_compa_engineering": {
+    "n": 15954,
+    "unit": "ratio",
+    "as_of": "2026-08-31",
+    "value": 0.98,
+    "denied": false,
+    "window": "month",
+    "by_stage": null,
+    "metric_id": "compa_ratio_median",
+    "annualized": false,
+    "identity_id": "demo-leader-engineering",
+    "metric_min_cell": 10,
+    "identity_min_cell": 20
+  },
+  "leader_compa_sales": {
+    "as_of": "2026-08-31",
+    "value": null,
+    "denied": true,
+    "reason": "org_scope",
+    "metric_id": "compa_ratio_median",
+    "job_family": "Sales",
+    "identity_id": "demo-leader-engineering",
+    "metric_min_cell": 10,
+    "identity_min_cell": 20
+  }
+}

@@ -3,6 +3,7 @@ import "server-only";
 import { Pool, type QueryResultRow } from "pg";
 import { PEOPLE_REF } from "./refs";
 import { DEFAULT_IDENTITY } from "./demo-identities";
+import { catalogDenominator, catalogRow, metricMinCell } from "./metric-catalog";
 
 export { DEFAULT_IDENTITY, DEMO_IDENTITIES } from "./demo-identities";
 export { peopleV2Configured } from "./v2-config";
@@ -219,21 +220,37 @@ export async function peopleGetMetricRow(metricId: string): Promise<Record<strin
     [metricId],
   );
   const row = asRecord(rows[0]);
+  const overlay = catalogRow(metricId);
+  const yamlMin = Number(row.min_cell);
   const attrition = metricId === "voluntary_attrition_rate";
+  const denominator = formulaPart(row.denominator) || catalogDenominator(metricId);
   return {
-    ...row,
+    metric_id: row.metric_id ?? metricId,
+    grain_table: row.grain_table,
+    numerator: row.numerator,
+    denominator: denominator || null,
+    metric_min_cell: Number.isFinite(yamlMin) ? yamlMin : metricMinCell(metricId),
+    sensitivity: row.sensitivity ?? overlay?.sensitivity,
+    status: row.status,
+    yaml_path: row.yaml_path,
     owner: "People Analytics",
     annualized: attrition,
-    time_logic: attrition ? "trailing-12m (annualized)" : "month (as-of)",
+    time_logic: overlay
+      ? overlay.kind === "rate" && metricId !== "engagement_score" && metricId !== "skill_coverage"
+        ? "trailing-12m (annualized)"
+        : "month (as-of)"
+      : attrition
+        ? "trailing-12m (annualized)"
+        : "month (as-of)",
     window: attrition ? "trailing-12m (annualized)" : "month (as-of)",
-    business_definition:
-      metricId === "headcount"
+    business_definition: overlay?.business_definition ??
+      (metricId === "headcount"
         ? "Certified workers as of month-end. Employment type and status follow BR-WF certified rules. Window is the as-of month, not a trailing average."
         : attrition
           ? "Voluntary terminations in the trailing 12 months divided by average certified headcount, annualized. Month grain is a secondary view."
-          : String(row.numerator ?? metricId),
-    formula: metricFormula(row.numerator, row.denominator),
-    formula_sql: metricFormula(row.numerator, row.denominator),
+          : String(row.numerator ?? metricId)),
+    formula: overlay?.formula ?? metricFormula(row.numerator, row.denominator),
+    formula_sql: overlay?.formula_sql ?? null,
   };
 }
 

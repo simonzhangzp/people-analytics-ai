@@ -1,0 +1,32 @@
+{
+  "note": "people_metric stores YAML numerator/denominator. Overlay src/lib/people/metric-catalog.ts supplies distinct business_definition, formula, and executable formula_sql. peopleGetMetricRow no longer copies numerator into all three fields.",
+  "fixes": [
+    "Removed min_cell from definition/get_metric evidence; emit metric_min_cell (YAML) and identity_min_cell (role floor).",
+    "Deny records now include as_of; agent evidence keeps as_of only (no asOf).",
+    "compa_ratio_median denominator filled; formula_sql is percentile_cont SQL from 022, not English prose.",
+    "MetricDefinitionButton shows Formula and Formula SQL as separate fields."
+  ],
+  "rows": [
+    {"metric_id": "headcount", "formula_sql_is_sql": true, "denominator_required": false, "business_definition_copied_from_formula": false},
+    {"metric_id": "average_headcount", "formula_sql_is_sql": true, "denominator_required": false, "business_definition_copied_from_formula": false},
+    {"metric_id": "hires", "formula_sql_is_sql": true, "denominator_required": false, "business_definition_copied_from_formula": false},
+    {"metric_id": "rehires", "formula_sql_is_sql": true, "denominator_required": false, "business_definition_copied_from_formula": false},
+    {"metric_id": "voluntary_attrition_rate", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "involuntary_attrition_rate", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "regrettable_attrition_rate", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "promotion_rate", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "internal_mobility_rate", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "span_of_control", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "manager_turnover_rate", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "compa_ratio_median", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "engagement_score", "formula_sql_is_sql": true, "denominator_required": false, "business_definition_copied_from_formula": false},
+    {"metric_id": "training_hours_per_worker", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "skill_coverage", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "quality_of_hire", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "time_to_fill_days", "formula_sql_is_sql": true, "denominator_required": false, "business_definition_copied_from_formula": false},
+    {"metric_id": "time_in_stage_hours", "formula_sql_is_sql": true, "denominator_required": false, "business_definition_copied_from_formula": false},
+    {"metric_id": "applications_per_opening", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "offer_acceptance_rate", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false},
+    {"metric_id": "recruiter_load", "formula_sql_is_sql": true, "denominator_required": true, "business_definition_copied_from_formula": false}
+  ]
+}

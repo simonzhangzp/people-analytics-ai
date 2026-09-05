@@ -1,56 +1,198 @@
-[
-  {
-    "file": "src/lib/people/demo-identities.ts",
-    "string": "identity_label values and identityLabel()",
-    "ruling": "keep",
-    "why": "Source of the variable. Compose must read these strings; they are not hardcoded into a playbook template."
+{
+  "pattern": "visitor|analyst|hrbp|leader",
+  "path": "src/",
+  "total_hits": 230,
+  "file_count": 31,
+  "per_file": {
+    "src/app/api/mcp/route.ts": 1,
+    "src/app/connect/page.tsx": 3,
+    "src/app/enterprise-demo/attrition/page.tsx": 5,
+    "src/components/workbench/story/StoryBuilder.tsx": 6,
+    "src/components/workbench/WorkbenchProvider.tsx": 3,
+    "src/lib/ai/schemas.ts": 4,
+    "src/lib/analysis/analyst-agent.test.ts": 6,
+    "src/lib/analysis/analyst-agent.ts": 6,
+    "src/lib/analysis/direct-query.ts": 2,
+    "src/lib/analysis/index.ts": 1,
+    "src/lib/analysis/people-intelligence.ts": 1,
+    "src/lib/analysis/query-router.test.ts": 3,
+    "src/lib/analysis/query-router.ts": 7,
+    "src/lib/analytics/ask-file.ts": 12,
+    "src/lib/analytics/local-workforce-analysis.ts": 1,
+    "src/lib/data/canonical-schema.ts": 4,
+    "src/lib/people/agent/agent.test.ts": 10,
+    "src/lib/people/agent/identity-copy.test.ts": 17,
+    "src/lib/people/case3-view.test.ts": 8,
+    "src/lib/people/demo-cases.ts": 1,
+    "src/lib/people/demo-identities.test.ts": 14,
+    "src/lib/people/demo-identities.ts": 30,
+    "src/lib/people/mcp/scope.ts": 1,
+    "src/lib/ppt/executive-story.test.ts": 7,
+    "src/lib/strategy/analyze-brief.ts": 2,
+    "src/lib/strategy/catalog.ts": 48,
+    "src/lib/strategy/metric-catalog.ts": 19,
+    "src/lib/strategy/metric-templates.ts": 1,
+    "src/lib/workbench/fallbacks.ts": 1,
+    "src/types/strategy.ts": 1,
+    "src/types/workbench.ts": 5
   },
-  {
-    "file": "src/lib/people/agent/compose-playbooks.ts",
-    "string": "`${who}` from identityLabel(identityId)",
-    "ruling": "keep",
-    "why": "This is the required variable path for locations, tenure, and compensation."
-  },
-  {
-    "file": "src/app/enterprise-demo/attrition/page.tsx",
-    "string": "At People analyst min_cell 5 … Neither is visible to the site visitor.",
-    "ruling": "keep",
-    "why": "Comparative static copy that names two identities on purpose. Not a compose template keyed off the current session identity."
-  },
-  {
-    "file": "src/components/enterprise-demo/RoleSwitcher.tsx",
-    "string": "DEMO_IDENTITIES.label in the identity picker",
-    "ruling": "keep",
-    "why": "Chooser labels. The selected identity_id is passed into compose; the option text is not interpolated into chip headlines."
-  },
-  {
-    "file": "src/app/connect/page.tsx",
-    "string": "site visitor identity / min_cell 50",
-    "ruling": "keep",
-    "why": "Public MCP is locked to demo-external-viewer. The page describes that contract, not a four-identity compose path."
-  },
-  {
-    "file": "src/app/api/mcp/route.ts",
-    "string": "Identity is demo-external-viewer (min_cell 50)",
-    "ruling": "keep",
-    "why": "MCP runtime identity is visitor-only by owner lock."
-  },
-  {
-    "file": "src/lib/people/agent/registry.ts",
-    "string": "PII fields hidden at this access level",
-    "ruling": "change",
-    "why": "Was 'hidden from visitors'. Tool schema is user-visible; it must not name a demo identity."
-  },
-  {
-    "file": "src/lib/analysis/* and src/lib/strategy/*",
-    "string": "leadership / analyst loop / HR leaders",
-    "ruling": "keep",
-    "why": "Workbench/strategy vocabulary, not People demo identity_label."
-  },
-  {
-    "file": "src/lib/people/agent/compose-playbooks.ts (pre-R2)",
-    "string": "Among cells visible at visitor min_cell N / restricted for site visitors",
-    "ruling": "change",
-    "why": "N1/N2 root cause. Replaced with identityLabel()."
-  }
-]
+  "keep_glob_expanded": [
+    {
+      "file": "src/lib/analysis/analyst-agent.test.ts",
+      "hit_count": 6,
+      "matched_strings": [
+        "Leader",
+        "leader"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    },
+    {
+      "file": "src/lib/analysis/analyst-agent.ts",
+      "hit_count": 6,
+      "matched_strings": [
+        "Analyst",
+        "Leader",
+        "leader"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    },
+    {
+      "file": "src/lib/analysis/direct-query.ts",
+      "hit_count": 2,
+      "matched_strings": [
+        "Leader",
+        "leader"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    },
+    {
+      "file": "src/lib/analysis/index.ts",
+      "hit_count": 1,
+      "matched_strings": [
+        "analyst"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    },
+    {
+      "file": "src/lib/analysis/people-intelligence.ts",
+      "hit_count": 1,
+      "matched_strings": [
+        "Leader"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    },
+    {
+      "file": "src/lib/analysis/query-router.test.ts",
+      "hit_count": 3,
+      "matched_strings": [
+        "leader"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    },
+    {
+      "file": "src/lib/analysis/query-router.ts",
+      "hit_count": 7,
+      "matched_strings": [
+        "LEADER",
+        "leader"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    },
+    {
+      "file": "src/lib/strategy/analyze-brief.ts",
+      "hit_count": 2,
+      "matched_strings": [
+        "Leader",
+        "leader"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    },
+    {
+      "file": "src/lib/strategy/catalog.ts",
+      "hit_count": 48,
+      "matched_strings": [
+        "Leader",
+        "leader"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    },
+    {
+      "file": "src/lib/strategy/metric-catalog.ts",
+      "hit_count": 19,
+      "matched_strings": [
+        "Leader",
+        "leader"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    },
+    {
+      "file": "src/lib/strategy/metric-templates.ts",
+      "hit_count": 1,
+      "matched_strings": [
+        "Leader"
+      ],
+      "ruling": "keep",
+      "why": "Workbench/strategy vocabulary, not People demo identity_label."
+    }
+  ],
+  "named_keep": [
+    {
+      "file": "src/lib/people/demo-identities.ts",
+      "string": "identity_label values and identityLabel()",
+      "ruling": "keep",
+      "why": "Source of the variable."
+    },
+    {
+      "file": "src/lib/people/agent/compose-playbooks.ts",
+      "string": "identityLabel(identityId)",
+      "ruling": "keep",
+      "why": "Required variable path; file no longer contains visitor|analyst|hrbp|leader literals."
+    },
+    {
+      "file": "src/app/enterprise-demo/attrition/page.tsx",
+      "string": "At People analyst min_cell 5 \u2026 Neither is visible to the site visitor.",
+      "ruling": "keep",
+      "why": "Comparative static copy naming two identities on purpose."
+    },
+    {
+      "file": "src/components/enterprise-demo/RoleSwitcher.tsx",
+      "string": "DEMO_IDENTITIES.label",
+      "ruling": "keep",
+      "why": "Chooser labels. Option text is not interpolated into chip headlines."
+    },
+    {
+      "file": "src/app/connect/page.tsx",
+      "string": "site visitor identity / min_cell 50",
+      "ruling": "keep",
+      "why": "Public MCP is locked to demo-external-viewer."
+    },
+    {
+      "file": "src/app/api/mcp/route.ts",
+      "string": "Identity is demo-external-viewer (min_cell 50)",
+      "ruling": "keep",
+      "why": "MCP runtime identity is visitor-only by owner lock."
+    },
+    {
+      "file": "src/lib/people/mcp/scope.ts",
+      "string": "min_cell 50",
+      "ruling": "keep",
+      "why": "Public demo token contract."
+    },
+    {
+      "file": "src/lib/people/agent/registry.ts",
+      "string": "PII fields hidden at this access level",
+      "ruling": "change-done",
+      "why": "R2: no longer names visitors."
+    }
+  ]
+}
