@@ -1,3 +1,7 @@
+-- LEGACY unprefixed Workbench tables. Superseded by people_* objects in
+-- data-platform/serving/schemas and 20260831000000_people_prefixed_objects.sql.
+-- Do not create new unprefixed People tables.
+
 -- Workbench persists semantic knowledge only. Raw employee rows remain local.
 create extension if not exists pgcrypto;
 

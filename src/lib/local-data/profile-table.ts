@@ -109,17 +109,34 @@ async function buildColumnProfiles(
   connection: AsyncDuckDBConnection,
   tableName: string,
   describedColumns: DescribedColumn[],
+  sourceColumnOrder?: readonly string[],
 ) {
+  const sourceIndexByName = new Map(
+    (sourceColumnOrder ?? describedColumns.map((column) => column.sourceName)).map(
+      (sourceName, index) => [sourceName, index],
+    ),
+  );
   const mappedColumns = describedColumns.map((column) => ({
     ...column,
+    sourceIndex: sourceIndexByName.get(column.sourceName),
     mapping: resolveWorkbenchCanonicalField(column.sourceName),
     likelyPii: isWorkbenchLikelyPii(column.sourceName),
   }));
+  const [rowStatistics] = await queryDuckDB(
+    `SELECT COUNT(*) AS ${quoteIdentifier("__row_count")}
+    FROM ${quoteIdentifier(tableName)}`,
+    connection,
+  );
+  const rowCount = asNumber(rowStatistics?.__row_count);
+  const distinctFunction =
+    rowCount >= 100_000 ? "APPROX_COUNT_DISTINCT" : "COUNT(DISTINCT";
   const aggregates = mappedColumns.flatMap((column, index) => {
     const identifier = quoteIdentifier(column.sourceName);
     const expressions = [
       `COUNT(*) FILTER (WHERE ${identifier} IS NULL) AS ${quoteIdentifier(profileAlias(index, "null"))}`,
-      `COUNT(DISTINCT ${identifier}) AS ${quoteIdentifier(profileAlias(index, "distinct"))}`,
+      distinctFunction === "APPROX_COUNT_DISTINCT"
+        ? `APPROX_COUNT_DISTINCT(${identifier}) AS ${quoteIdentifier(profileAlias(index, "distinct"))}`
+        : `COUNT(DISTINCT ${identifier}) AS ${quoteIdentifier(profileAlias(index, "distinct"))}`,
     ];
     if (!column.likelyPii && !column.mapping?.sensitive) {
       expressions.push(
@@ -131,13 +148,12 @@ async function buildColumnProfiles(
   });
   const [statistics] = await queryDuckDB(
     [
-      `SELECT COUNT(*) AS ${quoteIdentifier("__row_count")}`,
+      `SELECT ${rowCount} AS ${quoteIdentifier("__row_count")}`,
       ...aggregates.map((aggregate) => `, ${aggregate}`),
       `FROM ${quoteIdentifier(tableName)}`,
     ].join("\n"),
     connection,
   );
-  const rowCount = asNumber(statistics?.__row_count);
   const columns: ColumnProfile[] = mappedColumns.map((column, index) => {
     const nullCount = asNumber(statistics?.[profileAlias(index, "null")]);
     const distinctCount = asNumber(
@@ -151,6 +167,7 @@ async function buildColumnProfiles(
 
     return {
       sourceName: column.sourceName,
+      sourceIndex: column.sourceIndex,
       inferredType,
       rowCount,
       nullCount,
@@ -327,6 +344,7 @@ export async function profileDuckDBTable(
   connection: AsyncDuckDBConnection,
   tableName: string,
   file: Pick<File, "name" | "size">,
+  options: { sourceColumnOrder?: readonly string[] } = {},
 ): Promise<DatasetMetadata> {
   const describedColumns = await describeTable(connection, tableName);
   if (describedColumns.length === 0) {
@@ -337,6 +355,7 @@ export async function profileDuckDBTable(
     connection,
     tableName,
     describedColumns,
+    options.sourceColumnOrder,
   );
   if (initialProfile.rowCount === 0) {
     throw new Error(`${file.name} does not contain any data rows.`);

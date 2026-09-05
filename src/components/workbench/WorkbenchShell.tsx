@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   HelpCircle,
   Menu,
-  PanelRight,
   ShieldCheck,
 } from "lucide-react";
 import { BrandMark } from "@/components/ui";
@@ -28,7 +27,6 @@ interface WorkbenchShellProps {
   persistenceStatus: "local-only" | "syncing" | "synced" | "unavailable";
   storyCount: number;
   dataRail: React.ReactNode;
-  aiPanel: React.ReactNode;
   children: React.ReactNode;
   onOpenStory: () => void;
 }
@@ -39,12 +37,10 @@ export function WorkbenchShell({
   persistenceStatus,
   storyCount,
   dataRail,
-  aiPanel,
   children,
   onOpenStory,
 }: WorkbenchShellProps) {
   const [dataOpen, setDataOpen] = useState(false);
-  const [aiOpen, setAiOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-[#111827]">
@@ -64,7 +60,7 @@ export function WorkbenchShell({
             <DialogHeader className="sr-only">
               <DialogTitle>Data workspace</DialogTitle>
               <DialogDescription>
-                Files, mappings, metrics, analysis, and story.
+                Local files, the analysis thread, and executive story.
               </DialogDescription>
             </DialogHeader>
             {dataRail}
@@ -125,28 +121,6 @@ export function WorkbenchShell({
             <span aria-label={`${storyCount} selected insights`}>({storyCount})</span>
           </Button>
 
-          <Dialog open={aiOpen} onOpenChange={setAiOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Open AI Co-Designer"
-                className="xl:hidden"
-              >
-                <PanelRight aria-hidden="true" className="size-4.5" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent side="right" className="p-0">
-              <DialogHeader className="sr-only">
-                <DialogTitle>AI Co-Designer</DialogTitle>
-                <DialogDescription>
-                  Structured proposals, confirmations, gaps, and recommendations.
-                </DialogDescription>
-              </DialogHeader>
-              {aiPanel}
-            </DialogContent>
-          </Dialog>
-
           <Link
             href="/architecture"
             aria-label="Help and architecture"
@@ -163,16 +137,12 @@ export function WorkbenchShell({
         </div>
       </header>
 
-      <div className="grid min-h-[calc(100vh-64px)] grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_380px]">
+      <div className="grid min-h-[calc(100vh-64px)] grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="hidden border-r border-[#dfe3e9] bg-white lg:block">
           <div className="sticky top-16 h-[calc(100vh-64px)] overflow-hidden">{dataRail}</div>
         </aside>
 
         <main className="min-w-0 overflow-x-hidden">{children}</main>
-
-        <aside className="hidden border-l border-[#dfe3e9] bg-white xl:block">
-          <div className="sticky top-16 h-[calc(100vh-64px)] overflow-hidden">{aiPanel}</div>
-        </aside>
       </div>
 
     </div>

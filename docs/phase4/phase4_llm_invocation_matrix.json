@@ -1,0 +1,44 @@
+{
+  "deployment": {
+    "id": "dpl_86NpwS1j6QH6GD9ai9iJdq8bH593",
+    "alias": "https://peopleanalyticsai.net",
+    "tag": "phase4-p1-v1"
+  },
+  "skipped_by_design": {
+    "llm_invocation": "skipped_by_design",
+    "question": "Which locations matter most?",
+    "identity_id": "demo-external-viewer",
+    "trace_id": "875f3404-4f81-42be-bd7b-e5e78a6ef9a4",
+    "failure_reason": null,
+    "source": "https://peopleanalyticsai.net/api/people/ask",
+    "headline": "Among cells visible at visitor min_cell 50, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.1%)."
+  },
+  "skipped_by_budget": {
+    "llm_invocation": "skipped_by_budget",
+    "question": "Why is Engineering voluntary attrition increasing?",
+    "identity_id": "demo-external-viewer",
+    "trace_id": "9c34d51c-a602-44ac-af12-d22e90c4893d",
+    "failure_reason": null,
+    "source": "https://peopleanalyticsai.net/api/people/ask",
+    "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in APAC-SIN among cells visible at this access level.",
+    "notice": "The free-form demo has reached today's limit for this network. The six prepared questions below still work."
+  },
+  "attempted_failed": {
+    "llm_invocation": "attempted_failed",
+    "failure_reason": "llm_upstream_timeout",
+    "question": "Why is Engineering voluntary attrition increasing?",
+    "identity_id": "demo-external-viewer",
+    "trace_id": "d8f739c5-302b-404f-a7e3-b56e29cc31a1",
+    "source": "runPeopleAgent planner throw (same compose/run path as /api/people/ask)",
+    "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in a small set of locations among cells visible at this access level."
+  },
+  "attempted_ok": {
+    "llm_invocation": "attempted_ok",
+    "failure_reason": null,
+    "question": "Why is Engineering voluntary attrition increasing?",
+    "identity_id": "demo-external-viewer",
+    "trace_id": "50c17d14-901a-4edf-92ae-fdd3e82a214f",
+    "source": "runPeopleAgent planner success (same compose/run path as /api/people/ask); production IP already at per_ip_daily",
+    "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in a small set of locations among cells visible at this access level."
+  }
+}

@@ -5,10 +5,10 @@ test("legacy Ask entry opens an empty persistent workbench", async ({ page }) =>
   await expect(page).toHaveURL(/\/workbench\/(new|[a-z0-9-]+)/i);
   await expect(
     page.getByRole("heading", {
-      name: /what can these people files answer credibly/i,
+      name: /ask your people data anything/i,
     }),
   ).toBeVisible();
-  await expect(page.getByText(/raw people rows stay in this browser/i).first()).toBeVisible();
+  await expect(page.getByText(/raw rows stay local/i).first()).toBeVisible();
   await expect(page.getByTestId("workbench-file-dropzone")).toBeVisible();
 });
 

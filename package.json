@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "vitest run src/lib/people/platform-facts.test.ts src/lib/people/demo-payload.test.ts src/lib/people/case3-view.test.ts && next build",
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "formulator:bootstrap": "node scripts/bootstrap-formulator.mjs",
+    "formulator:test-rules": "python apps/formulator/people_layer/test_rules.py",
     "external:fetch": "node scripts/fetch-external-hr-files.mjs",
     "external:update": "node scripts/fetch-external-hr-files.mjs --refresh --update-hashes",
     "external:verify": "node scripts/fetch-external-hr-files.mjs --verify-only",
@@ -18,23 +20,26 @@
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.33.1-dev57.0",
-    "@kanaries/graphic-walker": "^0.5.2",
     "@radix-ui/react-dialog": "^1.1.23",
     "@radix-ui/react-tabs": "^1.1.21",
     "@radix-ui/react-tooltip": "^1.2.16",
     "@supabase/supabase-js": "^2.112.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "flint-chart": "^0.5.1",
     "lucide-react": "^1.34.0",
     "next": "^16.3.2",
     "papaparse": "^5.7.0",
+    "pg": "^8.23.0",
     "pptxgenjs": "^4.0.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "read-excel-file": "^9.3.10",
     "recharts": "^3.10.1",
-    "styled-components": "^6.5.3",
     "tailwind-merge": "^3.6.0",
+    "vega": "^6.4.0",
+    "vega-embed": "^7.1.0",
+    "vega-lite": "^6.4.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -42,6 +47,7 @@
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.3.0",
     "@types/papaparse": "^5.5.2",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "eslint": "^9.39.5",
@@ -52,12 +58,6 @@
     "vitest": "^4.1.11"
   },
   "overrides": {
-    "@kanaries/graphic-walker": {
-      "nanoid": "6.0.1",
-      "vega": "6.4.0",
-      "vega-embed": "7.1.0",
-      "vega-lite": "6.4.3"
-    },
     "d3-color": "3.1.0"
   }
 }

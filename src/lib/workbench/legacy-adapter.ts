@@ -110,7 +110,7 @@ export async function ingestWithLegacyProfiler(files: File[]) {
   const mappings = datasets.flatMap(convertMappings);
   const converted: LocalWorkbenchDataset[] = await Promise.all(
     datasets.map(async (dataset, index) => {
-      const columns = dataset.columns.map((column) => {
+      const columns = dataset.columns.map((column, sourceIndex) => {
         const mapping = resolveWorkbenchCanonicalField(column.name);
         const inferredType =
           column.inferredType === "mixed"
@@ -118,6 +118,7 @@ export async function ingestWithLegacyProfiler(files: File[]) {
             : column.inferredType;
         return {
           sourceName: column.name,
+          sourceIndex,
           inferredType,
           rowCount: dataset.rowCount,
           nullCount: Math.round(dataset.rowCount * (column.nullPercent / 100)),

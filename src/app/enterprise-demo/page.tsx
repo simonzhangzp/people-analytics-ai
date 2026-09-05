@@ -2,8 +2,17 @@ import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { WhyIBuiltThis } from "@/components/enterprise-demo/DemoShell";
 import { CASES } from "@/lib/people/demo-cases";
+import { pageMetadata } from "@/lib/site-metadata";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export const metadata = pageMetadata({
+  title: "Enterprise Demo",
+  description:
+    "Three People Analytics case studies on one governed platform: trusted Headcount, an HRIS incident replay, and Engineering attrition.",
+  path: "/enterprise-demo",
+});
 
 const CASE_CTAS = {
   trust: "Explore trusted Headcount",

@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { WorkbenchApp } from "@/components/workbench/WorkbenchApp";
 
 export const metadata: Metadata = {
-  title: "People Analytics Workbench",
+  title: "Analyze People Data",
   description:
-    "Understand local People data, agree on metric meaning, explore evidence, and build an executive story.",
+    "Upload local People data, ask a question, and get a reproducible chart and answer in one Data Thread.",
 };
 
 export default async function WorkbenchPage({

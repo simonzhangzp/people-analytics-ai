@@ -17,6 +17,13 @@ export function composePeopleAnswer(
 ): PeopleAskAnswer {
   const plan = {
     tier: (/why|apac|concentrat|investigate/i.test(question) ? 2 : 1) as 1 | 2,
+    playbook:
+      demoCase === "incident"
+        ? ("incident" as const)
+        : /headcount/i.test(question)
+          ? ("metric_value" as const)
+          : ("attrition_explore" as const),
+    llmEligible: false,
     snapshot_id: (demoCase === "incident" ? "incident_replay" : "current_certified") as
       | "current_certified"
       | "incident_replay",

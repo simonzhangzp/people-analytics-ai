@@ -306,4 +306,38 @@ def run_gold_dq(con: duckdb.DuckDBPyConnection, *, backfill: bool = True) -> lis
     tests.append(
         _row("span_max_le_15", "gold", int(span_max or 0) <= 15, span_max, "<=15", "SPAN_HI cap")
     )
+    recruiter_orphan = con.execute(
+        """
+        SELECT count(*) FROM people_snap_recruiter_month s
+        WHERE s.recruiter_user_id IS NOT NULL
+          AND NOT EXISTS (
+            SELECT 1 FROM people_dim_recruiter d
+            WHERE d.recruiter_id = s.recruiter_user_id
+          )
+        """
+    ).fetchone()[0]
+    tests.append(
+        _row(
+            "snap_recruiter_id_subseteq_dim_recruiter",
+            "recruiting",
+            recruiter_orphan == 0,
+            recruiter_orphan,
+            0,
+            "snap_recruiter_month.recruiter_id ⊆ people_dim_recruiter",
+        )
+    )
+    dim_rec = con.execute("SELECT count(*) FROM people_dim_recruiter").fetchone()[0]
+    opening_rec = con.execute(
+        "SELECT count(DISTINCT recruiter_id) FROM people_dim_requisition WHERE recruiter_id IS NOT NULL"
+    ).fetchone()[0]
+    tests.append(
+        _row(
+            "dim_recruiter_covers_opening_recruiters",
+            "recruiting",
+            int(dim_rec or 0) == int(opening_rec or 0) and int(dim_rec or 0) > 0,
+            dim_rec,
+            opening_rec,
+            "dim_recruiter rows equal distinct opening.recruiter_id",
+        )
+    )
     return tests

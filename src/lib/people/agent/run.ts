@@ -7,8 +7,9 @@ import { applyCritic, criticCheck } from "./critic";
 import { composeAnswerContract } from "./compose";
 import { deepSeekPlanner, type PeoplePlanner } from "./planner";
 import { executeRegistryTool } from "./registry";
-import { filterRegistryTools, routePeopleQuestion } from "./router";
+import { routePeopleQuestion } from "./router";
 import { PEOPLE_TOOL_NAMES, type PeopleAnswerContract, type PeopleToolCall } from "./types";
+import { resolveLlmInvocation } from "./llm-invocation";
 import { wrapUntrustedToolData } from "./wrap-data";
 
 const ALLOWED_IDENTITIES = new Set<string>(DEMO_IDENTITIES.map((row) => row.identity_id));
@@ -108,7 +109,9 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
   let callId: number | null = null;
 
   const injectedPlanner = options.planner;
-  const livePlanner = injectedPlanner === undefined && Boolean(process.env.DEEPSEEK_API_KEY?.trim());
+  const livePlanner =
+    injectedPlanner === undefined &&
+    Boolean(process.env.DEEPSEEK_API_KEY?.trim() || process.env.DEEPSEEK_KEY?.trim());
   const useBudget = Boolean(options.consume) || livePlanner;
 
   async function invokePlanner(maxTokens: number) {
@@ -131,7 +134,7 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
     });
   }
 
-  if (plan.tier === 2 && plan.tools.length && injectedPlanner !== null && (injectedPlanner || livePlanner || useBudget)) {
+  if (plan.llmEligible && plan.tools.length && injectedPlanner !== null && (injectedPlanner || livePlanner || useBudget)) {
     let allowed = !useBudget;
     let maxTokens = 1024;
     if (useBudget) {
@@ -163,19 +166,19 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
       let planned = null;
       try {
         planned = await invokePlanner(maxTokens);
-      } catch {
+      } catch (error) {
         planned = null;
+        llmSkipped =
+          error instanceof Error && error.message.startsWith("llm_") ? error.message : "llm_failed";
       }
       const latency = Date.now() - plannerStarted;
       if (!planned) {
-        llmSkipped = "llm_failed";
+        llmSkipped = llmSkipped ?? "llm_failed";
         if (callId) {
           await completeLlmBudget({ callId, traceId, ok: false, latencyMs: latency, model: "deepseek-chat" });
         }
       } else {
         llmCalls = 1;
-        const filtered = filterRegistryTools(planned.tools);
-        if (filtered.length) tools = filtered;
         plannerHypotheses = planned.hypotheses;
         if (callId) {
           await completeLlmBudget({
@@ -191,6 +194,7 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
   }
 
   if (options.forceRpcError) {
+    const llm = resolveLlmInvocation({ llmEligible: plan.llmEligible, llmCalls, llmSkipped });
     const failed = {
       question: options.question,
       supported: false,
@@ -215,8 +219,18 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
       critic: { ok: true, failures: [] },
       error_state: "rpc" as const,
       withheld: false,
-      llm_skipped: llmSkipped,
-      trace: { tools: [], latency_ms: Date.now() - started, llm_skipped: llmSkipped, llm_calls: llmCalls },
+      llm_skipped: llm.llm_skipped,
+      llm_invocation: llm.llm_invocation,
+      failure_reason: llm.failure_reason,
+      trace: {
+        tools: [],
+        latency_ms: Date.now() - started,
+        llm_skipped: llm.llm_skipped,
+        llm_calls: llm.llm_calls,
+        llm_used: llm.llm_used,
+        llm_invocation: llm.llm_invocation,
+        failure_reason: llm.failure_reason,
+      },
     };
     return failed;
   }
@@ -257,6 +271,7 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
     results: injected,
     hypotheses: plannerHypotheses,
     llmSkipped,
+    llmCalls,
     latencyMs: Date.now() - started,
     toolTrace: injected.map((row, seq) => ({
       seq: seq + 1,
@@ -327,7 +342,14 @@ export function toAskAnswer(answer: PeopleAnswerContract): PeopleAskAnswer {
     error_state: answer.error_state,
     withheld: answer.withheld,
     llm_skipped: answer.llm_skipped,
-    trace: answer.trace,
+    llm_invocation: answer.llm_invocation,
+    failure_reason: answer.failure_reason,
+    trace: {
+      ...answer.trace,
+      llm_used: answer.llm_invocation === "attempted_ok",
+      llm_invocation: answer.llm_invocation,
+      failure_reason: answer.failure_reason,
+    },
   };
 }
 

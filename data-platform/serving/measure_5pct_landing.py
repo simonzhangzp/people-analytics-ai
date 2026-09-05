@@ -288,6 +288,14 @@ def _drop_people_v2_user_objects(conn) -> None:
               loop
                 execute format('drop table if exists people_v2.%I cascade', r.relname);
               end loop;
+              for r in
+                select p.proname as name, pg_get_function_identity_arguments(p.oid) as args
+                from pg_proc p
+                join pg_namespace n on n.oid = p.pronamespace
+                where n.nspname = 'people_v2'
+              loop
+                execute format('drop function if exists people_v2.%I(%s) cascade', r.name, r.args);
+              end loop;
             end
             $$;
             """

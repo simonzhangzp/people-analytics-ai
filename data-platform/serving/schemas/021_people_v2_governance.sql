@@ -106,6 +106,11 @@ alter table people_v2.people_serving_run add column if not exists simulator_code
 alter table people_v2.people_serving_run add column if not exists seed text;
 alter table people_v2.people_serving_run add column if not exists scenario_versions jsonb;
 alter table people_v2.people_serving_run add column if not exists baseline_sha text;
+alter table people_v2.people_serving_run add column if not exists kind text;
+alter table people_v2.people_serving_run add column if not exists run_date date;
+alter table people_v2.people_serving_run add column if not exists database_bytes bigint;
+alter table people_v2.people_serving_run add column if not exists wal_bytes bigint;
+alter table people_v2.people_serving_run add column if not exists pointer_snapshot jsonb;
 
 create table if not exists people_v2.people_serving_pointer (
   pointer_id text primary key,

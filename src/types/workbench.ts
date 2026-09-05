@@ -37,6 +37,7 @@ export type ColumnDataType =
 
 export interface ColumnProfile {
   sourceName: string;
+  sourceIndex?: number;
   inferredType: ColumnDataType;
   rowCount: number;
   nullCount: number;
@@ -189,6 +190,11 @@ export type MetricExpression =
       rules?: MetricRule[];
     }
   | {
+      kind: "sum";
+      field: string;
+      rules?: MetricRule[];
+    }
+  | {
       kind: "ratio";
       numerator: MetricExpression;
       denominator: MetricExpression;
@@ -260,6 +266,47 @@ export interface AnalysisQuestion {
   id: string;
   text: string;
   metricIds: string[];
+  createdAt: string;
+}
+
+export type QueryDifficulty = "simple" | "semantic" | "diagnostic";
+
+export interface ResolvedQueryIntent {
+  id: string;
+  difficulty: QueryDifficulty;
+  domain: Exclude<PeopleDomain, "other">;
+  metricKey: string;
+  datasetId: string;
+  aggregation: "count" | "count_distinct" | "sum";
+  measureField?: string;
+  dimensions: string[];
+  profileDimensions: string[];
+  exploreDimensions?: string[];
+  dimensionFilters?: Array<{
+    field: string;
+    values: string[];
+  }>;
+  seriesValues: string[];
+  timeField?: string;
+  timeStrategy: "latest" | "all";
+  limit?: number;
+  populationHint?: "all" | "leadership";
+  inheritedFromTurnId?: string;
+  assumptions: string[];
+  confidence: ConfidenceLevel;
+}
+
+export interface DataThreadTurn {
+  id: string;
+  parentTurnId?: string;
+  question: string;
+  status: "running" | "needs_confirmation" | "complete" | "blocked";
+  intent?: ResolvedQueryIntent;
+  insightIds: string[];
+  metricId?: string;
+  methodNote?: string;
+  provisional?: boolean;
+  definitionAmbiguity?: MetricAmbiguity;
   createdAt: string;
 }
 
@@ -355,6 +402,8 @@ export interface ExecutiveSlide {
   limitation?: string;
 }
 
+export type StorySlideCount = 3 | 5 | 7;
+
 export interface ExecutiveStory {
   id: string;
   workspaceId: string;
@@ -365,7 +414,7 @@ export interface ExecutiveStory {
     | "TA Leadership"
     | "People Analytics Leadership";
   purpose: "Inform" | "Diagnose" | "Recommend action" | "Strategy review";
-  slideCount: 3 | 5;
+  slideCount: StorySlideCount;
   slides: ExecutiveSlide[];
   status: KnowledgeStatus;
   createdAt: string;
@@ -412,6 +461,8 @@ export interface WorkbenchState {
   pendingMetricPatch: MetricPatch | null;
   analysisPlan: AnalysisPlan | null;
   insights: Insight[];
+  thread: DataThreadTurn[];
+  activeTurnId: string | null;
   story: ExecutiveStory | null;
   interventions: AIIntervention[];
   progress: WorkbenchProgress;

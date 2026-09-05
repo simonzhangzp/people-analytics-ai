@@ -196,6 +196,22 @@ export async function peopleGetCase3Signals(
   return asRecord(rows[0]?.payload);
 }
 
+function formulaPart(value: unknown): string {
+  if (typeof value === "string" && value.trim()) return value.trim();
+  const record = asRecord(value);
+  const expression = record.expression;
+  if (typeof expression === "string" && expression.trim()) return expression.trim();
+  return "";
+}
+
+function metricFormula(numerator: unknown, denominator: unknown): string {
+  const num = formulaPart(numerator);
+  let den = formulaPart(denominator);
+  if (den === "average_headcount") den = "average certified headcount";
+  if (num && den) return `${num} / ${den}`;
+  return num || den;
+}
+
 export async function peopleGetMetricRow(metricId: string): Promise<Record<string, unknown>> {
   const rows = await peopleV2Query(
     `select metric_id, grain_table, numerator, denominator, min_cell, sensitivity, status, yaml_path
@@ -216,8 +232,8 @@ export async function peopleGetMetricRow(metricId: string): Promise<Record<strin
         : attrition
           ? "Voluntary terminations in the trailing 12 months divided by average certified headcount, annualized. Month grain is a secondary view."
           : String(row.numerator ?? metricId),
-    formula: row.numerator,
-    formula_sql: row.numerator,
+    formula: metricFormula(row.numerator, row.denominator),
+    formula_sql: metricFormula(row.numerator, row.denominator),
   };
 }
 

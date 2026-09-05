@@ -39,6 +39,12 @@ extensions:
   real_world_source: hrms/setup.py
   status: withdrawn
   gate1_decision: Not approved. Use SOURCE_NATIVE from the HRMS custom-field overlay.
+- id: E9
+  object: people_evt_worker_change.change_reason=rebalance_synthetic
+  reason: Month-end extract-diff manager changes with no same-day transfer or promotion are tree-repair artifacts, not T7 reorg. Classified in silver; excluded from people_evt_manager_change, mobility marts, and Case 3 signals.
+  real_world_source: none
+  status: approved
+  gate: data-v1.1
 fields:
 - canonical_table: people_ref_comp_band
   canonical_field: grade_id
@@ -184,6 +190,17 @@ fields:
   business_definition: E6 category.
   source_field: termination_category
 - canonical_table: people_dim_recruiter
+  canonical_field: recruiter_id
+  source_system: greenhouse_v3
+  source_object: user
+  transformation: user.id referenced by opening.recruiter_id
+  nullable: false
+  data_type: bigint
+  effective_date_logic: valid_from
+  provenance: CANONICAL_KEY
+  business_definition: Greenhouse recruiter user id. Grain of people_dim_recruiter.
+  source_field: id
+- canonical_table: people_dim_recruiter
   canonical_field: person_id
   source_system: greenhouse_v3
   source_object: user
@@ -249,3 +266,14 @@ fields:
   provenance: SYNTHETIC_EXTENSION
   business_definition: E4 version end.
   source_field: valid_to
+- canonical_table: people_evt_worker_change
+  canonical_field: change_reason
+  source_system: engagement_ext
+  source_object: people_evt_worker_change
+  transformation: month-end extract-diff without same-day transfer/promotion → rebalance_synthetic (E9)
+  nullable: true
+  data_type: text
+  effective_date_logic: event_date
+  provenance: SYNTHETIC_EXTENSION
+  business_definition: E9 fourth class. Default views exclude it.
+  source_field: change_reason

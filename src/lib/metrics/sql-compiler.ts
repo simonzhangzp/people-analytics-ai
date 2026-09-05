@@ -104,6 +104,7 @@ function bindExpression(
         rules: expression.rules?.map((rule) => bindRule(rule, bindings)),
       };
     case "average":
+    case "sum":
       return {
         ...expression,
         field: bindField(expression.field, bindings),
@@ -233,6 +234,13 @@ function compileExpression(
       const filter = aggregateFilter(expression.rules);
       return {
         sql: `AVG(TRY_CAST(${escapeSqlIdentifier(expression.field)} AS DOUBLE))${filter.sql}`,
+        parameters: filter.parameters,
+      };
+    }
+    case "sum": {
+      const filter = aggregateFilter(expression.rules);
+      return {
+        sql: `SUM(TRY_CAST(${escapeSqlIdentifier(expression.field)} AS DOUBLE))${filter.sql}`,
         parameters: filter.parameters,
       };
     }

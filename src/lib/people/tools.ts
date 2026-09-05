@@ -1,4 +1,16 @@
-import { peopleServing } from "./serving";
+import { DEFAULT_IDENTITY } from "./demo-identities";
+import {
+  peopleGetCase3Signals,
+  peopleGetHealth,
+  peopleGetIncidents,
+  peopleGetLineage,
+  peopleGetMetricBreakdown,
+  peopleGetMetricFor,
+  peopleGetMetricRow,
+  peopleGetMetricTrend,
+  peopleGetPointer,
+  peopleGetSkillCoverage,
+} from "./v2-client";
 
 export type PeopleToolName =
   | "get_metric_definition"
@@ -17,41 +29,65 @@ export interface PeopleToolCall {
   args?: Record<string, string | number | undefined>;
 }
 
+const METRIC_ALIAS: Record<string, string> = {
+  voluntary_attrition: "voluntary_attrition_rate",
+  compa_ratio: "compa_ratio_median",
+};
+
+function metricId(raw: string | undefined): string {
+  if (!raw) throw new Error("metric_id is required");
+  return METRIC_ALIAS[raw] ?? raw;
+}
+
 export async function runPeopleTool(call: PeopleToolCall): Promise<unknown> {
   const args = call.args ?? {};
-  const snapshot =
-    args.snapshot_id === "incident_replay" ? "incident_replay" : "current";
+  const identity = DEFAULT_IDENTITY;
   const jobFamily = typeof args.job_family === "string" ? args.job_family : undefined;
-  const metricId = typeof args.metric_id === "string" ? args.metric_id : undefined;
+  const metric = typeof args.metric_id === "string" ? metricId(args.metric_id) : undefined;
   const skillId = typeof args.skill_id === "string" ? args.skill_id : undefined;
   const dimension = typeof args.dimension === "string" ? args.dimension : "job_family";
+  const replay = args.snapshot_id === "incident_replay";
 
   switch (call.name) {
     case "get_metric_definition":
-      if (!metricId) throw new Error("metric_id is required");
-      return peopleServing.getMetricDefinition(metricId);
+      return peopleGetMetricRow(metricId(metric));
     case "get_metric_value":
-      if (!metricId) throw new Error("metric_id is required");
-      return peopleServing.getMetric(metricId, { jobFamily });
+      return peopleGetMetricFor(identity, metricId(metric), { jobFamily: jobFamily ?? null });
     case "get_metric_trend":
-      if (!metricId) throw new Error("metric_id is required");
-      return peopleServing.getMetricTrend(metricId, { jobFamily });
+      return peopleGetMetricTrend(identity, metricId(metric), { jobFamily: jobFamily ?? null });
     case "breakdown_metric":
-      if (!metricId) throw new Error("metric_id is required");
-      return peopleServing.getMetricBreakdown(metricId, dimension, { jobFamily });
+      return peopleGetMetricBreakdown(identity, metricId(metric), dimension, {
+        jobFamily: jobFamily ?? null,
+      });
     case "get_source_health":
-      return peopleServing.getSourceHealth(snapshot);
+      return replay
+        ? {
+            snapshot_id: "incident_replay",
+            pointer: await peopleGetPointer("incident_replay"),
+            quality_status: "failed",
+          }
+        : { snapshot_id: "current_certified", pointer: await peopleGetPointer("current_certified") };
     case "get_quality_incidents":
-      return peopleServing.getQualityIncidents(snapshot);
+      return { incidents: await peopleGetIncidents() };
     case "trace_lineage":
-      if (!metricId) throw new Error("metric_id is required");
-      return peopleServing.traceLineage(metricId, snapshot);
+      return { lineage: await peopleGetLineage(metric), snapshot_id: replay ? "incident_replay" : "current" };
     case "get_workforce_analysis":
-      return peopleServing.getRetentionAnalysis(jobFamily ?? "Engineering");
+      return {
+        metric: await peopleGetMetricFor(identity, "voluntary_attrition_rate", {
+          grain: "month",
+          jobFamily: jobFamily ?? "Engineering",
+        }),
+        signals: await peopleGetCase3Signals(identity),
+        health: await peopleGetHealth("voluntary_attrition_rate"),
+      };
     case "get_skill_gap":
-      return peopleServing.getSkillGap(jobFamily ?? "Engineering");
+      return { gaps: await peopleGetSkillCoverage(jobFamily ?? "Engineering") };
     case "get_learning_recommendations":
-      return peopleServing.getLearningRecommendations(jobFamily ?? "Engineering", skillId);
+      return {
+        recommendations: [],
+        note: "Learning recommendations stay on the v1 RPC until Phase 4 agent upgrade.",
+        skill_id: skillId ?? null,
+      };
     default:
       throw new Error("Unsupported People tool");
   }

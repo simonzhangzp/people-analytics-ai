@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ColumnProfile } from "@/types/workbench";
 import {
+  isSafeAggregateDimension,
   omitPrivateExplorationColumns,
   publicExplorationColumnNames,
 } from "./privacy";
@@ -33,6 +34,24 @@ describe("exploration privacy boundary", () => {
     column("department"),
     column("engagement_score", { inferredType: "number" }),
   ];
+
+  it("allows sensitive demographics as aggregate dimensions, not row explorer fields", () => {
+    expect(
+      isSafeAggregateDimension({
+        likelyPII: false,
+        sensitive: true,
+        semanticRole: "sensitive_dimension",
+        inferredType: "string",
+      }),
+    ).toBe(true);
+    expect(
+      isSafeAggregateDimension({
+        likelyPII: true,
+        inferredType: "string",
+        canonicalField: "employee_name",
+      }),
+    ).toBe(false);
+  });
 
   it("projects only de-identified, non-sensitive columns", () => {
     expect(publicExplorationColumnNames(columns)).toEqual([

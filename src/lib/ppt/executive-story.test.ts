@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Insight, InsightChartSpec } from "@/types/workbench";
 import {
   buildExecutiveStory,
+  recommendExecutiveStorySlideCount,
   sanitizePptText,
   sanitizePptxFileName,
 } from "./executive-story";
@@ -106,8 +107,38 @@ describe("buildExecutiveStory", () => {
     ]);
   });
 
-  it("builds exact executive-brief and diagnostic-deck structures", () => {
-    const insights = Array.from({ length: 5 }, (_, index) =>
+  it("recommends story length from selected content density", () => {
+    expect(recommendExecutiveStorySlideCount([makeInsight("one")])).toBe(3);
+    expect(
+      recommendExecutiveStorySlideCount([
+        makeInsight("dense", { finding: "Detailed evidence. ".repeat(140) }),
+      ]),
+    ).toBe(5);
+    expect(
+      recommendExecutiveStorySlideCount(
+        Array.from({ length: 3 }, (_, index) =>
+          makeInsight(`medium-${index + 1}`),
+        ),
+      ),
+    ).toBe(5);
+    expect(
+      recommendExecutiveStorySlideCount(
+        Array.from({ length: 5 }, (_, index) =>
+          makeInsight(`long-${index + 1}`),
+        ),
+      ),
+    ).toBe(7);
+    expect(
+      recommendExecutiveStorySlideCount([
+        makeInsight("not-selected", {
+          selectedForExecutiveStory: false,
+        }),
+      ]),
+    ).toBe(3);
+  });
+
+  it("builds exact brief, diagnostic, and decision deck structures", () => {
+    const insights = Array.from({ length: 7 }, (_, index) =>
       makeInsight(`insight-${index + 1}`),
     );
     const brief = buildExecutiveStory(
@@ -124,6 +155,13 @@ describe("buildExecutiveStory", () => {
       "Diagnose",
       5,
     );
+    const decision = buildExecutiveStory(
+      insights,
+      "workspace-decision",
+      "Business Leadership",
+      "Recommend action",
+      7,
+    );
 
     expect(brief.slides).toHaveLength(3);
     expect(brief.slides.every((slide) => /Executive brief/.test(slide.kicker))).toBe(
@@ -136,8 +174,12 @@ describe("buildExecutiveStory", () => {
     expect(diagnostic.slides.map((slide) => slide.index)).toEqual([
       0, 1, 2, 3, 4,
     ]);
+    expect(decision.slides).toHaveLength(7);
     expect(
-      [...brief.slides, ...diagnostic.slides].every(
+      decision.slides.every((slide) => /Decision deck/.test(slide.kicker)),
+    ).toBe(true);
+    expect(
+      [...brief.slides, ...diagnostic.slides, ...decision.slides].every(
         (slide) =>
           slide.headline.length > 0 &&
           slide.evidence.length >= 1 &&
@@ -249,6 +291,31 @@ describe("PowerPoint text and filename safety", () => {
 });
 
 describe("editable PPTX generation", () => {
+  it(
+    "exports the longer 7-slide decision deck",
+    async () => {
+      const story = buildExecutiveStory(
+        Array.from({ length: 7 }, (_, index) =>
+          makeInsight(`decision-${index + 1}`),
+        ),
+        "workspace-decision-export",
+        "Business Leadership",
+        "Recommend action",
+        7,
+      );
+      const arrayBuffer = await buildExecutiveStoryPptxArrayBuffer(story);
+      const { default: JSZip } = await import("jszip");
+      const archive = await JSZip.loadAsync(arrayBuffer);
+
+      expect(
+        Object.keys(archive.files).filter((entry) =>
+          /^ppt\/slides\/slide\d+\.xml$/.test(entry),
+        ),
+      ).toHaveLength(7);
+    },
+    30_000,
+  );
+
   it(
     "builds a valid 16:9 PPTX zip with editable charts and no media images",
     async () => {

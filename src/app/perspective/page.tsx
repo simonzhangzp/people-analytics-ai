@@ -1,9 +1,11 @@
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
+import { pageMetadata } from "@/lib/site-metadata";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Perspective",
   description: "Why governed People data has to exist before workforce AI can be trusted.",
-};
+  path: "/perspective",
+});
 
 export default function PerspectivePage() {
   return (

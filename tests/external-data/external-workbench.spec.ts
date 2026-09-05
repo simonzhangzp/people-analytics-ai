@@ -49,9 +49,6 @@ test("ingests and executes all ten pinned external HR schemas", async ({
         timeout: 90_000,
       });
       await expect(
-        page.getByTestId(`capability-${entry.domain}`),
-      ).toContainText("Runnable");
-      await expect(
         page.getByText("Local SQL used a compatibility parser"),
       ).toHaveCount(0);
 
@@ -59,12 +56,11 @@ test("ingests and executes all ten pinned external HR schemas", async ({
         .getByTestId("workbench-question")
         .fill(questions[entry.domain] ?? `Summarize ${entry.domain}.`);
       await page.getByTestId("ask-workbench-question").click();
-      await expect(page.getByTestId("continue-to-analysis")).toBeEnabled();
-      await page.getByTestId("continue-to-analysis").click();
-      await page.getByTestId("run-analysis-plan").click();
-      await expect(page.getByText("1 validated · 0 data gaps")).toBeVisible({
+      await expect(page.getByTestId("thread-answer").first()).toBeVisible({
         timeout: 60_000,
       });
+      await expect(page.getByTestId("workbench-nav-metrics")).toHaveCount(0);
+      await expect(page.getByTestId("workbench-nav-analysis")).toHaveCount(0);
     });
   }
 });

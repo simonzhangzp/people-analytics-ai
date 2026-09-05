@@ -193,6 +193,13 @@ export const metricExpressionSchema: z.ZodType<MetricExpression> = z.lazy(() =>
       .strict(),
     z
       .object({
+        kind: z.literal("sum"),
+        field: shortTextSchema,
+        rules: z.array(metricRuleSchema).max(100).optional(),
+      })
+      .strict(),
+    z
+      .object({
         kind: z.literal("ratio"),
         numerator: metricExpressionSchema,
         denominator: metricExpressionSchema,

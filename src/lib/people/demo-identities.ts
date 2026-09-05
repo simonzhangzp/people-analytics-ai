@@ -8,3 +8,7 @@ export const DEMO_IDENTITIES = [
 ] as const;
 
 export type DemoIdentityId = (typeof DEMO_IDENTITIES)[number]["identity_id"];
+
+export function identityShowsCompaRatio(identityId: string): boolean {
+  return identityId !== "demo-external-viewer";
+}

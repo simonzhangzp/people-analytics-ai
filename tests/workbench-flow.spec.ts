@@ -4,27 +4,9 @@ test.describe("People Analytics Workbench Phase 1", () => {
   test("completes the guided attrition vertical slice", async ({ page }) => {
     test.setTimeout(180_000);
     const aiBodies: string[] = [];
-    let explorerMonitoring = false;
-    const unsafeExplorerRequests = new Set<string>();
-    const externalExplorerUrls = new Set<string>();
     page.on("request", (request) => {
       if (request.url().includes("/api/workbench/ai") && request.method() === "POST") {
         aiBodies.push(request.postData() ?? "");
-      }
-      if (explorerMonitoring) {
-        const host = new URL(request.url()).hostname;
-        const unknownHost =
-          host !== "localhost" &&
-          host !== "127.0.0.1" &&
-          host !== "cdn.jsdelivr.net" &&
-          !host.endsWith(".supabase.co");
-        if (unknownHost) externalExplorerUrls.add(request.url());
-        if (
-          unknownHost &&
-          !["GET", "HEAD"].includes(request.method())
-        ) {
-          unsafeExplorerRequests.add(`${request.method()} ${host}`);
-        }
       }
     });
 
@@ -32,7 +14,7 @@ test.describe("People Analytics Workbench Phase 1", () => {
     await expect(page).toHaveURL(/\/workbench\/demo/);
     await expect(
       page.getByRole("heading", {
-        name: /what can these people files answer credibly/i,
+        name: /ask your people data anything/i,
       }),
     ).toBeVisible();
     await expect(page.getByText("monthly_headcount.xlsx").first()).toBeVisible({
@@ -40,79 +22,50 @@ test.describe("People Analytics Workbench Phase 1", () => {
     });
     await expect(page.getByText("terminations.csv").first()).toBeVisible();
     await expect(page.getByText("compensation.xlsx").first()).toBeVisible();
-    await expect(page.getByText(/relationship evidence/i)).toBeVisible();
-    await expect(page.getByText(/coverage/i).first()).toBeVisible();
-    await expect(page.getByText(/raw data never uploaded/i)).toBeVisible();
+    await expect(page.getByText(/raw rows stay local/i)).toBeVisible();
+    await expect(page.getByTestId("workbench-nav-metrics")).toHaveCount(0);
+    await expect(page.getByTestId("workbench-nav-analysis")).toHaveCount(0);
 
     await expect(page.getByTestId("workbench-question")).toHaveValue(
       "Why has Engineering voluntary attrition increased?",
     );
     await page.getByTestId("ask-workbench-question").click();
 
-    await expect(page.getByTestId("metric-ambiguity")).toBeVisible();
-    await expect(
-      page.getByText(/should retirement count as voluntary attrition/i),
-    ).toBeVisible();
-    await page
-      .getByRole("button", { name: /treat retirement separately/i })
-      .click();
-    await expect(page.getByTestId("metric-diff")).toBeVisible();
-    await expect(page.getByTestId("metric-diff")).toContainText(/retirement/i);
-    await page.getByTestId("apply-metric-change").click();
-    await expect(page.getByText(/version 2/i).first()).toBeVisible();
-
-    await page.getByTestId("continue-to-analysis").click();
-    await expect(page.getByText(/analysis plan/i).first()).toBeVisible();
-    await page.getByTestId("run-analysis-plan").click();
-    await expect(page.getByTestId("insight-trend")).toContainText(/\+4\.5|4\.5pp/i, {
+    const answer = page.getByTestId("thread-answer").first();
+    await expect(answer).toContainText(/\+4\.5|4\.5pp/i, {
       timeout: 60_000,
     });
+    await expect(page.getByTestId("answer-method").first()).toContainText(
+      /retirement excluded/i,
+    );
+    await expect(
+      page.getByText(/should retirement count as voluntary attrition/i),
+    ).toHaveCount(0);
     await expect(
       page.getByText("Guided demo aggregate fallback used"),
     ).toHaveCount(0);
 
-    await page.getByRole("button", { name: /break down by tenure/i }).click();
-    await expect(page.getByTestId("insight-tenure")).toContainText(/68%|2–4|2-4/i, {
-      timeout: 30_000,
-    });
-    await page.getByRole("button", { name: /compare compensation/i }).last().click();
-    await expect(page.getByTestId("insight-compensation")).toContainText(
-      /association|midpoint|positioning/i,
-      { timeout: 30_000 },
-    );
-    await expect(page.getByText(/manager effectiveness.*(absent|cannot|missing)/i).first()).toBeVisible();
-
-    explorerMonitoring = true;
-    await page.getByRole("button", { name: /explore data/i }).click();
-    const explorer = page.getByRole("dialog");
-    await expect(page.getByRole("heading", { name: /explore de-identified local rows/i })).toBeVisible({
-      timeout: 60_000,
-    });
-    await expect(
-      page.getByText(/PII and sensitive demographics are removed/i),
-    ).toBeVisible();
-    await expect(explorer).not.toContainText(/E02001|employee_id|email_address/i);
-    await page.waitForTimeout(1_000);
-    await page.getByRole("button", { name: "Close" }).click();
-    explorerMonitoring = false;
-    expect([...unsafeExplorerRequests]).toEqual([]);
-    expect([...externalExplorerUrls].join("\n")).not.toMatch(
-      /E02001|employee_id|email_address/i,
-    );
-
-    for (const testId of [
-      "insight-trend",
-      "insight-tenure",
-      "insight-compensation",
-    ]) {
-      const card = page.getByTestId(testId);
-      const addButton = card.getByRole("button", { name: /add to story/i });
-      if (await addButton.isVisible()) await addButton.click();
-    }
-
-    await page.getByTestId("continue-to-story").click();
+    await answer.getByRole("button", { name: /add to story/i }).click();
+    await page.getByTestId("story-tray-button").click();
     await page.getByLabel(/audience/i).selectOption("CHRO");
-    await page.getByRole("button", { name: "5 slides" }).click();
+    await expect(page.getByTestId("story-length-recommendation")).toContainText(
+      "3 slides recommended",
+    );
+    await page.getByTestId("generate-story").click();
+    await expect(page.getByText("3 editable slides")).toBeVisible();
+    await page.getByTestId("story-length-longer").click();
+    await expect(page.getByTestId("generate-story")).toContainText(
+      "Regenerate 5-slide story",
+    );
+    await page.getByTestId("generate-story").click();
+    await expect(page.getByText("5 editable slides")).toBeVisible();
+    await page.getByTestId("story-length-longer").click();
+    await expect(page.getByTestId("generate-story")).toContainText(
+      "Regenerate 7-slide story",
+    );
+    await page.getByTestId("generate-story").click();
+    await expect(page.getByText("7 editable slides")).toBeVisible();
+    await page.getByTestId("story-length-shorter").click();
     await page.getByTestId("generate-story").click();
     await expect(page.getByText("5 editable slides")).toBeVisible();
 
@@ -140,15 +93,9 @@ test.describe("People Analytics Workbench Phase 1", () => {
     await page.keyboard.press("Escape");
     await expect(dataButton).toBeFocused();
 
-    const aiButton = page.getByRole("button", { name: /open ai co-designer/i });
-    await expect(aiButton).toBeVisible();
-    await aiButton.focus();
-    await page.keyboard.press("Enter");
     await expect(
-      page.getByRole("heading", { name: "AI Co-Designer" }),
-    ).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(aiButton).toBeFocused();
+      page.getByRole("button", { name: /open ai co-designer/i }),
+    ).toHaveCount(0);
   });
 });
 

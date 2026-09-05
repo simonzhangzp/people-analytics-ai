@@ -125,6 +125,14 @@ def coverage_matrix(con) -> dict:
     promo = con.execute("SELECT count(*) FROM people_evt_promotion").fetchone()[0]
     xfer = con.execute("SELECT count(*) FROM people_evt_transfer").fetchone()[0]
     mgr = con.execute("SELECT count(*) FROM people_evt_manager_change").fetchone()[0]
+    mgr_synthetic = con.execute(
+        """
+        SELECT count(*) FROM people_evt_worker_change
+        WHERE property = 'reports_to'
+          AND change_reason = 'rebalance_synthetic'
+          AND old_value IS DISTINCT FROM new_value
+        """
+    ).fetchone()[0]
     train_n = con.execute("SELECT count(*) FROM people_fact_training_participation").fetchone()[0]
     hours = con.execute("SELECT coalesce(sum(hours),0), coalesce(avg(hours),0) FROM people_fact_training_participation").fetchone()
     skills_avg = con.execute(
@@ -217,6 +225,7 @@ def coverage_matrix(con) -> dict:
             "promotion_count": int(promo),
             "transfer_count": int(xfer),
             "manager_change_count": int(mgr),
+            "manager_change_synthetic_count": int(mgr_synthetic),
             "promotion_annualized": round(promo / person_years, 4),
             "transfer_annualized": round(xfer / person_years, 4),
             "manager_change_annualized": round(mgr / person_years, 4),

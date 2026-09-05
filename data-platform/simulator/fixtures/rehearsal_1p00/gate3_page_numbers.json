@@ -1,0 +1,249 @@
+{
+  "serving_run": {
+    "run_id": "data-v1",
+    "certified": true,
+    "simulator_code_sha": "b28c0083378241492c1d30d4e557f040644624a9",
+    "seed": "20260301",
+    "notes": "data-v1.1 gold rebuild; bronze frozen at data-v1; simulator_code_sha is the data-v1 tag commit"
+  },
+  "pointers": [
+    {
+      "pointer_id": "certified_as_of",
+      "as_of": "2026-08-07",
+      "extract_id": "ext-frappe-employee-2026-08-07",
+      "moved": true
+    },
+    {
+      "pointer_id": "current_certified",
+      "as_of": "2026-08-31",
+      "extract_id": "data-v1",
+      "moved": true
+    },
+    {
+      "pointer_id": "fault_extract",
+      "as_of": "2026-08-14",
+      "extract_id": "ext-frappe-employee-2026-08-14",
+      "moved": false
+    },
+    {
+      "pointer_id": "incident_replay",
+      "as_of": "2026-08-14",
+      "extract_id": "run-2026-08-14",
+      "moved": false
+    }
+  ],
+  "access_log_sample": [
+    {
+      "identity_id": "demo-people-analyst",
+      "role": "people_analyst",
+      "rpc": "people_get_metric_breakdown",
+      "metric_id": "voluntary_attrition_rate",
+      "rows_returned": 104,
+      "cells_suppressed": 30
+    },
+    {
+      "identity_id": "demo-hrbp",
+      "role": "hrbp",
+      "rpc": "people_get_metric_breakdown",
+      "metric_id": "voluntary_attrition_rate",
+      "rows_returned": 104,
+      "cells_suppressed": 34
+    },
+    {
+      "identity_id": "demo-leader-engineering",
+      "role": "leader",
+      "rpc": "people_get_metric_breakdown",
+      "metric_id": "voluntary_attrition_rate",
+      "rows_returned": 104,
+      "cells_suppressed": 42
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "role": "external_viewer",
+      "rpc": "people_get_metric_breakdown",
+      "metric_id": "voluntary_attrition_rate",
+      "rows_returned": 104,
+      "cells_suppressed": 44
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "role": "external_viewer",
+      "rpc": "people_get_case3_signals",
+      "metric_id": "voluntary_attrition_rate",
+      "rows_returned": 1,
+      "cells_suppressed": 0
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "role": "external_viewer",
+      "rpc": "people_get_case3_signals",
+      "metric_id": "voluntary_attrition_rate",
+      "rows_returned": 1,
+      "cells_suppressed": 0
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "role": "external_viewer",
+      "rpc": "people_get_case3_signals",
+      "metric_id": "voluntary_attrition_rate",
+      "rows_returned": 1,
+      "cells_suppressed": 0
+    },
+    {
+      "identity_id": "demo-external-viewer",
+      "role": "external_viewer",
+      "rpc": "people_get_case3_signals",
+      "metric_id": "voluntary_attrition_rate",
+      "rows_returned": 1,
+      "cells_suppressed": 0
+    }
+  ],
+  "suppression_log_sample": [
+    {
+      "metric_id": "voluntary_attrition_rate",
+      "dimension": "location_tenure_grade",
+      "cells_suppressed": 30,
+      "rule": "min_cell",
+      "ts": "2026-09-04 16:41:35.333629+00:00"
+    },
+    {
+      "metric_id": "voluntary_attrition_rate",
+      "dimension": "location_tenure_grade",
+      "cells_suppressed": 34,
+      "rule": "min_cell",
+      "ts": "2026-09-04 16:41:35.302603+00:00"
+    },
+    {
+      "metric_id": "voluntary_attrition_rate",
+      "dimension": "location_tenure_grade",
+      "cells_suppressed": 42,
+      "rule": "min_cell",
+      "ts": "2026-09-04 16:41:35.270550+00:00"
+    },
+    {
+      "metric_id": "voluntary_attrition_rate",
+      "dimension": "location_tenure_grade",
+      "cells_suppressed": 44,
+      "rule": "min_cell",
+      "ts": "2026-09-04 16:41:35.224447+00:00"
+    },
+    {
+      "metric_id": "voluntary_attrition_rate",
+      "dimension": "location_tenure_grade",
+      "cells_suppressed": 44,
+      "rule": "min_cell",
+      "ts": "2026-09-04 16:41:28.349486+00:00"
+    },
+    {
+      "metric_id": "voluntary_attrition_rate",
+      "dimension": "location_tenure_grade",
+      "cells_suppressed": 44,
+      "rule": "min_cell",
+      "ts": "2026-09-04 16:41:28.315472+00:00"
+    },
+    {
+      "metric_id": "voluntary_attrition_rate",
+      "dimension": "location_tenure_grade",
+      "cells_suppressed": 44,
+      "rule": "min_cell",
+      "ts": "2026-09-04 16:41:28.282587+00:00"
+    },
+    {
+      "metric_id": "voluntary_attrition_rate",
+      "dimension": "location_tenure_grade",
+      "cells_suppressed": 44,
+      "rule": "min_cell",
+      "ts": "2026-09-04 16:41:28.251524+00:00"
+    }
+  ],
+  "dim_recruiter": 110,
+  "case2_incident": {
+    "incident_id": "inc-frappe-employee-2026-08-14",
+    "details": {
+      "mode": "full",
+      "control_total": 84508,
+      "missing_count": 16572,
+      "rows_received": 67936,
+      "apac_rows_received_pct": 0.35
+    }
+  },
+  "case2_replay": {
+    "replay_id": "replay-headcount-2026-08-14",
+    "value_bad": "40255",
+    "value_expected": "49688"
+  },
+  "role_switch": [
+    {
+      "identity": "demo-external-viewer",
+      "min_cell": 50,
+      "cells": 104,
+      "suppressed": 44,
+      "visible": 60
+    },
+    {
+      "identity": "demo-leader-engineering",
+      "min_cell": 20,
+      "cells": 104,
+      "suppressed": 42,
+      "visible": 62
+    },
+    {
+      "identity": "demo-hrbp",
+      "min_cell": 10,
+      "cells": 104,
+      "suppressed": 34,
+      "visible": 70
+    },
+    {
+      "identity": "demo-people-analyst",
+      "min_cell": 5,
+      "cells": 104,
+      "suppressed": 30,
+      "visible": 74
+    }
+  ],
+  "case1_company_hc": {
+    "unit": "count",
+    "as_of": "2026-08-31",
+    "value": 49823,
+    "denied": false,
+    "window": "trailing_12m",
+    "by_stage": null,
+    "metric_id": "headcount",
+    "annualized": false,
+    "identity_id": "demo-external-viewer"
+  },
+  "case1_eng_hc": {
+    "unit": "count",
+    "as_of": "2026-08-31",
+    "value": 15954,
+    "denied": false,
+    "window": "trailing_12m",
+    "by_stage": null,
+    "metric_id": "headcount",
+    "annualized": false,
+    "identity_id": "demo-external-viewer"
+  },
+  "case3_company_vol": {
+    "unit": "rate",
+    "as_of": "2026-08-31",
+    "value": 0.13956249086013645,
+    "denied": false,
+    "window": "trailing_12m",
+    "by_stage": null,
+    "metric_id": "voluntary_attrition_rate",
+    "annualized": true,
+    "identity_id": "demo-external-viewer"
+  },
+  "case3_eng_vol_month": {
+    "unit": "rate",
+    "as_of": "2026-08-31",
+    "value": 0.17901466716810832,
+    "denied": false,
+    "window": "month",
+    "by_stage": null,
+    "metric_id": "voluntary_attrition_rate",
+    "annualized": true,
+    "identity_id": "demo-external-viewer"
+  }
+}

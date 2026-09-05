@@ -40,6 +40,7 @@ function expressionLabel(expression?: MetricExpression): string {
       : `Count ${expression.entity} records`;
   }
   if (expression.kind === "average") return `Average ${expression.field}`;
+  if (expression.kind === "sum") return `Sum ${expression.field}`;
   if (expression.kind === "duration") {
     return `${expression.aggregation} days from ${expression.startField} to ${expression.endField}`;
   }

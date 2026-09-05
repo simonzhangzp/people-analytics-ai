@@ -1,0 +1,31 @@
+{
+  "rpc": "people_v2.people_get_metric_for(identity_id, metric_id, as_of, grain, job_family)",
+  "sql": "select people_v2.people_get_metric_for($1, $2, $3::date, $4, $5) as payload",
+  "identity_id": "demo-external-viewer",
+  "metric_id": "voluntary_attrition_rate",
+  "job_family": "Engineering",
+  "aug": {
+    "as_of": "2026-08-31",
+    "grain": "month",
+    "value": 0.17901466716810832,
+    "pct": 17.9
+  },
+  "jul": {
+    "as_of": "2026-07-31",
+    "grain": "month",
+    "value": 0.15953844224256866,
+    "pct": 16.0
+  },
+  "delta_pp": 1.947622492553966,
+  "delta_pp_rounded": 1.9,
+  "t12m": {
+    "as_of": "2026-08-31",
+    "grain": "trailing_12m",
+    "value": 0.15998296921152771,
+    "pct": 16.0
+  },
+  "month_minus_t12m_pp": 1.903169795658061,
+  "coincidence": "July month view also rounds to 16.0%, so 17.9 − 16.0 looks like month-minus-t12m. The headline delta is MoM, not that difference.",
+  "headline_expr": "(month_as_of_2026-08-31 - month_as_of_2026-07-31) * 100",
+  "verdict": "MoM arithmetic is correct. Copy must name both windows."
+}

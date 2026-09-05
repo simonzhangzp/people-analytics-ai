@@ -20,6 +20,8 @@ def _load(path: Path) -> dict:
 def classify_table(name: str, spec: dict) -> str:
     classes = spec.get("table_classes") or {}
     no_sel = classes.get("no_select_people_app") or {}
+    if name in (no_sel.get("exact") or []):
+        return "deny"
     if name.endswith(str(no_sel.get("suffix") or "_restricted")):
         return "deny"
     for prefix in no_sel.get("prefixes") or []:
@@ -45,6 +47,7 @@ def render_table_sql(table: str, has_org_path: bool, spec: dict, rls: dict) -> s
     q = _quote_ident(table)
     lines = [
         f"alter table people_v2.{q} enable row level security;",
+        f"alter table people_v2.{q} force row level security;",
         f"drop policy if exists people_app_read on people_v2.{q};",
         f"revoke all on people_v2.{q} from people_app;",
     ]
@@ -176,6 +179,14 @@ def verify(conn) -> list[str]:
             row = cur.fetchone()
             if not row or not row[0]:
                 errors.append(f"{table}: RLS not enabled")
+            cur.execute(
+                "select c.relforcerowsecurity from pg_class c join pg_namespace n on n.oid = c.relnamespace "
+                "where n.nspname = 'people_v2' and c.relname = %s",
+                [table],
+            )
+            forced = cur.fetchone()
+            if not forced or not forced[0]:
+                errors.append(f"{table}: FORCE ROW LEVEL SECURITY required (table owner bypasses RLS unless forced)")
     if not names:
         errors.append("no people_v2 tables")
     return errors

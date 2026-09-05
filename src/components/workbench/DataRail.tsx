@@ -1,13 +1,11 @@
 "use client";
 
 import {
-  BarChart3,
   BookOpenText,
   CheckCircle2,
   Circle,
   Database,
   FileSpreadsheet,
-  Ruler,
   ShieldCheck,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -24,9 +22,7 @@ const views: Array<{
   description: string;
   icon: typeof Database;
 }> = [
-  { id: "data", label: "Data", description: "Files and relationships", icon: Database },
-  { id: "metrics", label: "Metrics", description: "Definitions and rules", icon: Ruler },
-  { id: "analysis", label: "Analysis", description: "Evidence thread", icon: BarChart3 },
+  { id: "data", label: "Analyze", description: "Ask and explore", icon: Database },
   { id: "story", label: "Story", description: "Executive narrative", icon: BookOpenText },
 ];
 
@@ -55,6 +51,7 @@ interface DataRailProps {
   activeView: WorkbenchView;
   onViewChange: (view: WorkbenchView) => void;
   datasets: LocalWorkbenchDataset[];
+  localDataAvailable: boolean;
   progress: WorkbenchProgress;
   activeDatasetId?: string;
   onSelectDataset?: (datasetId: string) => void;
@@ -64,6 +61,7 @@ export function DataRail({
   activeView,
   onViewChange,
   datasets,
+  localDataAvailable,
   progress,
   activeDatasetId,
   onSelectDataset,
@@ -73,7 +71,7 @@ export function DataRail({
       <div className="px-5 pb-4 pt-5">
         <p className="eyebrow">Workbench</p>
         <p className="mt-2 text-[12px] leading-5 text-[#768093]">
-          Meaning first. Evidence next.
+          Files → questions → evidence
         </p>
       </div>
 
@@ -119,8 +117,18 @@ export function DataRail({
       <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-4">
         <div className="flex items-center justify-between px-2">
           <p className="eyebrow">Local data</p>
-          <Badge variant={datasets.length ? "success" : "neutral"}>
-            {datasets.length} file{datasets.length === 1 ? "" : "s"}
+          <Badge
+            variant={
+              datasets.length && !localDataAvailable
+                ? "warning"
+                : datasets.length
+                  ? "success"
+                  : "neutral"
+            }
+          >
+            {datasets.length && !localDataAvailable
+              ? "Reattach"
+              : `${datasets.length} file${datasets.length === 1 ? "" : "s"}`}
           </Badge>
         </div>
 
@@ -132,7 +140,7 @@ export function DataRail({
                 No files attached
               </p>
               <p className="mt-1 text-[11px] leading-4 text-[#818a99]">
-                Add 1–3 files in Data to begin.
+                Add up to 10 files to begin.
               </p>
             </div>
           ) : (
@@ -163,6 +171,11 @@ export function DataRail({
                     <p className="mt-1 text-[10px] tabular-nums text-[#7b8494]">
                       {formatNumber(metadata.rowCount)} rows · {metadata.healthScore}/100
                     </p>
+                    {!localDataAvailable && (
+                      <p className="mt-1 text-[10px] font-semibold text-[#9a6b32]">
+                        Reattach to calculate
+                      </p>
+                    )}
                   </div>
                 </div>
               </button>

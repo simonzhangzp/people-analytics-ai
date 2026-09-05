@@ -102,8 +102,21 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   country: {
     label: "Country",
-    aliases: ["country", "country_cd", "country_name"],
+    aliases: [
+      "country",
+      "country_cd",
+      "country_name",
+      "country_nm",
+      "国家",
+      "所在国家",
+    ],
     type: "string",
+  },
+  nationality: {
+    label: "Nationality",
+    aliases: ["nationality", "citizenship", "国籍"],
+    type: "string",
+    sensitive: true,
   },
   region: {
     label: "Region",
@@ -181,6 +194,9 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
       "position_applied",
       "role_title",
       "tech_designation",
+      "岗位",
+      "管理职位",
+      "专业职位",
     ],
     type: "string",
   },
@@ -199,17 +215,43 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
       "cc_dept_by_cc",
       "cost_center_dept",
       "org_nm",
+      "dept_finance",
+      "finance_dept",
+      "组织单元",
+      "工作部门",
+      "所属部门",
+      "部门",
     ],
     type: "string",
   },
   location: {
     label: "Location",
-    aliases: ["location", "job_location", "office_location", "geography"],
+    aliases: [
+      "location",
+      "job_location",
+      "office_location",
+      "geography",
+      "location_people",
+      "people_location",
+      "工作地点",
+      "办公地点",
+      "城市",
+    ],
     type: "string",
   },
   seniority_level: {
     label: "Seniority Level",
-    aliases: ["seniority_level", "job_level", "level", "grade", "job_lvl"],
+    aliases: [
+      "seniority_level",
+      "job_level",
+      "level",
+      "grade",
+      "job_lvl",
+      "管理级别",
+      "管理职级",
+      "专业职级",
+      "专业子等",
+    ],
     type: "string",
   },
   target_hires: {
@@ -232,6 +274,28 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
     type: "id",
     pii: true,
   },
+  employee_name: {
+    label: "Employee Name",
+    aliases: [
+      "employee_name",
+      "employee_full_name",
+      "person_name",
+      "英文名",
+      "中文名",
+      "英文名_中文名",
+      "英文名(中文名)",
+      "姓名",
+      "员工姓名",
+    ],
+    type: "string",
+    pii: true,
+  },
+  contact_handle: {
+    label: "Personal Contact Handle",
+    aliases: ["qq", "qq_number", "qq号码", "wechat", "微信号"],
+    type: "string",
+    pii: true,
+  },
   attrition: {
     label: "Attrition",
     aliases: ["attrition", "terminated", "termination_flag"],
@@ -244,7 +308,19 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   job_role: {
     label: "Job Role",
-    aliases: ["job_role", "jobrole"],
+    aliases: [
+      "job_role",
+      "jobrole",
+      "job_function",
+      "function_name",
+      "岗位属性",
+      "发展通道",
+    ],
+    type: "string",
+  },
+  cost_center: {
+    label: "Cost Center",
+    aliases: ["cost_center", "costcentre", "cost_centre", "cc"],
     type: "string",
   },
   years_at_company: {
@@ -254,7 +330,14 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   employee_type: {
     label: "Employee Type",
-    aliases: ["employee_type", "person_type", "worker_category"],
+    aliases: [
+      "employee_type",
+      "person_type",
+      "worker_category",
+      "员工类别",
+      "用工类型",
+      "人员类别",
+    ],
     type: "string",
   },
   term_date: {
@@ -483,7 +566,7 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
   },
   gender: {
     label: "Gender",
-    aliases: ["gender", "sex", "gender_identity"],
+    aliases: ["gender", "sex", "gender_identity", "性别"],
     type: "string",
     sensitive: true,
   },
@@ -492,6 +575,39 @@ export const canonicalPeopleFields: Record<string, CanonicalFieldDefinition> = {
     aliases: ["ethnicity", "race", "ethnic_group", "racialized_group"],
     type: "string",
     sensitive: true,
+  },
+  education_level: {
+    label: "Education Level",
+    aliases: [
+      "education_level",
+      "highest_education",
+      "highest_degree",
+      "最高学历",
+      "学历",
+      "教育经历_学历",
+    ],
+    type: "string",
+  },
+  academic_degree: {
+    label: "Academic Degree",
+    aliases: ["academic_degree", "degree", "学位", "教育经历_学位"],
+    type: "string",
+  },
+  school: {
+    label: "School",
+    aliases: [
+      "school",
+      "university",
+      "alma_mater",
+      "毕业院校",
+      "教育经历_学校名称",
+    ],
+    type: "string",
+  },
+  major: {
+    label: "Major",
+    aliases: ["major", "specialization", "专业", "教育经历_专业"],
+    type: "string",
   },
   demographic_category: {
     label: "Demographic Category",
@@ -675,7 +791,8 @@ export function normalizeHeader(value: string) {
     .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
+    .normalize("NFKC")
+    .replace(/[^\p{L}\p{N}]+/gu, "_")
     .replace(/^_+|_+$/g, "");
 }
 
@@ -722,7 +839,7 @@ export function semanticRoleForCanonicalField(
     return "status";
   }
   if (
-    canonicalField.includes("count") ||
+    canonicalField.endsWith("_count") ||
     canonicalField === "applications_count" ||
     canonicalField === "advertisements_count" ||
     canonicalField === "movement_count"
@@ -790,6 +907,13 @@ export function findCanonicalField(sourceField: string) {
 }
 
 export function isLikelyPii(sourceField: string) {
+  if (
+    /姓名|名字|英文名|中文名|qq|微信|手机号|手机号码|电话号码|电话|邮箱|身份证|护照|住址|家庭地址|通信地址/i.test(
+      sourceField,
+    )
+  ) {
+    return true;
+  }
   const normalized = normalizeHeader(sourceField);
   if (exactPiiHeaders.has(normalized)) return true;
   const value = compact(sourceField);

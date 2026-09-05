@@ -1,0 +1,60 @@
+# Actual People quality tests executed by the data-v1 pipeline / serving layer.
+# Homepage count and Case 1 Quality panel read people_v2.people_quality_test.
+# Do not pad this list to a round number.
+
+tests:
+  - { test_id: bronze_volume, layer: bronze, object: people_bronze, type: volume, blocking: true, group: bronze }
+  - { test_id: bronze_schema_drift, layer: bronze, object: people_source_contracts.odcs, type: schema_drift, blocking: true, group: bronze }
+  - { test_id: bronze_parse, layer: bronze, object: people_bronze, type: parse, blocking: true, group: bronze }
+
+  - { test_id: unique_worker_id, layer: silver, object: people_worker, type: unique, blocking: true, group: unique }
+  - { test_id: unique_assignment_id, layer: silver, object: people_assignment, type: unique, blocking: true, group: unique }
+  - { test_id: unique_requisition_id, layer: silver, object: people_requisition, type: unique, blocking: true, group: unique }
+  - { test_id: worker_id_not_null, layer: silver, object: people_worker, type: not_null, blocking: true, group: not_null }
+  - { test_id: org_id_not_null, layer: silver, object: people_worker, type: not_null, blocking: true, group: not_null }
+  - { test_id: location_id_not_null, layer: silver, object: people_worker, type: not_null, blocking: true, group: not_null }
+  - { test_id: candidate_requisition_not_null, layer: silver, object: people_candidate, type: not_null, blocking: true, group: not_null }
+  - { test_id: worker_manager_fk, layer: silver, object: people_worker, type: referential, blocking: true, group: referential }
+  - { test_id: worker_job_fk, layer: silver, object: people_worker, type: referential, blocking: true, group: referential }
+  - { test_id: worker_org_fk, layer: silver, object: people_worker, type: referential, blocking: true, group: referential }
+  - { test_id: location_fk, layer: silver, object: people_worker, type: referential, blocking: true, group: referential }
+  - { test_id: candidate_requisition_fk, layer: silver, object: people_candidate, type: referential, blocking: true, group: referential }
+  - { test_id: learning_worker_fk, layer: silver, object: people_learning_completion, type: referential, blocking: true, group: referential }
+  - { test_id: performance_worker_fk, layer: silver, object: people_performance_review, type: referential, blocking: true, group: referential }
+  - { test_id: compensation_worker_fk, layer: silver, object: people_compensation, type: referential, blocking: true, group: referential }
+  - { test_id: hire_before_termination, layer: silver, object: people_worker, type: temporal, blocking: true, group: temporal }
+  - { test_id: promotion_after_hire, layer: silver, object: people_movement, type: temporal, blocking: true, group: temporal }
+  - { test_id: application_before_hire, layer: silver, object: people_candidate_hire, type: temporal, blocking: true, group: temporal }
+  - { test_id: assignment_effective_window, layer: silver, object: people_assignment, type: temporal, blocking: true, group: temporal }
+  - { test_id: hist_no_overlap, layer: silver, object: people_hist_worker_attr, type: temporal, blocking: true, group: temporal }
+  - { test_id: hist_no_gap, layer: silver, object: people_hist_worker_attr, type: temporal, blocking: true, group: temporal }
+  - { test_id: hist_first_valid_from_eq_hire, layer: silver, object: people_hist_worker_attr, type: temporal, blocking: true, group: temporal }
+  - { test_id: offer_application_ri, layer: silver, object: people_fact_offer, type: referential, blocking: true, group: referential }
+  - { test_id: offer_requisition_ri, layer: silver, object: people_fact_offer, type: referential, blocking: true, group: referential }
+  - { test_id: term_has_separation_ri, layer: silver, object: people_fact_separation, type: referential, blocking: true, group: referential }
+  - { test_id: hires_eq_accepted_offers, layer: silver, object: people_evt_hire, type: transaction, blocking: true, group: transaction }
+  - { test_id: window_hires_via_t1, layer: silver, object: people_dim_worker, type: transaction, blocking: true, group: transaction }
+  - { test_id: rejected_without_later_accept_keeps_open_or_cancelled, layer: silver, object: people_fact_offer, type: transaction, blocking: true, group: transaction }
+  - { test_id: salary_positive, layer: silver, object: people_compensation, type: business, blocking: true, group: business }
+  - { test_id: fte_valid, layer: silver, object: people_worker, type: business, blocking: true, group: business }
+  - { test_id: active_workers_unterminated, layer: silver, object: people_worker, type: business, blocking: true, group: business }
+  - { test_id: active_has_org, layer: silver, object: people_worker, type: business, blocking: true, group: business }
+  - { test_id: one_assignment_per_worker_min, layer: silver, object: people_assignment, type: business, blocking: true, group: business }
+  - { test_id: snap_recruiter_id_subseteq_dim_recruiter, layer: silver, object: people_snap_opening_month, type: referential, blocking: true, group: recruiting }
+  - { test_id: dim_recruiter_covers_opening_recruiters, layer: silver, object: people_dim_recruiter, type: referential, blocking: true, group: recruiting }
+
+  - { test_id: snapshot_roll_forward, layer: gold, object: people_snap_worker_month, type: roll_forward, blocking: true, group: gold }
+  - { test_id: hist_attr_switch_has_evt_worker_change, layer: gold, object: people_hist_worker_attr, type: roll_forward, blocking: true, group: gold }
+  - { test_id: evt_worker_change_has_hist_attr_switch, layer: gold, object: people_evt_worker_change, type: roll_forward, blocking: true, group: gold }
+  - { test_id: overview_rows_present, layer: gold, object: people_mart_workforce_overview, type: freshness, blocking: true, group: freshness }
+  - { test_id: active_headcount_scale, layer: gold, object: people_worker, type: row_count, blocking: true, group: gold }
+  - { test_id: hire_events_present, layer: gold, object: people_movement, type: row_count, blocking: true, group: gold }
+  - { test_id: headcount_non_negative, layer: gold, object: people_mart_workforce_overview, type: business, blocking: true, group: gold }
+  - { test_id: attrition_rate_bounds, layer: gold, object: people_mart_retention, type: metric_range, blocking: true, group: gold }
+  - { test_id: mobility_rate_bounds, layer: gold, object: people_mart_internal_mobility, type: metric_range, blocking: true, group: gold }
+  - { test_id: offer_acceptance_bounds, layer: gold, object: people_mart_recruiting, type: metric_range, blocking: true, group: gold }
+  - { test_id: compa_ratio_range, layer: gold, object: people_mart_compensation_equity, type: metric_range, blocking: true, group: gold }
+  - { test_id: skill_coverage_bounds, layer: gold, object: people_mart_skills, type: metric_range, blocking: true, group: gold }
+  - { test_id: orphan_manager_at_month_end, layer: gold, object: people_snap_worker_month, type: referential, blocking: true, group: gold }
+  - { test_id: certified_ceo_count, layer: gold, object: people_snap_worker_month, type: business, blocking: true, group: gold }
+  - { test_id: span_max_le_15, layer: gold, object: people_snap_worker_month, type: business, blocking: true, group: gold }

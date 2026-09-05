@@ -758,6 +758,8 @@ tables:
   natural_key: offer.id
 - name: people_dim_recruiter
   columns:
+  - name: recruiter_id
+    type: bigint
   - name: person_id
     type: text
   - name: specialization
@@ -772,9 +774,9 @@ tables:
     type: date
   schema: people_v2
   master_source: canonical
-  key: person_id
-  id_kind: surrogate
-  notes: E4; person via T8
+  key: recruiter_id
+  id_kind: master_immutable
+  notes: E4; Greenhouse user ids referenced by opening.recruiter_id
 - name: people_fact_survey_score_restricted
   columns:
   - name: worker_id

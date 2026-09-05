@@ -14,8 +14,15 @@ Do not ship this to the live homepage or nav in this phase. Bind it on the datas
 2. `apac_hris_feed_incomplete` — Case 2. One-day extract fault on 2026-08-14: APAC Employee rows_received = 35% of control_total. Not a workforce change.
 3. `hiring_slowdown_hm_latency` — Case 4. Sales Onsite dwell ×1.6 and offer acceptance −8 points from 2026-05-01. Scorecard and interview latency concentrated on hiring managers 101–103.
 
-**SYNTHETIC_EXTENSION (E1–E7):** compensation bands, grade rank, city geography, recruiter attributes, engagement instrument, separation-reason map, GlobalTech org names. See `people_mappings/synthetic_extensions.yml`.
+**SYNTHETIC_EXTENSION (E1–E7 plus E9):** compensation bands, grade rank, city geography, recruiter attributes, engagement instrument, separation-reason map, GlobalTech org names, and silver classification of month-end tree-repair manager changes (`rebalance_synthetic`). See `people_mappings/synthetic_extensions.yml`.
 
-**External sources (not simulated employees):** O*NET 31.0 occupation/skill files, BLS public series (including JOLTS quits used to calibrate attrition), Microsoft Learn catalog. Scale of the synthetic HR/ATS world is **~80–90k worker spells over 5 years**, ending **~50,000 certified**. The dataset is updated daily by the simulator; certified at month-end.
+**External sources (not simulated employees):** O*NET 31.0 occupation/skill files, BLS public series (including JOLTS quits used to calibrate attrition), Microsoft Learn catalog. Scale of the synthetic HR/ATS world is **~80–90k worker spells over 5 years**, ending **49,823 certified**.
+
+**Freshness card (eyebrow FRESHNESS, after External sources):**
+
+- Until healthcheck streak ≥ 3: The dataset is frozen at data-v1 (as-of 2026-08-31).
+- After streak ≥ 3, from `people_serving_run`: The dataset is frozen at data-v1 (as-of 2026-08-31); a daily job verifies the serving layer. Last serving check: YYYY-MM-DD.
+
+Do not claim a daily serving job while the Vercel Cron healthcheck streak is below 3 consecutive UTC days. Do not place freshness under External sources.
 
 **Privacy:** Individual compensation, appraisals, EEOC, and survey items are not shown on public pages. Aggregates use cell-size suppression.

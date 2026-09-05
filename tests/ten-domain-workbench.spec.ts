@@ -76,20 +76,16 @@ test("runs one deterministic browser path for all ten HR domains", async ({
       await expect(page.getByText(item.fileName).first()).toBeVisible({
         timeout: 60_000,
       });
-      await expect(
-        page.getByTestId(`capability-${item.domain}`),
-      ).toContainText("Runnable");
-
       await page.getByTestId("workbench-question").fill(item.question);
       await page.getByTestId("ask-workbench-question").click();
-      await expect(page.getByTestId("continue-to-analysis")).toBeEnabled();
-      await page.getByTestId("continue-to-analysis").click();
-      await expect(page.getByTestId("run-analysis-plan")).toBeVisible();
-      await page.getByTestId("run-analysis-plan").click();
-      await expect(page.getByText("1 validated · 0 data gaps")).toBeVisible({
+      await expect(page.getByTestId("thread-answer").first()).toBeVisible({
         timeout: 30_000,
       });
-      await expect(page.getByText("Deterministic result")).toBeVisible();
+      await expect(
+        page.getByTestId("thread-answer").first().getByText(/calculated|data gap/i),
+      ).toBeVisible();
+      await expect(page.getByTestId("workbench-nav-metrics")).toHaveCount(0);
+      await expect(page.getByTestId("workbench-nav-analysis")).toHaveCount(0);
     });
   }
 });

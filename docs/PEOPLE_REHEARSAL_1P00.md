@@ -1,7 +1,6 @@
 # 全量 5 年 lake 回填报告（data-v1，scale=1.0）
 
 **Stop.** simulator 已冻结为 tag `data-v1`。GATE 3 前不再改 simulator。serving 仅 PeopleAnalyticsAI.net。
-审核交回（D1–D6 / S7 逐条）：[`docs/PEOPLE_DATA_V1.md`](PEOPLE_DATA_V1.md)。
 全量 gold 在 lake：`people_bronze/rehearsal_1p00/`、`people_silver/rehearsal_1p00/`、`people_gold/rehearsal_1p00/`（不进 git）。
 
 JSON：`data-platform/simulator/fixtures/rehearsal_1p00/report.json`
@@ -105,7 +104,7 @@ D2 自愿离职分解（Engineering trailing-3m，有 scenario）：
 | other | 454 |
 | 合计 | 676 |
 
-闭式 Engineering：0.1334 → 0.1574。切片相关信号（gold，非因果）：compa 0.88 vs 0.98（n=2,149 / 47,674）；manager change / worker 1.8008 vs 1.5604。
+闭式 Engineering：0.1334 → 0.1574。切片相关信号（gold，非因果）：compa 0.88 vs 0.98（n=2,149 / 47,674）；manager change / worker 0.2564 vs 0.2132。
 
 ## Case 4（Sales，自 2026-05-01）
 
@@ -124,7 +123,7 @@ slow-HM 101–103 在 **TTF 与 Onsite aging 的 p90 尾部**均高于对照。
 | --- | --- |
 | **comp** | SSA **321,579**。对照 grade p50 compa-ratio **0.98**；Case 3 切片 0.88。 |
 | **performance** | Appraisal **199,421**。final_score 2/3/4/5 → 7,771 / 83,070 / 83,434 / 25,146。 |
-| **mobility** | 年化 promotion **8.42%** / transfer **5.40%** / manager change **147.64%**（计数 17,797 / 11,408 / 312,144）。 |
+| **mobility** | 年化 promotion **8.42%** / transfer **5.40%** / manager change **26.16%**（计数 17,797 / 11,408 / 55,303）。 |
 | **learning** | Training **990,000**；人均 certified **99.26** 小时；次均 5.0。 |
 | **skills** | 人均技能 **6.37**。Engineering × Governance gap **1.0**。 |
 | **engagement** | 10 波；response rate 0.71–0.82。 |
@@ -153,8 +152,8 @@ recruiter_load（as-of 人均 open req）**7.9455**；skill_coverage **0.5718**�
 | 层 | 对象数 | 字节 |
 | --- | ---: | ---: |
 | bronze | 44 | 630,185,339（≈ 601 MiB） |
-| silver | 47 | 493,589,296（≈ 471 MiB） |
-| gold | 33 | 353,761,937（≈ 337 MiB） |
+| silver | 47 | 482,742,467（≈ 460 MiB） |
+| gold | 33 | 349,056,853（≈ 333 MiB） |
 
 ## Postgres 落地
 

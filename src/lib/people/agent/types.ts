@@ -1,3 +1,5 @@
+import type { LlmInvocation } from "./llm-invocation";
+
 export const PEOPLE_TOOL_NAMES = [
   "list_metrics",
   "get_metric",
@@ -40,6 +42,7 @@ export interface PeopleObservedFact {
   unit?: string;
   denied?: boolean;
   suppressed?: boolean;
+  source_tool?: string;
 }
 
 export interface PeopleCriticResult {
@@ -57,12 +60,15 @@ export interface PeopleAskTraceTool {
   error?: string;
 }
 
-export interface PeopleAskTrace {
+export type PeopleAskTrace = {
   tools: PeopleAskTraceTool[];
   latency_ms: number;
   llm_skipped: string | null;
   llm_calls: number;
-}
+  llm_used: boolean;
+  llm_invocation: LlmInvocation;
+  failure_reason: string | null;
+};
 
 export type PeopleErrorState = "rpc" | "critic" | null;
 
@@ -102,6 +108,8 @@ export interface PeopleAnswerContract {
   error_state: PeopleErrorState;
   withheld: boolean;
   llm_skipped: string | null;
+  llm_invocation: LlmInvocation;
+  failure_reason: string | null;
   trace: PeopleAskTrace;
 }
 

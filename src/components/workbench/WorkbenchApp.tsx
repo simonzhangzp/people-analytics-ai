@@ -1,12 +1,9 @@
 "use client";
 
-import { AICoDesignerPanel } from "./AICoDesignerPanel";
 import { DataRail } from "./DataRail";
 import { WorkbenchProvider, useWorkbench } from "./WorkbenchProvider";
 import { WorkbenchShell } from "./WorkbenchShell";
-import { DataCanvas } from "./data/DataCanvas";
-import { MetricStudio } from "./metrics/MetricStudio";
-import { AnalysisCanvas } from "./analysis/AnalysisCanvas";
+import { AnalyzeCanvas } from "./analysis/AnalyzeCanvas";
 import { StoryBuilder } from "./story/StoryBuilder";
 
 export function WorkbenchApp({ workspaceId }: { workspaceId: string }) {
@@ -21,6 +18,7 @@ function WorkbenchContent() {
   const {
     state,
     activeDatasetId,
+    localDataAvailable,
     draftQuestion,
     processing,
     processingMessage,
@@ -29,25 +27,14 @@ function WorkbenchContent() {
     setDraftQuestion,
     setActiveDatasetId,
     setActiveView,
-    approveRelationship,
     addFiles,
     askQuestion,
     resolveAmbiguity,
-    requestMetricPatch,
-    applyMetricPatch,
-    cancelMetricPatch,
-    runAnalysis,
-    runBranch,
     toggleInsightStory,
     buildStory,
     exportStory,
-    submitCoDesignerContext,
-    handleInterventionAction,
   } = useWorkbench();
 
-  const activeMetric =
-    state.metrics.find((metric) => metric.id === state.activeMetricId) ??
-    state.metrics[0];
   const selectedForStory = state.insights.filter(
     (insight) => insight.selectedForExecutiveStory,
   ).length;
@@ -60,20 +47,12 @@ function WorkbenchContent() {
       activeView={state.activeView}
       onViewChange={setActiveView}
       datasets={state.datasets}
+      localDataAvailable={localDataAvailable}
       progress={state.progress}
       activeDatasetId={activeDataset?.metadata.id}
       onSelectDataset={setActiveDatasetId}
     />
   );
-  const aiPanel = (
-    <AICoDesignerPanel
-      interventions={state.interventions}
-      busy={busy}
-      onSubmitContext={submitCoDesignerContext}
-      onAction={handleInterventionAction}
-    />
-  );
-
   return (
     <WorkbenchShell
       workspaceName={state.workspaceName}
@@ -81,61 +60,31 @@ function WorkbenchContent() {
       persistenceStatus={state.persistenceStatus}
       storyCount={selectedForStory}
       dataRail={dataRail}
-      aiPanel={aiPanel}
       onOpenStory={() => setActiveView("story")}
     >
-      {state.activeView === "data" && (
-        <DataCanvas
+      {state.activeView !== "story" && (
+        <AnalyzeCanvas
           datasets={state.datasets}
-          mappings={state.fieldMappings}
-          relationships={state.relationships}
           capabilities={state.capabilities}
           activeDatasetId={activeDataset?.metadata.id}
+          localDataAvailable={localDataAvailable}
           processing={processing}
           processingMessage={processingMessage}
+          busy={busy}
           error={error}
           questionText={draftQuestion}
-          questionAsked={Boolean(state.question)}
+          thread={state.thread}
+          insights={state.insights}
+          ambiguity={state.ambiguity}
+          plan={state.analysisPlan}
           onAddFiles={addFiles}
           onSelectDataset={setActiveDatasetId}
           onQuestionTextChange={setDraftQuestion}
-          onAskQuestion={() => void askQuestion()}
-          onContinue={() => setActiveView("metrics")}
-          onApproveRelationship={approveRelationship}
-        />
-      )}
-
-      {state.activeView === "metrics" && (
-        <MetricStudio
-          metric={activeMetric}
-          ambiguity={state.ambiguity}
-          pendingPatch={state.pendingMetricPatch}
-          busy={busy}
-          onResolveAmbiguity={resolveAmbiguity}
-          onRequestPatch={requestMetricPatch}
-          onApplyPatch={() => void applyMetricPatch()}
-          onCancelPatch={cancelMetricPatch}
-          onContinue={() => setActiveView("analysis")}
-        />
-      )}
-
-      {state.activeView === "analysis" && (
-        <AnalysisCanvas
-          question={state.question}
-          plan={state.analysisPlan}
-          insights={state.insights}
-          running={busy}
-          explorationRows={activeDataset?.explorationRows ?? []}
-          explorationColumns={activeDataset?.metadata.columns ?? []}
-          explorationSource={activeDataset?.metadata.name ?? "No local dataset"}
-          explorationSampled={
-            (activeDataset?.metadata.rowCount ?? 0) >
-            (activeDataset?.explorationRows.length ?? 0)
+          onAskQuestion={(questionText, parentTurnId) =>
+            void askQuestion(questionText, parentTurnId)
           }
-          onRunPlan={runAnalysis}
-          onRunBranch={runBranch}
+          onResolveAmbiguity={resolveAmbiguity}
           onToggleStory={toggleInsightStory}
-          onContinueToStory={() => setActiveView("story")}
         />
       )}
 

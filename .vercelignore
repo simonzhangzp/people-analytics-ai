@@ -1,0 +1,18 @@
+# Next.js production does not read the People lake, rehearsal fixtures, or local analysis clones.
+data-platform/lake
+data-platform/lake/**
+data-platform/simulator/fixtures
+data-platform/simulator/fixtures/**
+data-platform/**/*.parquet
+**/*.parquet
+.next
+node_modules
+test-results
+playwright-report
+coverage
+vendor
+sample_data
+AIGP
+apps/formulator
+*.pdf
+!public/*.png

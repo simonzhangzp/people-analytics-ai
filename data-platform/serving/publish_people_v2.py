@@ -80,7 +80,7 @@ def _checkpoint_until_budget(ddl) -> None:
 
 def _finish_governance(conn, ddl) -> tuple[bool, list[str], bool]:
     from apply_policy import apply_all, seed_demo_identities, verify  # noqa: E402
-    from pipeline.lineage import run_lineage  # noqa: E402
+    from pipeline.lineage import data_v1_commit_sha, run_lineage  # noqa: E402
 
     pointer_moved = False
     policy_errors: list[str] = []
@@ -99,24 +99,27 @@ def _finish_governance(conn, ddl) -> tuple[bool, list[str], bool]:
         print("post_publish_policy_failed", policy_errors, flush=True)
         return pointer_moved, policy_errors, login_ok
     lineage = run_lineage(20260301, GOLD)
+    bronze_sha = data_v1_commit_sha()
     with conn.cursor() as cur:
         cur.execute(
             """
             insert into people_v2.people_serving_run
               (run_id, started_at, finished_at, certified, notes,
                simulator_code_sha, seed, scenario_versions, baseline_sha)
-            values (%s, now(), now(), true, 'data-v1 certified publish', %s, %s, %s::jsonb, %s)
+            values (%s, now(), now(), true, %s, %s, %s, %s::jsonb, %s)
             on conflict (run_id) do update set
               certified = excluded.certified,
               finished_at = excluded.finished_at,
               simulator_code_sha = excluded.simulator_code_sha,
               seed = excluded.seed,
+              notes = excluded.notes,
               scenario_versions = excluded.scenario_versions,
               baseline_sha = excluded.baseline_sha
             """,
             [
                 "data-v1",
-                lineage.get("simulator_code_sha"),
+                "data-v1.1 gold rebuild; bronze frozen at data-v1; simulator_code_sha is the data-v1 tag commit",
+                bronze_sha,
                 lineage.get("seed"),
                 json.dumps(lineage.get("scenario_versions") or {}),
                 lineage.get("baseline_sha"),
@@ -126,9 +129,12 @@ def _finish_governance(conn, ddl) -> tuple[bool, list[str], bool]:
             """
             insert into people_v2.people_serving_pointer
               (pointer_id, as_of, extract_id, moved, notes)
-            values ('current_certified', date '2026-08-31', 'data-v1', true, 'policy verified')
+            values
+              ('current_certified', date '2026-08-31', 'data-v1', true, 'policy verified'),
+              ('incident_replay', date '2026-08-14', 'run-2026-08-14', false, 'Case 2 isolated extract; pointer does not move')
             on conflict (pointer_id) do update set
-              extract_id = excluded.extract_id, moved = true, notes = excluded.notes, as_of = excluded.as_of
+              extract_id = excluded.extract_id, moved = excluded.moved,
+              notes = excluded.notes, as_of = excluded.as_of
             """
         )
     conn.commit()
@@ -151,7 +157,10 @@ def main() -> int:
                 cur.execute("SET statement_timeout = 0")
                 cur.execute("SET idle_in_transaction_session_timeout = 0")
             conn.commit()
+            # people_publisher owns people_v2 relations (grant_publisher_ownership.py)
+            # and performs DROP / truncate-swap without the postgres superuser.
             _drop_people_v2_user_objects(conn)
+            print("dropped_people_v2_as", "people_publisher", flush=True)
             _exec_script(conn, DDL_PATH.read_text(encoding="utf-8"))
             kinds = _pg_tables(conn)
             plan = _parquet_plan()

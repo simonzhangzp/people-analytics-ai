@@ -1,4 +1,4 @@
-import type { PeopleDemoCase } from "../ask-types";
+import { CASE_FOLLOW_UPS, type PeopleDemoCase } from "../ask-types";
 import {
   CERTIFIED_METRIC_IDS,
   METRIC_ALIASES,
@@ -8,8 +8,26 @@ import {
   type PeopleToolCall,
 } from "./types";
 
+export type PeoplePlaybook =
+  | "refuse"
+  | "incident"
+  | "definition"
+  | "quality"
+  | "lineage"
+  | "snapshot"
+  | "trend"
+  | "locations"
+  | "next_steps"
+  | "tenure"
+  | "compensation"
+  | "skills"
+  | "metric_value"
+  | "attrition_explore";
+
 export interface RouterPlan {
   tier: PeopleAgentTier;
+  playbook: PeoplePlaybook;
+  llmEligible: boolean;
   refuse_reason?: string;
   metric_id?: string;
   job_family?: string | null;
@@ -18,6 +36,15 @@ export interface RouterPlan {
   tools: PeopleToolCall[];
   filters: Record<string, string | number | null>;
 }
+
+const CHIP_PLAYBOOK: Record<string, PeoplePlaybook> = {
+  "which locations matter most?": "locations",
+  "what should we investigate next?": "next_steps",
+  "show me the tenure breakdown": "tenure",
+  "what about compensation?": "compensation",
+  "which critical skills have the largest gaps?": "skills",
+  "how is voluntary attrition defined?": "definition",
+};
 
 const REFUSE_PATTERNS: Array<{ re: RegExp; reason: string }> = [
   {
@@ -39,15 +66,12 @@ const REFUSE_PATTERNS: Array<{ re: RegExp; reason: string }> = [
 ];
 
 const CAUSAL =
-  /\b(why|driver|driving|explain|increasing|decreasing|concentrat|what should we investigate|locations matter)\b|为什么|驱动|上升/i;
-
+  /\b(why|driver|driving|explain|increasing|decreasing|concentrat)\b|为什么|驱动|上升/i;
 const DEFINITION = /\b(defined|definition|formula|owner|who owns|numerator|denominator|exclusions)\b/i;
 const TREND = /\b(trend|over time|24 months|time series)\b/i;
-const BREAKDOWN = /\b(breakdown|by tenure|by location|by grade|tenure band)\b/i;
 const QUALITY = /\b(quality tests|source health|tests ran)\b/i;
 const LINEAGE = /\b(lineage|how is (this|headcount) produced)\b/i;
 const SNAPSHOT = /\b(snapshot|certified run|serving run)\b/i;
-const SKILLS = /\b(skill gap|critical skills|skill coverage|learning)\b/i;
 const INCIDENT = /\b(apac|workforce change|metrics were affected|published as)\b/i;
 const VALUE = /\b(what is|current|how many|how much|trust this number)\b/i;
 
@@ -67,15 +91,31 @@ function jobFamily(question: string): string | null {
   return /\bengineering\b/i.test(question) ? "Engineering" : null;
 }
 
-function dimension(question: string): string | undefined {
-  if (/location.?tenure.?grade|locations matter|concentrat/i.test(question)) return "location_tenure_grade";
-  if (/location.?tenure/i.test(question)) return "location_tenure";
-  if (/by location|location breakdown/i.test(question)) return "location_id";
-  if (/tenure/i.test(question)) return "tenure_band";
-  if (/by grade/i.test(question)) return "location_tenure_grade";
-  if (/by region/i.test(question)) return "region";
-  if (/by job family/i.test(question)) return "job_family";
-  return undefined;
+function chipPlaybook(question: string): PeoplePlaybook | undefined {
+  return CHIP_PLAYBOOK[question.trim().toLowerCase().replace(/\s+/g, " ")];
+}
+
+function plan(
+  partial: Omit<RouterPlan, "llmEligible"> & { llmEligible?: boolean },
+): RouterPlan {
+  return { llmEligible: false, ...partial };
+}
+
+function engineeringAttritionTools(dimension: string): PeopleToolCall[] {
+  return [
+    {
+      name: "get_metric",
+      args: { metric_id: "voluntary_attrition_rate", job_family: "Engineering", grain: "trailing_12m" },
+    },
+    {
+      name: "get_metric_breakdown",
+      args: {
+        metric_id: "voluntary_attrition_rate",
+        dimension,
+        job_family: "Engineering",
+      },
+    },
+  ];
 }
 
 export function routePeopleQuestion(
@@ -88,23 +128,94 @@ export function routePeopleQuestion(
 
   for (const rule of REFUSE_PATTERNS) {
     if (rule.re.test(trimmed)) {
-      return {
+      return plan({
         tier: "refuse",
+        playbook: "refuse",
         refuse_reason: rule.reason,
         snapshot_id: "current_certified",
         tools: [],
         filters: {},
-      };
+      });
     }
+  }
+
+  const chip = chipPlaybook(trimmed);
+  if (chip === "locations") {
+    return plan({
+      tier: 1,
+      playbook: "locations",
+      metric_id: "voluntary_attrition_rate",
+      job_family: "Engineering",
+      dimension: "location_tenure_grade",
+      snapshot_id: "current_certified",
+      tools: engineeringAttritionTools("location_tenure_grade"),
+      filters: { metric_id: "voluntary_attrition_rate", dimension: "location_tenure_grade" },
+    });
+  }
+  if (chip === "next_steps") {
+    return plan({
+      tier: 1,
+      playbook: "next_steps",
+      metric_id: "voluntary_attrition_rate",
+      job_family: "Engineering",
+      dimension: "location_tenure_grade",
+      snapshot_id: "current_certified",
+      tools: engineeringAttritionTools("location_tenure_grade"),
+      filters: { metric_id: "voluntary_attrition_rate", dimension: "location_tenure_grade" },
+    });
+  }
+  if (chip === "tenure") {
+    return plan({
+      tier: 1,
+      playbook: "tenure",
+      metric_id: "voluntary_attrition_rate",
+      job_family: "Engineering",
+      dimension: "location_tenure",
+      snapshot_id: "current_certified",
+      tools: engineeringAttritionTools("location_tenure"),
+      filters: { metric_id: "voluntary_attrition_rate", dimension: "location_tenure" },
+    });
+  }
+  if (chip === "compensation") {
+    return plan({
+      tier: 1,
+      playbook: "compensation",
+      metric_id: "compa_ratio_median",
+      job_family: "Engineering",
+      snapshot_id: "current_certified",
+      tools: [{ name: "get_metric", args: { metric_id: "compa_ratio_median", job_family: "Engineering" } }],
+      filters: { metric_id: "compa_ratio_median", job_family: "Engineering" },
+    });
+  }
+  if (chip === "skills") {
+    return plan({
+      tier: 1,
+      playbook: "skills",
+      metric_id: "skill_coverage",
+      job_family: "Engineering",
+      snapshot_id: "current_certified",
+      tools: [{ name: "get_skill_coverage", args: { job_family: "Engineering" } }],
+      filters: { job_family: "Engineering" },
+    });
+  }
+  if (chip === "definition") {
+    return plan({
+      tier: 1,
+      playbook: "definition",
+      metric_id: "voluntary_attrition_rate",
+      snapshot_id: "current_certified",
+      tools: [{ name: "get_metric_definition", args: { metric_id: "voluntary_attrition_rate" } }],
+      filters: { metric_id: "voluntary_attrition_rate" },
+    });
   }
 
   const metric = resolveMetric(trimmed);
   const family = jobFamily(trimmed);
-  const dim = dimension(trimmed);
 
   if (INCIDENT.test(trimmed) && !VALUE.test(trimmed) && !DEFINITION.test(trimmed)) {
-    return {
+    return plan({
       tier: 1,
+      playbook: "incident",
       metric_id: "headcount",
       snapshot_id: "incident_replay",
       job_family: family,
@@ -113,136 +224,101 @@ export function routePeopleQuestion(
         { name: "get_source_health", args: { snapshot_id: "incident_replay" } },
       ],
       filters: { snapshot_id: "incident_replay" },
-    };
+    });
   }
 
   if (DEFINITION.test(trimmed)) {
     const defMetric = metric ?? "headcount";
-    return {
+    return plan({
       tier: 1,
+      playbook: "definition",
       metric_id: defMetric,
       snapshot_id,
       job_family: family,
       tools: [{ name: "get_metric_definition", args: { metric_id: defMetric } }],
       filters: { metric_id: defMetric },
-    };
+    });
   }
 
   if (QUALITY.test(trimmed)) {
-    return {
+    return plan({
       tier: 1,
+      playbook: "quality",
       snapshot_id,
-      tools: [
-        { name: "get_quality_tests" },
-        { name: "get_serving_snapshot" },
-      ],
+      tools: [{ name: "get_quality_tests" }, { name: "get_serving_snapshot" }],
       filters: {},
-    };
+    });
   }
 
   if (LINEAGE.test(trimmed)) {
-    return {
+    return plan({
       tier: 1,
+      playbook: "lineage",
       metric_id: metric ?? "headcount",
       snapshot_id,
       tools: [{ name: "get_lineage", args: { metric_id: metric ?? "headcount" } }],
       filters: { metric_id: metric ?? "headcount" },
-    };
+    });
   }
 
   if (SNAPSHOT.test(trimmed) && !VALUE.test(trimmed) && !metric) {
-    return {
+    return plan({
       tier: 1,
+      playbook: "snapshot",
       snapshot_id,
       tools: [{ name: "get_serving_snapshot" }],
       filters: {},
-    };
+    });
   }
 
   if (TREND.test(trimmed) && metric) {
-    return {
+    return plan({
       tier: 1,
+      playbook: "trend",
       metric_id: metric,
       job_family: family,
       snapshot_id,
-      tools: [
-        {
-          name: "get_metric_trend",
-          args: { metric_id: metric, job_family: family, months: 24 },
-        },
-      ],
+      tools: [{ name: "get_metric_trend", args: { metric_id: metric, job_family: family, months: 24 } }],
       filters: { metric_id: metric, job_family: family },
-    };
-  }
-
-  if (BREAKDOWN.test(trimmed) && !CAUSAL.test(trimmed)) {
-    const breakdownMetric = metric ?? "voluntary_attrition_rate";
-    return {
-      tier: 1,
-      metric_id: breakdownMetric,
-      job_family: family ?? "Engineering",
-      dimension: dim ?? "tenure_band",
-      snapshot_id,
-      tools: [
-        {
-          name: "get_metric_breakdown",
-          args: {
-            metric_id: breakdownMetric,
-            dimension: dim ?? "tenure_band",
-            job_family: family ?? "Engineering",
-          },
-        },
-      ],
-      filters: { metric_id: breakdownMetric, dimension: dim ?? "tenure_band" },
-    };
-  }
-
-  if (SKILLS.test(trimmed) && !CAUSAL.test(trimmed)) {
-    return {
-      tier: 1,
-      metric_id: "skill_coverage",
-      job_family: family ?? "Engineering",
-      snapshot_id,
-      tools: [{ name: "get_skill_coverage", args: { job_family: family ?? "Engineering" } }],
-      filters: { job_family: family ?? "Engineering" },
-    };
+    });
   }
 
   if (metric && !CAUSAL.test(trimmed)) {
     const grain = defaultGrain(metric);
-    return {
+    return plan({
       tier: 1,
+      playbook: "metric_value",
       metric_id: metric,
       job_family: family,
       snapshot_id,
       tools: [
-        {
-          name: "get_metric",
-          args: { metric_id: metric, job_family: family, grain },
-        },
+        { name: "get_metric", args: { metric_id: metric, job_family: family, grain } },
         { name: "get_metric_definition", args: { metric_id: metric } },
       ],
       filters: { metric_id: metric, job_family: family, grain },
-    };
+    });
   }
 
   if (CAUSAL.test(trimmed) || demoCase === "attrition") {
     const attritionMetric = metric ?? "voluntary_attrition_rate";
     const jf = family ?? "Engineering";
-    return {
+    return plan({
       tier: 2,
+      playbook: "attrition_explore",
+      llmEligible: true,
       metric_id: attritionMetric,
       job_family: jf,
-      dimension: dim ?? "location_tenure_grade",
+      dimension: "location_tenure_grade",
       snapshot_id,
-      tools: attritionSkeleton(attritionMetric, jf, /compensat|compa/i.test(trimmed)),
+      tools: attritionSkeleton(attritionMetric, jf, false),
       filters: { metric_id: attritionMetric, job_family: jf },
-    };
+    });
   }
 
   if (demoCase === "incident") {
-    return {
+    return plan({
       tier: 1,
+      playbook: "incident",
       metric_id: "headcount",
       snapshot_id: "incident_replay",
       tools: [
@@ -250,16 +326,17 @@ export function routePeopleQuestion(
         { name: "get_source_health", args: { snapshot_id: "incident_replay" } },
       ],
       filters: { snapshot_id: "incident_replay" },
-    };
+    });
   }
 
-  return {
+  return plan({
     tier: "refuse",
+    playbook: "refuse",
     refuse_reason: "unsupported_question",
     snapshot_id: "current_certified",
     tools: [],
     filters: {},
-  };
+  });
 }
 
 export function attritionSkeleton(
@@ -300,9 +377,18 @@ export function attritionSkeleton(
 }
 
 export function matchPeoplePlaybook(question: string): PeopleToolCall[] | null {
-  const plan = routePeopleQuestion(question);
-  if (plan.tier === "refuse") return null;
-  return plan.tools;
+  const routed = routePeopleQuestion(question);
+  if (routed.tier === "refuse") return null;
+  return routed.tools;
+}
+
+export function case3ChipPlaybooks(): Record<string, PeoplePlaybook> {
+  const out: Record<string, PeoplePlaybook> = {};
+  for (const chip of CASE_FOLLOW_UPS.attrition) {
+    const routed = routePeopleQuestion(chip, "attrition");
+    out[chip] = routed.playbook;
+  }
+  return out;
 }
 
 export function filterRegistryTools(calls: unknown): PeopleToolCall[] {

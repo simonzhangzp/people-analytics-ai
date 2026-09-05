@@ -1,0 +1,30 @@
+# People Analytics Formulator (fork overlay on Microsoft Data Formulator 0.8)
+#
+# 1. Copy apps/formulator/.env.example to apps/formulator/.env and add model keys.
+# 2. docker compose -f apps/formulator/docker-compose.yml up --build
+# 3. Open http://localhost:5567
+# 4. Point the Next.js site at it:
+#    NEXT_PUBLIC_FORMULATOR_URL=http://localhost:5567
+
+services:
+  formulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: people-analytics-formulator:0.8
+    ports:
+      - "5567:5567"
+    environment:
+      DISABLE_DISPLAY_KEYS: "false"
+      SANDBOX: local
+      WORKSPACE_BACKEND: local
+      AVAILABLE_LANGUAGES: en,zh
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - people_formulator_home:/home/appuser/.data_formulator
+    restart: unless-stopped
+
+volumes:
+  people_formulator_home:

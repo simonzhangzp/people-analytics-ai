@@ -74,7 +74,7 @@ type KnowledgeTable = {
       foreignKeyName: string;
       columns: ["workspace_id"];
       isOneToOne: false;
-      referencedRelation: "workspaces";
+      referencedRelation: "people_workspaces";
       referencedColumns: ["id"];
     },
   ];
@@ -86,15 +86,15 @@ export type Database = {
   };
   public: {
     Tables: {
-      workspaces: WorkspaceTable;
-      datasets: KnowledgeTable;
-      field_mappings: KnowledgeTable;
-      dataset_relationships: KnowledgeTable;
-      metric_definitions: KnowledgeTable;
-      analysis_questions: KnowledgeTable;
-      insights: KnowledgeTable;
-      executive_stories: KnowledgeTable;
-      ai_usage: {
+      people_workspaces: WorkspaceTable;
+      people_datasets: KnowledgeTable;
+      people_field_mappings: KnowledgeTable;
+      people_dataset_relationships: KnowledgeTable;
+      people_workbench_metrics: KnowledgeTable;
+      people_analysis_questions: KnowledgeTable;
+      people_insights: KnowledgeTable;
+      people_executive_stories: KnowledgeTable;
+      people_ai_usage: {
         Row: AIUsageRow;
         Insert: AIUsageInsert;
         Update: Partial<AIUsageInsert>;
@@ -103,7 +103,7 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
-      consume_ai_quota: {
+      people_consume_ai_quota: {
         Args: { [_ in never]: never };
         Returns: Array<{
           allowed: boolean;
@@ -112,13 +112,13 @@ export type Database = {
           resets_at: string;
         }>;
       };
-      cleanup_anonymous_workbench_data: {
+      people_cleanup_anonymous_workbench_data: {
         Args: {
           retention?: string;
         };
         Returns: number;
       };
-      knowledge_payload_is_safe: {
+      people_knowledge_payload_is_safe: {
         Args: {
           payload: Json;
         };

@@ -26,6 +26,7 @@ import type {
   Insight,
   LocalWorkbenchDataset,
   MetricDefinition,
+  StorySlideCount,
   WorkbenchState,
 } from "@/types/workbench";
 
@@ -188,7 +189,7 @@ export function buildWorkbenchStory(
   insights: Insight[],
   audience: ExecutiveStory["audience"],
   purpose: ExecutiveStory["purpose"],
-  slideCount: 3 | 5,
+  slideCount: StorySlideCount,
 ) {
   return buildExecutiveStory(
     insights,

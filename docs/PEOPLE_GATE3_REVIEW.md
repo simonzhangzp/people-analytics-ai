@@ -14,7 +14,9 @@ Vercel Production 已写入 `PEOPLE_DB_URL`（secret）、`PEOPLE_SERVING_REF=za
 | --- | --- | --- |
 | 1. Case 页数字与 parity | **达标** | 公司级 Headcount **49823**、voluntary_attrition_rate **0.13956249086013645**（页上 14.0%）。 |
 | 2. 角色切换改变所见结果 | **达标** | 抑制 44/42/34/30。头条按可见格地点加权（四身份均为 APAC-SIN）。列表按 attrition 降序；分析师第一行是 EMEA-LON n=6。 |
-| 3. 每日巡检 | **切流不阻塞 streak** | 冻结下 skipped simulate 为正确。`ok=true` / `reason=frozen_data_v1`。`success_streak.json` 只写本地文件，不读 `people_serving_run` 的 kind/run_date 物理列。 |
+| 3. 每日巡检 | **改 Vercel Cron** | Serving healthcheck = `GET /api/cron/people-healthcheck`（`vercel.json` `0 10 * * *` UTC）。streak 由 `people_serving_run`（kind/run_date/ok）计算。Hetzner 不再声明 daily job。 |
+
+Vercel Cron 频率（官方 [Usage & Pricing](https://vercel.com/docs/cron-jobs/usage-and-pricing)）：Hobby 每天最多 1 次、整点精度 ±59 分钟；Pro/Enterprise 最短间隔 1 分钟。本 job 是每天一次，Hobby 与 Pro 都允许。`CRON_SECRET` 已写入 Production；Vercel 调度会带 `Authorization: Bearer $CRON_SECRET`。Dataset 文案在连续 3 个 UTC 日 `ok=true` 之前只写 frozen as-of，不写 daily job。
 
 ## V1 线上定位（2026-09-04）
 

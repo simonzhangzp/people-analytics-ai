@@ -1,4 +1,4 @@
-import { asList, asRecord, formatCount, formatRate, isoDate } from "../format";
+import { asList, asRecord, isoDate } from "../format";
 import {
   attritionHeadline,
   concentrationLocationFromVisible,
@@ -11,27 +11,21 @@ import type {
   PeopleObservedFact,
   PeopleToolCall,
 } from "./types";
-
-function metricVersion(id: string | undefined, version = 1): string | undefined {
-  return id ? `${id}@${version}` : undefined;
-}
-
-function num(value: unknown): number | null {
-  const n = typeof value === "number" ? value : Number(value);
-  return Number.isFinite(n) ? n : null;
-}
-
-function formatMetricValue(payload: unknown): string {
-  const row = asRecord(payload);
-  if (row.denied === true) return "denied";
-  const value = num(row.value);
-  if (value == null) return "unavailable";
-  const unit = String(row.unit ?? "");
-  if (unit === "rate") return formatRate(value);
-  if (unit === "hours") return `${value.toFixed(1)} hours`;
-  if (unit === "ratio") return value.toFixed(2);
-  return formatCount(value);
-}
+import {
+  composeCompensation,
+  composeDefinition,
+  composeLocations,
+  composeNextSteps,
+  composeSkills,
+  composeTenure,
+  fact,
+  formatMetricValue,
+  metricVersion,
+  num,
+  pickNamed,
+  tracedFacts,
+} from "./compose-playbooks";
+import { resolveLlmInvocation } from "./llm-invocation";
 
 function pickMetric(results: unknown[], metricId?: string, jobFamily?: string | null): Record<string, unknown> {
   for (const item of results) {
@@ -41,11 +35,6 @@ function pickMetric(results: unknown[], metricId?: string, jobFamily?: string | 
     if (row.value != null || row.denied === true) return row;
   }
   return asRecord(results[0]);
-}
-
-function pickNamed(results: Array<{ call: PeopleToolCall; result: unknown }>, name: string, index = 0): Record<string, unknown> {
-  const matches = results.filter((row) => row.call.name === name);
-  return asRecord(matches[index]?.result);
 }
 
 function healthStatus(results: unknown[], snapshotId: string, metricHealth?: string): string {
@@ -73,17 +62,6 @@ function healthClause(status: string): string | null {
   return null;
 }
 
-function fact(text: string, extra: Partial<PeopleObservedFact> = {}): PeopleObservedFact {
-  const asOf = extra.as_of ?? extra.asOf;
-  return {
-    text,
-    filters: extra.filters ?? {},
-    ...extra,
-    as_of: asOf,
-    asOf: asOf,
-  };
-}
-
 export function composeAnswerContract(input: {
   question: string;
   identityId: string;
@@ -94,6 +72,7 @@ export function composeAnswerContract(input: {
   results: Array<{ call: PeopleToolCall; result: unknown; ok: boolean; error?: string }>;
   hypotheses?: string[];
   llmSkipped?: string | null;
+  llmCalls?: number;
   latencyMs?: number;
   toolTrace?: PeopleAnswerContract["trace"]["tools"];
 }): Omit<PeopleAnswerContract, "critic"> & { critic?: PeopleAnswerContract["critic"] } {
@@ -101,22 +80,23 @@ export function composeAnswerContract(input: {
   const payloads = results.map((row) => row.result);
   const rpcFailed = results.some((row) => !row.ok);
   const snapshotId = plan.snapshot_id;
-  const firstMetric = pickNamed(results, "get_metric") ;
+  const firstMetric = pickNamed(results, "get_metric");
   const metricHealth = String(firstMetric.quality_status ?? "");
   let quality = healthStatus(payloads, snapshotId, metricHealth);
   const asOf =
     isoDate(firstMetric.as_of) ||
     isoDate(asRecord(pickNamed(results, "get_serving_snapshot").pointer).as_of) ||
     isoDate(asRecord(pickNamed(results, "get_source_health").pointer).as_of) ||
+    isoDate(pickNamed(results, "get_skill_coverage").as_of) ||
     "2026-08-31";
 
-  const observedFacts: PeopleObservedFact[] = [];
-  const hypotheses: string[] = [];
+  let observedFacts: PeopleObservedFact[] = [];
+  let hypotheses: string[] = [];
   let headline = "Serving tools returned structured evidence.";
   let definition: unknown;
   let lineage: unknown;
-  const suppressed: PeopleAnswerContract["suppressed_cells"] = [];
-  const skillsUsed: string[] = [];
+  let suppressed: PeopleAnswerContract["suppressed_cells"] = [];
+  let skillsUsed: string[] = [];
 
   if (rpcFailed) {
     headline = "People serving could not complete this lookup. No substitute numbers were generated.";
@@ -126,7 +106,7 @@ export function composeAnswerContract(input: {
       }),
     );
     quality = quality === "healthy" ? "unknown" : quality;
-  } else if (plan.tier === "refuse") {
+  } else if (plan.playbook === "refuse" || plan.tier === "refuse") {
     headline = "I can look that up with governed People tools.";
     observedFacts.push(
       fact(
@@ -136,13 +116,8 @@ export function composeAnswerContract(input: {
         { filters: { refuse: plan.refuse_reason ?? "policy" } },
       ),
     );
-    observedFacts.push(
-      fact("SQL and arithmetic stay in the database. This assistant does not run arbitrary queries.", {
-        filters: {},
-      }),
-    );
     quality = "unknown";
-  } else if (snapshotId === "incident_replay" || /apac|workforce change|metrics were affected|lineage show/i.test(question)) {
+  } else if (plan.playbook === "incident" || snapshotId === "incident_replay") {
     const incidentsPayload = pickNamed(results, "get_quality_incidents");
     const list = asList(incidentsPayload.incidents);
     const apac = asRecord(
@@ -158,57 +133,85 @@ export function composeAnswerContract(input: {
     observedFacts.push(
       fact(
         `Expected APAC rows: ${String(details.control_total ?? apac.expected_records ?? "see incident")}; received: ${String(details.rows_received ?? apac.actual_records ?? "see incident")}.`,
-        { metric_id: metricVersion("headcount"), filters: { snapshot_id: "incident_replay" }, as_of: asOf },
+        { metric_id: metricVersion("headcount"), filters: { snapshot_id: "incident_replay" }, as_of: asOf, source_tool: "get_quality_incidents" },
       ),
     );
     observedFacts.push(
       fact(`Incident business_change=${String(apac.business_change ?? details.business_change ?? false)}.`, {
         filters: { snapshot_id: "incident_replay" },
+        source_tool: "get_quality_incidents",
       }),
     );
     observedFacts.push(
       fact("The incomplete extract was not published into the current trusted snapshot.", {
         filters: { snapshot_id: "incident_replay" },
+        source_tool: "get_quality_incidents",
       }),
     );
     observedFacts.push(
       fact("You are in incident replay, not the current trusted snapshot. Blocked metrics are not presented as certified.", {
         filters: { snapshot_id: "incident_replay" },
+        source_tool: "get_quality_incidents",
       }),
     );
     hypotheses.push("Replay context only: downstream Headcount reporting is blocked until the HRIS feed is complete.");
     lineage = pickNamed(results, "get_lineage").lineage ?? pickNamed(results, "get_source_health");
-  } else if (results.some((row) => row.call.name === "get_metric_definition") && /defined|owner|formula/i.test(question)) {
-    const def = pickNamed(results, "get_metric_definition");
-    definition = def;
-    headline = String(def.business_definition ?? `${String(def.metric_id ?? plan.metric_id)} definition`);
-    observedFacts.push(fact(`Owner: ${String(def.owner ?? "People Analytics")}`, { metric_id: metricVersion(String(def.metric_id ?? plan.metric_id)), filters: {} }));
-    observedFacts.push(fact(`Formula: ${String(def.formula ?? def.formula_sql ?? "")}`, { filters: {} }));
-    observedFacts.push(fact(`Version ${String(def.version ?? 1)}`, { filters: {} }));
-    if (def.numerator_definition) observedFacts.push(fact(`Numerator: ${String(def.numerator_definition)}`, { filters: {} }));
-    if (def.denominator_definition) observedFacts.push(fact(`Denominator: ${String(def.denominator_definition)}`, { filters: {} }));
-    if (def.exclusions) observedFacts.push(fact(`Exclusions: ${String(def.exclusions)}`, { filters: {} }));
-  } else if (results.some((row) => row.call.name === "get_quality_tests")) {
+  } else if (plan.playbook === "definition") {
+    const draft = composeDefinition(results, plan.metric_id);
+    headline = draft.headline;
+    observedFacts = draft.facts;
+    hypotheses = draft.hypotheses;
+    definition = draft.definition;
+  } else if (plan.playbook === "locations") {
+    const draft = composeLocations(results, asOf);
+    headline = draft.headline;
+    observedFacts = draft.facts;
+    hypotheses = draft.hypotheses;
+    suppressed = draft.suppressed;
+  } else if (plan.playbook === "next_steps") {
+    const draft = composeNextSteps(results, asOf);
+    headline = draft.headline;
+    observedFacts = draft.facts;
+    hypotheses = draft.hypotheses;
+    suppressed = draft.suppressed;
+  } else if (plan.playbook === "tenure") {
+    const draft = composeTenure(results, asOf);
+    headline = draft.headline;
+    observedFacts = draft.facts;
+    hypotheses = draft.hypotheses;
+    suppressed = draft.suppressed;
+  } else if (plan.playbook === "compensation") {
+    const draft = composeCompensation(results, asOf, identityId);
+    headline = draft.headline;
+    observedFacts = draft.facts;
+    hypotheses = draft.hypotheses;
+  } else if (plan.playbook === "skills") {
+    const draft = composeSkills(results, asOf);
+    headline = draft.headline;
+    observedFacts = draft.facts;
+    hypotheses = draft.hypotheses;
+    skillsUsed = draft.skillsUsed;
+  } else if (plan.playbook === "quality" || results.some((row) => row.call.name === "get_quality_tests")) {
     const tests = asList(pickNamed(results, "get_quality_tests").tests);
     headline = "Quality tests and source health are available from the serving layer.";
     observedFacts.push(
       fact(`${tests.length} quality tests are registered for the data-v1 run.`, {
         filters: { run_id: "data-v1" },
+        source_tool: "get_quality_tests",
       }),
     );
     observedFacts.push(
       fact("Current published metrics remain trusted; the APAC volume test belongs to incident replay.", {
         filters: {},
+        source_tool: "get_quality_tests",
       }),
     );
-  } else if (plan.tier === 2 || results.some((row) => row.call.name === "get_metric_breakdown")) {
+  } else if (plan.playbook === "attrition_explore") {
     const eng = pickMetric(
       results.filter((row) => row.call.name === "get_metric").map((row) => row.result),
       plan.metric_id ?? "voluntary_attrition_rate",
       plan.job_family ?? "Engineering",
     );
-    const company = results.filter((row) => row.call.name === "get_metric").map((row) => asRecord(row.result));
-    const companyRow = company.find((row) => !row.job_family && row.metric_id === (plan.metric_id ?? "voluntary_attrition_rate")) ?? company[1] ?? {};
     const breakdown = pickNamed(results, "get_metric_breakdown");
     const cells = asList(breakdown.cells);
     for (const cell of cells) {
@@ -227,6 +230,7 @@ export function composeAnswerContract(input: {
       t12m: engValue,
       rate: engValue,
       where,
+      asOf: isoDate(eng.as_of) || asOf,
     });
     const healthNote = healthClause(quality);
     if (healthNote) headline = `${headline} ${healthNote}`;
@@ -240,6 +244,7 @@ export function composeAnswerContract(input: {
     });
     observedFacts.push(
       fact(`Engineering trailing-12m voluntary attrition: ${formatMetricValue(eng)} as of ${engAsOf}.`, {
+        source_tool: "get_metric",
         metric_id: metricVersion(String(eng.metric_id ?? "voluntary_attrition_rate")),
         filters: { job_family: plan.job_family ?? "Engineering", grain: "trailing_12m" },
         value: engValue,
@@ -250,19 +255,9 @@ export function composeAnswerContract(input: {
         denied: eng.denied === true,
       }),
     );
-    if (companyRow && companyRow !== eng) {
-      observedFacts.push(
-        fact(`Company trailing-12m voluntary attrition: ${formatMetricValue(companyRow)}.`, {
-          metric_id: metricVersion(String(companyRow.metric_id ?? "voluntary_attrition_rate")),
-          filters: { grain: "trailing_12m" },
-          value: num(companyRow.value),
-          unit: String(companyRow.unit ?? "rate"),
-          as_of: isoDate(companyRow.as_of) || engAsOf,
-        }),
-      );
-    }
     observedFacts.push(
       fact(`${suppressed.length} cells suppressed at min_cell ${String(breakdown.min_cell ?? 50)} (n is as-of month headcount).`, {
+        source_tool: "get_metric_breakdown",
         filters: { dimension: String(breakdown.dimension ?? ""), min_cell: num(breakdown.min_cell) },
       }),
     );
@@ -271,39 +266,17 @@ export function composeAnswerContract(input: {
     if (skillRows[0] && num(skillRows[0].coverage_ratio) != null) {
       skillsUsed.push("get_skill_coverage");
       observedFacts.push(
-        fact(
-          `Engineering skill coverage (job-family aggregate): ${formatRate(skillRows[0].coverage_ratio)}.`,
-          {
-            metric_id: metricVersion("skill_coverage"),
-            filters: { job_family: "Engineering" },
-            value: num(skillRows[0].coverage_ratio),
-            unit: "rate",
-          },
-        ),
-      );
-    }
-    const compa = results.find(
-      (row) => row.call.name === "get_metric" && row.call.args?.metric_id === "compa_ratio_median",
-    );
-    if (compa) {
-      const row = asRecord(compa.result);
-      observedFacts.push(
-        fact(
-          row.denied === true
-            ? "Engineering median compa-ratio is denied for this identity (sensitivity). No substitute value was generated."
-            : `Engineering median compa-ratio is ${formatMetricValue(row)}.`,
-          {
-            metric_id: metricVersion("compa_ratio_median"),
-            filters: { job_family: "Engineering" },
-            value: row.denied === true ? null : num(row.value),
-            denied: row.denied === true,
-          },
-        ),
+        fact(`Engineering skill coverage (job-family aggregate): ${formatRateSafe(skillRows[0].coverage_ratio)}.`, {
+          source_tool: "get_skill_coverage",
+          metric_id: metricVersion("skill_coverage"),
+          filters: { job_family: "Engineering" },
+          value: num(skillRows[0].coverage_ratio),
+          unit: "rate",
+        }),
       );
     }
     hypotheses.push("Location, tenure, and level concentrations are observed associations. They do not by themselves prove a cause.");
     hypotheses.push("Investigate the highest-rate visible Engineering slices before a company-wide program.");
-    hypotheses.push("Keep the APAC HRIS replay out of any current-state board pack.");
   } else {
     const metric = pickNamed(results, "get_metric");
     const def = pickNamed(results, "get_metric_definition");
@@ -316,6 +289,7 @@ export function composeAnswerContract(input: {
     const metricAsOf = isoDate(metric.as_of) || asOf;
     observedFacts.push(
       fact(`Certified calculator: ${formatMetricValue(metric)} as of ${metricAsOf || "latest month"}.`, {
+        source_tool: "get_metric",
         metric_id: metricVersion(metricId),
         filters: { job_family: plan.job_family ?? null, grain: String(metric.window ?? plan.filters.grain ?? "") },
         value: metric.denied === true ? null : num(metric.value),
@@ -323,11 +297,6 @@ export function composeAnswerContract(input: {
         as_of: metricAsOf,
         asOf: metricAsOf,
         denied: metric.denied === true,
-      }),
-    );
-    observedFacts.push(
-      fact(`Current published snapshot quality: ${quality}.`, {
-        filters: { snapshot_id: snapshotId },
       }),
     );
     if (quality === "healthy" && snapshotId === "current_certified") {
@@ -339,24 +308,39 @@ export function composeAnswerContract(input: {
     }
   }
 
+  observedFacts = tracedFacts(observedFacts, results);
+  const chipBooks = new Set([
+    "locations",
+    "next_steps",
+    "tenure",
+    "compensation",
+    "skills",
+    "definition",
+  ]);
+  if (chipBooks.has(plan.playbook)) {
+    observedFacts = observedFacts.filter((item) => Boolean(item.source_tool));
+  }
+
   const skeletonHypotheses = [...hypotheses];
+  const allowLlmHypotheses = plan.playbook === "attrition_explore" && Boolean(input.hypotheses?.length);
   const allowedDigits = new Set(numbersInObserved(headline, observedFacts));
-  const candidate = input.hypotheses?.length ? input.hypotheses : skeletonHypotheses;
+  const candidate = allowLlmHypotheses ? input.hypotheses ?? skeletonHypotheses : skeletonHypotheses;
   const safeHypotheses = candidate.filter((line) =>
     numbersInText(line).every((digit) => allowedDigits.has(digit)),
   );
   const finalHypotheses = safeHypotheses.length ? safeHypotheses : skeletonHypotheses;
-
-  const skills = results.filter((row) => row.call.name === "get_skill_coverage").length
-    ? ["get_skill_coverage"]
-    : skillsUsed;
+  const llm = resolveLlmInvocation({
+    llmEligible: plan.llmEligible,
+    llmCalls: input.llmCalls ?? 0,
+    llmSkipped: input.llmSkipped ?? null,
+  });
 
   return {
     question,
     supported: plan.tier !== "refuse" && !rpcFailed,
     headline,
     facts: observedFacts.map((item) => item.text),
-    interpretation: finalHypotheses.length ? finalHypotheses : hypotheses,
+    interpretation: finalHypotheses,
     quality_status: quality,
     freshness: null,
     definition,
@@ -372,19 +356,30 @@ export function composeAnswerContract(input: {
       as_of: asOf,
     },
     observed: { headline, facts: observedFacts },
-    hypotheses: finalHypotheses.length ? finalHypotheses : hypotheses,
+    hypotheses: finalHypotheses,
     suppressed_cells: suppressed,
-    skills_used: skills,
+    skills_used: skillsUsed,
     error_state: rpcFailed ? "rpc" : null,
     withheld: false,
-    llm_skipped: input.llmSkipped ?? null,
+    llm_skipped: llm.llm_skipped,
+    llm_invocation: llm.llm_invocation,
+    failure_reason: llm.failure_reason,
     trace: {
       tools: input.toolTrace ?? [],
       latency_ms: input.latencyMs ?? 0,
-      llm_skipped: input.llmSkipped ?? null,
-      llm_calls: input.llmSkipped ? 0 : input.hypotheses ? 1 : 0,
+      llm_skipped: llm.llm_skipped,
+      llm_calls: llm.llm_calls,
+      llm_used: llm.llm_used,
+      llm_invocation: llm.llm_invocation,
+      failure_reason: llm.failure_reason,
     },
   };
+}
+
+function formatRateSafe(value: unknown): string {
+  const n = num(value);
+  if (n == null) return "unavailable";
+  return `${(n * 100).toFixed(1)}%`;
 }
 
 function numbersInText(text: string): string[] {
@@ -397,7 +392,7 @@ function numbersInObserved(headline: string, facts: PeopleObservedFact[]): Set<s
   for (const item of facts) {
     for (const token of numbersInText(item.text)) set.add(token);
     if (item.value != null) {
-      for (const token of numbersInText(String(item.value))) set.add(token);
+      for (const token of numbersInText(String(item.value)) ) set.add(token);
       for (const token of numbersInText((item.value * 100).toFixed(1))) set.add(token);
     }
   }

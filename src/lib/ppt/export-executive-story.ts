@@ -54,8 +54,10 @@ const CHART_COLORS = [
 const SLIDE_HEIGHT = 7.5;
 
 function validateStoryShape(story: ExecutiveStory): void {
-  if (story.slideCount !== 3 && story.slideCount !== 5) {
-    throw new RangeError("Only 3-slide and 5-slide executive stories can be exported.");
+  if (![3, 5, 7].includes(story.slideCount)) {
+    throw new RangeError(
+      "Only 3-slide, 5-slide, and 7-slide executive stories can be exported.",
+    );
   }
   if (story.slides.length !== story.slideCount) {
     throw new Error(
@@ -579,7 +581,11 @@ async function createExecutiveStoryPresentation(
   const { default: PptxGenJS } = await import("pptxgenjs");
   const pptx = new PptxGenJS();
   const deckKind =
-    story.slideCount === 3 ? "Executive brief" : "Diagnostic deck";
+    story.slideCount === 3
+      ? "Executive brief"
+      : story.slideCount === 5
+        ? "Diagnostic deck"
+        : "Decision deck";
 
   pptx.layout = "LAYOUT_WIDE";
   pptx.author = "People Analytics AI";
@@ -629,7 +635,11 @@ export function defaultExecutiveStoryPptxFileName(
   story: Pick<ExecutiveStory, "workspaceId" | "slideCount">,
 ): string {
   const deckKind =
-    story.slideCount === 3 ? "executive-brief" : "diagnostic-deck";
+    story.slideCount === 3
+      ? "executive-brief"
+      : story.slideCount === 5
+        ? "diagnostic-deck"
+        : "decision-deck";
   return sanitizePptxFileName(`${story.workspaceId}-${deckKind}`);
 }
 

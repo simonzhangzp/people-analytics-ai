@@ -25,10 +25,10 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def git_head(repo: Path = REPO) -> str:
+def git_rev_parse(ref: str, repo: Path = REPO) -> str:
     try:
         out = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"],
+            ["git", "rev-parse", ref],
             cwd=repo,
             text=True,
             stderr=subprocess.DEVNULL,
@@ -36,6 +36,28 @@ def git_head(repo: Path = REPO) -> str:
         return out.strip()
     except (subprocess.CalledProcessError, FileNotFoundError, OSError):
         return "unknown"
+
+
+def git_head(repo: Path = REPO) -> str:
+    return git_rev_parse("HEAD", repo)
+
+
+def git_is_dirty(repo: Path = REPO) -> bool:
+    try:
+        out = subprocess.check_output(
+            ["git", "status", "--porcelain"],
+            cwd=repo,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+        return bool(out.strip())
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        return True
+
+
+def data_v1_commit_sha(repo: Path = REPO) -> str:
+    sha = git_rev_parse("data-v1^{commit}", repo)
+    return sha if sha != "unknown" else git_head(repo)
 
 
 def baseline_sha() -> str:
@@ -92,7 +114,9 @@ def write_manifest(path: Path, payload: dict) -> None:
 
 def run_lineage(seed: int, gold_dir: Path | None = None) -> dict:
     payload = {
-        "simulator_code_sha": git_head(),
+        "simulator_code_sha": data_v1_commit_sha(),
+        "pipeline_code_sha": git_head(),
+        "git_dirty": git_is_dirty(),
         "seed": str(seed),
         "baseline_sha": baseline_sha(),
         "scenario_versions": scenario_versions(),

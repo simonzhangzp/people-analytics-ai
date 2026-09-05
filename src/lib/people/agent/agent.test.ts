@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { applyCritic, criticCheck } from "./critic";
 import { composeAnswerContract } from "./compose";
+import { CASE_FOLLOW_UPS } from "../ask-types";
 import { filterRegistryTools, routePeopleQuestion } from "./router";
 import { garbagePlannerStub, parsePlannerJson, type PeoplePlanner } from "./planner";
 import { wrapUntrustedToolData, UNTRUSTED_START } from "./wrap-data";
@@ -45,7 +46,7 @@ const ATTRITION_EVIDENCE = [
   },
 ];
 
-function composeWith(hypotheses?: string[]) {
+function composeWith(hypotheses?: string[], llmSkipped?: string | null) {
   const plan = routePeopleQuestion("Why is Engineering voluntary attrition increasing?", "attrition");
   return composeAnswerContract({
     question: "Why is Engineering voluntary attrition increasing?",
@@ -60,6 +61,7 @@ function composeWith(hypotheses?: string[]) {
       ok: true,
     })),
     hypotheses,
+    llmSkipped,
   });
 }
 
@@ -161,10 +163,11 @@ describe("People serving agent", () => {
 
   it("silently keeps skeleton numbers when budget blocks the LLM", () => {
     const allowed = composeWith();
-    const skipped = composeWith();
-    skipped.llm_skipped = "per_ip_daily";
+    const skipped = composeWith(undefined, "per_ip_daily");
     expect(skipped.observed).toEqual(allowed.observed);
     expect(skipped.llm_skipped).toBe("per_ip_daily");
+    expect(skipped.llm_invocation).toBe("skipped_by_budget");
+    expect(allowed.llm_invocation).toBe("skipped_by_design");
   });
 
   it("parses planner JSON only for registry tools", () => {
@@ -175,6 +178,17 @@ describe("People serving agent", () => {
       }),
     ).toMatchObject({
       tools: [{ name: "get_metric" }],
+    });
+  });
+
+  it("keeps hypotheses when tool args are not planner-schema-clean", () => {
+    expect(
+      parsePlannerJson({
+        tools: [{ name: "get_metric", args: { nested: { job_family: "Engineering" } } }],
+        hypotheses: ["Rewrite this line without new numbers."],
+      }),
+    ).toMatchObject({
+      hypotheses: ["Rewrite this line without new numbers."],
     });
   });
 
@@ -237,6 +251,8 @@ describe("People serving agent budget seam", () => {
     }
     expect(plannerCalls).toHaveLength(3);
     expect(answers[3].llm_skipped).toBe("per_ip_daily");
+    expect(answers[3].llm_invocation).toBe("skipped_by_budget");
+    expect(answers[0].llm_invocation).toBe("attempted_ok");
     expect(answers[3].observed).toEqual(answers[0].observed);
     expect(answers[3].critic.ok).toBe(true);
   });
@@ -263,6 +279,361 @@ describe("People serving agent budget seam", () => {
     });
     expect(planned).toBe(0);
     expect(answer.llm_skipped).toBe("ledger_write_failed");
+    expect(answer.llm_invocation).toBe("skipped_by_budget");
     expect(answer.observed.headline).toMatch(/16\.0%/);
+  });
+
+  it("records attempted_failed with a non-empty failure_reason when the planner throws", async () => {
+    process.env.PEOPLE_IP_HASH_SECRET = "unit-test-secret";
+    const answer = await runPeopleAgent({
+      question,
+      demoCase: "attrition",
+      headers: new Headers({ "x-forwarded-for": "198.51.100.9" }),
+      consume: async () => ({
+        allowed: true,
+        blocked_by: null,
+        call_id: null,
+        max_tokens_per_call: 1024,
+        remaining: {},
+      }),
+      planner: async () => {
+        throw new Error("llm_upstream_timeout");
+      },
+      fixtureResults: fixtures,
+    });
+    expect(answer.llm_invocation).toBe("attempted_failed");
+    expect(answer.failure_reason).toBe("llm_upstream_timeout");
+    expect(answer.trace.llm_used).toBe(false);
+    expect(answer.observed.headline).toMatch(/16\.0%/);
+  });
+});
+
+describe("Case 3 chip playbooks", () => {
+  const chips = CASE_FOLLOW_UPS.attrition;
+
+  it("gives each of the six chips its own playbook", () => {
+    const playbooks = chips.map((chip) => routePeopleQuestion(chip, "attrition").playbook);
+    expect(playbooks).toEqual([
+      "tenure",
+      "compensation",
+      "locations",
+      "definition",
+      "next_steps",
+      "skills",
+    ]);
+    expect(new Set(playbooks).size).toBe(6);
+    for (const chip of chips) {
+      expect(routePeopleQuestion(chip, "attrition").llmEligible).toBe(false);
+    }
+    const definition = composeAnswerContract({
+      question: "How is voluntary attrition defined?",
+      identityId: "demo-external-viewer",
+      traceId: "99999999-9999-4999-8999-999999999999",
+      demoCase: "attrition",
+      plan: routePeopleQuestion("How is voluntary attrition defined?", "attrition"),
+      tools: routePeopleQuestion("How is voluntary attrition defined?", "attrition").tools,
+      results: [
+        {
+          call: routePeopleQuestion("How is voluntary attrition defined?", "attrition").tools[0],
+          ok: true,
+          result: {
+            metric_id: "voluntary_attrition_rate",
+            owner: "People Analytics",
+            formula: "terminated_in_month ∧ voluntary (sum over window) / average certified headcount",
+            version: 1,
+            business_definition: "Voluntary terminations in the trailing 12 months divided by average certified headcount, annualized.",
+          },
+        },
+      ],
+    });
+    expect(definition.llm_invocation).toBe("skipped_by_design");
+    expect(definition.facts.join(" ")).toMatch(/average certified headcount/);
+  });
+
+  it("answers locations and next steps with different hypotheses", () => {
+    const locPlan = routePeopleQuestion("Which locations matter most?", "attrition");
+    const nextPlan = routePeopleQuestion("What should we investigate next?", "attrition");
+    const breakdown = {
+      dimension: "location_tenure_grade",
+      min_cell: 50,
+      cells: [
+        {
+          key: "APAC-SIN|<1y|G7",
+          location_id: "APAC-SIN",
+          tenure_band: "<1y",
+          grade_id: "G7",
+          value: 0.343,
+          n: 248,
+          terms_vol: 83,
+          avg_hc: 242,
+          suppressed: false,
+          grain: "trailing_12m",
+        },
+        { key: "tiny", location_id: "EMEA-LON", n: 6, suppressed: true, value: null },
+      ],
+    };
+    const eng = {
+      metric_id: "voluntary_attrition_rate",
+      job_family: "Engineering",
+      value: 0.15998,
+      unit: "rate",
+      as_of: "2026-08-31",
+    };
+    const loc = composeAnswerContract({
+      question: "Which locations matter most?",
+      identityId: "demo-external-viewer",
+      traceId: "33333333-3333-4333-8333-333333333333",
+      demoCase: "attrition",
+      plan: locPlan,
+      tools: locPlan.tools,
+      results: [
+        { call: locPlan.tools[0], result: eng, ok: true },
+        { call: locPlan.tools[1], result: breakdown, ok: true },
+      ],
+    });
+    const next = composeAnswerContract({
+      question: "What should we investigate next?",
+      identityId: "demo-external-viewer",
+      traceId: "44444444-4444-4444-8444-444444444444",
+      demoCase: "attrition",
+      plan: nextPlan,
+      tools: nextPlan.tools,
+      results: [
+        { call: nextPlan.tools[0], result: eng, ok: true },
+        { call: nextPlan.tools[1], result: breakdown, ok: true },
+      ],
+    });
+    expect(loc.headline).toMatch(/Among cells visible at visitor min_cell 50/);
+    expect(loc.headline).toMatch(/APAC-SIN/);
+    expect(loc.facts.join(" ")).toMatch(/1 of 2 location × tenure × grade cells hidden/);
+    expect(next.headline).toMatch(/Next:/);
+    expect(next.headline).toMatch(/after min_cell 50/);
+    expect(loc.hypotheses.join(" ")).not.toBe(next.hypotheses.join(" "));
+    expect(loc.withheld).toBe(false);
+    expect(next.withheld).toBe(false);
+    expect(criticCheck({ observed: loc.observed, evidence: loc.evidence }).ok).toBe(true);
+    expect(loc.observed.facts.every((row) => row.source_tool)).toBe(true);
+    expect(next.observed.facts.every((row) => row.source_tool)).toBe(true);
+  });
+
+  it("explains all-suppressed tenure instead of withholding", () => {
+    const plan = routePeopleQuestion("Show me the tenure breakdown", "attrition");
+    const answer = composeAnswerContract({
+      question: "Show me the tenure breakdown",
+      identityId: "demo-external-viewer",
+      traceId: "55555555-5555-4555-8555-555555555555",
+      demoCase: "attrition",
+      plan,
+      tools: plan.tools,
+      results: [
+        {
+          call: plan.tools[0],
+          ok: true,
+          result: {
+            metric_id: "voluntary_attrition_rate",
+            job_family: "Engineering",
+            value: 0.15998,
+            unit: "rate",
+            as_of: "2026-08-31",
+          },
+        },
+        {
+          call: plan.tools[1],
+          ok: true,
+          result: {
+            dimension: "location_tenure",
+            min_cell: 50,
+            cells: [{ key: "tiny", tenure_band: "<1y", n: 6, suppressed: true, value: null }],
+          },
+        },
+      ],
+    });
+    expect(answer.headline).toMatch(/all tenure bands fall below min_cell 50/i);
+    expect(answer.headline).not.toMatch(/0\.0%/);
+    expect(answer.withheld).toBe(false);
+    expect(criticCheck({ observed: answer.observed, evidence: answer.evidence }).ok).toBe(true);
+  });
+
+  it("accepts tenure-band rates rolled up from visible location×tenure cells", () => {
+    const plan = routePeopleQuestion("Show me the tenure breakdown", "attrition");
+    const cells = [
+      {
+        key: "AMER-NYC|<1y",
+        location_id: "AMER-NYC",
+        tenure_band: "<1y",
+        value: 0.3,
+        n: 100,
+        avg_hc: 100,
+        terms_vol: 30,
+        suppressed: false,
+        grain: "trailing_12m",
+      },
+      {
+        key: "APAC-SIN|<1y",
+        location_id: "APAC-SIN",
+        tenure_band: "<1y",
+        value: 0.1,
+        n: 100,
+        avg_hc: 100,
+        terms_vol: 10,
+        suppressed: false,
+        grain: "trailing_12m",
+      },
+    ];
+    const answer = composeAnswerContract({
+      question: "Show me the tenure breakdown",
+      identityId: "demo-external-viewer",
+      traceId: "88888888-8888-4888-8888-888888888888",
+      demoCase: "attrition",
+      plan,
+      tools: plan.tools,
+      results: [
+        {
+          call: plan.tools[0],
+          ok: true,
+          result: {
+            metric_id: "voluntary_attrition_rate",
+            job_family: "Engineering",
+            value: 0.15998,
+            unit: "rate",
+            as_of: "2026-08-31",
+          },
+        },
+        {
+          call: plan.tools[1],
+          ok: true,
+          result: { dimension: "location_tenure", min_cell: 50, cells },
+        },
+      ],
+    });
+    expect(answer.headline).toMatch(/20\.0%/);
+    expect(answer.headline).not.toMatch(/after min_cell/);
+    expect(answer.facts.join(" ")).toMatch(/No cells hidden at this grain \(min_cell 50\)/);
+    expect(answer.facts.join(" ")).not.toMatch(/among cells still visible/);
+    expect(answer.withheld).toBe(false);
+    expect(criticCheck({ observed: answer.observed, evidence: answer.evidence }).ok).toBe(true);
+  });
+
+  it("keeps visible-cell hedging when some tenure bands stay hidden", () => {
+    const plan = routePeopleQuestion("Show me the tenure breakdown", "attrition");
+    const answer = composeAnswerContract({
+      question: "Show me the tenure breakdown",
+      identityId: "demo-external-viewer",
+      traceId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      demoCase: "attrition",
+      plan,
+      tools: plan.tools,
+      results: [
+        {
+          call: plan.tools[0],
+          ok: true,
+          result: {
+            metric_id: "voluntary_attrition_rate",
+            job_family: "Engineering",
+            value: 0.15998,
+            unit: "rate",
+            as_of: "2026-08-31",
+          },
+        },
+        {
+          call: plan.tools[1],
+          ok: true,
+          result: {
+            dimension: "location_tenure",
+            min_cell: 50,
+            cells: [
+              {
+                key: "APAC-SIN|<1y",
+                location_id: "APAC-SIN",
+                tenure_band: "<1y",
+                value: 0.24,
+                n: 120,
+                avg_hc: 120,
+                terms_vol: 29,
+                suppressed: false,
+                grain: "trailing_12m",
+              },
+              {
+                key: "tiny|10y+",
+                location_id: "EMEA-LON",
+                tenure_band: "10y+",
+                n: 6,
+                suppressed: true,
+                value: null,
+              },
+            ],
+          },
+        },
+      ],
+    });
+    expect(answer.headline).toMatch(/after min_cell 50/);
+    expect(answer.facts.join(" ")).toMatch(/among cells still visible at min_cell 50/);
+    expect(answer.facts.join(" ")).toMatch(/1 of 2 tenure_band cells hidden/);
+    expect(answer.withheld).toBe(false);
+    expect(criticCheck({ observed: answer.observed, evidence: answer.evidence }).ok).toBe(true);
+  });
+
+  it("reads skill coverage from get_skill_coverage, not get_metric", () => {
+    const plan = routePeopleQuestion("Which critical skills have the largest gaps?", "attrition");
+    expect(plan.tools.map((row) => row.name)).toEqual(["get_skill_coverage"]);
+    const answer = composeAnswerContract({
+      question: "Which critical skills have the largest gaps?",
+      identityId: "demo-external-viewer",
+      traceId: "66666666-6666-4666-8666-666666666666",
+      demoCase: "attrition",
+      plan,
+      tools: plan.tools,
+      results: [
+        {
+          call: plan.tools[0],
+          ok: true,
+          result: {
+            as_of: "2026-08-31",
+            rows: [
+              { org_id: "ENG-APAC", coverage_ratio: 0.629 },
+              { org_id: "ENG-AMER", coverage_ratio: 0.71 },
+            ],
+          },
+        },
+      ],
+    });
+    expect(answer.headline).not.toMatch(/unavailable/i);
+    expect(answer.headline).toMatch(/62\.9%/);
+    expect(answer.headline).toMatch(/ENG-APAC/);
+    expect(answer.observed.facts.every((row) => row.source_tool === "get_skill_coverage")).toBe(true);
+    expect(criticCheck({ observed: answer.observed, evidence: answer.evidence }).ok).toBe(true);
+  });
+
+  it("states compensation restriction in plain language when denied", () => {
+    const plan = routePeopleQuestion("What about compensation?", "attrition");
+    const answer = composeAnswerContract({
+      question: "What about compensation?",
+      identityId: "demo-external-viewer",
+      traceId: "77777777-7777-4777-8777-777777777777",
+      demoCase: "attrition",
+      plan,
+      tools: plan.tools,
+      results: [{ call: plan.tools[0], ok: true, result: { denied: true, metric_id: "compa_ratio_median", as_of: "2026-08-31" } }],
+    });
+    expect(answer.headline).toMatch(/restricted for site visitors/i);
+    expect(answer.headline).not.toMatch(/denied\.$/i);
+    expect(answer.withheld).toBe(false);
+    expect(answer.observed.facts.every((row) => row.source_tool === "get_metric")).toBe(true);
+  });
+
+  it("does not call a leader a site visitor when compensation is restricted", () => {
+    const plan = routePeopleQuestion("What about compensation?", "attrition");
+    const answer = composeAnswerContract({
+      question: "What about compensation?",
+      identityId: "demo-leader-engineering",
+      traceId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      demoCase: "attrition",
+      plan,
+      tools: plan.tools,
+      results: [{ call: plan.tools[0], ok: true, result: { denied: true, metric_id: "compa_ratio_median", as_of: "2026-08-31" } }],
+    });
+    expect(answer.headline).toMatch(/restricted for this identity/i);
+    expect(answer.headline).not.toMatch(/site visitors/i);
+    expect(answer.facts.join(" ")).toMatch(/scenario aggregates/i);
   });
 });

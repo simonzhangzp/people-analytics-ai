@@ -2,9 +2,22 @@ import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { CASES } from "@/lib/people/demo-cases";
 import { formatCount } from "@/lib/people/format";
-import { peopleServing, peopleServingConfigured } from "@/lib/people/serving";
+import {
+  emptyHomePlatformFacts,
+  loadHomePlatformFacts,
+} from "@/lib/people/platform-facts";
+import { pageMetadata } from "@/lib/site-metadata";
+import { peopleV2Configured } from "@/lib/people/v2-config";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export const metadata = pageMetadata({
+  title: "Trusted People data. Governed metrics.",
+  description:
+    "A working enterprise People Data & AI environment: certified headcount, governed metrics, and identity-aware case studies on a frozen data-v1 snapshot.",
+  path: "/",
+});
 
 const STACK = [
   ["HR Domain", "Understand the workforce decision and operating context."],
@@ -21,22 +34,51 @@ const CASE_CTAS = {
 } as const;
 
 export default async function HomePage() {
-  let facts: Record<string, unknown> = {};
-  if (peopleServingConfigured()) {
+  let facts = emptyHomePlatformFacts();
+  if (peopleV2Configured()) {
     try {
-      facts = (await peopleServing.getPlatformFacts()) as Record<string, unknown>;
+      facts = await loadHomePlatformFacts();
     } catch {
-      facts = {};
+      facts = emptyHomePlatformFacts();
     }
   }
   const factRow = [
-    [formatCount(facts.active_employees ?? 50010), "Synthetic Employees"],
-    [String(facts.historical_years ?? 5), "Years of Workforce History"],
-    [String(facts.certified_metrics ?? 20), "Certified Metrics"],
-    [String(facts.data_quality_tests ?? 30), "Automated Quality Tests"],
-    [`${facts.hr_data_domains ?? 6}+`, "People Data Domains"],
-    ["Daily", "Pipeline Refresh"],
-    [formatCount(facts.learning_resources ?? 4587), "Public Learning Resources"],
+    {
+      testId: "fact-certified-headcount",
+      value: formatCount(facts.headcount),
+      raw: facts.headcount,
+      label: "Certified Headcount",
+    },
+    {
+      testId: "fact-history-years",
+      value: String(facts.years),
+      raw: facts.years,
+      label: "Years of Workforce History",
+    },
+    {
+      testId: "fact-certified-metrics",
+      value: facts.certifiedMetrics == null ? "—" : String(facts.certifiedMetrics),
+      raw: facts.certifiedMetrics,
+      label: "Certified Metrics",
+    },
+    {
+      testId: "fact-quality-tests",
+      value: facts.qualityTests == null ? "—" : String(facts.qualityTests),
+      raw: facts.qualityTests,
+      label: "Automated Quality Tests",
+    },
+    {
+      testId: "fact-data-domains",
+      value: `${facts.domains}+`,
+      raw: facts.domains,
+      label: "People Data Domains",
+    },
+    {
+      testId: "fact-serving-freshness",
+      value: facts.freshness,
+      raw: facts.freshness,
+      label: "Certified snapshot",
+    },
   ];
 
   return (
@@ -121,11 +163,16 @@ export default async function HomePage() {
 
         <section className="mt-14" data-testid="platform-facts">
           <p className="eyebrow">Platform facts</p>
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-            {factRow.map(([value, label]) => (
-              <div key={label} className="surface p-3">
-                <div className="text-[18px] font-bold text-[#13203a]">{value}</div>
-                <div className="mt-1 text-[11px] leading-4 text-[#667085]">{label}</div>
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {factRow.map((item) => (
+              <div
+                key={item.label}
+                className="surface p-3"
+                data-testid={item.testId}
+                data-value={item.raw == null ? "" : String(item.raw)}
+              >
+                <div className="text-[18px] font-bold leading-6 text-[#13203a]">{item.value}</div>
+                <div className="mt-1 text-[11px] leading-4 text-[#667085]">{item.label}</div>
               </div>
             ))}
           </div>

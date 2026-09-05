@@ -6,7 +6,10 @@ import type {
   AsyncDuckDB,
   AsyncDuckDBConnection,
 } from "@duckdb/duckdb-wasm";
-import { readPeopleFileText } from "@/lib/data/file-encoding";
+import {
+  detectFileEncoding,
+  readPeopleFileText,
+} from "@/lib/data/file-encoding";
 import {
   resolveTableHeaders,
   stripSectionHeaderLine,
@@ -38,6 +41,7 @@ import {
   buildExplorationQuery,
   EXPLORATION_ROW_LIMIT,
   quoteIdentifier,
+  quoteLiteral,
 } from "./sql";
 
 const MAX_LOCAL_FILE_BYTES = 400 * 1024 * 1024;
@@ -187,6 +191,7 @@ async function workbookSheetsAsJson(file: File) {
     return [
       {
         sheet,
+        columnOrder: headers,
         json: JSON.stringify(normalizeWorkbookColumnTypes(headers, rows)),
       },
     ];
@@ -201,6 +206,7 @@ interface RegisteredSource {
   tableName: string;
   displayName: string;
   sheetName?: string;
+  columnOrder?: string[];
 }
 
 async function registerSource(
@@ -213,6 +219,31 @@ async function registerSource(
   const token = localToken();
 
   if (extension === "csv") {
+    const prefixBytes = new Uint8Array(
+      await file.slice(0, Math.min(file.size, 65_536)).arrayBuffer(),
+    );
+    const binaryFastPath =
+      detectFileEncoding(prefixBytes) === "utf-8" &&
+      !/^.*section\s*\d+.*(?:\r?\n)/i.test(
+        new TextDecoder("utf-8").decode(prefixBytes),
+      );
+    if (binaryFastPath) {
+      const virtualFileName = `local_upload_${token}.csv`;
+      await database.registerFileBuffer(
+        virtualFileName,
+        new Uint8Array(await file.arrayBuffer()),
+      );
+      try {
+        await connection.query(
+          `CREATE TABLE ${quoteIdentifier(tableName)} AS
+          SELECT *
+          FROM read_csv_auto('${virtualFileName}', header = true, sample_size = 20480)`,
+        );
+      } finally {
+        await database.dropFile(virtualFileName);
+      }
+      return [{ tableName, displayName: file.name }] satisfies RegisteredSource[];
+    }
     const { text } = await readPeopleFileText(file);
     const prepared = stripSectionHeaderLine(text);
     const virtualFileName = `local_upload_${token}.csv`;
@@ -243,14 +274,23 @@ async function registerSource(
       const virtualFileName = `local_upload_${token}_${index + 1}.json`;
       await database.registerFileText(virtualFileName, sheet.json);
       try {
-        await connection.insertJSONFromPath(virtualFileName, {
-          name: sheetTableName,
-          create: true,
-        });
+        try {
+          await connection.query(
+            `CREATE TABLE ${quoteIdentifier(sheetTableName)} AS
+            SELECT *
+            FROM read_json_auto(${quoteLiteral(virtualFileName)}, format = 'array')`,
+          );
+        } catch {
+          await connection.insertJSONFromPath(virtualFileName, {
+            name: sheetTableName,
+            create: true,
+          });
+        }
         registered.push({
           tableName: sheetTableName,
           displayName: `${file.name} · ${sheet.sheet}`,
           sheetName: sheet.sheet,
+          columnOrder: sheet.columnOrder,
         });
       } finally {
         await database.dropFile(virtualFileName);
@@ -283,6 +323,7 @@ async function ingestFileWithConnection(
           name: source.displayName,
           size: file.size,
         },
+        { sourceColumnOrder: source.columnOrder },
       );
       metadata.sourceFileName = file.name;
       metadata.sheetName = source.sheetName;

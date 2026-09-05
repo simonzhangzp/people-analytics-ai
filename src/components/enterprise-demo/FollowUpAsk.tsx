@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CASE_FOLLOW_UPS, type PeopleAskAnswer, type PeopleDemoCase } from "@/lib/people/ask-types";
+import { LLM_BUDGET_NOTICE } from "@/lib/people/agent/llm-invocation";
 import { QualityBadge } from "./format";
 
 export function FollowUpAsk({
@@ -115,6 +116,11 @@ export function FollowUpAsk({
           >
             {answer.headline}
           </h3>
+          {answer.llm_invocation === "skipped_by_budget" ? (
+            <p className="mt-3 text-[13px] leading-6 text-[#546277]" data-testid="people-ai-budget">
+              {LLM_BUDGET_NOTICE}
+            </p>
+          ) : null}
           {rpcError ? (
             <p className="mt-3 text-[13px] leading-6 text-[#934646]" data-testid="people-ai-rpc-error">
               Serving lookup failed. No substitute numbers were generated.
@@ -148,7 +154,7 @@ export function FollowUpAsk({
               {answer.interpretation.length ? (
                 <>
                   <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[#738097]">
-                    Interpretation
+                    Hypotheses
                   </p>
                   <ul className="mt-1 space-y-1 text-[13px] leading-6 text-[#546277]">
                     {answer.interpretation.map((item) => (
@@ -175,10 +181,15 @@ export function FollowUpAsk({
                   <div>tier {String(answer.tier)}</div>
                   <div>identity {answer.identity_id}</div>
                   <div>snapshot {answer.snapshot?.pointer_id} · {answer.snapshot?.as_of}</div>
-                  {answer.llm_skipped ? <div>llm_skipped {answer.llm_skipped}</div> : null}
+                  <div data-testid="people-ai-trace-llm">
+                    llm_invocation {answer.llm_invocation ?? answer.trace?.llm_invocation ?? "skipped_by_design"}
+                  </div>
+                  {answer.llm_invocation === "attempted_failed" && answer.failure_reason ? (
+                    <div data-testid="people-ai-trace-failure">failure_reason {answer.failure_reason}</div>
+                  ) : null}
                   {(answer.trace?.tools ?? []).map((tool) => (
                     <div key={`${tool.seq}-${tool.name}`}>
-                      {tool.seq}. {tool.name} ({tool.latency_ms} ms) {tool.ok ? "ok" : tool.error}
+                      {tool.seq}. {tool.name} ({tool.latency_ms} ms) {tool.ok ? "ok" : "not ok"}
                     </div>
                   ))}
                 </dl>

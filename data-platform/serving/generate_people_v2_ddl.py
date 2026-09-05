@@ -40,7 +40,8 @@ def event_views() -> str:
             "  from people_v2.people_evt_worker w",
             "  left join people_v2.people_evt_worker_change c",
             "    on c.worker_id = w.worker_id and c.event_date = w.event_date and c.property = 'reports_to'",
-            "  where w.event_type = 'manager_change';",
+            "  where w.event_type = 'manager_change'",
+            "    and coalesce(c.change_reason, 'reorg') in ('reorg', 'transfer', 'manager_departure');",
             "",
         ]
     )
@@ -71,6 +72,16 @@ def render() -> str:
             extra_idx.append(f"create index if not exists {name}_{key}_idx on people_v2.{name} ({key});")
         if "month_end" in col_names:
             extra_idx.append(f"create index if not exists {name}_month_end_idx on people_v2.{name} (month_end);")
+        if name == "people_snap_worker_month":
+            extra_idx.append(
+                "create index if not exists people_snap_worker_month_case_slice_idx "
+                "on people_v2.people_snap_worker_month (month_end, is_certified, job_family, location_id, tenure_band);"
+            )
+            extra_idx.append(
+                "create index if not exists people_snap_worker_month_grade_slice_idx "
+                "on people_v2.people_snap_worker_month "
+                "(month_end, is_certified, job_family, location_id, tenure_band, grade_id);"
+            )
         if "worker_id" in col_names:
             extra_idx.append(f"create index if not exists {name}_worker_id_idx on people_v2.{name} (worker_id);")
         if "application_id" in col_names:
@@ -78,6 +89,23 @@ def render() -> str:
         if "org_path" in col_names:
             extra_idx.append(f"create index if not exists {name}_org_path_idx on people_v2.{name} using gist (org_path);")
         lines.append("")
+    extra_idx.append(
+        "create index if not exists people_evt_worker_event_type_date_idx "
+        "on people_v2.people_evt_worker (event_type, event_date);"
+    )
+    extra_idx.append(
+        "create index if not exists people_evt_worker_change_reports_to_idx "
+        "on people_v2.people_evt_worker_change (event_date, worker_id, change_reason) "
+        "where property = 'reports_to';"
+    )
+    extra_idx.append(
+        "create index if not exists people_fact_comp_assignment_restricted_worker_from_idx "
+        "on people_v2.people_fact_comp_assignment_restricted (worker_id, from_date desc);"
+    )
+    extra_idx.append(
+        "create index if not exists people_hist_worker_attr_asof_idx "
+        "on people_v2.people_hist_worker_attr (worker_id, valid_from, valid_to);"
+    )
     lines.append("-- indexes")
     lines.extend(extra_idx)
     lines.append("")

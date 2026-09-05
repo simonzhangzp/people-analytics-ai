@@ -18,22 +18,31 @@ import {
   createVoluntaryAttritionMetric,
 } from "@/lib/workbench/fallbacks";
 import { assertSafeAIPayload } from "@/lib/ai/payload-guard";
-import { createAttritionAnalysisPlan } from "@/lib/analysis";
+import {
+  createAttritionAnalysisPlan,
+  isDirectlyExecutableIntent,
+  resolveQueryIntent,
+  runAnalystAgent,
+} from "@/lib/analysis";
 import {
   createCapabilityAnalysisPlan,
   metricForCapability,
 } from "@/lib/analysis/registry";
 import { applyMetricDefinitionPatch } from "@/lib/metrics";
+import { HEADCOUNT_METRIC } from "@/lib/metrics/library";
 import {
   buildCapabilityReports,
   selectCapabilityForQuestion,
 } from "@/lib/semantics";
 import type {
   AIIntervention,
+  DataThreadTurn,
   ExecutiveStory,
   Insight,
   MetricDefinition,
   MetricPatch,
+  ResolvedQueryIntent,
+  StorySlideCount,
   WorkbenchState,
   WorkbenchView,
 } from "@/types/workbench";
@@ -49,6 +58,8 @@ interface StoredWorkbenchState {
   metrics: WorkbenchState["metrics"];
   activeMetricId: string | null;
   insights: WorkbenchState["insights"];
+  thread?: WorkbenchState["thread"];
+  activeTurnId?: string | null;
   story: WorkbenchState["story"];
   progress: WorkbenchState["progress"];
 }
@@ -56,6 +67,7 @@ interface StoredWorkbenchState {
 interface WorkbenchContextValue {
   state: WorkbenchState;
   activeDatasetId?: string;
+  localDataAvailable: boolean;
   draftQuestion: string;
   processing: boolean;
   processingMessage?: string;
@@ -66,8 +78,8 @@ interface WorkbenchContextValue {
   setActiveView: (view: WorkbenchView) => void;
   approveRelationship: (relationshipId: string) => void;
   addFiles: (files: File[]) => Promise<void>;
-  askQuestion: () => Promise<void>;
-  resolveAmbiguity: (optionId: string) => void;
+  askQuestion: (questionText?: string, parentTurnId?: string) => Promise<void>;
+  resolveAmbiguity: (optionId: string) => Promise<void>;
   requestMetricPatch: (instruction: string) => Promise<void>;
   applyMetricPatch: () => Promise<void>;
   cancelMetricPatch: () => void;
@@ -77,7 +89,7 @@ interface WorkbenchContextValue {
   buildStory: (
     audience: ExecutiveStory["audience"],
     purpose: ExecutiveStory["purpose"],
-    slideCount: 3 | 5,
+    slideCount: StorySlideCount,
   ) => Promise<void>;
   exportStory: () => Promise<void>;
   submitCoDesignerContext: (text: string) => Promise<void>;
@@ -88,6 +100,123 @@ interface WorkbenchContextValue {
 }
 
 const WorkbenchContext = createContext<WorkbenchContextValue | null>(null);
+
+const MISSING_LOCAL_TABLE =
+  /Catalog Error:[\s\S]*Table with name[\s\S]*does not exist/i;
+
+function sourceDatasetKey(
+  dataset: WorkbenchState["datasets"][number],
+): string {
+  return [
+    dataset.metadata.sourceFileName ?? dataset.metadata.name,
+    dataset.metadata.sheetName ?? "",
+    String(dataset.metadata.fileSize),
+    dataset.metadata.fingerprint,
+  ].join("|");
+}
+
+function canResumeRestoredThread(
+  previous: WorkbenchState["datasets"],
+  next: WorkbenchState["datasets"],
+): boolean {
+  if (previous.length === 0 || previous.length !== next.length) return false;
+  const previousKeys = previous.map(sourceDatasetKey).sort();
+  const nextKeys = next.map(sourceDatasetKey).sort();
+  return previousKeys.every((key, index) => key === nextKeys[index]);
+}
+
+function restoredDatasetIdMap(
+  previous: WorkbenchState["datasets"],
+  next: WorkbenchState["datasets"],
+): Map<string, string> {
+  const nextByKey = new Map(
+    next.map((dataset) => [sourceDatasetKey(dataset), dataset.metadata.id]),
+  );
+  return new Map(
+    previous.flatMap((dataset) => {
+      const nextId = nextByKey.get(sourceDatasetKey(dataset));
+      return nextId ? [[dataset.metadata.id, nextId] as const] : [];
+    }),
+  );
+}
+
+function localFilesLabel(datasets: WorkbenchState["datasets"]): string {
+  return [
+    ...new Set(
+      datasets.map(
+        ({ metadata }) => metadata.sourceFileName ?? metadata.name,
+      ),
+    ),
+  ].join(", ");
+}
+
+function userFacingCalculationError(
+  cause: unknown,
+  datasets: WorkbenchState["datasets"],
+): { message: string; needsReattach: boolean } {
+  const technicalMessage =
+    cause instanceof Error ? cause.message : String(cause ?? "");
+  if (MISSING_LOCAL_TABLE.test(technicalMessage)) {
+    return {
+      message: `Reattach ${localFilesLabel(
+        datasets,
+      )} to continue. Raw employee rows intentionally remain session-only and were not retained after the page reloaded.`,
+      needsReattach: true,
+    };
+  }
+  if (/(?:Catalog|Binder|Parser|Internal) Error:/i.test(technicalMessage)) {
+    return {
+      message:
+        "The local calculation could not safely translate this question. Try a more specific People Analytics question or review the inferred data meaning.",
+      needsReattach: false,
+    };
+  }
+  return {
+    message:
+      technicalMessage || "The local calculation could not be completed.",
+    needsReattach: false,
+  };
+}
+
+function isInternalCalculationMessage(value: string | undefined): boolean {
+  return Boolean(
+    value &&
+      (MISSING_LOCAL_TABLE.test(value) ||
+        /(?:Catalog|Binder|Parser|Internal) Error:/i.test(value)),
+  );
+}
+
+function sanitizeRestoredInsight(
+  insight: Insight,
+  datasets: WorkbenchState["datasets"],
+): Insight {
+  const technicalMessage = [
+    insight.finding,
+    ...insight.evidence.map((item) => item.detail),
+    ...insight.limitations,
+  ].find(isInternalCalculationMessage);
+  if (!technicalMessage) return insight;
+  const failure = userFacingCalculationError(
+    new Error(technicalMessage),
+    datasets,
+  );
+  return {
+    ...insight,
+    headline: failure.needsReattach
+      ? "Reattach local files to continue"
+      : "This question needs more evidence",
+    finding: failure.message,
+    evidence: insight.evidence.map((item) => ({
+      ...item,
+      detail: isInternalCalculationMessage(item.detail)
+        ? failure.message
+        : item.detail,
+    })),
+    limitations: insight.limitations.map((item) =>
+      isInternalCalculationMessage(item) ? failure.message : item,
+    ),
+  };
+}
 
 function initialState(workspaceId: string): WorkbenchState {
   const demo = workspaceId === "demo";
@@ -109,6 +238,8 @@ function initialState(workspaceId: string): WorkbenchState {
     pendingMetricPatch: null,
     analysisPlan: null,
     insights: [],
+    thread: [],
+    activeTurnId: null,
     story: null,
     interventions: createInitialInterventions(demo),
     progress: {
@@ -134,6 +265,8 @@ function safeStoredState(state: WorkbenchState): StoredWorkbenchState {
     metrics: state.metrics,
     activeMetricId: state.activeMetricId,
     insights: state.insights,
+    thread: state.thread,
+    activeTurnId: state.activeTurnId,
     story: state.story,
     progress: state.progress,
   };
@@ -154,6 +287,34 @@ function intervention(
     rationale,
     actions,
     createdAt: new Date().toISOString(),
+  };
+}
+
+function metricForIntent(intent: ResolvedQueryIntent): MetricDefinition {
+  const formula: MetricDefinition["formula"] =
+    intent.aggregation === "sum" && intent.measureField
+      ? { kind: "sum", field: intent.measureField }
+      : intent.aggregation === "count_distinct" && intent.measureField
+        ? {
+            kind: "count",
+            entity: "employee",
+            distinctField: intent.measureField,
+          }
+        : { kind: "count", entity: "aggregate_record" };
+  return {
+    ...HEADCOUNT_METRIC,
+    id: `${HEADCOUNT_METRIC.id}:${intent.id}`,
+    formula,
+    sourceFields: [
+      ...(intent.measureField ? [intent.measureField] : []),
+      ...(intent.timeField ? [intent.timeField] : []),
+    ],
+    dimensions: [...intent.dimensions, ...intent.profileDimensions],
+    description: intent.assumptions.join(" "),
+    status: "Approved",
+    confidence: intent.confidence,
+    version: 1,
+    approvedAt: new Date().toISOString(),
   };
 }
 
@@ -220,6 +381,7 @@ export function WorkbenchProvider({
   const isDemo = workspaceId === "demo";
   const [state, setState] = useState<WorkbenchState>(() => initialState(workspaceId));
   const [activeDatasetId, setActiveDatasetId] = useState<string>();
+  const [localDataAvailable, setLocalDataAvailable] = useState(false);
   const [draftQuestion, setDraftQuestion] = useState(isDemo ? DEMO_QUESTION : "");
   const [processing, setProcessing] = useState(false);
   const [processingMessage, setProcessingMessage] = useState<string>();
@@ -229,6 +391,12 @@ export function WorkbenchProvider({
   const hydrated = useRef(false);
   const calculatedInsights = useRef<Insight[]>([]);
   const stateRef = useRef(state);
+  const localDataAvailableRef = useRef(false);
+
+  const markLocalDataAvailable = useCallback((available: boolean) => {
+    localDataAvailableRef.current = available;
+    setLocalDataAvailable(available);
+  }, []);
 
   useEffect(() => {
     stateRef.current = state;
@@ -243,37 +411,61 @@ export function WorkbenchProvider({
 
   useEffect(() => {
     if (workspaceId === "new" || workspaceId === "demo" || hydrated.current) return;
-    hydrated.current = true;
     let timer: number | undefined;
     try {
       const saved = window.localStorage.getItem(`people-workbench:${workspaceId}`);
-      if (!saved) return;
+      if (!saved) {
+        hydrated.current = true;
+        return;
+      }
       const parsed = JSON.parse(saved) as StoredWorkbenchState;
       timer = window.setTimeout(() => {
+        hydrated.current = true;
+        const restoredDatasets = (parsed.datasetMetadata ?? []).map(
+          (metadata) => ({
+            metadata,
+            explorationRows: [],
+          }),
+        );
+        const restoredInsights = (parsed.insights ?? []).map((insight) =>
+          sanitizeRestoredInsight(insight, restoredDatasets),
+        );
+        const restoredThread = (parsed.thread ?? []).map((turn) => ({
+          ...turn,
+          methodNote: isInternalCalculationMessage(turn.methodNote)
+            ? userFacingCalculationError(
+                new Error(turn.methodNote),
+                restoredDatasets,
+              ).message
+            : turn.methodNote,
+        }));
         setState((current) => ({
           ...current,
           workspaceName: parsed.workspaceName,
-          datasets: parsed.datasetMetadata.map((metadata) => ({
-            metadata,
-            explorationRows: [],
-          })),
-          fieldMappings: parsed.fieldMappings,
-          relationships: parsed.relationships,
+          datasets: restoredDatasets,
+          fieldMappings: parsed.fieldMappings ?? [],
+          relationships: parsed.relationships ?? [],
           capabilities:
             parsed.capabilities ??
-            buildCapabilityReports(parsed.datasetMetadata),
+            buildCapabilityReports(
+              restoredDatasets.map(({ metadata }) => metadata),
+            ),
           activeCapabilityId: parsed.activeCapabilityId ?? null,
           question: parsed.question,
-          metrics: parsed.metrics,
+          metrics: parsed.metrics ?? [],
           activeMetricId: parsed.activeMetricId,
-          insights: parsed.insights,
+          insights: restoredInsights,
+          thread: restoredThread,
+          activeTurnId: parsed.activeTurnId ?? null,
           story: parsed.story,
           progress: {
             ...parsed.progress,
-            data: parsed.datasetMetadata.length
+            data: restoredDatasets.length
               ? "Needs input"
               : parsed.progress.data,
-            analysis: parsed.insights.length ? "Ready" : parsed.progress.analysis,
+            analysis: restoredInsights.length
+              ? "Ready"
+              : parsed.progress.analysis,
           },
           interventions: [
             intervention(
@@ -288,6 +480,7 @@ export function WorkbenchProvider({
         setActiveDatasetId(parsed.datasetMetadata[0]?.id);
       }, 0);
     } catch {
+      hydrated.current = true;
       window.localStorage.removeItem(`people-workbench:${workspaceId}`);
     }
     return () => {
@@ -339,6 +532,8 @@ export function WorkbenchProvider({
   const addFiles = useCallback(
     async (files: File[]) => {
       if (files.length === 0) return;
+      const previousDatasets = stateRef.current.datasets;
+      const wasLocalDataAvailable = localDataAvailableRef.current;
       setProcessing(true);
       setError(undefined);
       setProcessingMessage("Reading files and starting local SQL…");
@@ -420,6 +615,12 @@ export function WorkbenchProvider({
           datasets.map(({ metadata }) => metadata),
         );
         const firstRunnable = capabilities.find((item) => item.runnable);
+        const resumeRestoredThread =
+          !wasLocalDataAvailable &&
+          canResumeRestoredThread(previousDatasets, datasets);
+        const restoredIds = resumeRestoredThread
+          ? restoredDatasetIdMap(previousDatasets, datasets)
+          : new Map<string, string>();
         setActiveDatasetId(datasets[0]?.metadata.id);
         setProcessingMessage("Confirming relationships and answerability…");
         setState((current) => ({
@@ -429,43 +630,80 @@ export function WorkbenchProvider({
           relationships,
           capabilities,
           activeCapabilityId: firstRunnable?.id ?? null,
-          question: null,
-          metrics: [],
-          activeMetricId: null,
+          question: resumeRestoredThread ? current.question : null,
+          metrics: resumeRestoredThread ? current.metrics : [],
+          activeMetricId: resumeRestoredThread
+            ? current.activeMetricId
+            : null,
           ambiguity: null,
           pendingMetricPatch: null,
-          analysisPlan: null,
-          insights: [],
-          story: null,
+          analysisPlan: resumeRestoredThread ? current.analysisPlan : null,
+          insights: resumeRestoredThread
+            ? current.insights.map((insight) => ({
+                ...insight,
+                evidence: insight.evidence.map((item) => ({
+                  ...item,
+                  sourceDatasetIds: item.sourceDatasetIds.map(
+                    (id) => restoredIds.get(id) ?? id,
+                  ),
+                })),
+              }))
+            : [],
+          thread: resumeRestoredThread
+            ? current.thread.map((turn) => ({
+                ...turn,
+                intent: turn.intent
+                  ? {
+                      ...turn.intent,
+                      datasetId:
+                        restoredIds.get(turn.intent.datasetId) ??
+                        turn.intent.datasetId,
+                    }
+                  : undefined,
+              }))
+            : [],
+          activeTurnId: resumeRestoredThread ? current.activeTurnId : null,
+          story: resumeRestoredThread ? current.story : null,
           engineStatus: "ready",
           progress: {
             data: "Ready",
-            metrics: "Not started",
-            analysis: "Not started",
-            story: "Not started",
+            metrics: resumeRestoredThread
+              ? current.progress.metrics
+              : "Not started",
+            analysis: resumeRestoredThread
+              ? current.progress.analysis
+              : "Not started",
+            story: resumeRestoredThread
+              ? current.progress.story
+              : "Not started",
           },
           interventions: [
             intervention(
-              "Proposal",
-              `${datasets.length} People datasets understood`,
-              `${datasets
-                .map(
-                  ({ metadata }) =>
-                    `${metadata.inferredType} at ${metadata.grain.label} grain`,
-                )
-                .join("; ")}. ${
-                capabilities.filter((item) => item.runnable).length
-              } deterministic domain path${
-                capabilities.filter((item) => item.runnable).length === 1
-                  ? ""
-                  : "s"
-              } and ${relationships.length} relationship${
-                relationships.length === 1 ? "" : "s"
-              } can support the question.`,
+              resumeRestoredThread ? "Applied" : "Proposal",
+              resumeRestoredThread
+                ? "Local files reattached"
+                : `${datasets.length} People datasets understood`,
+              resumeRestoredThread
+                ? "The source structure matches the restored workspace. Previous answers remain visible and new local calculations are available."
+                : `${datasets
+                    .map(
+                      ({ metadata }) =>
+                        `${metadata.inferredType} at ${metadata.grain.label} grain`,
+                    )
+                    .join("; ")}. ${
+                    capabilities.filter((item) => item.runnable).length
+                  } deterministic domain path${
+                    capabilities.filter((item) => item.runnable).length === 1
+                      ? ""
+                      : "s"
+                  } and ${relationships.length} relationship${
+                    relationships.length === 1 ? "" : "s"
+                  } can support the question.`,
             ),
             ...current.interventions,
           ],
         }));
+        markLocalDataAvailable(true);
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "Could not profile the files.");
         setState((current) => ({
@@ -478,7 +716,7 @@ export function WorkbenchProvider({
         setProcessingMessage(undefined);
       }
     },
-    [appendIntervention, isDemo],
+    [appendIntervention, isDemo, markLocalDataAvailable],
   );
 
   useEffect(() => {
@@ -487,150 +725,418 @@ export function WorkbenchProvider({
     void loadWorkbenchDemoFiles().then(addFiles);
   }, [addFiles, isDemo]);
 
-  const askQuestion = useCallback(async () => {
-    const text = draftQuestion.trim();
-    if (!text || state.datasets.length === 0) return;
-    setBusy(true);
-    const capability = selectCapabilityForQuestion(text, state.capabilities);
-    if (!capability) {
-      appendIntervention(
-        intervention(
-          "Data gap",
-          "No supported HR question matches the attached contracts",
-          "Map an identity, period, category, or measure field before selecting a deterministic analysis path.",
-        ),
+  const askQuestion = useCallback(async (
+    questionText?: string,
+    parentTurnId?: string,
+  ) => {
+    const text = (questionText ?? draftQuestion).trim();
+    const snapshot = stateRef.current;
+    if (!text || snapshot.datasets.length === 0) return;
+    if (!localDataAvailableRef.current) {
+      setError(
+        `Reattach ${localFilesLabel(
+          snapshot.datasets,
+        )} to continue. Raw employee rows intentionally remain session-only and were not retained after the page reloaded.`,
       );
-      setBusy(false);
       return;
     }
+    setBusy(true);
+    setError(undefined);
+    const intent = resolveQueryIntent({
+      question: text,
+      datasets: snapshot.datasets,
+      capabilities: snapshot.capabilities,
+      thread: snapshot.thread,
+      parentTurnId: parentTurnId ?? snapshot.activeTurnId ?? undefined,
+    });
+    const capability = selectCapabilityForQuestion(
+      text,
+      snapshot.capabilities,
+    );
     const guidedAttrition =
-      isDemo && capability.domain === "retention";
-    const metric = guidedAttrition
-      ? createVoluntaryAttritionMetric()
-      : metricForCapability(capability);
-    const ambiguity = guidedAttrition
+      isDemo && capability?.domain === "retention";
+    const metric =
+      intent && isDirectlyExecutableIntent(intent)
+        ? metricForIntent(intent)
+        : guidedAttrition
+          ? applyMetricDefinitionPatch(
+              createRetirementMetricPatch(createVoluntaryAttritionMetric()),
+            )
+          : capability
+            ? metricForCapability(capability)
+            : intent
+              ? metricForIntent(intent)
+              : HEADCOUNT_METRIC;
+    const definitionAmbiguity = guidedAttrition
       ? createRetirementAmbiguity(metric.id)
-      : null;
+      : undefined;
     const question = {
       id: `question-${Date.now()}`,
       text,
       metricIds: [metric.id],
       createdAt: new Date().toISOString(),
     };
-    const analysisPlan = ambiguity
+    const turn: DataThreadTurn = {
+      id: question.id,
+      parentTurnId: parentTurnId ?? snapshot.activeTurnId ?? undefined,
+      question: text,
+      status: "running",
+      intent,
+      insightIds: [],
+      metricId: metric.id,
+      methodNote: guidedAttrition
+        ? "Using: voluntary exits / beginning HC · Retirement excluded · Employees only"
+        : undefined,
+      provisional: guidedAttrition,
+      definitionAmbiguity,
+      createdAt: question.createdAt,
+    };
+    const analysisPlan = !capability
       ? null
       : createCapabilityAnalysisPlan(question, capability, metric);
     setState((current) => ({
       ...current,
-      activeView: "metrics",
+      activeView: "data",
       question,
-      metrics: [metric],
+      metrics: [
+        ...current.metrics.filter((item) => item.id !== metric.id),
+        metric,
+      ],
       activeMetricId: metric.id,
-      activeCapabilityId: capability.id,
-      ambiguity,
+      activeCapabilityId: capability?.id ?? null,
+      ambiguity: null,
       pendingMetricPatch: null,
       analysisPlan,
-      insights: [],
       story: null,
+      thread: [...current.thread, turn],
+      activeTurnId: turn.id,
       progress: {
         ...current.progress,
-        metrics: ambiguity ? "Needs input" : "Ready",
-        analysis: capability.runnable ? "In progress" : "Blocked",
-        story: "Not started",
+        metrics: "Ready",
+        analysis:
+          capability?.runnable || Boolean(intent) ? "In progress" : "Blocked",
       },
       interventions: [
         guidedAttrition
           ? intervention(
-              "Needs confirmation",
-              "One classification changes the selected metric",
-              "The guided source distinguishes retirement from resignation. Confirm its treatment before calculation.",
-              "Combining different separation types can lead to a different leadership action.",
+              "Proposal",
+              "Provisional People metric used",
+              "Voluntary exits over beginning headcount, retirement excluded, employees only. Change the definition if your organization uses a different rule.",
             )
           : intervention(
-              capability.runnable ? "Proposal" : "Data gap",
-              capability.runnable
-                ? `${capability.metricName} selected`
-                : `${capability.metricName} is not answerable yet`,
-              capability.runnable
-                ? `${capability.datasetIds.length} compatible local dataset${capability.datasetIds.length === 1 ? "" : "s"} can run ${capability.supportedOperations.join(", ")}.`
-                : capability.missing.join(" "),
-              capability.assumptions.join(" "),
-              [
-                {
-                  id: capability.runnable ? "review-metric" : "review-data",
-                  label: capability.runnable ? "Review metric" : "Review data",
-                  intent: capability.runnable ? "metrics" : "data",
-                },
-              ],
+              "Proposal",
+              "Question translated into a local calculation",
+              intent?.assumptions.join(" ") ??
+                "The analyst loop inspects schema, profiles the measure, and calculates locally.",
             ),
         ...current.interventions,
       ],
     }));
-    setBusy(false);
+    setDraftQuestion("");
+
+    try {
+      if (intent && isDirectlyExecutableIntent(intent)) {
+        const dataset = snapshot.datasets.find(
+          ({ metadata }) => metadata.id === intent.datasetId,
+        );
+        if (!dataset) throw new Error("The selected local dataset is unavailable.");
+        const result = await runAnalystAgent({
+          question: text,
+          dataset,
+          intent,
+          turn,
+          metricId: metric.id,
+        });
+        calculatedInsights.current = [
+          ...calculatedInsights.current,
+          ...result.insights,
+        ];
+        setState((current) => ({
+          ...current,
+          analysisPlan: result.plan,
+          insights: [...current.insights, ...result.insights],
+          thread: current.thread.map((item) =>
+            item.id === turn.id
+              ? {
+                  ...item,
+                  status: result.insights.some((insight) => insight.validated)
+                    ? ("complete" as const)
+                    : ("blocked" as const),
+                  insightIds: result.insights.map((insight) => insight.id),
+                  methodNote: result.methodNote,
+                }
+              : item,
+          ),
+          progress: {
+            ...current.progress,
+            analysis: result.insights.some((insight) => insight.validated)
+              ? "Ready"
+              : "Blocked",
+          },
+        }));
+        return;
+      }
+
+      if (!capability || !analysisPlan) {
+        throw new Error(
+          capability?.missing.join(" ") ||
+            "The attached data does not yet contain the evidence required for this question.",
+        );
+      }
+      const runtime = await import("@/lib/workbench/runtime");
+      const result = await runtime.executeWorkbenchAnalysis({
+        question,
+        metric,
+        datasets: snapshot.datasets,
+        plan: analysisPlan,
+        capability,
+      });
+      calculatedInsights.current = [
+        ...calculatedInsights.current,
+        ...result.insights,
+      ];
+      const visibleInsights =
+        result.insights.filter((insight) => insight.validated).slice(0, 1).length
+          ? result.insights.filter((insight) => insight.validated).slice(0, 1)
+          : result.insights.slice(0, 1);
+      setState((current) => ({
+        ...current,
+        analysisPlan: result.plan,
+        insights: [...current.insights, ...visibleInsights],
+        thread: current.thread.map((item) =>
+          item.id === turn.id
+            ? {
+                ...item,
+                status: visibleInsights.some((insight) => insight.validated)
+                  ? ("complete" as const)
+                  : ("blocked" as const),
+                  insightIds: visibleInsights.map((insight) => insight.id),
+                  methodNote: item.methodNote ?? result.plan.summary,
+              }
+            : item,
+        ),
+        progress: {
+          ...current.progress,
+          analysis: visibleInsights.some((insight) => insight.validated)
+            ? "Ready"
+            : "Blocked",
+        },
+      }));
+    } catch (cause) {
+      const failure = userFacingCalculationError(cause, snapshot.datasets);
+      const reason = failure.message;
+      if (failure.needsReattach) {
+        markLocalDataAvailable(false);
+        setError(reason);
+      }
+      const dataGap: Insight = {
+        id: `${turn.id}-data-gap`,
+        questionId: turn.id,
+        branchKey: "data-gap",
+        headline: failure.needsReattach
+          ? "Reattach local files to continue"
+          : "This question needs more evidence",
+        finding: reason,
+        metricIds: [metric.id],
+        filters: {},
+        population: capability?.population.label ?? "Attached local data",
+        evidence: [
+          {
+            id: `${turn.id}-missing-evidence`,
+            label: "Missing evidence",
+            value: "Not calculated",
+            detail: reason,
+            sourceDatasetIds:
+              capability?.datasetIds ??
+              (intent ? [intent.datasetId] : snapshot.datasets.map(({ metadata }) => metadata.id)),
+          },
+        ],
+        confidence: "Low",
+        limitations: [
+          ...(capability?.missing ?? []),
+          "No substitute result or fabricated number was used.",
+        ],
+        suggestedFollowUps: [],
+        selectedForExecutiveStory: false,
+        validated: false,
+      };
+      setState((current) => ({
+        ...current,
+        insights: [...current.insights, dataGap],
+        thread: current.thread.map((item) =>
+          item.id === turn.id
+            ? {
+                ...item,
+                status: "blocked" as const,
+                insightIds: [dataGap.id],
+                methodNote: reason,
+              }
+            : item,
+        ),
+        progress: { ...current.progress, analysis: "Blocked" },
+      }));
+      appendIntervention(
+        intervention(
+          "Data gap",
+          failure.needsReattach
+            ? "Local files need to be reattached"
+            : "The question could not be calculated",
+          reason,
+        ),
+      );
+    } finally {
+      setBusy(false);
+    }
   }, [
     appendIntervention,
     draftQuestion,
     isDemo,
-    state.capabilities,
-    state.datasets,
+    markLocalDataAvailable,
   ]);
 
-  const resolveAmbiguity = useCallback((optionId: string) => {
-    setState((current) => {
-      const metric = current.metrics.find(
-        (item) => item.id === current.activeMetricId,
-      );
-      if (!metric || !current.ambiguity) return current;
-      if (optionId === "separate-retirement") {
-        return {
-          ...current,
-          ambiguity: {
-            ...current.ambiguity,
-            selectedOptionId: optionId,
-            status: "Resolved",
-          },
-          pendingMetricPatch: createRetirementMetricPatch(metric),
-        };
-      }
-      const approved: MetricDefinition = {
-        ...metric,
-        status: "Approved",
-        confidence: "High",
-        version: metric.version + 1,
-        approvedAt: new Date().toISOString(),
-      };
-      const capability = current.capabilities.find(
-        (item) => item.id === current.activeCapabilityId,
-      );
-      return {
+  const resolveAmbiguity = useCallback(async (optionId: string) => {
+    const snapshot = stateRef.current;
+    const metric = snapshot.metrics.find(
+      (item) => item.id === snapshot.activeMetricId,
+    );
+    const question = snapshot.question;
+    const capability = snapshot.capabilities.find(
+      (item) => item.id === snapshot.activeCapabilityId,
+    );
+    const turn = snapshot.thread.find(
+      (item) => item.id === snapshot.activeTurnId,
+    );
+    const ambiguity = snapshot.ambiguity ?? turn?.definitionAmbiguity;
+    if (!metric || !ambiguity || !question || !capability || !turn) {
+      return;
+    }
+    setBusy(true);
+    const approved =
+      optionId === "separate-retirement"
+        ? applyMetricDefinitionPatch(createRetirementMetricPatch(metric))
+        : ({
+            ...metric,
+            status: "Approved",
+            confidence: "High",
+            version: metric.version + 1,
+            approvedAt: new Date().toISOString(),
+          } satisfies MetricDefinition);
+    const availableFields = snapshot.fieldMappings.flatMap((mapping) =>
+      mapping.canonicalField
+        ? [mapping.sourceColumn, mapping.canonicalField]
+        : [mapping.sourceColumn],
+    );
+    const analysisPlan = createAttritionAnalysisPlan(question, {
+      metricId: approved.id,
+      availableFields,
+    });
+    setState((current) => ({
+      ...current,
+      metrics: current.metrics.map((item) =>
+        item.id === metric.id ? approved : item,
+      ),
+      ambiguity: null,
+      pendingMetricPatch: null,
+      analysisPlan,
+      thread: current.thread.map((item) =>
+        item.id === turn.id ? { ...item, status: "running" as const } : item,
+      ),
+      progress: {
+        ...current.progress,
+        metrics: "Ready",
+        analysis: "In progress",
+      },
+    }));
+
+    try {
+      const runtime = await import("@/lib/workbench/runtime");
+      const result = await runtime.executeWorkbenchAnalysis({
+        question,
+        metric: approved,
+        datasets: snapshot.datasets,
+        plan: analysisPlan,
+        capability,
+      });
+      calculatedInsights.current = [
+        ...calculatedInsights.current,
+        ...result.insights,
+      ];
+      const visible =
+        result.insights.find((insight) => insight.validated) ??
+        result.insights[0];
+      if (!visible) throw new Error("No deterministic result was produced.");
+      setState((current) => ({
         ...current,
-        metrics: current.metrics.map((item) =>
-          item.id === metric.id ? approved : item,
+        insights: [
+          ...current.insights.filter(
+            (insight) => !turn.insightIds.includes(insight.id),
+          ),
+          visible,
+        ],
+        analysisPlan: result.plan,
+        thread: current.thread.map((item) =>
+          item.id === turn.id
+            ? {
+                ...item,
+                status: visible.validated
+                  ? ("complete" as const)
+                  : ("blocked" as const),
+                insightIds: [visible.id],
+                methodNote:
+                  optionId === "separate-retirement"
+                    ? "Using: voluntary exits / beginning HC · Retirement excluded · Employees only"
+                    : "Using: voluntary exits including retirement / beginning HC · Employees only",
+                provisional: false,
+                definitionAmbiguity: undefined,
+              }
+            : item,
         ),
-        ambiguity: null,
-        analysisPlan:
-          current.question && capability
-            ? createAttritionAnalysisPlan(current.question, {
-                metricId: approved.id,
-                availableFields: current.fieldMappings.flatMap((mapping) =>
-                  mapping.canonicalField
-                    ? [mapping.sourceColumn, mapping.canonicalField]
-                    : [mapping.sourceColumn],
-                ),
-              })
-            : current.analysisPlan,
-        progress: { ...current.progress, metrics: "Ready" },
+        progress: {
+          ...current.progress,
+          analysis: visible.validated ? "Ready" : "Blocked",
+        },
         interventions: [
           intervention(
             "Applied",
-            "Retirement included in voluntary attrition",
-            "The organizational definition was approved and versioned. Reopen the metric if this convention changes.",
+            optionId === "separate-retirement"
+              ? "Retirement treated separately"
+              : "Retirement included as voluntary",
+            "The definition was applied, the answer was recalculated, and it was saved as this workspace's People metric.",
           ),
           ...current.interventions,
         ],
-      };
-    });
-  }, []);
+      }));
+      const persistenceRuntime = await import("@/lib/workbench/runtime").catch(
+        () => null,
+      );
+      await persistenceRuntime?.persistApprovedMetric(
+        snapshot.workspaceId,
+        approved,
+      );
+    } catch (cause) {
+      const failure = userFacingCalculationError(cause, snapshot.datasets);
+      const reason = failure.message;
+      if (failure.needsReattach) {
+        markLocalDataAvailable(false);
+      }
+      setState((current) => ({
+        ...current,
+        thread: current.thread.map((item) =>
+          item.id === turn.id
+            ? {
+                ...item,
+                status: "blocked" as const,
+                methodNote: reason,
+              }
+            : item,
+        ),
+        progress: { ...current.progress, analysis: "Blocked" },
+      }));
+      setError(reason);
+    } finally {
+      setBusy(false);
+    }
+  }, [markLocalDataAvailable]);
 
   const requestMetricPatch = useCallback(
     async (instruction: string) => {
@@ -844,11 +1350,15 @@ export function WorkbenchProvider({
         ],
       }));
     } catch (cause) {
+      const failure = userFacingCalculationError(cause, state.datasets);
       const reason =
-        cause instanceof Error
-          ? cause.message
-          : capability.missing.join(" ") ||
-            "Confirm the inferred identity, period, population, and measure roles before running.";
+        failure.message ||
+        capability.missing.join(" ") ||
+        "Confirm the inferred identity, period, population, and measure roles before running.";
+      if (failure.needsReattach) {
+        markLocalDataAvailable(false);
+        setError(reason);
+      }
       const dataGap: Insight = {
         id: `${state.question.id}-${capability.domain}-runtime-data-gap`,
         questionId: state.question.id,
@@ -912,6 +1422,7 @@ export function WorkbenchProvider({
     state.datasets,
     state.metrics,
     state.question,
+    markLocalDataAvailable,
   ]);
 
   const runBranch = useCallback(
@@ -1015,36 +1526,48 @@ export function WorkbenchProvider({
     async (
       audience: ExecutiveStory["audience"],
       purpose: ExecutiveStory["purpose"],
-      slideCount: 3 | 5,
+      slideCount: StorySlideCount,
     ) => {
       setBusy(true);
-      const runtime = await import("@/lib/workbench/runtime").catch(() => null);
-      const story = runtime
-        ? runtime.buildWorkbenchStory(
-            state.workspaceId,
-            state.insights,
-            audience,
-            purpose,
-            slideCount,
-          )
-        : null;
-      if (!story) {
-        throw new Error("Executive Story Builder is unavailable.");
+      setError(undefined);
+      try {
+        const runtime = await import("@/lib/workbench/runtime").catch(
+          () => null,
+        );
+        const story = runtime
+          ? runtime.buildWorkbenchStory(
+              state.workspaceId,
+              state.insights,
+              audience,
+              purpose,
+              slideCount,
+            )
+          : null;
+        if (!story) {
+          throw new Error("Executive Story Builder is unavailable.");
+        }
+        setState((current) => ({
+          ...current,
+          story,
+          progress: { ...current.progress, story: "Ready" },
+          interventions: [
+            intervention(
+              "Proposal",
+              `${slideCount}-slide ${audience} story is ready`,
+              "Each page uses a validated finding, one primary chart at most, and explicit source or limitation notes.",
+            ),
+            ...current.interventions,
+          ],
+        }));
+      } catch (cause) {
+        setError(
+          cause instanceof Error
+            ? cause.message
+            : "Executive Story Builder is unavailable.",
+        );
+      } finally {
+        setBusy(false);
       }
-      setState((current) => ({
-        ...current,
-        story,
-        progress: { ...current.progress, story: "Ready" },
-        interventions: [
-          intervention(
-            "Proposal",
-            `${slideCount}-slide ${audience} story is ready`,
-            "Each page uses a validated finding, one primary chart at most, and explicit source or limitation notes.",
-          ),
-          ...current.interventions,
-        ],
-      }));
-      setBusy(false);
     },
     [state.insights, state.workspaceId],
   );
@@ -1119,6 +1642,7 @@ export function WorkbenchProvider({
     () => ({
       state,
       activeDatasetId,
+      localDataAvailable,
       draftQuestion,
       processing,
       processingMessage,
@@ -1155,6 +1679,7 @@ export function WorkbenchProvider({
       draftQuestion,
       error,
       exportStory,
+      localDataAvailable,
       processing,
       processingMessage,
       requestMetricPatch,

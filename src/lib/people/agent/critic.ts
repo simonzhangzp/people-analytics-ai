@@ -1,4 +1,5 @@
-import { asRecord } from "../format";
+import { asList, asRecord } from "../format";
+import { aggregateVisibleBy } from "../case3-view";
 import type { PeopleAnswerContract, PeopleCriticResult, PeopleObservedFact } from "./types";
 
 const EPS = 1e-6;
@@ -22,18 +23,32 @@ function toolRatesAndCounts(evidence: unknown[]): { rates: number[]; counts: num
     if (!value || typeof value !== "object") return;
     const row = asRecord(value);
     if (row.denied === true || row.suppressed === true) return;
-    const n = typeof row.value === "number" ? row.value : Number(row.value);
-    if (Number.isFinite(n)) {
-      if (row.unit === "rate" || (n > 0 && n <= 1.5 && row.unit !== "count")) rates.push(n);
-      else counts.push(n);
+    if (row.value != null && row.value !== "") {
+      const n = typeof row.value === "number" ? row.value : Number(row.value);
+      if (Number.isFinite(n)) {
+        if (row.unit === "rate" || (n > 0 && n <= 1.5 && row.unit !== "count")) rates.push(n);
+        else counts.push(n);
+      }
     }
-    const ratio = typeof row.coverage_ratio === "number" ? row.coverage_ratio : Number(row.coverage_ratio);
-    if (Number.isFinite(ratio)) rates.push(ratio);
+    if (row.coverage_ratio != null && row.coverage_ratio !== "") {
+      const ratio =
+        typeof row.coverage_ratio === "number" ? row.coverage_ratio : Number(row.coverage_ratio);
+      if (Number.isFinite(ratio)) rates.push(ratio);
+    }
     visit(row.cells);
     visit(row.rows);
     visit(row.points);
   };
   evidence.forEach(visit);
+  for (const item of evidence) {
+    const cells = asList(asRecord(item).cells);
+    if (!cells.length) continue;
+    for (const key of ["location_id", "tenure_band"] as const) {
+      for (const agg of aggregateVisibleBy(cells, key)) {
+        rates.push(agg.rate);
+      }
+    }
+  }
   return { rates, counts };
 }
 

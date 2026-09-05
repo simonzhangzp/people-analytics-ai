@@ -198,7 +198,7 @@
       "denied": false,
       "expect_deny": false,
       "ok": true,
-      "value": 3.665744565532
+      "value": 3.665744565531
     },
     {
       "identity_id": "demo-leader-engineering",
@@ -366,7 +366,7 @@
       "denied": false,
       "expect_deny": false,
       "ok": true,
-      "value": 3.665744565532
+      "value": 3.665744565531
     },
     {
       "identity_id": "demo-hrbp",
@@ -534,7 +534,7 @@
       "denied": false,
       "expect_deny": false,
       "ok": true,
-      "value": 3.665744565532
+      "value": 3.665744565531
     },
     {
       "identity_id": "demo-people-analyst",

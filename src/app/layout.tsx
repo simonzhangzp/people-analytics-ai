@@ -21,6 +21,14 @@ export const metadata: Metadata = {
     description:
       "A working enterprise People Data & AI environment showing how data foundations, governance, workforce analytics, and AI support trusted workforce decisions.",
     type: "website",
+    images: [{ url: "/og-peopleanalyticsai.png", width: 1200, height: 630, alt: "PeopleAnalyticsAI" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PeopleAnalyticsAI · Enterprise People Data & AI",
+    description:
+      "A working enterprise People Data & AI environment showing how data foundations, governance, workforce analytics, and AI support trusted workforce decisions.",
+    images: ["/og-peopleanalyticsai.png"],
   },
 };
 

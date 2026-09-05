@@ -363,6 +363,7 @@ create table if not exists people_v2.people_fact_offer (
 );
 
 create table if not exists people_v2.people_dim_recruiter (
+  recruiter_id bigint,
   person_id text,
   specialization text,
   supported_region text,
@@ -629,13 +630,15 @@ create index if not exists people_fact_scorecard_scorecard_id_idx on people_v2.p
 create index if not exists people_fact_scorecard_application_id_idx on people_v2.people_fact_scorecard (application_id);
 create index if not exists people_fact_offer_offer_id_idx on people_v2.people_fact_offer (offer_id);
 create index if not exists people_fact_offer_application_id_idx on people_v2.people_fact_offer (application_id);
-create index if not exists people_dim_recruiter_person_id_idx on people_v2.people_dim_recruiter (person_id);
+create index if not exists people_dim_recruiter_recruiter_id_idx on people_v2.people_dim_recruiter (recruiter_id);
 create index if not exists people_fact_survey_score_restricted_worker_id_idx on people_v2.people_fact_survey_score_restricted (worker_id);
 create index if not exists people_fact_survey_score_restricted_worker_id_idx on people_v2.people_fact_survey_score_restricted (worker_id);
 create index if not exists people_ref_city_city_idx on people_v2.people_ref_city (city);
 create index if not exists people_ref_separation_reason_map_raw_reason_idx on people_v2.people_ref_separation_reason_map (raw_reason);
 create index if not exists people_snap_worker_month_worker_id_idx on people_v2.people_snap_worker_month (worker_id);
 create index if not exists people_snap_worker_month_month_end_idx on people_v2.people_snap_worker_month (month_end);
+create index if not exists people_snap_worker_month_case_slice_idx on people_v2.people_snap_worker_month (month_end, is_certified, job_family, location_id, tenure_band);
+create index if not exists people_snap_worker_month_region_tenure_idx on people_v2.people_snap_worker_month (month_end, region, tenure_band) where is_certified;
 create index if not exists people_snap_worker_month_worker_id_idx on people_v2.people_snap_worker_month (worker_id);
 create index if not exists people_snap_worker_month_org_path_idx on people_v2.people_snap_worker_month using gist (org_path);
 create index if not exists people_snap_requisition_month_requisition_id_idx on people_v2.people_snap_requisition_month (requisition_id);
@@ -667,6 +670,8 @@ create index if not exists people_mart_engagement_wave_org_path_idx on people_v2
 create index if not exists people_mart_source_health_daily_extract_date_idx on people_v2.people_mart_source_health_daily (extract_date);
 create index if not exists people_mart_applicant_flow_job_family_idx on people_v2.people_mart_applicant_flow (job_family);
 create index if not exists people_mart_funnel_monthly_month_start_idx on people_v2.people_mart_funnel_monthly (month_start);
+create index if not exists people_evt_worker_event_type_date_idx on people_v2.people_evt_worker (event_type, event_date);
+create index if not exists people_evt_worker_change_reports_to_idx on people_v2.people_evt_worker_change (event_date, worker_id, change_reason) where property = 'reports_to';
 
 create or replace view people_v2.people_evt_promotion as
   select event_id as promotion_id, worker_id, event_date from people_v2.people_evt_worker where event_type = 'promotion';
@@ -677,5 +682,6 @@ create or replace view people_v2.people_evt_manager_change as
   from people_v2.people_evt_worker w
   left join people_v2.people_evt_worker_change c
     on c.worker_id = w.worker_id and c.event_date = w.event_date and c.property = 'reports_to'
-  where w.event_type = 'manager_change';
+  where w.event_type = 'manager_change'
+    and coalesce(c.change_reason, 'reorg') in ('reorg', 'transfer', 'manager_departure');
 

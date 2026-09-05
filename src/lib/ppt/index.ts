@@ -1,8 +1,10 @@
 export {
   buildExecutiveStory,
+  recommendExecutiveStorySlideCount,
   sanitizeInsightChartSpec,
   sanitizePptText,
   sanitizePptxFileName,
+  STORY_SLIDE_COUNTS,
 } from "./executive-story";
 export {
   buildExecutiveStoryPptx,

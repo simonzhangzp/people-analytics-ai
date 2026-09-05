@@ -1,3 +1,5 @@
+import type { LlmInvocation } from "./agent/llm-invocation";
+
 export type PeopleDemoCase = "trust" | "incident" | "attrition";
 
 export const CASE_FOLLOW_UPS: Record<PeopleDemoCase, string[]> = {
@@ -54,6 +56,8 @@ export interface PeopleAskAnswer {
   error_state?: "rpc" | "critic" | null;
   withheld?: boolean;
   llm_skipped?: string | null;
+  llm_invocation?: LlmInvocation;
+  failure_reason?: string | null;
   trace?: {
     tools: Array<{
       seq: number;
@@ -67,5 +71,8 @@ export interface PeopleAskAnswer {
     latency_ms: number;
     llm_skipped: string | null;
     llm_calls: number;
+    llm_used?: boolean;
+    llm_invocation?: LlmInvocation;
+    failure_reason?: string | null;
   };
 }

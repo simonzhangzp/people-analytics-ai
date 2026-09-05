@@ -40,6 +40,16 @@ export function MetricDefinitionButton({
         <dl className="mt-4 space-y-3 text-[13px] leading-6 text-[#3e4c61]">
           <div>
             <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
+              Grain (must match the figure on the page)
+            </dt>
+            <dd className="mt-1">
+              metric_id {String(def.metric_id ?? "—")} · Scope {String(def.scope ?? "—")} · Window{" "}
+              {String(def.window ?? def.time_logic ?? "—")} · as_of {String(def.as_of ?? "—")}
+              {def.annualized === true ? " · annualized" : ""}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
               Business definition
             </dt>
             <dd className="mt-1">{String(def.business_definition ?? "—")}</dd>

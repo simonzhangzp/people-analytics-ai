@@ -84,6 +84,7 @@ describe("shared AI route guard", () => {
       ),
     ).resolves.toEqual({ status: "live" });
     expect(rpc).toHaveBeenCalledOnce();
+    expect(rpc).toHaveBeenCalledWith("people_consume_ai_quota");
   });
 
   it("distinguishes exhausted and unverifiable quota", async () => {

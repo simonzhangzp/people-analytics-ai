@@ -153,10 +153,26 @@ def build_events_and_gold(con) -> None:
             e.new_value AS new_canonical_id,
             'Employee (extract diff)' AS source_object,
             CASE
-              WHEN e.property = 'reports_to' AND e.change_reason IN ('reorg', 'transfer', 'manager_departure')
-                THEN e.change_reason
-              WHEN e.property = 'reports_to' THEN 'reorg'
-              ELSE NULL
+              WHEN e.property <> 'reports_to' THEN NULL
+              WHEN EXISTS (
+                    SELECT 1 FROM bronze_promotion p
+                    WHERE p.employee = e.worker_id
+                      AND CAST(p.promotion_date AS DATE) = e.event_date
+                      AND coalesce(p.docstatus, 0) = 1
+                  )
+                  OR EXISTS (
+                    SELECT 1 FROM bronze_transfer t
+                    WHERE t.employee = e.worker_id
+                      AND CAST(t.transfer_date AS DATE) = e.event_date
+                      AND coalesce(t.docstatus, 0) = 1
+                  )
+                THEN CASE
+                  WHEN e.change_reason IN ('reorg', 'transfer', 'manager_departure') THEN e.change_reason
+                  ELSE 'transfer'
+                END
+              WHEN e.event_date = last_day(e.event_date) THEN 'rebalance_synthetic'
+              WHEN e.change_reason IN ('reorg', 'transfer', 'manager_departure') THEN e.change_reason
+              ELSE 'reorg'
             END AS change_reason
           FROM extract_raw e
           WHERE NOT EXISTS (
@@ -233,8 +249,25 @@ def build_events_and_gold(con) -> None:
           coalesce(r.new_canonical_id, h.new_value) AS new_canonical_id,
           coalesce(r.source_object, 'Employee (extract diff)') AS source_object,
           CASE
-            WHEN r.change_reason IN ('reorg', 'transfer', 'manager_departure') THEN r.change_reason
+            WHEN r.change_reason IN ('reorg', 'transfer', 'manager_departure', 'rebalance_synthetic')
+              THEN r.change_reason
             WHEN h.property = 'reports_to' AND r.source_object LIKE 'Employee Transfer%' THEN 'transfer'
+            WHEN h.property = 'reports_to'
+                 AND coalesce(r.source_object, 'Employee (extract diff)') LIKE '%extract diff%'
+                 AND h.event_date = last_day(h.event_date)
+                 AND NOT EXISTS (
+                   SELECT 1 FROM bronze_promotion p
+                   WHERE p.employee = h.worker_id
+                     AND CAST(p.promotion_date AS DATE) = h.event_date
+                     AND coalesce(p.docstatus, 0) = 1
+                 )
+                 AND NOT EXISTS (
+                   SELECT 1 FROM bronze_transfer t
+                   WHERE t.employee = h.worker_id
+                     AND CAST(t.transfer_date AS DATE) = h.event_date
+                     AND coalesce(t.docstatus, 0) = 1
+                 )
+              THEN 'rebalance_synthetic'
             WHEN h.property = 'reports_to' THEN coalesce(r.change_reason, 'reorg')
             ELSE r.change_reason
           END AS change_reason
@@ -301,7 +334,8 @@ def build_events_and_gold(con) -> None:
           ON c.worker_id = w.worker_id
          AND c.event_date = w.event_date
          AND c.property = 'reports_to'
-        WHERE w.event_type = 'manager_change';
+        WHERE w.event_type = 'manager_change'
+          AND coalesce(c.change_reason, 'reorg') IN ('reorg', 'transfer', 'manager_departure');
         CREATE OR REPLACE VIEW people_fact_separation AS
         SELECT name, employee, boarding_begins_on, boarding_status, docstatus
         FROM bronze_separation WHERE docstatus = 1;
@@ -695,13 +729,20 @@ def build_events_and_gold(con) -> None:
           count(*) FILTER (WHERE e.event_type = 'promotion') AS promotions,
           count(*) FILTER (WHERE e.event_type = 'transfer') AS transfers,
           count(*) FILTER (WHERE e.event_type IN ('promotion','transfer')) AS internal_mobility,
-          count(*) FILTER (WHERE e.event_type = 'manager_change') AS manager_changes
+          count(*) FILTER (
+            WHERE e.event_type = 'manager_change'
+              AND coalesce(c.change_reason, 'reorg') IN ('reorg', 'transfer', 'manager_departure')
+          ) AS manager_changes
         FROM people_evt_worker e
         JOIN people_hist_worker_attr h
           ON h.worker_id = e.worker_id
          AND h.valid_from <= e.event_date
          AND (h.valid_to IS NULL OR h.valid_to > e.event_date)
         LEFT JOIN people_dim_org o ON o.org_id = h.org_id
+        LEFT JOIN people_evt_worker_change c
+          ON c.worker_id = e.worker_id
+         AND c.event_date = e.event_date
+         AND c.property = 'reports_to'
         WHERE e.event_type IN ('promotion','transfer','manager_change')
         GROUP BY 1,2,3;
 

@@ -536,15 +536,17 @@ Phase 0 期间允许并行的唯一 L2 工作：定义 metric YAML schema（不�
 
 ---
 
-## 8. 实施前需 owner 决策的问题
+## 8. Owner 决策（decided 2026-09-05）
 
-1. Semantic layer 技术路线：自研 YAML → 生成 RPC（推荐，最兼容现有 serving）vs dbt MetricFlow vs Cube
-2. Policy 执行：SQL policy 表 + RLS（推荐，简单）vs OPA / Cedar
-3. `people-mcp` 部署位置（Vercel serverless vs Hetzner）与外部访客 token 模型
-4. min cell size 默认值（建议 5）与 demo 角色集合
-5. Skill 格式是否完全兼容 Agent Skills 规范（便于 Claude / Cursor 直接加载）
-6. attrition_risk 模型是否上公开站（建议只展示 model card + 聚合校准曲线）
-7. 是否引入 ESCO 作为 O*NET 之外的技能分类（面向全球组织的叙事）
+下列选型已锁定。实施不得再开 MetricFlow / Cube / OPA / Cedar / Hetzner MCP / 公开风险分 / ESCO 双 taxonomy，除非 owner 另发书面变更。
+
+1. **Semantic layer — decided: 自研 YAML → 生成 RPC。** 与现网 `people_get_metric*`、RLS、`min_cell` 同一条路径。不引入 dbt MetricFlow 或 Cube。OSI 仅作未来交换格式，现在不接入。
+2. **Policy — decided: SQL policy 表 + Postgres RLS（含 FORCE RLS）。** 不引入 OPA / Cedar。单一 serving 面不设第二套 PDP。
+3. **people-mcp — decided: Vercel `/api/mcp`，公开 demo Bearer → 只映射 `demo-external-viewer`。** 不放 Hetzner。Owner 已用 Cursor 真机测通；`/connect` 保留。Token 轮换 = 改 env 再部署。
+4. **min_cell 与 demo 角色 — decided: YAML 默认 5；访客运行时 50；四身份锁定**（`demo-external-viewer` / `demo-leader-engineering` / `demo-hrbp` / `demo-people-analyst`）。访客不得改回 5。不新增第五个公开 demo 身份。
+5. **Skill 格式 — decided: 暂不宣称兼容 Agent Skills。** Phase 4 的 15 个是 MCP tool schema，不是 `SKILL.md`。Claude / Cursor 可连 MCP，不能把 serving tool 当 Agent Skill 加载。L3 certified skills 落地时再按 Agent Skills 规范另写 `SKILL.md`（调用 MCP，不复制 RPC）。
+6. **attrition_risk 上公开站 — decided: 不上。** 不上个人分、不上可反推的高风险团队榜。将来若有模型，最多 model card + 聚合校准曲线。
+7. **ESCO — decided: 不做。** 技能分类维持 O*NET。欧盟/全球雇主案例出现前不引入第二套 taxonomy。
 
 ---
 

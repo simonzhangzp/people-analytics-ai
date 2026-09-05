@@ -10,7 +10,7 @@ scale=1 before the owner approved step 5 second segment. That process was killed
 import json
 import os
 import sys
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 import shutil
 
@@ -36,7 +36,13 @@ from pipeline.coverage import (
 )
 from pipeline.dq import run_gold_dq
 from pipeline.landing_estimate import parquet_sizes
-from pipeline.lineage import run_lineage, write_manifest
+from pipeline.lineage import (
+    data_v1_commit_sha,
+    git_head,
+    git_is_dirty,
+    run_lineage,
+    write_manifest,
+)
 from pipeline.transform import transform
 
 try:
@@ -64,6 +70,76 @@ def require_owner_approval(argv: list[str]) -> None:
     raise SystemExit(
         "refused: full lake backfill requires PEOPLE_FULL_BACKFILL_APPROVED=1 or "
         "--i-have-owner-approval. Do not start scale=1 just because 5% passed."
+    )
+
+
+def refuse_dirty_full_backfill(argv: list[str]) -> None:
+    """Full simulate wipes bronze. Rebuild-from-bronze / resume-from-lakes may run dirty."""
+    if "--from-bronze" in argv or "--resume-from-lakes" in argv:
+        return
+    if git_is_dirty():
+        raise SystemExit(
+            "refused: git worktree is dirty; full lake backfill requires a clean tree"
+        )
+
+
+def _backfill_mode(argv: list[str]) -> str:
+    if "--resume-from-lakes" in argv:
+        return "resume-from-lakes"
+    if "--from-bronze" in argv:
+        return "from-bronze"
+    return "full-simulate"
+
+
+def _write_run_manifest(argv: list[str], extra: dict | None = None) -> dict:
+    payload = {
+        "started_at": datetime.now(timezone.utc).isoformat(),
+        "git_head": git_head(),
+        "data_v1_tag_sha": data_v1_commit_sha(),
+        "git_dirty": git_is_dirty(),
+        "mode": _backfill_mode(argv),
+        "seed": SEED,
+        "prefix": PREFIX,
+        "control_prefix": CONTROL_PREFIX,
+        "argv": [a for a in argv if a != APPROVAL_FLAG],
+    }
+    if extra:
+        payload.update(extra)
+    write_manifest(OUT / "run_manifest.json", payload)
+    logs = LAKE / "people_logs" / PREFIX
+    logs.mkdir(parents=True, exist_ok=True)
+    write_manifest(logs / "run_manifest.json", payload)
+    print("run_manifest", payload["git_head"], payload["mode"], flush=True)
+    return payload
+
+
+def bronze_lineage_path(prefix: str) -> Path:
+    return LAKE / "people_bronze" / prefix / "_simulator_lineage.json"
+
+
+def read_bronze_simulator_sha(prefix: str) -> str:
+    """Sidecar is authoritative after data-v1. Do not fall back to an older logs/report.json."""
+    path = bronze_lineage_path(prefix)
+    if path.exists():
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            return str(payload.get("simulator_code_sha") or "")
+        except (OSError, json.JSONDecodeError, TypeError):
+            return ""
+    return ""
+
+
+def write_bronze_lineage_sidecar(prefix: str, sha: str, note: str) -> None:
+    dest = bronze_lineage_path(prefix)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    write_manifest(
+        dest,
+        {
+            "simulator_code_sha": sha,
+            "seed": str(SEED),
+            "prefix": prefix,
+            "note": note,
+        },
     )
 
 
@@ -142,11 +218,13 @@ def main(argv: list[str] | None = None) -> int:
         print("rewrote", dest)
         return 0
     require_owner_approval(argv)
+    refuse_dirty_full_backfill(argv)
     try:
         sys.stdout.reconfigure(line_buffering=True)
     except Exception:
         pass
     print("scale", SCALE, "seed", SEED, "publish", False, flush=True)
+    run_manifest = _write_run_manifest(argv)
     resume = "--resume-from-lakes" in argv
     if resume:
         print("resume_from_lakes", PREFIX, CONTROL_PREFIX, flush=True)
@@ -209,6 +287,11 @@ def main(argv: list[str] | None = None) -> int:
     if max_depth > 8:
         print("blocking_org_depth", org)
         blocking.append("org_depth")
+    mgr_ann = float((coverage.get("mobility") or {}).get("manager_change_annualized") or 0)
+    print("manager_change_annualized", mgr_ann, flush=True)
+    if mgr_ann > 1.0 or mgr_ann < 0.05:
+        print("blocking_manager_change_annualized", mgr_ann, coverage.get("mobility"))
+        blocking.append("manager_change_annualized")
     if int(org.get("orphan_manager_at_month_end") or 0) != 0:
         print("blocking_orphan_manager", org)
         blocking.append("orphan_manager")
@@ -270,7 +353,34 @@ def main(argv: list[str] | None = None) -> int:
     if littles.get("rel_gap") is not None and littles["rel_gap"] > 0.5:
         print("blocking_littles_law", littles)
         blocking.append("littles_law")
+    main_bronze_sha = read_bronze_simulator_sha(PREFIX)
+    control_bronze_sha = read_bronze_simulator_sha(CONTROL_PREFIX)
+    frozen_sha = data_v1_commit_sha()
+    if not main_bronze_sha:
+        write_bronze_lineage_sidecar(PREFIX, frozen_sha, "data-v1 bronze; engine frozen")
+        main_bronze_sha = frozen_sha
+    if not control_bronze_sha:
+        write_bronze_lineage_sidecar(CONTROL_PREFIX, frozen_sha, "data-v1 bronze; engine frozen")
+        control_bronze_sha = frozen_sha
+    bronze_sha_match = main_bronze_sha == control_bronze_sha == frozen_sha
+    print(
+        "nocase3_bronze_simulator_sha",
+        control_bronze_sha,
+        "main",
+        main_bronze_sha,
+        "data-v1",
+        frozen_sha,
+        "match",
+        bronze_sha_match,
+        flush=True,
+    )
+    if main_bronze_sha != control_bronze_sha:
+        print("blocking_nocase3_bronze_lineage", main_bronze_sha, control_bronze_sha, flush=True)
+        blocking.append("nocase3_bronze_sha")
     lineage = run_lineage(SEED, LAKE / "people_gold" / PREFIX)
+    lineage["bronze_simulator_code_sha"] = main_bronze_sha
+    lineage["control_bronze_simulator_code_sha"] = control_bronze_sha
+    lineage["nocase3_bronze_sha_match"] = bronze_sha_match
     write_manifest(OUT / "gold_sha256.json", lineage.get("gold_sha256") or {})
     bronze_sizes = parquet_sizes(LAKE / "people_bronze" / PREFIX)
     silver_sizes = parquet_sizes(LAKE / "people_silver" / PREFIX)
@@ -306,6 +416,7 @@ def main(argv: list[str] | None = None) -> int:
         "case3_term_decomposition": decomp,
         "littles_law": littles,
         "lineage": lineage,
+        "run_manifest": run_manifest,
         "blocking": blocking,
         "parquet_bytes": {"bronze": bronze_sizes, "silver": silver_sizes, "gold": gold_sizes},
         "control_prefix": CONTROL_PREFIX,
@@ -317,6 +428,21 @@ def main(argv: list[str] | None = None) -> int:
     logs = LAKE / "people_logs" / PREFIX
     logs.mkdir(parents=True, exist_ok=True)
     (logs / "report.json").write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    _write_run_manifest(
+        argv,
+        {
+            "started_at": run_manifest.get("started_at"),
+            "finished_at": datetime.now(timezone.utc).isoformat(),
+            "ending_certified_headcount": report["ending_certified_headcount"],
+            "blocking": blocking,
+            "manager_change_annualized": (coverage.get("mobility") or {}).get(
+                "manager_change_annualized"
+            ),
+            "nocase3_bronze_sha_match": bronze_sha_match,
+            "bronze_simulator_code_sha": main_bronze_sha,
+            "control_bronze_simulator_code_sha": control_bronze_sha,
+        },
+    )
     _write_markdown(report)
     print("scale", SCALE, "ending", report["ending_certified_headcount"], "hires", hires, "accepted", accepted)
     print("ttf_ratio", ttf_ratio, "case3_delta_pp", measured_delta_pp, "blocking", blocking)

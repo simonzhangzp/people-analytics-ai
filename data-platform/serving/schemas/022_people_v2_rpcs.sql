@@ -14,11 +14,13 @@ $$;
 
 drop function if exists people_v2.people_get_metric(text, date);
 drop function if exists people_v2.people_get_metric(text, date, text);
+drop function if exists people_v2.people_get_metric(text, date, text, text);
 
 create or replace function people_v2.people_get_metric(
   p_metric_id text,
   p_as_of date default null,
-  p_grain text default 'trailing_12m'
+  p_grain text default 'trailing_12m',
+  p_job_family text default null
 )
 returns jsonb
 language plpgsql
@@ -35,6 +37,7 @@ declare
   avg_hc numeric;
   month_hc numeric;
   stages jsonb;
+  job_fam text;
 begin
   if p_metric_id is null or p_metric_id !~ '^[a-z][a-z0-9_]{1,62}$' then
     raise exception 'invalid metric_id' using errcode = '22023';
@@ -48,15 +51,18 @@ begin
   end if;
   as_of := coalesce(p_as_of, people_v2.people_latest_month());
   win_start := as_of - interval '12 months';
+  job_fam := nullif(p_job_family, '');
 
   select count(*) into month_hc
   from people_snap_worker_month
-  where month_end = as_of and is_certified;
+  where month_end = as_of and is_certified
+    and (job_fam is null or job_family = job_fam);
 
   select avg(hc) into avg_hc from (
     select count(*) as hc
     from people_snap_worker_month
     where is_certified and month_end <= as_of and month_end > win_start
+      and (job_fam is null or job_family = job_fam)
     group by month_end
   ) t;
 
@@ -91,12 +97,15 @@ begin
     if grain = 'month' then
       select (count(*) filter (where terminated_in_month and termination_category = 'voluntary')) * 12.0
              / nullif(count(*) filter (where is_certified), 0)
-      into v from people_snap_worker_month where month_end = as_of;
+      into v from people_snap_worker_month
+      where month_end = as_of
+        and (job_fam is null or job_family = job_fam);
     else
       select count(*) filter (where terminated_in_month and termination_category = 'voluntary') * 1.0
              / nullif(avg_hc, 0)
       into v from people_snap_worker_month
-      where month_end <= as_of and month_end > win_start;
+      where month_end <= as_of and month_end > win_start
+        and (job_fam is null or job_family = job_fam);
     end if;
   elsif p_metric_id = 'involuntary_attrition_rate' then
     unit := 'rate';
@@ -311,4 +320,4 @@ end;
 $$;
 
 grant execute on function people_v2.people_latest_month() to people_publisher, people_definer, people_app;
-grant execute on function people_v2.people_get_metric(text, date, text) to people_publisher, people_definer, people_app;
+grant execute on function people_v2.people_get_metric(text, date, text, text) to people_publisher, people_definer, people_app;

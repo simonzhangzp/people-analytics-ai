@@ -4,6 +4,7 @@ import {
   type WorkbenchSupabaseClient,
 } from "@/lib/supabase/browser";
 import type { Json } from "@/lib/supabase/database.types";
+import { PEOPLE_TABLE } from "@/lib/people/tables";
 import type {
   AnalysisQuestion,
   DatasetMetadata,
@@ -26,13 +27,13 @@ const FORBIDDEN_PERSISTENCE_KEYS = new Set([
 ]);
 
 type KnowledgeTableName =
-  | "datasets"
-  | "field_mappings"
-  | "dataset_relationships"
-  | "metric_definitions"
-  | "analysis_questions"
-  | "insights"
-  | "executive_stories";
+  | "people_datasets"
+  | "people_field_mappings"
+  | "people_dataset_relationships"
+  | "people_workbench_metrics"
+  | "people_analysis_questions"
+  | "people_insights"
+  | "people_executive_stories";
 
 export type PersistedDatasetMetadata = Pick<
   DatasetMetadata,
@@ -160,31 +161,31 @@ function entityRecords(knowledge: PersistedWorkbenchKnowledge): Record<
   Array<{ entityKey: string; payload: unknown }>
 > {
   return {
-    datasets: knowledge.datasets.map((dataset) => ({
+    people_datasets: knowledge.datasets.map((dataset) => ({
       entityKey: dataset.id,
       payload: dataset,
     })),
-    field_mappings: knowledge.fieldMappings.map((mapping) => ({
+    people_field_mappings: knowledge.fieldMappings.map((mapping) => ({
       entityKey: mapping.id,
       payload: mapping,
     })),
-    dataset_relationships: knowledge.relationships.map((relationship) => ({
+    people_dataset_relationships: knowledge.relationships.map((relationship) => ({
       entityKey: relationship.id,
       payload: relationship,
     })),
-    metric_definitions: knowledge.metrics.map((metric) => ({
+    people_workbench_metrics: knowledge.metrics.map((metric) => ({
       entityKey: metric.id,
       payload: metric,
     })),
-    analysis_questions: knowledge.questions.map((question) => ({
+    people_analysis_questions: knowledge.questions.map((question) => ({
       entityKey: question.id,
       payload: question,
     })),
-    insights: knowledge.insights.map((insight) => ({
+    people_insights: knowledge.insights.map((insight) => ({
       entityKey: insight.id,
       payload: insight,
     })),
-    executive_stories: knowledge.stories.map((story) => ({
+    people_executive_stories: knowledge.stories.map((story) => ({
       entityKey: story.id,
       payload: story,
     })),
@@ -245,7 +246,7 @@ export class SupabaseKnowledgeRepository {
     const knowledge = serializeWorkbenchKnowledge(state);
 
     const workspaceResult = await this.client
-      .from("workspaces")
+      .from(PEOPLE_TABLE.workspaces)
       .upsert(
         {
           workspace_key: knowledge.workspace.id,
@@ -274,7 +275,7 @@ export class SupabaseKnowledgeRepository {
   ): Promise<PersistedWorkbenchKnowledge | null> {
     const session = await ensureAnonymousSession(this.client);
     const workspaceResult = await this.client
-      .from("workspaces")
+      .from(PEOPLE_TABLE.workspaces)
       .select("id,workspace_key,name")
       .eq("user_id", session.user.id)
       .eq("workspace_key", workspaceKey)
@@ -284,13 +285,13 @@ export class SupabaseKnowledgeRepository {
     const workspace = workspaceResult.data;
 
     const tables: KnowledgeTableName[] = [
-      "datasets",
-      "field_mappings",
-      "dataset_relationships",
-      "metric_definitions",
-      "analysis_questions",
-      "insights",
-      "executive_stories",
+      PEOPLE_TABLE.datasets,
+      PEOPLE_TABLE.fieldMappings,
+      PEOPLE_TABLE.datasetRelationships,
+      PEOPLE_TABLE.workbenchMetrics,
+      PEOPLE_TABLE.analysisQuestions,
+      PEOPLE_TABLE.insights,
+      PEOPLE_TABLE.executiveStories,
     ];
     const results = await Promise.all(
       tables.map(async (table) => {
@@ -316,14 +317,17 @@ export class SupabaseKnowledgeRepository {
         id: workspace.workspace_key,
         name: workspace.name,
       },
-      datasets: payloads.datasets as unknown as PersistedDatasetMetadata[],
-      fieldMappings: payloads.field_mappings as unknown as FieldMapping[],
+      datasets: payloads.people_datasets as unknown as PersistedDatasetMetadata[],
+      fieldMappings: payloads.people_field_mappings as unknown as FieldMapping[],
       relationships:
-        payloads.dataset_relationships as unknown as DatasetRelationship[],
-      metrics: payloads.metric_definitions as unknown as MetricDefinition[],
-      questions: payloads.analysis_questions as unknown as AnalysisQuestion[],
-      insights: payloads.insights as unknown as Insight[],
-      stories: payloads.executive_stories as unknown as ExecutiveStory[],
+        payloads.people_dataset_relationships as unknown as DatasetRelationship[],
+      metrics:
+        payloads.people_workbench_metrics as unknown as MetricDefinition[],
+      questions:
+        payloads.people_analysis_questions as unknown as AnalysisQuestion[],
+      insights: payloads.people_insights as unknown as Insight[],
+      stories:
+        payloads.people_executive_stories as unknown as ExecutiveStory[],
     };
   }
 

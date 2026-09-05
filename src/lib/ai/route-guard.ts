@@ -3,6 +3,7 @@ import {
   assertSafeAIPayload,
   UnsafeAIPayloadError,
 } from "./payload-guard";
+import { PEOPLE_RPC } from "@/lib/people/tables";
 import {
   LLMProviderError,
   type LLMProvider,
@@ -28,7 +29,7 @@ interface QuotaClient {
       error: unknown | null;
     }>;
   };
-  rpc(name: "consume_ai_quota"): Promise<{
+  rpc(name: typeof PEOPLE_RPC.consumeAiQuota): Promise<{
     data: unknown;
     error: unknown | null;
   }>;
@@ -276,7 +277,7 @@ export async function resolveLiveAIAccess(
       );
     }
 
-    const quotaResult = await client.rpc("consume_ai_quota");
+    const quotaResult = await client.rpc(PEOPLE_RPC.consumeAiQuota);
     const quota = (
       Array.isArray(quotaResult.data)
         ? quotaResult.data[0]

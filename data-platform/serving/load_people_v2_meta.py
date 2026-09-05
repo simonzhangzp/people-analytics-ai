@@ -108,23 +108,6 @@ def load_meta(conn) -> None:
                 """,
                 [metric_id],
             )
-        for test_name, group in (
-            ("hist_no_overlap", "temporal"),
-            ("hist_no_gap", "temporal"),
-            ("hist_first_valid_from_eq_hire", "temporal"),
-            ("hires_eq_accepted_offers", "transaction"),
-            ("snapshot_roll_forward", "gold"),
-            ("hist_attr_switch_has_evt_worker_change", "gold"),
-            ("evt_worker_change_has_hist_attr_switch", "gold"),
-        ):
-            cur.execute(
-                """
-                insert into people_v2.people_quality_test (test_name, test_group, blocking)
-                values (%s,%s,true)
-                on conflict (test_name) do nothing
-                """,
-                [test_name, group],
-            )
         cur.execute(
             """
             insert into people_v2.people_lineage (lineage_id, from_object, to_object, via, note)
@@ -132,7 +115,11 @@ def load_meta(conn) -> None:
               ('employee_to_hist', 'frappe_hr.Employee', 'people_hist_worker_attr', 'SCD2 versions', 'BR-WF-008'),
               ('ph_to_change', 'frappe_hr.Employee Property History', 'people_evt_worker_change', 'SOURCE_NESTED', 'T2/T3'),
               ('extract_to_change', 'frappe_hr.Employee', 'people_evt_worker_change', 'extract diff', 'BR-WF-007 T7'),
-              ('eeoc_to_mart', 'people_fact_candidate_eeoc_restricted', 'people_mart_applicant_flow', 'suppress min cell 10', 'lake-only fact')
+              ('eeoc_to_mart', 'people_fact_candidate_eeoc_restricted', 'people_mart_applicant_flow', 'suppress min cell 10', 'lake-only fact'),
+              ('transfer_to_mapping', 'frappe_hr.Employee Transfer', 'people_mappings/frappe_employee_transfer.yml', 'identity', 'Phase 0'),
+              ('mapping_to_canonical', 'people_mappings/frappe_employee_transfer.yml', 'people_evt_transfer', 'canonical_layer', 'Phase 0'),
+              ('canonical_to_metric', 'people_evt_transfer', 'people_metric.internal_mobility_rate', 'gold mart + RPC', 'Phase 0'),
+              ('bls_jolts_calibration', 'bls.JOLTS_quits', 'people_metric.voluntary_attrition_rate', 'calibration only', 'not GlobalTech employees')
             on conflict (lineage_id) do nothing
             """
         )
@@ -153,6 +140,9 @@ def load_meta(conn) -> None:
                     [str(cid), row.get("source_system"), row.get("source_object"), row.get("file")],
                 )
     conn.commit()
+    from load_quality_catalog import upsert_catalog  # noqa: E402
+
+    upsert_catalog(conn)
     load_serving_control(conn)
     print("loaded_people_v2_meta")
 
@@ -198,13 +188,15 @@ def load_serving_control(conn) -> None:
             insert into people_v2.people_serving_pointer (pointer_id, as_of, extract_id, moved, notes)
             values
               ('certified_as_of', date '2026-08-07', %s, true, 'prior full succeeded'),
-              ('fault_extract', date '2026-08-14', %s, %s, 'pointer does not move on isolated extract')
+              ('fault_extract', date '2026-08-14', %s, %s, 'pointer does not move on isolated extract'),
+              ('incident_replay', date '2026-08-14', %s, false, 'Case 2 replay pointer; not current certified')
             on conflict (pointer_id) do update set moved = excluded.moved, extract_id = excluded.extract_id
             """,
             [
                 f"ext-frappe-employee-{prior.get('extract_date') or '2026-08-07'}",
                 f"ext-frappe-employee-{fault.get('extract_date') or '2026-08-14'}",
                 bool(fault.get("pointer_moved")),
+                f"run-{fault.get('extract_date') or '2026-08-14'}",
             ],
         )
         cur.execute(
@@ -224,6 +216,9 @@ def load_serving_control(conn) -> None:
                         "control_total": fault.get("control_total"),
                         "rows_received": fault.get("rows_received"),
                         "mode": fault.get("mode"),
+                        "missing_count": int(fault.get("control_total") or 0)
+                        - int(fault.get("rows_received") or 0),
+                        "apac_rows_received_pct": 0.35,
                     }
                 ),
             ],
@@ -250,5 +245,25 @@ def load_serving_control(conn) -> None:
             on conflict (metric_id) do update set reason = excluded.reason, as_of = now()
             """
         )
+        failed = {str(row.get("test_name")) for row in (report.get("dq_failed") or []) if isinstance(row, dict)}
+        for test_name in (
+            "hist_no_overlap",
+            "hist_no_gap",
+            "hist_first_valid_from_eq_hire",
+            "hires_eq_accepted_offers",
+            "snapshot_roll_forward",
+            "hist_attr_switch_has_evt_worker_change",
+            "evt_worker_change_has_hist_attr_switch",
+            "snap_recruiter_id_subseteq_dim_recruiter",
+        ):
+            cur.execute(
+                """
+                insert into people_v2.people_quality_result
+                  (test_name, run_id, status, observed_value, expected_value, details)
+                values (%s, 'data-v1', %s, %s, 'passed', 'gold rebuild')
+                on conflict (test_name, run_id) do update set status = excluded.status
+                """,
+                [test_name, "failed" if test_name in failed else "passed", "failed" if test_name in failed else "ok"],
+            )
     conn.commit()
     print("loaded_people_v2_serving_control")

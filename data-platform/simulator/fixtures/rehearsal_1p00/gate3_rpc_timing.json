@@ -1,0 +1,78 @@
+{
+  "ref": "zapmigfrtnwnkmezjefx",
+  "calls": [
+    {
+      "name": "case1_headcount_eng",
+      "p50_ms": 38.9,
+      "p95_ms": 90.4,
+      "max_ms": 92.0,
+      "n": 7
+    },
+    {
+      "name": "case1_headcount_co",
+      "p50_ms": 90.0,
+      "p95_ms": 90.9,
+      "max_ms": 90.9,
+      "n": 7
+    },
+    {
+      "name": "case3_vol_eng",
+      "p50_ms": 100.3,
+      "p95_ms": 102.2,
+      "max_ms": 103.5,
+      "n": 7
+    },
+    {
+      "name": "case3_breakdown",
+      "p50_ms": 32.7,
+      "p95_ms": 35.2,
+      "max_ms": 46.8,
+      "n": 7
+    },
+    {
+      "name": "case3_trend",
+      "p50_ms": 179.6,
+      "p95_ms": 242.9,
+      "max_ms": 246.5,
+      "n": 7
+    },
+    {
+      "name": "case3_signals",
+      "p50_ms": 484.6,
+      "p95_ms": 495.4,
+      "max_ms": 2555.5,
+      "n": 7
+    }
+  ],
+  "over_2s": [],
+  "role_switch": [
+    {
+      "identity": "demo-external-viewer",
+      "min_cell": 50,
+      "cells": 104,
+      "suppressed": 44,
+      "ms": 54.3
+    },
+    {
+      "identity": "demo-leader-engineering",
+      "min_cell": 20,
+      "cells": 104,
+      "suppressed": 42,
+      "ms": 31.0
+    },
+    {
+      "identity": "demo-hrbp",
+      "min_cell": 10,
+      "cells": 104,
+      "suppressed": 34,
+      "ms": 32.2
+    },
+    {
+      "identity": "demo-people-analyst",
+      "min_cell": 5,
+      "cells": 104,
+      "suppressed": 30,
+      "ms": 31.4
+    }
+  ]
+}

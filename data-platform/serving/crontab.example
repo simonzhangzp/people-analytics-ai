@@ -1,0 +1,6 @@
+# Hetzner cron is thaw-only. Serving healthcheck runs on Vercel Cron
+# (GET /api/cron/people-healthcheck, once per UTC day). Do not install a
+# frozen daily_step job here — it never lived at /opt/people.
+#
+# After data-v2 engine thaw:
+# 15 6 * * * PEOPLE_DAILY_MODE=thaw /usr/bin/python3 /home/edgeai/Job_Application/data-platform/serving/daily_step.py >> /home/edgeai/logs/people-thaw.log 2>&1

@@ -6,8 +6,8 @@ import { CASES } from "@/lib/people/demo-cases";
 
 export function CaseSelector({ active }: { active?: "trust" | "incident" | "attrition" }) {
   return (
-    <nav className="flex flex-wrap gap-2" aria-label="Case studies">
-      {CASES.map((item) => {
+    <nav className="flex flex-col gap-2" aria-label="Case studies">
+      {CASES.map((item, index) => {
         const isActive = item.id === active;
         return (
           <Link
@@ -19,6 +19,9 @@ export function CaseSelector({ active }: { active?: "trust" | "incident" | "attr
                 : "border-[#e3e7ed] bg-white text-[#546277] hover:border-[#c5cdd8]"
             }`}
           >
+            <span className="block text-[10px] font-bold uppercase tracking-[0.12em] text-[#738097]">
+              Case {index + 1}
+            </span>
             {item.question}
           </Link>
         );
@@ -46,19 +49,46 @@ export function WhyIBuiltThis() {
   );
 }
 
+const STAGE: Record<string, { stage: string; question: string }> = {
+  trust: { stage: "Measurement", question: "Can this Headcount number be used in a decision?" },
+  incident: { stage: "Data", question: "Is the drop a workforce change or a feed failure?" },
+  attrition: { stage: "Analysis", question: "Where is Engineering attrition concentrating?" },
+};
+
 export function DemoShell({
   children,
   active,
+  railExtra,
+  ai,
 }: {
   children: React.ReactNode;
   active?: "trust" | "incident" | "attrition";
+  railExtra?: React.ReactNode;
+  ai?: React.ReactNode;
 }) {
+  const stage = active ? STAGE[active] : undefined;
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-[#111827]">
       <SiteHeader active="/enterprise-demo" />
-      <div className="mx-auto max-w-[980px] px-5 py-8 sm:px-8">
-        <CaseSelector active={active} />
-        <div className="mt-8">{children}</div>
+      <div className="mx-auto max-w-[1100px] px-5 py-8 sm:px-8">
+        <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)_280px]">
+          <aside className="space-y-4">
+            <div className="surface p-4">
+              <p className="eyebrow">Workflow</p>
+              <p className="mt-2 text-[13px] font-semibold text-[#1c2b44]">{stage?.stage ?? "Strategy"}</p>
+              <p className="mt-2 text-[12px] leading-5 text-[#546277]">{stage?.question}</p>
+            </div>
+            <CaseSelector active={active} />
+            {railExtra}
+          </aside>
+          <div>{children}</div>
+          <aside className="space-y-4">
+            {ai}
+            <p className="text-[11px] leading-5 text-[#667085]">
+              Case pages read certified aggregates only.
+            </p>
+          </aside>
+        </div>
       </div>
       <SiteFooter />
     </div>
@@ -75,8 +105,9 @@ export function ServingUnavailable() {
           People serving is not configured
         </h1>
         <p className="mt-4 text-[15px] leading-7 text-[#536177]">
-          Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to the People
-          staging project to load certified marts.
+          Set server-only PEOPLE_DB_URL (transaction pooler 6543, role people_app) and
+          PEOPLE_SERVING_REF=zapmigfrtnwnkmezjefx. The v2 path does not use
+          NEXT_PUBLIC_SUPABASE_*.
         </p>
       </main>
       <SiteFooter />

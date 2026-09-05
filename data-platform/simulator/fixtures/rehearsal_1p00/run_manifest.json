@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "--from-bronze"
+  ],
+  "blocking": [],
+  "bronze_simulator_code_sha": "b28c0083378241492c1d30d4e557f040644624a9",
+  "control_bronze_simulator_code_sha": "b28c0083378241492c1d30d4e557f040644624a9",
+  "control_prefix": "rehearsal_1p00_nocase3",
+  "data_v1_tag_sha": "b28c0083378241492c1d30d4e557f040644624a9",
+  "ending_certified_headcount": 49823,
+  "finished_at": "2026-09-04T16:12:22.734709+00:00",
+  "git_dirty": true,
+  "git_head": "b28c0083378241492c1d30d4e557f040644624a9",
+  "manager_change_annualized": 0.2616,
+  "mode": "from-bronze",
+  "nocase3_bronze_sha_match": true,
+  "prefix": "rehearsal_1p00",
+  "seed": 20260301,
+  "started_at": "2026-09-04T15:46:31.119029+00:00"
+}

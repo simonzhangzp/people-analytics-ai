@@ -14,7 +14,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InsightChart } from "@/components/workbench/analysis/InsightChart";
-import type { ExecutiveStory, Insight } from "@/types/workbench";
+import {
+  recommendExecutiveStorySlideCount,
+  STORY_SLIDE_COUNTS,
+} from "@/lib/ppt";
+import type {
+  ExecutiveStory,
+  Insight,
+  StorySlideCount,
+} from "@/types/workbench";
 
 type Audience = ExecutiveStory["audience"];
 type Purpose = ExecutiveStory["purpose"];
@@ -27,7 +35,7 @@ interface StoryBuilderProps {
   onBuildStory: (
     audience: Audience,
     purpose: Purpose,
-    slideCount: 3 | 5,
+    slideCount: StorySlideCount,
   ) => Promise<void> | void;
   onExport: () => Promise<void> | void;
 }
@@ -42,8 +50,23 @@ export function StoryBuilder({
 }: StoryBuilderProps) {
   const [audience, setAudience] = useState<Audience>("HR Leadership Team");
   const [purpose, setPurpose] = useState<Purpose>("Recommend action");
-  const [slideCount, setSlideCount] = useState<3 | 5>(3);
+  const [lengthOffset, setLengthOffset] = useState(0);
   const selected = insights.filter((insight) => insight.selectedForExecutiveStory);
+  const recommendedSlideCount = recommendExecutiveStorySlideCount(insights);
+  const recommendedIndex = STORY_SLIDE_COUNTS.indexOf(recommendedSlideCount);
+  const selectedLengthIndex = Math.max(
+    0,
+    Math.min(
+      STORY_SLIDE_COUNTS.length - 1,
+      recommendedIndex + lengthOffset,
+    ),
+  );
+  const slideCount = STORY_SLIDE_COUNTS[
+    selectedLengthIndex
+  ] as StorySlideCount;
+  const canShorten = selectedLengthIndex > 0;
+  const canLengthen =
+    selectedLengthIndex < STORY_SLIDE_COUNTS.length - 1;
 
   return (
     <div className="mx-auto w-full max-w-[1080px] px-5 py-8 sm:px-8 lg:px-10">
@@ -117,20 +140,84 @@ export function StoryBuilder({
               <legend className="text-[10px] font-bold uppercase tracking-[0.07em] text-[#818a99]">
                 Length
               </legend>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {([3, 5] as const).map((count) => (
+              <div
+                className="mt-2 rounded-[7px] border border-[#dce3f1] bg-[#f7f9fd] px-3 py-2.5"
+                data-testid="story-length-recommendation"
+              >
+                <p className="text-[12px] font-semibold text-[#344d83]">
+                  {recommendedSlideCount} slides recommended
+                </p>
+                <p className="mt-1 text-[10px] leading-4 text-[#6c7890]">
+                  Based on {selected.length} selected finding
+                  {selected.length === 1 ? "" : "s"}, charts, evidence, and
+                  narrative density.
+                </p>
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {(
+                  [
+                    {
+                      id: "shorter",
+                      label: "Shorter",
+                      disabled: !canShorten,
+                    },
+                    {
+                      id: "recommended",
+                      label: "Recommended",
+                      disabled: false,
+                    },
+                    {
+                      id: "longer",
+                      label: "Longer",
+                      disabled: !canLengthen,
+                    },
+                  ] as const
+                ).map((option) => (
                   <button
-                    key={count}
+                    key={option.id}
                     type="button"
-                    aria-pressed={slideCount === count}
-                    onClick={() => setSlideCount(count)}
-                    className={`min-h-10 rounded-[6px] border text-[12px] font-semibold ${
-                      slideCount === count
+                    aria-pressed={
+                      option.id === "recommended"
+                        ? lengthOffset === 0
+                        : option.id === "shorter"
+                          ? lengthOffset < 0
+                          : lengthOffset > 0
+                    }
+                    disabled={option.disabled}
+                    onClick={() =>
+                      setLengthOffset(
+                        option.id === "recommended"
+                          ? 0
+                          : option.id === "shorter"
+                            ? selectedLengthIndex - 1 - recommendedIndex
+                            : selectedLengthIndex + 1 - recommendedIndex,
+                      )
+                    }
+                    className={`min-h-11 rounded-[6px] border px-1 text-[10px] font-semibold disabled:cursor-not-allowed disabled:opacity-45 ${
+                      (option.id === "recommended" && lengthOffset === 0) ||
+                      (option.id === "shorter" && lengthOffset < 0) ||
+                      (option.id === "longer" && lengthOffset > 0)
                         ? "border-[#8fa3d9] bg-[#eef2fb] text-[#3153ad]"
                         : "border-[#d7dce4] bg-white text-[#617086]"
                     }`}
+                    data-testid={`story-length-${option.id}`}
                   >
-                    {count} slides
+                    <span className="block">{option.label}</span>
+                    <span className="mt-0.5 block font-medium">
+                      {option.id === "shorter"
+                        ? STORY_SLIDE_COUNTS[
+                            Math.max(0, selectedLengthIndex - 1)
+                          ]
+                        : option.id === "longer"
+                          ? STORY_SLIDE_COUNTS[
+                              Math.min(
+                                STORY_SLIDE_COUNTS.length - 1,
+                                selectedLengthIndex + 1,
+                              )
+                            ]
+                          : recommendedSlideCount}{" "}
+                      slides
+                    </span>
                   </button>
                 ))}
               </div>
@@ -143,7 +230,9 @@ export function StoryBuilder({
               data-testid="generate-story"
             >
               <Sparkles aria-hidden="true" className="size-4" />
-              {story ? "Regenerate preview" : "Generate preview"}
+              {story
+                ? `Regenerate ${slideCount}-slide story`
+                : `Generate ${slideCount}-slide story`}
             </Button>
 
             <div className="mt-4 flex items-start gap-2 rounded-[7px] border border-[#d9e4dd] bg-[#f6faf7] p-3">
@@ -233,8 +322,8 @@ export function StoryBuilder({
                   Select validated findings and generate a preview
                 </p>
                 <p className="mx-auto mt-2 max-w-sm text-[11px] leading-5 text-[#7b8494]">
-                  A 3-slide brief focuses on the decision; a 5-slide diagnostic adds
-                  evidence depth and limitations.
+                  Start with the recommended length, then make the story shorter
+                  or longer before generating it.
                 </p>
               </div>
             </div>

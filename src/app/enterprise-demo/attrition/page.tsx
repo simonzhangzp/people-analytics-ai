@@ -5,7 +5,7 @@ import { MetricDefinitionButton } from "@/components/enterprise-demo/MetricDefin
 import { RoleSwitcher } from "@/components/enterprise-demo/RoleSwitcher";
 import { TrendSparkline } from "@/components/enterprise-demo/TrendSparkline";
 import { asList, asRecord, formatRate } from "@/lib/people/format";
-import { DEFAULT_IDENTITY } from "@/lib/people/demo-identities";
+import { DEFAULT_IDENTITY, identityShowsCompaRatio } from "@/lib/people/demo-identities";
 import { loadAttritionCase } from "@/lib/people/demo-payload";
 import { learningRecommendationsForGaps } from "@/lib/people/learn-catalog";
 import { VOL_T12M_WINDOW } from "@/lib/people/metric-grain";
@@ -138,15 +138,27 @@ export default async function AttritionCasePage({
           </p>
         </section>
 
-        <section className="mt-8">
+        <section className="mt-8" data-testid="related-signals">
           <p className="eyebrow">Related signals</p>
           <ul className="mt-3 space-y-1 text-[13px] leading-6 text-[#3e4c61]">
-            {compa.map((row) => (
-              <li key={String(row.group)}>
-                Compa-ratio {String(row.group)} median {Number(row.median_compa ?? 0).toFixed(2)} (n=
-                {String(row.n)})
+            {identityShowsCompaRatio(identity) ? (
+              <>
+                {compa.map((row) => (
+                  <li key={String(row.group)}>
+                    Compa-ratio {String(row.group)} median {Number(row.median_compa ?? 0).toFixed(2)} (n=
+                    {String(row.n)})
+                  </li>
+                ))}
+                <li className="text-[12px] text-[#667085]" data-testid="related-signals-compa-note">
+                  Scenario control vs slice aggregates; not a substitute for the certified Engineering
+                  median.
+                </li>
+              </>
+            ) : (
+              <li data-testid="related-signals-compa-gate">
+                Compa-ratio comparison is available to internal People identities.
               </li>
-            ))}
+            )}
             {mgr.map((row) => (
               <li key={String(row.group)}>
                 Reorg-class manager change {String(row.group)}: {String(row.manager_changes)} events
@@ -167,7 +179,11 @@ export default async function AttritionCasePage({
             <ul className="mt-2 space-y-2 text-[13px] leading-6 text-[#3e4c61]">
               <li>The voluntary attrition definition, period, and grain are certified.</li>
               <li>Rates are not uniform across Engineering locations and tenure bands.</li>
-              <li>Compa-ratio lag and reorg-class manager change are related signals, not causes.</li>
+              <li>
+                {identityShowsCompaRatio(identity)
+                  ? "Compa-ratio lag and reorg-class manager change are related signals, not causes."
+                  : "Reorg-class manager change is a related signal, not a cause."}
+              </li>
             </ul>
           </section>
           <section className="surface p-4" data-testid="unknown-evidence">

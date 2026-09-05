@@ -4,6 +4,7 @@ import type {
   ExecutiveStory,
   Insight,
   InsightChartSpec,
+  StorySlideCount,
 } from "@/types/workbench";
 
 const MAX_TEXT_LENGTH = 2_000;
@@ -45,6 +46,71 @@ const FIVE_SLIDE_KICKERS = [
   "Diagnostic deck · Evidence boundary",
   "Diagnostic deck · Decision context",
 ] as const;
+
+const SEVEN_SLIDE_KICKERS = [
+  "Decision deck · Executive answer",
+  "Decision deck · What changed",
+  "Decision deck · Where it concentrates",
+  "Decision deck · Supporting evidence",
+  "Decision deck · Evidence boundary",
+  "Decision deck · Decision options",
+  "Decision deck · Recommended next step",
+] as const;
+
+export const STORY_SLIDE_COUNTS = [3, 5, 7] as const;
+
+function eligibleStoryInsights(insights: readonly Insight[]): Insight[] {
+  return insights.filter(
+    (insight) =>
+      insight.validated === true &&
+      insight.selectedForExecutiveStory === true,
+  );
+}
+
+export function recommendExecutiveStorySlideCount(
+  insights: readonly Insight[],
+): StorySlideCount {
+  const eligible = eligibleStoryInsights(insights);
+  if (eligible.length === 0) return 3;
+  const contentCharacters = eligible.reduce(
+    (total, insight) =>
+      total +
+      insight.headline.length +
+      insight.finding.length +
+      insight.evidence.reduce(
+        (evidenceTotal, item) =>
+          evidenceTotal +
+          item.label.length +
+          item.value.length +
+          (item.detail?.length ?? 0),
+        0,
+      ) +
+      insight.limitations.reduce(
+        (limitationTotal, item) => limitationTotal + item.length,
+        0,
+      ),
+    0,
+  );
+  const evidenceCount = eligible.reduce(
+    (total, insight) => total + insight.evidence.length,
+    0,
+  );
+  const chartCount = eligible.filter((insight) => insight.chartSpec).length;
+  const contentScore =
+    eligible.length * 2 +
+    Math.ceil(contentCharacters / 700) +
+    chartCount +
+    Math.ceil(evidenceCount / 3);
+
+  if (eligible.length >= 5 || contentScore >= 16) return 7;
+  if (eligible.length >= 3 || contentScore >= 8) return 5;
+  return 3;
+}
+
+function kickersForSlideCount(slideCount: StorySlideCount) {
+  if (slideCount === 7) return SEVEN_SLIDE_KICKERS;
+  return slideCount === 5 ? FIVE_SLIDE_KICKERS : THREE_SLIDE_KICKERS;
+}
 
 function decodeHtmlEntities(value: string): string {
   return value
@@ -320,7 +386,7 @@ function stableHash(value: string): string {
 }
 
 /**
- * Builds a fixed 3-page executive brief or 5-page diagnostic deck exclusively
+ * Builds a 3-page brief, 5-page diagnostic, or 7-page decision deck exclusively
  * from selected, validated Insight objects. It never receives or reads datasets.
  *
  * If fewer eligible insights than pages are supplied, eligible insights repeat
@@ -332,17 +398,13 @@ export function buildExecutiveStory(
   workspaceId: string,
   audience: ExecutiveStory["audience"],
   purpose: ExecutiveStory["purpose"],
-  slideCount: 3 | 5 = 3,
+  slideCount: StorySlideCount = 3,
 ): ExecutiveStory {
-  if (slideCount !== 3 && slideCount !== 5) {
-    throw new RangeError("Executive stories support exactly 3 or 5 slides.");
+  if (!STORY_SLIDE_COUNTS.includes(slideCount)) {
+    throw new RangeError("Executive stories support exactly 3, 5, or 7 slides.");
   }
 
-  const eligibleInsights = insights.filter(
-    (insight) =>
-      insight.validated === true &&
-      insight.selectedForExecutiveStory === true,
-  );
+  const eligibleInsights = eligibleStoryInsights(insights);
 
   if (eligibleInsights.length === 0) {
     throw new Error(
@@ -359,8 +421,7 @@ export function buildExecutiveStory(
       ...eligibleInsights.map((insight) => insight.id),
     ].join("|"),
   )}`;
-  const kickers =
-    slideCount === 3 ? THREE_SLIDE_KICKERS : FIVE_SLIDE_KICKERS;
+  const kickers = kickersForSlideCount(slideCount);
   const slides = Array.from({ length: slideCount }, (_, index) => {
     const insight = eligibleInsights[index % eligibleInsights.length];
     return slideFromInsight(insight, index, kickers[index], storyKey);

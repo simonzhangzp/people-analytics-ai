@@ -152,10 +152,11 @@
     "mobility": {
       "promotion_count": 17797,
       "transfer_count": 11408,
-      "manager_change_count": 312144,
+      "manager_change_count": 55303,
+      "manager_change_synthetic_count": 256841,
       "promotion_annualized": 0.0842,
       "transfer_annualized": 0.054,
-      "manager_change_annualized": 1.4764,
+      "manager_change_annualized": 0.2616,
       "baseline": {
         "promotion": 0.08,
         "transfer": 0.06,
@@ -183,22 +184,22 @@
         },
         {
           "job_family": "Other",
-          "skill_id": "Stakeholder",
-          "gap": 0.9962
-        },
-        {
-          "job_family": "Other",
           "skill_id": "Org Design",
           "gap": 0.9962
         },
         {
           "job_family": "Other",
-          "skill_id": "People Leadership",
+          "skill_id": "Stakeholder",
           "gap": 0.9962
         },
         {
           "job_family": "Other",
           "skill_id": "Strategy",
+          "gap": 0.9962
+        },
+        {
+          "job_family": "Other",
+          "skill_id": "People Leadership",
           "gap": 0.9962
         },
         {
@@ -794,55 +795,55 @@
       {
         "group": "control",
         "n_workers": 47674,
-        "manager_changes_since_2025q4": 74390,
-        "changes_per_worker": 1.5604
+        "manager_changes_since_2025q4": 10165,
+        "changes_per_worker": 0.2132
       },
       {
         "group": "slice",
         "n_workers": 2149,
-        "manager_changes_since_2025q4": 3870,
-        "changes_per_worker": 1.8008
+        "manager_changes_since_2025q4": 551,
+        "changes_per_worker": 0.2564
       }
     ],
     "case3_manager_change_reorg": [
-      {
-        "group": "control",
-        "n_workers": 47674,
-        "manager_changes_since_2025q4": 1909,
-        "changes_per_worker": 0.04
-      },
       {
         "group": "slice",
         "n_workers": 2149,
         "manager_changes_since_2025q4": 212,
         "changes_per_worker": 0.0987
+      },
+      {
+        "group": "control",
+        "n_workers": 47674,
+        "manager_changes_since_2025q4": 1908,
+        "changes_per_worker": 0.04
       }
     ],
     "case3_manager_change_by_reason": [
       {
         "group": "control",
         "change_reason": "manager_departure",
-        "n": 6319
+        "n": 5516
       },
       {
         "group": "control",
         "change_reason": "reorg",
-        "n": 65336
+        "n": 1913
       },
       {
         "group": "control",
         "change_reason": "transfer",
-        "n": 2735
+        "n": 2736
       },
       {
         "group": "slice",
         "change_reason": "manager_departure",
-        "n": 300
+        "n": 254
       },
       {
         "group": "slice",
         "change_reason": "reorg",
-        "n": 3486
+        "n": 213
       },
       {
         "group": "slice",
@@ -853,15 +854,15 @@
     "manager_change_counts": [
       {
         "change_reason": "manager_departure",
-        "n": 34315
+        "n": 29539
       },
       {
         "change_reason": "reorg",
-        "n": 263046
+        "n": 10979
       },
       {
         "change_reason": "transfer",
-        "n": 14783
+        "n": 14785
       }
     ],
     "case4_scorecard_delay": [
@@ -880,16 +881,16 @@
     ],
     "case4_time_to_fill": [
       {
-        "group": "other_hm",
-        "ttf_p50_days": 34.0,
-        "ttf_p90_days": 84.2,
-        "n": 469
-      },
-      {
         "group": "slow_hm",
         "ttf_p50_days": 55.5,
         "ttf_p90_days": 122.1,
         "n": 310
+      },
+      {
+        "group": "other_hm",
+        "ttf_p50_days": 34.0,
+        "ttf_p90_days": 84.2,
+        "n": 469
       }
     ],
     "case4_onsite_aging": [
@@ -1093,7 +1094,9 @@
     "recruiter_load": 7.9455
   },
   "lineage": {
-    "simulator_code_sha": "4668c2c2d59ddd7365b5dffb9dfdebc48614cde2",
+    "simulator_code_sha": "b28c0083378241492c1d30d4e557f040644624a9",
+    "pipeline_code_sha": "b28c0083378241492c1d30d4e557f040644624a9",
+    "git_dirty": true,
     "seed": "20260301",
     "baseline_sha": "e3ee34e26d64cb3a439f2c5457d33090c3ae218190af8956bdb4de8b81928e25",
     "scenario_versions": {
@@ -1114,7 +1117,7 @@
       "people_dim_requisition.parquet": "084d89bca069231132ecf692cd74b139e820f0a9aef44c0cfb3b53da2dbb7012",
       "people_dim_worker.parquet": "e263a03310b5d22999875f2811cf8f224453af976f79fc1666cca343504671ae",
       "people_evt_application_stage.parquet": "58e5a708306d9dd179b63b616d7f42a65a5a33e2293442234f03c98698579025",
-      "people_evt_manager_change.parquet": "29a0dea282940678b9816275a2304cdfd2d22bb7ef2415b66566207b6684369f",
+      "people_evt_manager_change.parquet": "4af080ea567ed700b2968dbe7052b703a2f2c489f2665311c04cf88fa0b8b553",
       "people_evt_promotion.parquet": "629dc5e84c2d45e3d5412bc756d4c70c1ab68cd7af58b6ba6a292ae96e335d1c",
       "people_evt_transfer.parquet": "1dee8683a59c16ebb663188c37a907cd8ebf1cf1ef547e3d3e25d4a9fa6e530b",
       "people_fact_application.parquet": "c5b1ad9001275e2cfe2ce17cd3df56cc18b94b47d4e01182d376e3f917e99567",
@@ -1132,19 +1135,35 @@
       "people_mart_engagement_wave.parquet": "18454cbced9aad79a6b87658db3a2efbbc451ea586c146fe23c812ccfe738662",
       "people_mart_funnel_monthly.parquet": "93782b373dea2aa5c60c6634ad8d1df725606050eeec310acd230bee9a46a692",
       "people_mart_learning_monthly.parquet": "6ab343f7c2c220f6e09b180ce1df9a65a8ac9e8cc4b2c57599776b551a093f45",
-      "people_mart_mobility_monthly.parquet": "9dc6f09676f0e67b19804190678171360363cfcfc74f9b9dc149cbe652a21cd4",
+      "people_mart_mobility_monthly.parquet": "3b434ce0d53bef297b5e03a9e12bec85be1148723472b8c89bef6f5fb66920a0",
       "people_mart_recruiter_load_monthly.parquet": "9f43908dccc8e2840533da3179dd91b4d57c4d03e7b70d075139ddc3e3ffd4b9",
       "people_mart_recruiting_monthly.parquet": "16e296488e82642265f859bc75205e1b1e4ee2e5c97c149c82ee7f869f303b0d",
       "people_mart_skill_coverage_monthly.parquet": "47fa24ba03050eec16963f4e2f11f0e2921af397fe9389d47cdf3ef2bde4262d",
-      "people_mart_source_health_daily.parquet": "f45ea508d0c2233d14655fdb67ba532356bcf51f7b167ab7c56ce3275eb6fc59",
+      "people_mart_source_health_daily.parquet": "3d5ca7078a6baa9ac719279bfe6c9fe007a6a5711e55a6c4e4e2bdce4c22bf0f",
       "people_mart_stage_aging_monthly.parquet": "5da5218208bd2e9a8a948463ddafbba7f52848bb2b30cbd266e94848bf22f123",
       "people_mart_workforce_monthly.parquet": "56482bdc7d0f898ee84928b25c93b917f31c5de9efded8e14eda8800a4139b7d",
       "people_mart_workforce_monthly_2d.parquet": "3f1b73ef03810ec73753a4da3cf86637e8924c58427539ebae281e8d5b148039",
       "people_ref_comp_band.parquet": "fb28318b12959dbbcc51638554f46bc00bdc28883b964d63353578ecb0215a26",
       "people_snap_recruiter_month.parquet": "9f43908dccc8e2840533da3179dd91b4d57c4d03e7b70d075139ddc3e3ffd4b9",
       "people_snap_requisition_month.parquet": "5dc19464e2d54a6f1fd12d67b1d9b63df94a4e3cc355c2d37fc147906e43798d",
-      "people_snap_worker_month.parquet": "a1de36711be6eac2aef4509a01a0b60fb52f48f908c531aec9a84b5c26c6f137"
-    }
+      "people_snap_worker_month.parquet": "6d1cbf920bd75bb80339b55e0b1fbe5949d2bb0691f2c6bc3e6d5124fa897e44"
+    },
+    "bronze_simulator_code_sha": "b28c0083378241492c1d30d4e557f040644624a9",
+    "control_bronze_simulator_code_sha": "b28c0083378241492c1d30d4e557f040644624a9",
+    "nocase3_bronze_sha_match": true
+  },
+  "run_manifest": {
+    "started_at": "2026-09-04T15:46:31.119029+00:00",
+    "git_head": "b28c0083378241492c1d30d4e557f040644624a9",
+    "data_v1_tag_sha": "b28c0083378241492c1d30d4e557f040644624a9",
+    "git_dirty": true,
+    "mode": "from-bronze",
+    "seed": 20260301,
+    "prefix": "rehearsal_1p00",
+    "control_prefix": "rehearsal_1p00_nocase3",
+    "argv": [
+      "--from-bronze"
+    ]
   },
   "blocking": [],
   "parquet_bytes": {
@@ -1196,16 +1215,16 @@
     },
     "silver": {
       "people_dim_appraisal_cycle": 865,
-      "people_dim_candidate": 68057845,
+      "people_dim_candidate": 68015685,
       "people_dim_date": 906,
       "people_dim_grade": 1222,
       "people_dim_job": 1123,
       "people_dim_learning_resource": 1100,
       "people_dim_location": 1111,
       "people_dim_org": 2127,
-      "people_dim_person": 1307793,
-      "people_dim_person_restricted": 2221737,
-      "people_dim_recruiter": 1627,
+      "people_dim_person": 1307073,
+      "people_dim_person_restricted": 2221419,
+      "people_dim_recruiter": 3474,
       "people_dim_rejection_reason": 571,
       "people_dim_requisition": 1324069,
       "people_dim_skill": 1267,
@@ -1213,31 +1232,31 @@
       "people_dim_stage": 22237,
       "people_dim_survey_item": 895,
       "people_dim_survey_wave": 979,
-      "people_dim_worker": 2691642,
+      "people_dim_worker": 2686528,
       "people_evt_application_stage": 98155916,
-      "people_evt_manager_change": 4498058,
-      "people_evt_promotion": 239363,
-      "people_evt_transfer": 157852,
-      "people_evt_worker": 23995370,
-      "people_evt_worker_change": 8919943,
-      "people_fact_application": 92001260,
+      "people_evt_manager_change": 938218,
+      "people_evt_promotion": 239618,
+      "people_evt_transfer": 157675,
+      "people_evt_worker": 16488300,
+      "people_evt_worker_change": 9183820,
+      "people_fact_application": 92060986,
       "people_fact_appraisal": 2584148,
       "people_fact_candidate_demographic_restricted": 60256313,
       "people_fact_candidate_eeoc_restricted": 45083004,
-      "people_fact_comp_assignment": 3550766,
-      "people_fact_comp_assignment_restricted": 5340732,
-      "people_fact_interview": 21771930,
+      "people_fact_comp_assignment": 3563445,
+      "people_fact_comp_assignment_restricted": 5362675,
+      "people_fact_interview": 21766764,
       "people_fact_offer": 1081308,
-      "people_fact_scorecard": 29956060,
+      "people_fact_scorecard": 29937811,
       "people_fact_separation": 430533,
-      "people_fact_training_participation": 6557817,
+      "people_fact_training_participation": 6558220,
       "people_fact_worker_skill": 2356498,
-      "people_hist_worker_attr": 9747775,
-      "people_ref_city": 485,
+      "people_hist_worker_attr": 9678860,
+      "people_ref_city": 484,
       "people_ref_comp_band": 1323,
-      "people_ref_job_skill_target": 1269,
+      "people_ref_job_skill_target": 1273,
       "people_ref_separation_reason_map": 591,
-      "people_xw_identity": 1257369,
+      "people_xw_identity": 1257536,
       "people_xw_job": 837,
       "people_xw_location": 963,
       "people_xw_org": 1101,
@@ -1245,38 +1264,38 @@
     },
     "gold": {
       "people_dim_requisition": 1324069,
-      "people_dim_worker": 2691642,
+      "people_dim_worker": 2686528,
       "people_evt_application_stage": 98155916,
-      "people_evt_manager_change": 4498058,
-      "people_evt_promotion": 239363,
-      "people_evt_transfer": 157852,
-      "people_fact_application": 92001260,
+      "people_evt_manager_change": 938218,
+      "people_evt_promotion": 239618,
+      "people_evt_transfer": 157675,
+      "people_fact_application": 92060986,
       "people_fact_appraisal": 2584148,
-      "people_fact_comp_assignment": 3550766,
-      "people_fact_interview": 21771930,
-      "people_fact_scorecard": 29956060,
+      "people_fact_comp_assignment": 3563445,
+      "people_fact_interview": 21766764,
+      "people_fact_scorecard": 29937811,
       "people_fact_survey_score": 26995889,
-      "people_fact_survey_score_restricted": 9378203,
+      "people_fact_survey_score_restricted": 9381483,
       "people_fact_survey_wave": 1699,
-      "people_fact_training_participation": 6557817,
+      "people_fact_training_participation": 6558220,
       "people_fact_worker_skill": 2356498,
-      "people_mart_applicant_flow": 1499,
-      "people_mart_comp_monthly": 27142,
-      "people_mart_engagement_wave": 5028,
-      "people_mart_funnel_monthly": 3033,
-      "people_mart_learning_monthly": 1445,
-      "people_mart_mobility_monthly": 5264,
-      "people_mart_recruiter_load_monthly": 51922,
-      "people_mart_recruiting_monthly": 1638,
-      "people_mart_skill_coverage_monthly": 4143,
+      "people_mart_applicant_flow": 1497,
+      "people_mart_comp_monthly": 27151,
+      "people_mart_engagement_wave": 5034,
+      "people_mart_funnel_monthly": 3049,
+      "people_mart_learning_monthly": 1447,
+      "people_mart_mobility_monthly": 5157,
+      "people_mart_recruiter_load_monthly": 52323,
+      "people_mart_recruiting_monthly": 1630,
+      "people_mart_skill_coverage_monthly": 4134,
       "people_mart_source_health_daily": 1089,
-      "people_mart_stage_aging_monthly": 5433,
-      "people_mart_workforce_monthly": 31751,
-      "people_mart_workforce_monthly_2d": 34440,
+      "people_mart_stage_aging_monthly": 5426,
+      "people_mart_workforce_monthly": 31357,
+      "people_mart_workforce_monthly_2d": 34329,
       "people_ref_comp_band": 1323,
-      "people_snap_recruiter_month": 51922,
-      "people_snap_requisition_month": 8176239,
-      "people_snap_worker_month": 43137456
+      "people_snap_recruiter_month": 52323,
+      "people_snap_requisition_month": 8149584,
+      "people_snap_worker_month": 41971033
     }
   },
   "control_prefix": "rehearsal_1p00_nocase3",

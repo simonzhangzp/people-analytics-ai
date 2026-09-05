@@ -1,0 +1,96 @@
+{
+  "as_of": "2026-08-31",
+  "rows": [
+    {
+      "page": "Case 1",
+      "ui_label": "Company Headcount",
+      "metric_id": "headcount",
+      "params": {
+        "grain": "month",
+        "job_family": null,
+        "scope": "Company",
+        "window": "month (as-of)"
+      },
+      "page_value": 49823,
+      "parity_rpc": 49823,
+      "digit_match": true,
+      "slice_only": false
+    },
+    {
+      "page": "Case 1",
+      "ui_label": "Engineering Headcount (hero)",
+      "metric_id": "headcount",
+      "params": {
+        "grain": "month",
+        "job_family": "Engineering",
+        "scope": "Engineering",
+        "window": "month (as-of)"
+      },
+      "page_value": 15954,
+      "parity_rpc": null,
+      "digit_match": null,
+      "slice_only": true
+    },
+    {
+      "page": "Case 3",
+      "ui_label": "Company voluntary attrition (parity)",
+      "metric_id": "voluntary_attrition_rate",
+      "params": {
+        "grain": "trailing_12m",
+        "job_family": null,
+        "scope": "Company",
+        "window": "trailing-12m (annualized)"
+      },
+      "page_value": 0.13956249086013645,
+      "parity_rpc": 0.13956249086013645,
+      "digit_match": true,
+      "slice_only": false
+    },
+    {
+      "page": "Case 3",
+      "ui_label": "Engineering voluntary attrition (hero)",
+      "metric_id": "voluntary_attrition_rate",
+      "params": {
+        "grain": "trailing_12m",
+        "job_family": "Engineering",
+        "scope": "Engineering",
+        "window": "trailing-12m (annualized)"
+      },
+      "page_value": 0.15998296921152771,
+      "parity_rpc": null,
+      "digit_match": null,
+      "slice_only": true
+    },
+    {
+      "page": "Case 3",
+      "ui_label": "Engineering voluntary attrition (month secondary)",
+      "metric_id": "voluntary_attrition_rate",
+      "params": {
+        "grain": "month",
+        "job_family": "Engineering",
+        "scope": "Engineering",
+        "window": "month (annualized)"
+      },
+      "page_value": 0.17901466716810832,
+      "parity_rpc": null,
+      "digit_match": null,
+      "slice_only": true
+    }
+  ],
+  "recruiter_dq": [
+    {
+      "test_name": "snap_recruiter_id_subseteq_dim_recruiter",
+      "test_group": "recruiting"
+    },
+    {
+      "test_name": "dim_recruiter_covers_opening_recruiters",
+      "test_group": "recruiting"
+    }
+  ],
+  "healthcheck_run": {
+    "run_id": "healthcheck-2026-09-04",
+    "certified": false,
+    "notes": "{\"kind\": \"healthcheck\", \"run_date\": \"2026-09-04\", \"reason\": \"frozen_data_v1\", \"database_bytes\": 2998135955, \"wal_bytes\": 0, \"pointer_snapshot\": [{\"pointer_id\": \"certified_as_of\", \"as_of\": \"2026-08-07\", \"extract_id\": \"ext-frappe-employee-2026-08-07\", \"moved\": true, \"notes\": \"prior full succeeded\"}, {\"pointer_id\": \"current_certified\", \"as_of\": \"2026-08-31\", \"extract_id\": \"data-v1\", \"moved\": true, \"notes\": \"policy verified\"}, {\"pointer_id\": \"fault_extract\", \"as_of\": \"2026-08-14\", \"extract_id\": \"ext-frappe-employee-2026-08-14\", \"moved\": false, \"notes\": \"pointer does not move on isolated extract\"}, {\"pointer_id\": \"incident_replay\", \"as_of\": \"2026-08-14\", \"extract_id\": \"run-2026-08-14\", \"moved\": false, \"notes\": \"Case 2 isolated extract; pointer does not move\"}]}"
+  },
+  "company_digit_match": true
+}

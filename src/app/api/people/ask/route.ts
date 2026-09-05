@@ -5,6 +5,7 @@ import { runPeopleAgent, toAskAnswer } from "@/lib/people/agent/run";
 import type { PeopleDemoCase } from "@/lib/people/ask-types";
 
 export const runtime = "nodejs";
+export const maxDuration = 30;
 
 const identities = DEMO_IDENTITIES.map((row) => row.identity_id) as [
   string,

@@ -9,6 +9,9 @@ import type {
 import type { DataRow } from "@/types/local-data";
 
 let databasePromise: Promise<AsyncDuckDB> | null = null;
+let sharedConnection: AsyncDuckDBConnection | null = null;
+let sharedConnectionPromise: Promise<AsyncDuckDBConnection> | null = null;
+let connectionQueue: Promise<unknown> = Promise.resolve();
 
 export class DuckDBInitializationError extends Error {
   readonly cause: unknown;
@@ -100,15 +103,36 @@ export function getLocalDuckDB(): Promise<AsyncDuckDB> {
   return databasePromise;
 }
 
+async function getSharedDuckDBConnection() {
+  if (!sharedConnectionPromise) {
+    sharedConnectionPromise = getLocalDuckDB()
+      .then(async (database) => {
+        sharedConnection = await database.connect();
+        return sharedConnection;
+      })
+      .catch((error) => {
+        sharedConnection = null;
+        sharedConnectionPromise = null;
+        throw error;
+      });
+  }
+  return sharedConnectionPromise;
+}
+
 export async function withDuckDBConnection<T>(
   operation: (connection: AsyncDuckDBConnection) => Promise<T>,
 ) {
-  const database = await getLocalDuckDB();
-  const connection = await database.connect();
+  let release!: () => void;
+  const previous = connectionQueue;
+  connectionQueue = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await previous;
   try {
+    const connection = await getSharedDuckDBConnection();
     return await operation(connection);
   } finally {
-    await connection.close();
+    release();
   }
 }
 
@@ -207,10 +231,21 @@ export async function executeDuckDB(
 }
 
 export async function terminateLocalDuckDB() {
-  const activePromise = databasePromise;
+  const activeConnection = sharedConnection;
+  const activeConnectionPromise = sharedConnectionPromise;
+  const activeDatabasePromise = databasePromise;
+  sharedConnection = null;
+  sharedConnectionPromise = null;
   databasePromise = null;
-  if (activePromise) {
-    const database = await activePromise;
+  connectionQueue = Promise.resolve();
+  try {
+    await activeConnectionPromise;
+    await activeConnection?.close();
+  } catch {
+    // Termination should still release the Wasm worker.
+  }
+  if (activeDatabasePromise) {
+    const database = await activeDatabasePromise;
     await database.terminate();
   }
 }

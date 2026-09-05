@@ -89,6 +89,8 @@ const state: WorkbenchState = {
   pendingMetricPatch: null,
   analysisPlan: null,
   insights: [],
+  thread: [],
+  activeTurnId: null,
   story: null,
   interventions: [],
   progress: {

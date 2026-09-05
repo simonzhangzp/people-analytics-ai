@@ -50,6 +50,9 @@ table_classes:
     - people_describe_entity
     - people_get_join_paths
     - people_get_skill_coverage_for
+    - people_run_serving_healthcheck
+    - people_healthcheck_status
+    - people_healthcheck_streak
   no_select_people_app:
     prefixes: [people_snap_, people_evt_, people_fact_, people_hist_]
     suffix: _restricted

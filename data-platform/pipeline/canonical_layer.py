@@ -416,16 +416,21 @@ def build_canonical_layer(con, bronze: Path) -> None:
 
         CREATE TABLE people_dim_recruiter AS
         SELECT
-          w.person_id,
+          u.id AS recruiter_id,
+          coalesce(w.person_id, 'greenhouse_v3:user:' || CAST(u.id AS VARCHAR)) AS person_id,
           'generalist' AS specialization,
-          w.region AS supported_region,
-          w.job_family AS supported_job_family,
+          coalesce(w.region, 'AMER') AS supported_region,
+          coalesce(w.job_family, 'General') AS supported_job_family,
           DATE '2021-09-01' AS valid_from,
           NULL::DATE AS valid_to
         FROM bronze_user u
-        JOIN people_dim_worker w ON w.worker_id = u.employee_id
-        WHERE u.id BETWEEN 201 AND 224
-        QUALIFY row_number() OVER (PARTITION BY w.person_id ORDER BY w.hire_date) = 1;
+        LEFT JOIN people_dim_worker w ON w.worker_id = u.employee_id
+        WHERE u.id IN (
+          SELECT DISTINCT recruiter_id
+          FROM people_dim_requisition
+          WHERE recruiter_id IS NOT NULL
+        )
+        QUALIFY row_number() OVER (PARTITION BY u.id ORDER BY w.hire_date NULLS LAST) = 1;
         """
     )
     con.execute("ALTER TABLE people_dim_worker ADD COLUMN frappe_employee VARCHAR")
