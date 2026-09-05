@@ -25,6 +25,7 @@ import {
   pickNamed,
   tracedFacts,
 } from "./compose-playbooks";
+import { identityLabel } from "../demo-identities";
 import { resolveLlmInvocation } from "./llm-invocation";
 
 function pickMetric(results: unknown[], metricId?: string, jobFamily?: string | null): Record<string, unknown> {
@@ -163,7 +164,7 @@ export function composeAnswerContract(input: {
     hypotheses = draft.hypotheses;
     definition = draft.definition;
   } else if (plan.playbook === "locations") {
-    const draft = composeLocations(results, asOf);
+    const draft = composeLocations(results, asOf, identityId);
     headline = draft.headline;
     observedFacts = draft.facts;
     hypotheses = draft.hypotheses;
@@ -175,7 +176,7 @@ export function composeAnswerContract(input: {
     hypotheses = draft.hypotheses;
     suppressed = draft.suppressed;
   } else if (plan.playbook === "tenure") {
-    const draft = composeTenure(results, asOf);
+    const draft = composeTenure(results, asOf, identityId);
     headline = draft.headline;
     observedFacts = draft.facts;
     hypotheses = draft.hypotheses;
@@ -283,28 +284,54 @@ export function composeAnswerContract(input: {
     definition = Object.keys(def).length ? def : undefined;
     const label = plan.job_family ? `${plan.job_family} ` : "";
     const metricId = String(metric.metric_id ?? plan.metric_id ?? "metric");
-    headline = `${label}${metricId.replaceAll("_", " ")} is ${formatMetricValue(metric)}.`;
-    const healthNote = healthClause(quality);
-    if (healthNote) headline = `${headline} ${healthNote}`;
     const metricAsOf = isoDate(metric.as_of) || asOf;
-    observedFacts.push(
-      fact(`Certified calculator: ${formatMetricValue(metric)} as of ${metricAsOf || "latest month"}.`, {
-        source_tool: "get_metric",
-        metric_id: metricVersion(metricId),
-        filters: { job_family: plan.job_family ?? null, grain: String(metric.window ?? plan.filters.grain ?? "") },
-        value: metric.denied === true ? null : num(metric.value),
-        unit: String(metric.unit ?? ""),
-        as_of: metricAsOf,
-        asOf: metricAsOf,
-        denied: metric.denied === true,
-      }),
-    );
-    if (quality === "healthy" && snapshotId === "current_certified") {
-      hypotheses.push(
-        "This is the latest certified month-end snapshot. The APAC extract failure is a separate historical replay and was not published as a workforce change.",
-      );
+    if (metric.denied === true && metricId.includes("compa")) {
+      const who = identityLabel(identityId);
+      const reason = metric.reason ? ` (${String(metric.reason)})` : "";
+      headline = `Compensation positioning is not available to ${who}. No substitute number is shown.`;
+      observedFacts = [
+        fact(
+          `As of ${metricAsOf || asOf}, certified ${label}median compa-ratio is not available to ${who}${reason}. Grain: month snapshot. min_cell does not create a fallback value.`,
+          {
+            source_tool: "get_metric",
+            metric_id: metricVersion(metricId),
+            filters: { job_family: plan.job_family ?? null },
+            value: null,
+            denied: true,
+            as_of: metricAsOf,
+            asOf: metricAsOf,
+            grain: "month (as-of)",
+          },
+        ),
+      ];
+      hypotheses = [
+        metric.reason === "org_scope"
+          ? `${who} can read Engineering pay positioning only. A different org is not substituted.`
+          : "Related Signals control/slice medians, if shown, are scenario aggregates and are not this certified metric.",
+      ];
     } else {
-      hypotheses.push("This figure is not treated as trusted business data in the selected snapshot.");
+      headline = `${label}${metricId.replaceAll("_", " ")} is ${formatMetricValue(metric)}.`;
+      const healthNote = healthClause(quality);
+      if (healthNote) headline = `${headline} ${healthNote}`;
+      observedFacts.push(
+        fact(`Certified calculator: ${formatMetricValue(metric)} as of ${metricAsOf || "latest month"}.`, {
+          source_tool: "get_metric",
+          metric_id: metricVersion(metricId),
+          filters: { job_family: plan.job_family ?? null, grain: String(metric.window ?? plan.filters.grain ?? "") },
+          value: metric.denied === true ? null : num(metric.value),
+          unit: String(metric.unit ?? ""),
+          as_of: metricAsOf,
+          asOf: metricAsOf,
+          denied: metric.denied === true,
+        }),
+      );
+      if (quality === "healthy" && snapshotId === "current_certified") {
+        hypotheses.push(
+          "This is the latest certified month-end snapshot. The APAC extract failure is a separate historical replay and was not published as a workforce change.",
+        );
+      } else {
+        hypotheses.push("This figure is not treated as trusted business data in the selected snapshot.");
+      }
     }
   }
 

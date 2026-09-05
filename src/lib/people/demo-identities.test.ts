@@ -1,9 +1,21 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { identityShowsCompaRatio } from "./demo-identities";
+import { DEMO_IDENTITIES, identityLabel, identityShowsCompaRatio } from "./demo-identities";
 
 describe("visitor compa-ratio gate", () => {
+  it("stores identity_label for every demo identity", () => {
+    expect(
+      DEMO_IDENTITIES.map((row) => [row.identity_id, row.identity_label]),
+    ).toEqual([
+      ["demo-external-viewer", "site visitor"],
+      ["demo-leader-engineering", "Engineering leader"],
+      ["demo-hrbp", "HRBP"],
+      ["demo-people-analyst", "People analyst"],
+    ]);
+    expect(identityLabel("demo-people-analyst")).toBe("People analyst");
+  });
+
   it("hides certified compensation positioning from the site visitor only", () => {
     expect(identityShowsCompaRatio("demo-external-viewer")).toBe(false);
     expect(identityShowsCompaRatio("demo-leader-engineering")).toBe(true);

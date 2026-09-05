@@ -365,7 +365,7 @@ export function mcpToolDescriptors(): Array<{
     { name: "get_metric_breakdown", description: "Aggregate breakdown with automatic min-cell suppression.", inputSchema: { type: "object", properties: { metric_id: { type: "string" }, dimension: { type: "string" }, job_family: { type: "string" } } } },
     { name: "get_metric_definition", description: "Business definition, formula, owner, and version.", inputSchema: { type: "object", properties: { metric_id: { type: "string" } } } },
     { name: "list_entities", description: "Ontology entities filtered by sensitivity.", inputSchema: { type: "object", properties: {} } },
-    { name: "describe_entity", description: "Attributes for one entity. PII fields hidden from visitors.", inputSchema: { type: "object", properties: { entity_id: { type: "string" } } } },
+    { name: "describe_entity", description: "Attributes for one entity. PII fields hidden at this access level.", inputSchema: { type: "object", properties: { entity_id: { type: "string" } } } },
     { name: "get_join_paths", description: "Allowed and denied join edges. No SQL.", inputSchema: { type: "object", properties: {} } },
     { name: "get_glossary_term", description: "Business-rule glossary term.", inputSchema: { type: "object", properties: { term: { type: "string" } } } },
     { name: "get_lineage", description: "Lineage edges for a metric or object.", inputSchema: { type: "object", properties: { metric_id: { type: "string" } } } },

@@ -1,0 +1,56 @@
+[
+  {
+    "file": "src/lib/people/demo-identities.ts",
+    "string": "identity_label values and identityLabel()",
+    "ruling": "keep",
+    "why": "Source of the variable. Compose must read these strings; they are not hardcoded into a playbook template."
+  },
+  {
+    "file": "src/lib/people/agent/compose-playbooks.ts",
+    "string": "`${who}` from identityLabel(identityId)",
+    "ruling": "keep",
+    "why": "This is the required variable path for locations, tenure, and compensation."
+  },
+  {
+    "file": "src/app/enterprise-demo/attrition/page.tsx",
+    "string": "At People analyst min_cell 5 … Neither is visible to the site visitor.",
+    "ruling": "keep",
+    "why": "Comparative static copy that names two identities on purpose. Not a compose template keyed off the current session identity."
+  },
+  {
+    "file": "src/components/enterprise-demo/RoleSwitcher.tsx",
+    "string": "DEMO_IDENTITIES.label in the identity picker",
+    "ruling": "keep",
+    "why": "Chooser labels. The selected identity_id is passed into compose; the option text is not interpolated into chip headlines."
+  },
+  {
+    "file": "src/app/connect/page.tsx",
+    "string": "site visitor identity / min_cell 50",
+    "ruling": "keep",
+    "why": "Public MCP is locked to demo-external-viewer. The page describes that contract, not a four-identity compose path."
+  },
+  {
+    "file": "src/app/api/mcp/route.ts",
+    "string": "Identity is demo-external-viewer (min_cell 50)",
+    "ruling": "keep",
+    "why": "MCP runtime identity is visitor-only by owner lock."
+  },
+  {
+    "file": "src/lib/people/agent/registry.ts",
+    "string": "PII fields hidden at this access level",
+    "ruling": "change",
+    "why": "Was 'hidden from visitors'. Tool schema is user-visible; it must not name a demo identity."
+  },
+  {
+    "file": "src/lib/analysis/* and src/lib/strategy/*",
+    "string": "leadership / analyst loop / HR leaders",
+    "ruling": "keep",
+    "why": "Workbench/strategy vocabulary, not People demo identity_label."
+  },
+  {
+    "file": "src/lib/people/agent/compose-playbooks.ts (pre-R2)",
+    "string": "Among cells visible at visitor min_cell N / restricted for site visitors",
+    "ruling": "change",
+    "why": "N1/N2 root cause. Replaced with identityLabel()."
+  }
+]

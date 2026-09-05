@@ -283,7 +283,7 @@ describe("People serving agent budget seam", () => {
     expect(answer.observed.headline).toMatch(/16\.0%/);
   });
 
-  it("records attempted_failed with a non-empty failure_reason when the planner throws", async () => {
+  it("records attempted_failed as internal_code_error when the planner throws a ReferenceError", async () => {
     process.env.PEOPLE_IP_HASH_SECRET = "unit-test-secret";
     const answer = await runPeopleAgent({
       question,
@@ -297,14 +297,38 @@ describe("People serving agent budget seam", () => {
         remaining: {},
       }),
       planner: async () => {
-        throw new Error("llm_upstream_timeout");
+        throw new ReferenceError("wrapUntrustedToolData is not defined");
       },
       fixtureResults: fixtures,
     });
     expect(answer.llm_invocation).toBe("attempted_failed");
-    expect(answer.failure_reason).toBe("llm_upstream_timeout");
+    expect(answer.failure_reason).toBe("internal_code_error");
+    expect(JSON.stringify(answer)).not.toMatch(/wrapUntrustedToolData is not defined/);
+    expect(JSON.stringify(answer.trace)).not.toMatch(/\sat\s/);
     expect(answer.trace.llm_used).toBe(false);
     expect(answer.observed.headline).toMatch(/16\.0%/);
+  });
+
+  it("records attempted_failed as upstream_timeout when the planner times out", async () => {
+    process.env.PEOPLE_IP_HASH_SECRET = "unit-test-secret";
+    const answer = await runPeopleAgent({
+      question,
+      demoCase: "attrition",
+      headers: new Headers({ "x-forwarded-for": "198.51.100.19" }),
+      consume: async () => ({
+        allowed: true,
+        blocked_by: null,
+        call_id: null,
+        max_tokens_per_call: 1024,
+        remaining: {},
+      }),
+      planner: async () => {
+        throw new Error("llm_timeout");
+      },
+      fixtureResults: fixtures,
+    });
+    expect(answer.llm_invocation).toBe("attempted_failed");
+    expect(answer.failure_reason).toBe("upstream_timeout");
   });
 });
 
@@ -403,7 +427,7 @@ describe("Case 3 chip playbooks", () => {
         { call: nextPlan.tools[1], result: breakdown, ok: true },
       ],
     });
-    expect(loc.headline).toMatch(/Among cells visible at visitor min_cell 50/);
+    expect(loc.headline).toMatch(/Among cells visible at site visitor min_cell 50/);
     expect(loc.headline).toMatch(/APAC-SIN/);
     expect(loc.facts.join(" ")).toMatch(/1 of 2 location × tenure × grade cells hidden/);
     expect(next.headline).toMatch(/Next:/);
@@ -448,7 +472,7 @@ describe("Case 3 chip playbooks", () => {
         },
       ],
     });
-    expect(answer.headline).toMatch(/all tenure bands fall below min_cell 50/i);
+    expect(answer.headline).toMatch(/At site visitor access, all tenure bands fall below min_cell 50/i);
     expect(answer.headline).not.toMatch(/0\.0%/);
     expect(answer.withheld).toBe(false);
     expect(criticCheck({ observed: answer.observed, evidence: answer.evidence }).ok).toBe(true);
@@ -615,8 +639,9 @@ describe("Case 3 chip playbooks", () => {
       tools: plan.tools,
       results: [{ call: plan.tools[0], ok: true, result: { denied: true, metric_id: "compa_ratio_median", as_of: "2026-08-31" } }],
     });
-    expect(answer.headline).toMatch(/restricted for site visitors/i);
+    expect(answer.headline).toMatch(/not available to site visitor/i);
     expect(answer.headline).not.toMatch(/denied\.$/i);
+    expect(answer.headline).not.toMatch(/restricted for site visitors/i);
     expect(answer.withheld).toBe(false);
     expect(answer.observed.facts.every((row) => row.source_tool === "get_metric")).toBe(true);
   });
@@ -632,8 +657,8 @@ describe("Case 3 chip playbooks", () => {
       tools: plan.tools,
       results: [{ call: plan.tools[0], ok: true, result: { denied: true, metric_id: "compa_ratio_median", as_of: "2026-08-31" } }],
     });
-    expect(answer.headline).toMatch(/restricted for this identity/i);
-    expect(answer.headline).not.toMatch(/site visitors/i);
-    expect(answer.facts.join(" ")).toMatch(/scenario aggregates/i);
+    expect(answer.headline).toMatch(/not available to Engineering leader/i);
+    expect(answer.headline).not.toMatch(/site visitor/i);
+    expect(answer.facts.join(" ")).toMatch(/Engineering leader/);
   });
 });

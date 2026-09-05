@@ -241,6 +241,8 @@ export async function loadAttritionCase(identityId = DEFAULT_IDENTITY) {
       asOf,
       annualized: true,
     }),
+    prior,
+    priorAsOf,
     trend: { points, grain: "trailing_12m", scenario_start: "2026-03-01" },
     breakdown,
     rankedVisible: rankedVisible.slice(0, TOP_BREAKDOWN_ROWS),

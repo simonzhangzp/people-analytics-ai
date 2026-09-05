@@ -1,11 +1,12 @@
 [
   {
     "identity": "demo-external-viewer",
+    "identity_label": "site visitor",
     "chip": "Which locations matter most?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Among cells visible at visitor min_cell 50, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.1%).",
+    "headline": "Among cells visible at site visitor min_cell 50, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.1%).",
     "facts": [
       "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31. Grain: trailing-12m (annualized).",
       "Visible location APAC-SIN: 20.1% (as-of month n used for min_cell).",
@@ -13,10 +14,19 @@
       "Visible location EMEA-LON: 14.3% (as-of month n used for min_cell).",
       "44 of 104 location × tenure × grade cells hidden (min_cell 50; n is as-of month headcount, not trailing-12m average)."
     ],
-    "trace_id": "875f3404-4f81-42be-bd7b-e5e78a6ef9a4"
+    "hypotheses": [
+      "Location concentration is an observed association after suppression. It does not by itself prove a cause.",
+      "Read the visible location ranking before treating any one site as a company-wide problem."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "861a16a7-cf3d-4961-9873-229e07555801"
   },
   {
     "identity": "demo-external-viewer",
+    "identity_label": "site visitor",
     "chip": "What should we investigate next?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -27,10 +37,19 @@
       "Highest-rate visible cell after min_cell 50: APAC-SIN · <1y · G7 at 34.3%.",
       "44 of 104 location × tenure × grade cells hidden (min_cell 50; n is as-of month headcount, not trailing-12m average). Hidden cells are not evidence for a company-wide action."
     ],
-    "trace_id": "1281afe7-797f-453d-a223-675a1fc6236f"
+    "hypotheses": [
+      "Pull the APAC-SIN / <1y Engineering file that remains visible after min_cell 50: manager changes, hiring mix, and whether the rate is new or persistent.",
+      "Do not use the APAC HRIS replay, or any hidden cell, as the brief for a company-wide retention program."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "c75ff170-9559-4f03-aeb4-143091f11d33"
   },
   {
     "identity": "demo-external-viewer",
+    "identity_label": "site visitor",
     "chip": "Show me the tenure breakdown",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -45,22 +64,37 @@
       "Tenure 10y+: 8.1%.",
       "No cells hidden at this grain (min_cell 50)."
     ],
-    "trace_id": "88b9865a-9508-43e6-b4f5-00771f1bfb17"
+    "hypotheses": [
+      "Tenure differences are associations after suppression. They are not a claim that tenure causes quits."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "d0364eb3-8a68-49b1-9940-470c62ea9b36"
   },
   {
     "identity": "demo-external-viewer",
+    "identity_label": "site visitor",
     "chip": "What about compensation?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Compensation positioning is restricted for site visitors. No substitute number is shown.",
+    "headline": "Compensation positioning is not available to site visitor. No substitute number is shown.",
     "facts": [
-      "As of 2026-08-31, Engineering median compa-ratio is not available to this identity (sensitivity). Grain: month snapshot. min_cell does not create a fallback value."
+      "As of 2026-08-31, certified Engineering median compa-ratio is not available to site visitor (sensitivity). Grain: month snapshot. min_cell does not create a fallback value."
     ],
-    "trace_id": "a21ec720-f898-4050-b1ee-4a16b19787c1"
+    "hypotheses": [
+      "Related Signals control/slice medians, if shown, are scenario aggregates and are not this certified metric."
+    ],
+    "tools_used": [
+      "get_metric"
+    ],
+    "trace_id": "08384444-0a0f-446c-b00f-807e8d9e47d8"
   },
   {
     "identity": "demo-external-viewer",
+    "identity_label": "site visitor",
     "chip": "Which critical skills have the largest gaps?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -70,10 +104,17 @@
       "Skill coverage grain: job-family aggregate. As-of 2026-08-31. This table does not list workers; min_cell is not used to hide people.",
       "Largest coverage gap (lowest ratio): Engineering - Platform at 62.9%."
     ],
-    "trace_id": "b0c235b4-9876-4718-8783-7c5c693e73f8"
+    "hypotheses": [
+      "Coverage ratios are observed aggregates. They are not a ranked list of people or a hiring requisition."
+    ],
+    "tools_used": [
+      "get_skill_coverage"
+    ],
+    "trace_id": "0523ba4e-6b45-4147-9ba2-a83e7c782fcf"
   },
   {
     "identity": "demo-external-viewer",
+    "identity_label": "site visitor",
     "chip": "How is voluntary attrition defined?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -84,15 +125,20 @@
       "Formula: terminated_in_month ∧ voluntary (sum over window) / average certified headcount",
       "Version 1. Certified snapshot as-of 2026-08-31. min_cell does not apply to a definition lookup."
     ],
-    "trace_id": "f76fa66a-2e1b-4556-a24d-dbc692f3f23d"
+    "hypotheses": [],
+    "tools_used": [
+      "get_metric_definition"
+    ],
+    "trace_id": "30b8d9af-06ea-4709-9118-9af4e93841be"
   },
   {
     "identity": "demo-leader-engineering",
+    "identity_label": "Engineering leader",
     "chip": "Which locations matter most?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Among cells visible at visitor min_cell 20, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.1%).",
+    "headline": "Among cells visible at Engineering leader min_cell 20, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.1%).",
     "facts": [
       "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31. Grain: trailing-12m (annualized).",
       "Visible location APAC-SIN: 20.1% (as-of month n used for min_cell).",
@@ -100,10 +146,19 @@
       "Visible location EMEA-LON: 14.3% (as-of month n used for min_cell).",
       "42 of 104 location × tenure × grade cells hidden (min_cell 20; n is as-of month headcount, not trailing-12m average)."
     ],
-    "trace_id": "910d4710-ecba-4840-b0c9-7702577830e8"
+    "hypotheses": [
+      "Location concentration is an observed association after suppression. It does not by itself prove a cause.",
+      "Read the visible location ranking before treating any one site as a company-wide problem."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "aeccd5fa-fbe5-4a46-a540-06e679856a08"
   },
   {
     "identity": "demo-leader-engineering",
+    "identity_label": "Engineering leader",
     "chip": "What should we investigate next?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -114,10 +169,19 @@
       "Highest-rate visible cell after min_cell 20: APAC-SIN · <1y · G7 at 34.3%.",
       "42 of 104 location × tenure × grade cells hidden (min_cell 20; n is as-of month headcount, not trailing-12m average). Hidden cells are not evidence for a company-wide action."
     ],
-    "trace_id": "61732ce5-d55b-4a79-8a5d-015b245e2813"
+    "hypotheses": [
+      "Pull the APAC-SIN / <1y Engineering file that remains visible after min_cell 20: manager changes, hiring mix, and whether the rate is new or persistent.",
+      "Do not use the APAC HRIS replay, or any hidden cell, as the brief for a company-wide retention program."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "b0c7b252-2560-4d45-9893-546086fba163"
   },
   {
     "identity": "demo-leader-engineering",
+    "identity_label": "Engineering leader",
     "chip": "Show me the tenure breakdown",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -132,22 +196,37 @@
       "Tenure 10y+: 8.1%.",
       "No cells hidden at this grain (min_cell 20)."
     ],
-    "trace_id": "03025bfd-4a30-42c2-9e4c-d3d6b7e67f7c"
+    "hypotheses": [
+      "Tenure differences are associations after suppression. They are not a claim that tenure causes quits."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "eda0729c-bc93-45b3-bd12-abf4113fcaa0"
   },
   {
     "identity": "demo-leader-engineering",
+    "identity_label": "Engineering leader",
     "chip": "What about compensation?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Compensation positioning is restricted for site visitors. No substitute number is shown.",
+    "headline": "Engineering median compa-ratio is 0.98 (n=15954 Engineering certified workers) as of 2026-08-31.",
     "facts": [
-      "As of 2026-08-31, Engineering median compa-ratio is not available to this identity (sensitivity). Grain: month snapshot. min_cell does not create a fallback value."
+      "Certified calculator: 0.98 (n=15954 Engineering certified workers) as of 2026-08-31. Grain: month (as-of)."
     ],
-    "trace_id": "12419750-f978-4232-81e0-5859ecf07610"
+    "hypotheses": [
+      "Compa-ratio is a pay-positioning snapshot. It does not by itself explain attrition."
+    ],
+    "tools_used": [
+      "get_metric"
+    ],
+    "trace_id": "236808b3-d087-4158-aba6-6b7573d0d385"
   },
   {
     "identity": "demo-leader-engineering",
+    "identity_label": "Engineering leader",
     "chip": "Which critical skills have the largest gaps?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -157,10 +236,17 @@
       "Skill coverage grain: job-family aggregate. As-of 2026-08-31. This table does not list workers; min_cell is not used to hide people.",
       "Largest coverage gap (lowest ratio): Engineering - Platform at 62.9%."
     ],
-    "trace_id": "a4f6596c-8170-4b0b-8130-218c8036e66d"
+    "hypotheses": [
+      "Coverage ratios are observed aggregates. They are not a ranked list of people or a hiring requisition."
+    ],
+    "tools_used": [
+      "get_skill_coverage"
+    ],
+    "trace_id": "67969faf-c174-4e9f-9636-9d0e096a816c"
   },
   {
     "identity": "demo-leader-engineering",
+    "identity_label": "Engineering leader",
     "chip": "How is voluntary attrition defined?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -171,15 +257,20 @@
       "Formula: terminated_in_month ∧ voluntary (sum over window) / average certified headcount",
       "Version 1. Certified snapshot as-of 2026-08-31. min_cell does not apply to a definition lookup."
     ],
-    "trace_id": "218bda00-f12f-43d6-a7a3-03a9926b5879"
+    "hypotheses": [],
+    "tools_used": [
+      "get_metric_definition"
+    ],
+    "trace_id": "59fb451e-8681-42cf-a2e7-b12fd075c77b"
   },
   {
     "identity": "demo-hrbp",
+    "identity_label": "HRBP",
     "chip": "Which locations matter most?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Among cells visible at visitor min_cell 10, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.0%).",
+    "headline": "Among cells visible at HRBP min_cell 10, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.0%).",
     "facts": [
       "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31. Grain: trailing-12m (annualized).",
       "Visible location APAC-SIN: 20.0% (as-of month n used for min_cell).",
@@ -187,10 +278,19 @@
       "Visible location EMEA-LON: 14.2% (as-of month n used for min_cell).",
       "34 of 104 location × tenure × grade cells hidden (min_cell 10; n is as-of month headcount, not trailing-12m average)."
     ],
-    "trace_id": "6fec57e7-d033-4451-8b54-d90995a30fed"
+    "hypotheses": [
+      "Location concentration is an observed association after suppression. It does not by itself prove a cause.",
+      "Read the visible location ranking before treating any one site as a company-wide problem."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "bf0ff741-5acb-4e3f-b5aa-f4b47115888b"
   },
   {
     "identity": "demo-hrbp",
+    "identity_label": "HRBP",
     "chip": "What should we investigate next?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -201,10 +301,19 @@
       "Highest-rate visible cell after min_cell 10: APAC-SIN · <1y · G7 at 34.3%.",
       "34 of 104 location × tenure × grade cells hidden (min_cell 10; n is as-of month headcount, not trailing-12m average). Hidden cells are not evidence for a company-wide action."
     ],
-    "trace_id": "dae384f1-8b1c-4dfb-8f98-aec60888cdf9"
+    "hypotheses": [
+      "Pull the APAC-SIN / <1y Engineering file that remains visible after min_cell 10: manager changes, hiring mix, and whether the rate is new or persistent.",
+      "Do not use the APAC HRIS replay, or any hidden cell, as the brief for a company-wide retention program."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "4064cb28-cbd0-42ba-a24b-3a787aa08749"
   },
   {
     "identity": "demo-hrbp",
+    "identity_label": "HRBP",
     "chip": "Show me the tenure breakdown",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -219,22 +328,37 @@
       "Tenure 10y+: 8.1%.",
       "No cells hidden at this grain (min_cell 10)."
     ],
-    "trace_id": "8ffe27f9-22cf-40d1-bd47-cabe2faba3e7"
+    "hypotheses": [
+      "Tenure differences are associations after suppression. They are not a claim that tenure causes quits."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "f9785b9b-a473-4a75-b110-c9fedb9edd8a"
   },
   {
     "identity": "demo-hrbp",
+    "identity_label": "HRBP",
     "chip": "What about compensation?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Compensation positioning is restricted for site visitors. No substitute number is shown.",
+    "headline": "Engineering median compa-ratio is 0.98 (n=15954 Engineering certified workers) as of 2026-08-31.",
     "facts": [
-      "As of 2026-08-31, Engineering median compa-ratio is not available to this identity (sensitivity). Grain: month snapshot. min_cell does not create a fallback value."
+      "Certified calculator: 0.98 (n=15954 Engineering certified workers) as of 2026-08-31. Grain: month (as-of)."
     ],
-    "trace_id": "fd560001-081d-4050-8c78-8393b62b11c7"
+    "hypotheses": [
+      "Compa-ratio is a pay-positioning snapshot. It does not by itself explain attrition."
+    ],
+    "tools_used": [
+      "get_metric"
+    ],
+    "trace_id": "15785db9-ad31-4e7b-89d3-e1ffb1ffd0a5"
   },
   {
     "identity": "demo-hrbp",
+    "identity_label": "HRBP",
     "chip": "Which critical skills have the largest gaps?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -244,10 +368,17 @@
       "Skill coverage grain: job-family aggregate. As-of 2026-08-31. This table does not list workers; min_cell is not used to hide people.",
       "Largest coverage gap (lowest ratio): Engineering - Platform at 62.9%."
     ],
-    "trace_id": "1734ef05-8941-4815-a573-84145732f0d6"
+    "hypotheses": [
+      "Coverage ratios are observed aggregates. They are not a ranked list of people or a hiring requisition."
+    ],
+    "tools_used": [
+      "get_skill_coverage"
+    ],
+    "trace_id": "1775be97-a133-4e0b-9864-02c0806a7d71"
   },
   {
     "identity": "demo-hrbp",
+    "identity_label": "HRBP",
     "chip": "How is voluntary attrition defined?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -258,15 +389,20 @@
       "Formula: terminated_in_month ∧ voluntary (sum over window) / average certified headcount",
       "Version 1. Certified snapshot as-of 2026-08-31. min_cell does not apply to a definition lookup."
     ],
-    "trace_id": "0e7f3940-6ca1-4547-978a-284084eab03f"
+    "hypotheses": [],
+    "tools_used": [
+      "get_metric_definition"
+    ],
+    "trace_id": "fe3c6789-18c0-4dcf-a582-e6ae4f99a9aa"
   },
   {
     "identity": "demo-people-analyst",
+    "identity_label": "People analyst",
     "chip": "Which locations matter most?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Among cells visible at visitor min_cell 5, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.0%).",
+    "headline": "Among cells visible at People analyst min_cell 5, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.0%).",
     "facts": [
       "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31. Grain: trailing-12m (annualized).",
       "Visible location APAC-SIN: 20.0% (as-of month n used for min_cell).",
@@ -274,10 +410,19 @@
       "Visible location EMEA-LON: 14.2% (as-of month n used for min_cell).",
       "30 of 104 location × tenure × grade cells hidden (min_cell 5; n is as-of month headcount, not trailing-12m average)."
     ],
-    "trace_id": "53deef4b-d7cf-41ce-a264-9a9ead3dae7f"
+    "hypotheses": [
+      "Location concentration is an observed association after suppression. It does not by itself prove a cause.",
+      "Read the visible location ranking before treating any one site as a company-wide problem."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "878c2721-f8c5-4324-b272-96f673d2b11b"
   },
   {
     "identity": "demo-people-analyst",
+    "identity_label": "People analyst",
     "chip": "What should we investigate next?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -288,10 +433,19 @@
       "Highest-rate visible cell after min_cell 5: APAC-SIN · <1y · G7 at 34.3%.",
       "30 of 104 location × tenure × grade cells hidden (min_cell 5; n is as-of month headcount, not trailing-12m average). Hidden cells are not evidence for a company-wide action."
     ],
-    "trace_id": "cbb9e992-b593-49ed-b200-dae680040798"
+    "hypotheses": [
+      "Pull the APAC-SIN / <1y Engineering file that remains visible after min_cell 5: manager changes, hiring mix, and whether the rate is new or persistent.",
+      "Do not use the APAC HRIS replay, or any hidden cell, as the brief for a company-wide retention program."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "b63aff03-8342-4e67-9b0d-5c4d8070154c"
   },
   {
     "identity": "demo-people-analyst",
+    "identity_label": "People analyst",
     "chip": "Show me the tenure breakdown",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -306,22 +460,37 @@
       "Tenure 10y+: 8.1%.",
       "No cells hidden at this grain (min_cell 5)."
     ],
-    "trace_id": "d3fff42e-c800-4881-957c-e9ce316edce7"
+    "hypotheses": [
+      "Tenure differences are associations after suppression. They are not a claim that tenure causes quits."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ],
+    "trace_id": "e4c68ef3-247b-4fdb-baa8-3315d9d3e625"
   },
   {
     "identity": "demo-people-analyst",
+    "identity_label": "People analyst",
     "chip": "What about compensation?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
     "withheld": false,
-    "headline": "Engineering median compa-ratio is 0.98 as of 2026-08-31.",
+    "headline": "Engineering median compa-ratio is 0.98 (n=15954 Engineering certified workers) as of 2026-08-31.",
     "facts": [
-      "Certified calculator: 0.98 as of 2026-08-31. Grain: month (as-of)."
+      "Certified calculator: 0.98 (n=15954 Engineering certified workers) as of 2026-08-31. Grain: month (as-of)."
     ],
-    "trace_id": "9d773ed5-625a-4fa2-950d-ea1a276c9bfc"
+    "hypotheses": [
+      "Compa-ratio is a pay-positioning snapshot. It does not by itself explain attrition."
+    ],
+    "tools_used": [
+      "get_metric"
+    ],
+    "trace_id": "ab195a66-f070-4543-b196-bdf9ad3c815d"
   },
   {
     "identity": "demo-people-analyst",
+    "identity_label": "People analyst",
     "chip": "Which critical skills have the largest gaps?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -331,10 +500,17 @@
       "Skill coverage grain: job-family aggregate. As-of 2026-08-31. This table does not list workers; min_cell is not used to hide people.",
       "Largest coverage gap (lowest ratio): Engineering - Platform at 62.9%."
     ],
-    "trace_id": "4f675f86-88f5-4061-b8e1-8ad03d48489a"
+    "hypotheses": [
+      "Coverage ratios are observed aggregates. They are not a ranked list of people or a hiring requisition."
+    ],
+    "tools_used": [
+      "get_skill_coverage"
+    ],
+    "trace_id": "8ee44c18-6bbc-4769-a1f4-45cae2239ea8"
   },
   {
     "identity": "demo-people-analyst",
+    "identity_label": "People analyst",
     "chip": "How is voluntary attrition defined?",
     "llm_invocation": "skipped_by_design",
     "failure_reason": null,
@@ -345,6 +521,10 @@
       "Formula: terminated_in_month ∧ voluntary (sum over window) / average certified headcount",
       "Version 1. Certified snapshot as-of 2026-08-31. min_cell does not apply to a definition lookup."
     ],
-    "trace_id": "35c28004-58e1-4e40-a62f-349afd5c7ec6"
+    "hypotheses": [],
+    "tools_used": [
+      "get_metric_definition"
+    ],
+    "trace_id": "e21110ca-f62f-4d86-be7b-d207dada6556"
   }
 ]

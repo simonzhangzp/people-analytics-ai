@@ -1,0 +1,45 @@
+{
+  "question": "What is Sales compensation?",
+  "identity_id": "demo-leader-engineering",
+  "headline": "Compensation positioning is not available to Engineering leader. No substitute number is shown.",
+  "facts": [
+    "As of 2026-08-31, certified Sales median compa-ratio is not available to Engineering leader (org_scope). Grain: month snapshot. min_cell does not create a fallback value."
+  ],
+  "hypotheses": [
+    "Engineering leader can read Engineering pay positioning only. A different org is not substituted."
+  ],
+  "evidence": [
+    {
+      "value": null,
+      "denied": true,
+      "reason": "org_scope",
+      "metric_id": "compa_ratio_median",
+      "identity_id": "demo-leader-engineering",
+      "metric_version": 1,
+      "quality_status": "healthy",
+      "health_reason": "v1 published",
+      "asOf": "",
+      "as_of": ""
+    },
+    {
+      "metric_id": "compa_ratio_median",
+      "grain_table": "people_fact_comp_assignment_restricted",
+      "numerator": "median(base / band_mid) for certified workers as-of",
+      "denominator": null,
+      "min_cell": 10,
+      "sensitivity": "confidential",
+      "status": "certified",
+      "yaml_path": "people_metrics/compa_ratio.yml",
+      "owner": "People Analytics",
+      "annualized": false,
+      "time_logic": "month (as-of)",
+      "window": "month (as-of)",
+      "business_definition": "median(base / band_mid) for certified workers as-of",
+      "formula": "median(base / band_mid) for certified workers as-of",
+      "formula_sql": "median(base / band_mid) for certified workers as-of",
+      "version": 1,
+      "quality_status": "healthy"
+    }
+  ],
+  "trace_id": "0169ab1a-d61d-47ee-b729-f927b8a1b1a2"
+}

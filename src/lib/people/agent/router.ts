@@ -88,6 +88,7 @@ function resolveMetric(question: string): string | undefined {
 }
 
 function jobFamily(question: string): string | null {
+  if (/\bsales\b/i.test(question)) return "Sales";
   return /\bengineering\b/i.test(question) ? "Engineering" : null;
 }
 
@@ -183,8 +184,8 @@ export function routePeopleQuestion(
       metric_id: "compa_ratio_median",
       job_family: "Engineering",
       snapshot_id: "current_certified",
-      tools: [{ name: "get_metric", args: { metric_id: "compa_ratio_median", job_family: "Engineering" } }],
-      filters: { metric_id: "compa_ratio_median", job_family: "Engineering" },
+      tools: [{ name: "get_metric", args: { metric_id: "compa_ratio_median", job_family: "Engineering", grain: "month" } }],
+      filters: { metric_id: "compa_ratio_median", job_family: "Engineering", grain: "month" },
     });
   }
   if (chip === "skills") {

@@ -7,7 +7,7 @@ annualized: false
 numerator:
   expression: median(base / band_mid) for certified workers as-of
 min_cell: 10
-sensitivity: restricted
+sensitivity: confidential
 expected_range:
 - 0.7
 - 1.3

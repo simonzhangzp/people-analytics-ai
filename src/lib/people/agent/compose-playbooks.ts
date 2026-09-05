@@ -1,4 +1,5 @@
 import { asList, asRecord, formatRate, isoDate } from "../format";
+import { identityLabel } from "../demo-identities";
 import { aggregateVisibleBy, finiteRate, visibleBreakdownCells } from "../case3-view";
 import { suppressionCopy } from "./suppression-copy";
 import type { PeopleObservedFact, PeopleToolCall } from "./types";
@@ -82,6 +83,7 @@ export type ChipDraft = {
 export function composeLocations(
   results: Array<{ call: PeopleToolCall; result: unknown; ok: boolean }>,
   asOf: string,
+  identityId: string,
 ): ChipDraft {
   const eng = engineeringMetric(results);
   const breakdown = pickNamed(results, "get_metric_breakdown");
@@ -92,6 +94,7 @@ export function composeLocations(
   const suppressed = collectSuppressed(breakdown);
   const rate = num(eng.value);
   const asOfDate = isoDate(eng.as_of) || asOf;
+  const who = identityLabel(identityId);
   const copy = suppressionCopy({
     hidden: suppressed.length,
     total: cells.length,
@@ -99,10 +102,10 @@ export function composeLocations(
     grain: "location × tenure × grade",
   });
   const headline = !top
-    ? `At visitor min_cell ${minCell}, no location slice is visible. Engineering trailing-12m voluntary attrition is ${formatMetricValue(eng)}.`
+    ? `At ${who} min_cell ${minCell}, no location slice is visible. Engineering trailing-12m voluntary attrition is ${formatMetricValue(eng)}.`
     : copy.noneHidden
       ? `Engineering trailing-12m voluntary attrition concentrates in ${top.key} (${formatRate(top.rate)}).`
-      : `Among cells visible at visitor min_cell ${minCell}, Engineering trailing-12m voluntary attrition concentrates in ${top.key} (${formatRate(top.rate)}).`;
+      : `Among cells visible at ${who} min_cell ${minCell}, Engineering trailing-12m voluntary attrition concentrates in ${top.key} (${formatRate(top.rate)}).`;
   const facts = [
     fact(
       `Engineering trailing-12m voluntary attrition: ${formatMetricValue(eng)} as of ${asOfDate}. Grain: trailing-12m (annualized).`,
@@ -233,6 +236,7 @@ export function composeNextSteps(
 export function composeTenure(
   results: Array<{ call: PeopleToolCall; result: unknown; ok: boolean }>,
   asOf: string,
+  identityId: string,
 ): ChipDraft {
   const eng = engineeringMetric(results);
   const breakdown = pickNamed(results, "get_metric_breakdown");
@@ -252,11 +256,12 @@ export function composeTenure(
     minCell,
     grain: "tenure_band",
   });
+  const who = identityLabel(identityId);
   const allHidden = visibleCells.length === 0 || ranked.length === 0 || copy.allHidden;
 
   if (allHidden) {
     return {
-      headline: `At visitor access, all tenure bands fall below min_cell ${minCell}; only the Engineering total is visible.`,
+      headline: `At ${who} access, all tenure bands fall below min_cell ${minCell}; only the Engineering total is visible.`,
       facts: [
         fact(
           `Engineering trailing-12m voluntary attrition: ${formatMetricValue(eng)} as of ${asOfDate}. Grain: trailing-12m (annualized).`,
@@ -281,7 +286,7 @@ export function composeTenure(
         ),
       ],
       hypotheses: [
-        "Ask with an internal identity if you need tenure bands that clear the visitor min_cell rule.",
+        `Ask with an identity whose min_cell is below ${minCell} if you need tenure bands that remain hidden here.`,
       ],
       suppressed,
       skillsUsed: [],
@@ -340,21 +345,21 @@ export function composeTenure(
 export function composeCompensation(
   results: Array<{ call: PeopleToolCall; result: unknown; ok: boolean }>,
   asOf: string,
-  identityId = "demo-external-viewer",
+  identityId: string,
 ): ChipDraft {
   const row = pickNamed(results, "get_metric");
   const asOfDate = isoDate(row.as_of) || asOf;
+  const who = identityLabel(identityId);
+  const n = num(row.n);
+  const nClause = n != null ? ` (n=${Math.round(n)} Engineering certified workers)` : "";
   if (row.denied === true) {
-    const visitor = identityId === "demo-external-viewer";
     return {
-      headline: visitor
-        ? "Compensation positioning is restricted for site visitors. No substitute number is shown."
-        : "Certified Engineering median compa-ratio is restricted for this identity. No substitute number is shown.",
+      headline: `Compensation positioning is not available to ${who}. No substitute number is shown.`,
       facts: [
         fact(
-          visitor
-            ? `As of ${asOfDate}, Engineering median compa-ratio is not available to this identity (sensitivity). Grain: month snapshot. min_cell does not create a fallback value.`
-            : `As of ${asOfDate}, the certified Engineering median compa-ratio is not available to this identity. Related Signals control/slice medians are scenario aggregates, not this metric.`,
+          `As of ${asOfDate}, certified Engineering median compa-ratio is not available to ${who}${
+            row.reason ? ` (${String(row.reason)})` : ""
+          }. Grain: month snapshot. min_cell does not create a fallback value.`,
           {
             source_tool: "get_metric",
             metric_id: metricVersion("compa_ratio_median"),
@@ -367,25 +372,28 @@ export function composeCompensation(
         ),
       ],
       hypotheses: [
-        visitor
-          ? "Switch to an internal People identity if compensation positioning is in scope for the review."
-          : "Use a People analyst identity for the certified Engineering median; do not treat scenario control/slice medians as that metric.",
+        row.reason === "org_scope"
+          ? `${who} can read Engineering pay positioning only. A different org is not substituted.`
+          : "Related Signals control/slice medians, if shown, are scenario aggregates and are not this certified metric.",
       ],
       suppressed: [],
       skillsUsed: [],
     };
   }
   return {
-    headline: `Engineering median compa-ratio is ${formatMetricValue(row)} as of ${asOfDate}.`,
+    headline: `Engineering median compa-ratio is ${formatMetricValue(row)}${nClause} as of ${asOfDate}.`,
     facts: [
-      fact(`Certified calculator: ${formatMetricValue(row)} as of ${asOfDate}. Grain: month (as-of).`, {
-        source_tool: "get_metric",
-        metric_id: metricVersion("compa_ratio_median"),
-        filters: { job_family: "Engineering" },
-        value: num(row.value),
-        as_of: asOfDate,
-        grain: "month (as-of)",
-      }),
+      fact(
+        `Certified calculator: ${formatMetricValue(row)}${nClause} as of ${asOfDate}. Grain: month (as-of).`,
+        {
+          source_tool: "get_metric",
+          metric_id: metricVersion("compa_ratio_median"),
+          filters: { job_family: "Engineering" },
+          value: num(row.value),
+          as_of: asOfDate,
+          grain: "month (as-of)",
+        },
+      ),
     ],
     hypotheses: [
       "Compa-ratio is a pay-positioning snapshot. It does not by itself explain attrition.",

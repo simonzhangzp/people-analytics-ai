@@ -9,7 +9,7 @@ import { deepSeekPlanner, type PeoplePlanner } from "./planner";
 import { executeRegistryTool } from "./registry";
 import { routePeopleQuestion } from "./router";
 import { PEOPLE_TOOL_NAMES, type PeopleAnswerContract, type PeopleToolCall } from "./types";
-import { resolveLlmInvocation } from "./llm-invocation";
+import { resolveLlmInvocation, classifyPlannerFailure } from "./llm-invocation";
 import { wrapUntrustedToolData } from "./wrap-data";
 
 const ALLOWED_IDENTITIES = new Set<string>(DEMO_IDENTITIES.map((row) => row.identity_id));
@@ -107,6 +107,7 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
   let llmCalls = 0;
   let plannerHypotheses: string[] | undefined;
   let callId: number | null = null;
+  let plannerInternal: { type: string; frame: string } | null = null;
 
   const injectedPlanner = options.planner;
   const livePlanner =
@@ -168,12 +169,13 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
         planned = await invokePlanner(maxTokens);
       } catch (error) {
         planned = null;
-        llmSkipped =
-          error instanceof Error && error.message.startsWith("llm_") ? error.message : "llm_failed";
+        const classified = classifyPlannerFailure(error);
+        llmSkipped = classified.llm_skipped;
+        plannerInternal = classified.internal;
       }
       const latency = Date.now() - plannerStarted;
       if (!planned) {
-        llmSkipped = llmSkipped ?? "llm_failed";
+        llmSkipped = llmSkipped ?? "upstream_error";
         if (callId) {
           await completeLlmBudget({ callId, traceId, ok: false, latencyMs: latency, model: "deepseek-chat" });
         }
@@ -307,6 +309,11 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
           withheld: answer.withheld,
           error_state: answer.error_state,
           headline: answer.observed.headline.slice(0, 240),
+          llm_invocation: answer.llm_invocation,
+          failure_reason: answer.failure_reason,
+          ...(plannerInternal
+            ? { internal_error_type: plannerInternal.type, internal_error_frame: plannerInternal.frame }
+            : {}),
         },
       });
     } catch {

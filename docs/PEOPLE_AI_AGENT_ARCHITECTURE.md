@@ -547,6 +547,7 @@ Phase 0 期间允许并行的唯一 L2 工作：定义 metric YAML schema（不�
 5. **Skill 格式 — decided: 暂不宣称兼容 Agent Skills。** Phase 4 的 15 个是 MCP tool schema，不是 `SKILL.md`。Claude / Cursor 可连 MCP，不能把 serving tool 当 Agent Skill 加载。L3 certified skills 落地时再按 Agent Skills 规范另写 `SKILL.md`（调用 MCP，不复制 RPC）。
 6. **attrition_risk 上公开站 — decided: 不上。** 不上个人分、不上可反推的高风险团队榜。将来若有模型，最多 model card + 聚合校准曲线。
 7. **ESCO — decided: 不做。** 技能分类维持 O*NET。欧盟/全球雇主案例出现前不引入第二套 taxonomy。
+8. **Run-time planner vs copy — decided (P1 R2): hypotheses wording only.** The serving planner does not choose tools, invent numbers, or rewrite headlines/facts. `attempted_ok` and `attempted_failed` therefore share the same skeleton headline, facts, and tool sequence; only hypotheses wording may differ. E1 scores `llm_invocation` and the tool sequence for those two states, not headline/facts text equality.
 
 ---
 

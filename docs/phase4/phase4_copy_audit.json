@@ -1,0 +1,47 @@
+[
+  {
+    "claim": "Hidden cells across the four demo identities are 44 / 42 / 34 / 30",
+    "actual": "P1 R1 24-grid and Case 3 suppression counts: visitor 44, leader 42, HRBP 34, analyst 30",
+    "verdict": "keep"
+  },
+  {
+    "claim": "At People analyst min_cell 5, AMER-NYC · 3–5y · G10 and EMEA-LON · <1y · G3 (n=6) enter the ranked list; neither is visible to the site visitor",
+    "actual": "R2 review: EMEA-LON · <1y · G3 is 7th at analyst min_cell 5 (head is APAC-SIN 34.3%). Top-8 list includes both six-person slices. Visitor min_cell 50 hides n=6.",
+    "verdict": "keep after rewrite; previous 'can sit at the top' was false"
+  },
+  {
+    "claim": "Engineering trailing-12m voluntary attrition 16.0% as-of 2026-08-31; month view 17.9%; up 1.9 pp from 2026-07",
+    "actual": "b3-month-view.json: t12m 0.15998 → 16.0%; Aug month 0.17901 → 17.9%; Jul month 0.15954 → 16.0%; Δ 1.95 pp → 1.9",
+    "verdict": "keep; July 16.0% is now also printed under Month view"
+  },
+  {
+    "claim": "Certified Headcount 49,823",
+    "actual": "data-v1 / people_get_metric headcount month 2026-08-31",
+    "verdict": "keep"
+  },
+  {
+    "claim": "About page: 21-metric certified registry",
+    "actual": "CERTIFIED_METRIC_IDS length 21",
+    "verdict": "keep"
+  },
+  {
+    "claim": "MCP / Connect: min_cell 50",
+    "actual": "Owner lock: public MCP maps only demo-external-viewer",
+    "verdict": "keep"
+  },
+  {
+    "claim": "Related Signals control median 0.98 (n=47674) vs certified Engineering median 0.98",
+    "actual": "Scenario aggregate n is company-wide; certified Engineering n is job-family certified workers. Same 0.98, different grain — certified chip now prints n.",
+    "verdict": "keep distinction; certified n added"
+  },
+  {
+    "claim": "Chart mid-tick 15.1% vs 15.7% on two screenshots of the same identity",
+    "actual": "TrendSparkline ticks = [yMin, mid, yMax] from the full 24-point series min/max plus pad. Same identity, same RPC, same ticks. 15.1 vs 15.7 is screenshot/fullPage compression, not a second scale.",
+    "verdict": "keep formula; no code change to the scale"
+  },
+  {
+    "claim": "Dataset frozen at data-v1 (as-of 2026-08-31)",
+    "actual": "DATASET_FRESHNESS_FROZEN; streak copy waits for 9/6 cron",
+    "verdict": "keep; S3 screenshot still pending 9/6"
+  }
+]

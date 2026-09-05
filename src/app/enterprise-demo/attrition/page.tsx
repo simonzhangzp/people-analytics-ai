@@ -86,6 +86,11 @@ export default async function AttritionCasePage({
         <p className="mt-3 text-[13px] text-[#546277]">
           Month view (secondary) {formatRate(asRecord(data.monthMetric).value)}.
         </p>
+        {data.priorAsOf ? (
+          <p className="text-[13px] text-[#546277]" data-testid="case3-prior-month">
+            {data.priorAsOf.slice(0, 7)}: {formatRate(data.prior)}
+          </p>
+        ) : null}
         <MetricCaption
           scope={data.monthGrain.scope}
           window={data.monthGrain.window}
@@ -99,9 +104,10 @@ export default async function AttritionCasePage({
         <p className="mt-2 max-w-3xl text-[13px] leading-6 text-[#546277]" data-testid="suppression-changes-conclusion">
           Cell suppression is not cosmetic. Across the four demo identities the hidden cells are 44 /
           42 / 34 / 30. The headline location is computed from cells still visible after min-cell
-          suppression at this access level. The ranked list is also identity-specific: a six-person
-          EMEA-LON slice can sit at the top for the People analyst while remaining hidden for the
-          visitor. Suppression changes the conclusion — that is the governance demonstration.
+          suppression at this access level. At People analyst min_cell 5, two six-person slices
+          (AMER-NYC · 3–5y · G10 and EMEA-LON · {"<1y"} · G3) enter the ranked list. Neither is
+          visible to the site visitor. Suppression changes the conclusion — that is the governance
+          demonstration.
         </p>
 
         <section className="mt-8">

@@ -1,44 +1,118 @@
 {
   "deployment": {
-    "id": "dpl_86NpwS1j6QH6GD9ai9iJdq8bH593",
+    "id": "dpl_4haWuzB5v5QgvgZPQcWmLsArJwoa",
     "alias": "https://peopleanalyticsai.net",
-    "tag": "phase4-p1-v1"
+    "tag": "phase4-p1-v2"
   },
   "skipped_by_design": {
     "llm_invocation": "skipped_by_design",
     "question": "Which locations matter most?",
     "identity_id": "demo-external-viewer",
-    "trace_id": "875f3404-4f81-42be-bd7b-e5e78a6ef9a4",
+    "trace_id": "861a16a7-cf3d-4961-9873-229e07555801",
     "failure_reason": null,
     "source": "https://peopleanalyticsai.net/api/people/ask",
-    "headline": "Among cells visible at visitor min_cell 50, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.1%)."
+    "headline": "Among cells visible at site visitor min_cell 50, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.1%).",
+    "facts": [
+      "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31. Grain: trailing-12m (annualized).",
+      "Visible location APAC-SIN: 20.1% (as-of month n used for min_cell).",
+      "Visible location AMER-NYC: 14.4% (as-of month n used for min_cell).",
+      "Visible location EMEA-LON: 14.3% (as-of month n used for min_cell).",
+      "44 of 104 location × tenure × grade cells hidden (min_cell 50; n is as-of month headcount, not trailing-12m average)."
+    ],
+    "hypotheses": [
+      "Location concentration is an observed association after suppression. It does not by itself prove a cause.",
+      "Read the visible location ranking before treating any one site as a company-wide problem."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric_breakdown"
+    ]
   },
   "skipped_by_budget": {
     "llm_invocation": "skipped_by_budget",
     "question": "Why is Engineering voluntary attrition increasing?",
     "identity_id": "demo-external-viewer",
-    "trace_id": "9c34d51c-a602-44ac-af12-d22e90c4893d",
+    "trace_id": "940c73ef-dfbc-49f7-af1f-1bdca46d44cb",
     "failure_reason": null,
     "source": "https://peopleanalyticsai.net/api/people/ask",
     "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in APAC-SIN among cells visible at this access level.",
+    "facts": [
+      "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31.",
+      "44 cells suppressed at min_cell 50 (n is as-of month headcount).",
+      "Engineering skill coverage (job-family aggregate): 62.9%."
+    ],
+    "hypotheses": [
+      "Location, tenure, and level concentrations are observed associations. They do not by themselves prove a cause.",
+      "Investigate the highest-rate visible Engineering slices before a company-wide program."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric",
+      "get_metric_trend",
+      "get_metric_breakdown",
+      "get_skill_coverage"
+    ],
     "notice": "The free-form demo has reached today's limit for this network. The six prepared questions below still work."
   },
   "attempted_failed": {
     "llm_invocation": "attempted_failed",
-    "failure_reason": "llm_upstream_timeout",
+    "failure_reason": "internal_code_error",
     "question": "Why is Engineering voluntary attrition increasing?",
     "identity_id": "demo-external-viewer",
-    "trace_id": "d8f739c5-302b-404f-a7e3-b56e29cc31a1",
-    "source": "runPeopleAgent planner throw (same compose/run path as /api/people/ask)",
-    "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in a small set of locations among cells visible at this access level."
+    "trace_id": "9b283b95-b63e-45de-b829-74d132a281eb",
+    "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in a small set of locations among cells visible at this access level.",
+    "facts": [
+      "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31.",
+      "0 cells suppressed at min_cell 50 (n is as-of month headcount)."
+    ],
+    "hypotheses": [
+      "Location, tenure, and level concentrations are observed associations. They do not by themselves prove a cause.",
+      "Investigate the highest-rate visible Engineering slices before a company-wide program."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric",
+      "get_metric_trend",
+      "get_metric_breakdown",
+      "get_skill_coverage"
+    ],
+    "source": "runPeopleAgent planner throw ReferenceError (same compose/run path as /api/people/ask)"
   },
   "attempted_ok": {
     "llm_invocation": "attempted_ok",
     "failure_reason": null,
     "question": "Why is Engineering voluntary attrition increasing?",
     "identity_id": "demo-external-viewer",
-    "trace_id": "50c17d14-901a-4edf-92ae-fdd3e82a214f",
-    "source": "runPeopleAgent planner success (same compose/run path as /api/people/ask); production IP already at per_ip_daily",
-    "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in a small set of locations among cells visible at this access level."
+    "trace_id": "7dbf7d46-3ba2-4fe3-8f68-fc7fbfee1dea",
+    "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in a small set of locations among cells visible at this access level.",
+    "facts": [
+      "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31.",
+      "0 cells suppressed at min_cell 50 (n is as-of month headcount)."
+    ],
+    "hypotheses": [
+      "Investigate the highest-rate visible Engineering slices before treating this as company-wide."
+    ],
+    "tools_used": [
+      "get_metric",
+      "get_metric",
+      "get_metric_trend",
+      "get_metric_breakdown",
+      "get_skill_coverage"
+    ],
+    "source": "runPeopleAgent planner success (same compose/run path as /api/people/ask)"
+  },
+  "b2a_diff": {
+    "headline_equal": true,
+    "facts_equal": true,
+    "hypotheses_equal": false,
+    "tools_equal": true,
+    "attempted_ok_hypotheses": [
+      "Investigate the highest-rate visible Engineering slices before treating this as company-wide."
+    ],
+    "attempted_failed_hypotheses": [
+      "Location, tenure, and level concentrations are observed associations. They do not by themselves prove a cause.",
+      "Investigate the highest-rate visible Engineering slices before a company-wide program."
+    ],
+    "note": "Planner rewrites hypotheses wording only. E1 scores llm_invocation and tool sequence, not headline/facts equality."
   }
 }

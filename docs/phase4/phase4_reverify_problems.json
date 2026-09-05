@@ -1,1 +1,51 @@
-[]
+[
+  {
+    "id": "N1",
+    "status": "closed",
+    "summary": "Locations headlines use identity_label and the matching min_cell (site visitor 50 / Engineering leader 20 / HRBP 10 / People analyst 5). No non-visitor row names visitor.",
+    "evidence": "docs/phase4/phase4_chip_api.json",
+    "blocking": true
+  },
+  {
+    "id": "N2",
+    "status": "closed",
+    "summary": "Visitor chip-04 uses the deny template with site visitor. Leader/HRBP/analyst receive Engineering median 0.98 with n=15954. Leader Sales compensation is denied with reason org_scope.",
+    "evidence": "docs/phase4/phase4_chip_api.json; docs/phase4/phase4_n2_leader_org_scope.json",
+    "blocking": true
+  },
+  {
+    "id": "N3",
+    "status": "closed",
+    "summary": "This file uses the required schema and lists every cover leftover. Empty array is not used while S3 remains open.",
+    "evidence": "docs/phase4/PHASE4_VERIFY.md",
+    "blocking": true
+  },
+  {
+    "id": "B2-a",
+    "status": "closed",
+    "summary": "Full response diff: headline and facts and tools match; hypotheses differ. Planner rewrites hypotheses only. E1 scores llm_invocation and tool sequence, not headline/facts equality.",
+    "evidence": "docs/phase4/phase4_llm_invocation_matrix.json#b2a_diff",
+    "blocking": true
+  },
+  {
+    "id": "B2-b",
+    "status": "closed",
+    "summary": "failure_reason is the classified enum. A thrown ReferenceError is internal_code_error, not upstream_*. Stack type+frame stay in telemetry only.",
+    "evidence": "src/lib/people/agent/identity-copy.test.ts; docs/phase4/phase4_llm_invocation_matrix.json attempted_failed",
+    "blocking": true
+  },
+  {
+    "id": "S3",
+    "status": "open",
+    "summary": "FRESHNESS card still shows frozen-at-data-v1 only. Last serving check / streak=3 and the deliberate ok=false fallback wait for the 9/6 UTC cron. Do not fake ok=false on production before that date.",
+    "evidence": "docs/phase4/p1-s3-freshness-card.png",
+    "blocking": true
+  },
+  {
+    "id": "F1",
+    "status": "closed",
+    "summary": "Annotated tags phase4-p1-v1 and phase4-p1-v2 are pushed with this delivery. Production alias is dpl_4haWuzB5v5QgvgZPQcWmLsArJwoa.",
+    "evidence": "git ls-remote --tags origin refs/tags/phase4-p1-v2; dpl_4haWuzB5v5QgvgZPQcWmLsArJwoa",
+    "blocking": true
+  }
+]

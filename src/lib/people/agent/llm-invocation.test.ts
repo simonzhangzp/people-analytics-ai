@@ -36,13 +36,12 @@ describe("resolveLlmInvocation", () => {
     });
   });
 
-  it("requires a non-empty failure_reason for attempted_failed", () => {
+  it("requires a classified failure_reason for attempted_failed", () => {
     const state = resolveLlmInvocation({
       llmEligible: true,
-      llmSkipped: "llm_upstream_timeout",
+      llmSkipped: "upstream_timeout",
     });
     expect(state.llm_invocation).toBe("attempted_failed");
-    expect(state.failure_reason).toBe("llm_upstream_timeout");
-    expect(state.failure_reason?.trim()).toBeTruthy();
+    expect(state.failure_reason).toBe("upstream_timeout");
   });
 });

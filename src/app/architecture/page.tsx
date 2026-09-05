@@ -19,7 +19,7 @@ const LAYERS = [
   ["Lineage / Freshness / Governance", "people_dataset_lineage, source health, and people_serving_snapshot separate current trusted state from incident replay."],
   ["Serving RPC Layer", "people_get_* functions. Arithmetic stays in Postgres."],
   ["Workforce Intelligence", "Retention, skill coverage and related signals over certified metrics."],
-  ["People AI Tools", "A bounded tool list over the same RPCs. Not generic NL-to-SQL."],
+  ["People AI Tools", "A bounded tool list over the same RPCs. Not generic NL-to-SQL. The run-time planner rewrites hypotheses wording only; headlines, facts, and tool calls stay on the SQL/compose path. Eval of attempted_ok vs attempted_failed scores llm_invocation and the tool sequence, not headline text."],
 ];
 
 export default function ArchitecturePage() {

@@ -75,6 +75,9 @@ export function TrendSparkline({
             </text>
           </g>
         ))}
+        <desc data-testid="attrition-trend-ticks">
+          {ticks.map((tick) => (tick * 100).toFixed(1)).join(",")}
+        </desc>
         {scenarioIndex >= 0 ? (
           <g>
             <line

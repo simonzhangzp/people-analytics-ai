@@ -14,13 +14,13 @@ export const metadata = pageMetadata({
 });
 
 const TOOLS = [
-  ["list_metrics", "Certified metrics visible to the visitor identity"],
+  ["list_metrics", "Certified metrics visible to the site visitor identity"],
   ["get_metric", "Scalar value; denied metrics return value=null"],
   ["get_metric_trend", "Monthly points for a certified metric"],
   ["get_metric_breakdown", "Aggregate cells with automatic min-cell suppression"],
   ["get_metric_definition", "Definition, formula, owner, version"],
   ["list_entities", "Ontology entities filtered by sensitivity"],
-  ["describe_entity", "Attributes; PII hidden from visitors"],
+  ["describe_entity", "Attributes; PII hidden from the site visitor identity"],
   ["get_join_paths", "Allowed and denied edges. No SQL"],
   ["get_glossary_term", "Business-rule glossary"],
   ["get_lineage", "Lineage edges"],

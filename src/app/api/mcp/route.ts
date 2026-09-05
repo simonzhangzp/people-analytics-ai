@@ -86,7 +86,7 @@ async function handleRpc(body: RpcBody): Promise<Response> {
     }
     const args = (body.params?.arguments ?? {}) as Record<string, string | number | null | undefined>;
     if (args.snapshot_id === "incident_replay") {
-      return jsonRpcError(id, -32602, "incident_replay is not in MCP visitor scope.");
+      return jsonRpcError(id, -32602, "incident_replay is not in MCP site-visitor scope.");
     }
     const executed = await executeRegistryTool({
       call: { name: name as PeopleRegistryToolName, args },

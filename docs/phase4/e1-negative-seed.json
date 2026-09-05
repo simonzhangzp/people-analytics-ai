@@ -1,0 +1,34 @@
+{
+  "status": "prep_only",
+  "note": "Full E1 golden set is paused. These three negative cases actually failed on production in P1 R1/R2.",
+  "cases": [
+    {
+      "id": "B1",
+      "kind": "negative",
+      "prompt": "Related Signals vs certified compensation positioning on Case 3.",
+      "identity_id": "demo-external-viewer",
+      "fail_if": "Page or chip shows a certified or scenario compa-ratio number to the site visitor, or Related Signals shows 0.98/0.88 while chip-04 claims the metric is unavailable.",
+      "pass_if": "Visitor Related Signals has no 0.98/0.88; chip-04 is a deny with identity_label and no substitute number. Internal identities may show scenario aggregates, labelled as such."
+    },
+    {
+      "id": "N1",
+      "kind": "negative",
+      "prompt": "Which locations matter most?",
+      "identities": [
+        "demo-external-viewer",
+        "demo-leader-engineering",
+        "demo-hrbp",
+        "demo-people-analyst"
+      ],
+      "fail_if": "Headline uses a hardcoded identity word (visitor/analyst/hrbp/leader) that is not this row's identity_label, especially 'visitor min_cell' on a non-visitor.",
+      "pass_if": "Each headline uses that identity's identity_label and that identity's min_cell (50/20/10/5)."
+    },
+    {
+      "id": "N2",
+      "kind": "negative",
+      "prompt": "What about compensation?",
+      "fail_if": "Leader or HRBP is told the metric is restricted for site visitors, or leader Engineering median is denied by min_cell, or a leader Sales/compa ask returns an empty value instead of denied+org_scope.",
+      "pass_if": "Visitor deny uses site visitor. Leader and HRBP receive the Engineering certified median. Leader 'What is Sales compensation?' returns denied with reason org_scope and the Engineering-leader identity_label."
+    }
+  ]
+}
