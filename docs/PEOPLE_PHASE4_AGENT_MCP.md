@@ -407,14 +407,15 @@ alter table people_v2.people_agent_tool_call force row level security;
 
 | budget_key | limit_value | window |
 | --- | --- | --- |
-| per_ip_daily | 3 | UTC 日 |
-| per_ip_rolling_30d | 10 | 滚动 30 天 |
-| site_rolling_30d | 50 | 站点硬顶（Agent + `/api/workbench/ai` + `/api/strategy/analyze` 共用） |
+| per_ip_daily | 3 | UTC 日；只计 `ok=true` |
+| per_ip_daily_attempts | 10 | UTC 日；失败也计 |
+| per_ip_rolling_30d | 10 | 滚动 30 天；只计 `ok=true` |
+| site_rolling_30d | 50 | 站点硬顶，仅 `/api/people/ask`（早期文件分析实验已下线） |
 | max_tokens_per_call | 1024 | 单次 DeepSeek `max_tokens` |
 
 任一超限 → **不调 DeepSeek**，静默回落 Tier 2 骨架，trace 记 `llm_skipped=<budget_key>`。用户仍得到完整 observed / evidence / 抑制，不显示错误，不降级数字。账本写入失败 → `allowed:false`（fail-closed）。
 
-`people_consume_ai_quota`（QuantReview `public`，登录用户日配额）**保留**。`people_try_consume_llm` 是 People v2 站点 IP/站点硬顶。Lab 在配置了 PEOPLE v2 时先走站点账本；blocked 则确定性 fallback，不调 DeepSeek。
+`people_consume_ai_quota`（QuantReview `public`，登录用户日配额）**保留**。`people_try_consume_llm` 是 People v2 站点 IP/站点硬顶，仅 `/api/people/ask`。早期文件分析实验已下线。
 
 Owner 查看：`people_v2.people_llm_usage_daily`、`people_v2.people_llm_usage_30d`（publisher / Table Editor）。`site_rolling_30d` 达 80% 时 daily healthcheck 打 `llm_budget warn`，`ok` 仍为 true。
 

@@ -6,6 +6,22 @@ import path from "node:path";
 const BASE = process.env.PHASE4_BASE ?? "https://peopleanalyticsai.net";
 const OUT = path.resolve("docs/phase4");
 
+async function writeJsonRetry(file, payload) {
+  const dest = path.join(OUT, file);
+  const body = `${JSON.stringify(payload, null, 2)}\n`;
+  let lastError;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    try {
+      await writeFile(dest, body);
+      return;
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)));
+    }
+  }
+  throw lastError;
+}
+
 async function saveShot(buffer, file) {
   const dest = path.join(OUT, file);
   const tmp = path.join(tmpdir(), `phase4-${process.pid}-${file.replaceAll(/[\\/]/g, "-")}`);
@@ -88,6 +104,7 @@ const COVER_IDS = new Set([
   "D1-hrbp-sales",
   "D1-hrbp-company",
   "quality-summary",
+  "known-limitations",
   "case4",
 ]);
 
@@ -127,19 +144,23 @@ await page.goto(`${BASE}/dataset`, { waitUntil: "networkidle" });
 const freshnessCard = page.locator("section").filter({ has: page.getByText("FRESHNESS", { exact: true }) });
 await freshnessCard.waitFor({ timeout: 30_000 });
 const freshness = await page.getByTestId("dataset-freshness").innerText();
-note(/frozen at data-v1/i.test(freshness), "S3", `dataset freshness: ${freshness}`, "docs/phase4/p1-s3-freshness-card.png", false);
+note(/frozen at data-v1/i.test(freshness), "S3-copy", `dataset freshness: ${freshness}`, "docs/phase4/p1-s3-freshness-card.png", false);
 note(!(await freshnessCard.locator("p.eyebrow").filter({ hasText: "External sources" }).count()), "S3-card", "freshness is its own card", "docs/phase4/p1-s3-freshness-card.png", false);
 await shotPage(page, "p0-dataset-freshness.png");
 await shotLocator(freshnessCard, "p1-s3-freshness-card.png");
-if (!/Last serving check/i.test(freshness)) {
-  problem(
-    "S3",
-    "open",
-    "FRESHNESS card still lacks Last serving check / streak=3; wait for 9/6 UTC cron. Do not fake ok=false before that date.",
-    "docs/phase4/p1-s3-freshness-card.png",
-    true,
-  );
-}
+const s3Flipped =
+  /a daily job verifies the serving layer/.test(freshness) &&
+  /Serving check streak: 3/.test(freshness) &&
+  /Last serving check: \d{4}-\d{2}-\d{2}/.test(freshness);
+problem(
+  "S3",
+  s3Flipped ? "closed" : "open",
+  s3Flipped
+    ? `FRESHNESS flipped from people_healthcheck_status: ${freshness}`
+    : `streak is not yet 3 consecutive UTC days (9/5 healthcheck row missing; do not backfill). Current copy: ${freshness}`,
+  "docs/phase4/p1-s3-freshness-card.png",
+  true,
+);
 
 await page.goto(`${BASE}/enterprise-demo/attrition`, { waitUntil: "domcontentloaded" });
 await page.getByTestId("case3-headline").waitFor({ timeout: 45_000 });
@@ -490,13 +511,25 @@ note(
 );
 const qualitySummary = await page.getByTestId("quality-tests-summary").innerText();
 note(
-  /\d+ tests · bronze \d+ \/ silver \d+ \/ gold \d+/.test(qualitySummary),
+  /\d+ tests · bronze \d+ \/ silver \d+ \/ gold \d+/.test(qualitySummary) &&
+    /last run against data-v1 \(frozen snapshot\)/.test(qualitySummary),
   "quality-summary",
   qualitySummary,
   "docs/phase4/p1-quality-collapsed.png",
 );
 await shotLocator(page.getByTestId("quality-tests"), "p1-quality-collapsed.png");
 await shotPage(page, "p1-authz-matrix.png");
+const limits = await page.getByTestId("known-limitations").innerText();
+note(
+  /Graded aggregate access has an inference path/.test(limits) &&
+    /as-of month n/.test(limits) &&
+    /frozen at data-v1/.test(limits) &&
+    /§9\.4 v1\.1/.test(limits),
+  "known-limitations",
+  limits.replaceAll("\n", " ").slice(0, 280),
+  "docs/phase4/p1-known-limitations.png",
+);
+await shotLocator(page.getByTestId("known-limitations"), "p1-known-limitations.png");
 
 await page.goto(`${BASE}/dataset`, { waitUntil: "domcontentloaded" });
 const datasetBody = await page.locator("main").innerText();
@@ -551,6 +584,28 @@ if (n2Ok) {
   problem("N2", "closed", "chip-04 uses identity_label; leader/HRBP/analyst Engineering median allowed; leader Sales deny recorded.", "docs/phase4/phase4_n2_leader_org_scope.json");
 }
 
+problem(
+  "F1",
+  "open",
+  "Only llm_used=true trace is f5b05693-b5ad-4751-b7e5-8f8a93043a95 (2026-09-05T19:45:32Z, 972ms, tokens null). 2026-09-06 latest failure ef7a9c06-da1c-45bb-b38f-0fa3b6aeaeda is llm_network Invalid URL on DEEPSEEK_BASE_URL.",
+  "docs/phase4/phase4_f1_llm_trace.json",
+  true,
+);
+problem(
+  "F3",
+  "open",
+  "Production NEXT_PUBLIC_SUPABASE_* removed; /lab retired. Staging anon SELECT is QuantReview ops — see docs/phase4/phase4_f3_revoke_list.md.",
+  "docs/phase4/phase4_f3_anon_key.md",
+  false,
+);
+problem(
+  "E1",
+  "open",
+  "Golden set list_only: 101 cases (+27 vs R5 74). Families session 6, chip_diff 6, suppression 11, refuse 10, adversarial 5. Runner not executed.",
+  "docs/phase4/e1-golden-set.md",
+  false,
+);
+
 const unique = [];
 const seen = new Set();
 for (const row of problems) {
@@ -560,9 +615,9 @@ for (const row of problems) {
   unique.push(row);
 }
 
-await writeFile(path.join(OUT, "phase4_chip_api.json"), `${JSON.stringify(apiRows, null, 2)}\n`);
-await writeFile(path.join(OUT, "phase4_llm_invocation_matrix.json"), `${JSON.stringify(matrix, null, 2)}\n`);
-await writeFile(path.join(OUT, "phase4_reverify_problems.json"), `${JSON.stringify(unique, null, 2)}\n`);
+await writeJsonRetry("phase4_chip_api.json", apiRows);
+await writeJsonRetry("phase4_llm_invocation_matrix.json", matrix);
+await writeJsonRetry("phase4_reverify_problems.json", unique);
 
 const blockingOpen = unique.filter((row) => row.blocking && row.status === "open" && row.id !== "S3");
 console.log("problems", unique.length, "blocking_open_except_s3", blockingOpen.length);

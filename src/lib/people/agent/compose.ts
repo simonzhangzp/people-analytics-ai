@@ -317,11 +317,13 @@ export function composeAnswerContract(input: {
             : "Related Signals control/slice medians, if shown, are scenario aggregates and are not this certified metric.",
       ];
     } else {
-      headline = `${label}${metricId.replaceAll("_", " ")} is ${formatMetricValue(metric)}.`;
+      const n = num(metric.n);
+      const nClause = n != null ? ` (n=${Math.round(n)})` : "";
+      headline = `${label}${metricId.replaceAll("_", " ")} is ${formatMetricValue(metric)}${nClause}.`;
       const healthNote = healthClause(quality);
       if (healthNote) headline = `${headline} ${healthNote}`;
       observedFacts.push(
-        fact(`Certified calculator: ${formatMetricValue(metric)} as of ${metricAsOf || "latest month"}.`, {
+        fact(`Certified calculator: ${formatMetricValue(metric)}${nClause} as of ${metricAsOf || "latest month"}.`, {
           source_tool: "get_metric",
           metric_id: metricVersion(metricId),
           filters: { job_family: plan.job_family ?? null, grain: String(metric.window ?? plan.filters.grain ?? "") },
@@ -355,12 +357,15 @@ export function composeAnswerContract(input: {
   }
 
   const skeletonHypotheses = [...hypotheses];
-  const allowLlmHypotheses = plan.playbook === "attrition_explore" && Boolean(input.hypotheses?.length);
+  const refused = plan.playbook === "refuse" || plan.tier === "refuse";
+  const allowLlmHypotheses = !refused && plan.playbook === "attrition_explore" && Boolean(input.hypotheses?.length);
   const candidate = allowLlmHypotheses ? input.hypotheses ?? skeletonHypotheses : skeletonHypotheses;
-  const finalHypotheses = sanitizeHypotheses(
-    candidate,
-    observedFacts.map((item) => item.text),
-  );
+  const finalHypotheses = refused
+    ? []
+    : sanitizeHypotheses(
+        candidate,
+        observedFacts.map((item) => item.text),
+      );
   const llm = resolveLlmInvocation({
     llmEligible: plan.llmEligible,
     llmCalls: input.llmCalls ?? 0,
@@ -401,6 +406,12 @@ export function composeAnswerContract(input: {
     skills_used: skillsUsed,
     error_state: rpcFailed ? "rpc" : null,
     withheld: false,
+    refuse_reason: plan.refuse_reason ?? null,
+    denied: observedFacts.some((item) => item.denied === true) || /not available/i.test(headline),
+    deny_reason: (() => {
+      const reason = firstMetric.reason ?? pickNamed(results, "get_metric").reason;
+      return reason == null || reason === "" ? null : String(reason);
+    })(),
     llm_skipped: llm.llm_skipped,
     llm_invocation: llm.llm_invocation,
     failure_reason: llm.failure_reason,

@@ -688,7 +688,7 @@ weekly: full extract 校验；eval harness（Phase 4 起）
 - `peopleServing.*` 改为 v2 客户端：直连 Postgres（`people_app` 角色，pooler），所有调用带 `identity_id`；默认 `external_viewer`。
 - RPC 名称由 metric YAML 生成；旧 `people_get_*` 在 `public` 保留到切流后 30 天。
 - 三个 case 页只改数据绑定与数字校对，不改叙事结构；数据集页新增 scenario 列表与 SYNTHETIC_EXTENSION 说明。
-- `/lab` 不受影响（独立路径与数据）。
+- 早期文件分析实验已下线。
 
 ---
 

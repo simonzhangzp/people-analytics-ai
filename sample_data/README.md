@@ -1,8 +1,8 @@
 # Local test data
 
-These files exercise the People Analytics workflow. On Analyze they are stored
-in the Formulator workspace. On `/workbench` they are parsed in the browser
-and are not uploaded to the marketing site.
+These files are synthetic / public-domain samples kept for offline checks.
+The public site no longer parses them in the browser. The early file-analysis
+experiment is retired.
 
 ## `ibm_bpo_recruiting_candidates.csv`
 

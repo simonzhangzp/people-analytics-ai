@@ -4,6 +4,24 @@ import path from "node:path";
 const SHOTS = path.join("docs", "phase4");
 
 test.describe("Phase 4 agent + connect", () => {
+  test("trust scorecard links to Metric Explorer; Lab is gone", async ({ page }) => {
+    await page.goto("/enterprise-demo/trust");
+    if (await page.getByRole("heading", { name: /people serving is not configured/i }).isVisible()) {
+      test.skip(true, "People serving env is not configured");
+    }
+    await expect(page.getByTestId("primary-nav")).toContainText("Enterprise Demo");
+    await expect(page.getByTestId("primary-nav")).not.toContainText("Lab");
+    await expect(page.locator("footer")).not.toContainText("Lab");
+    await expect(page.getByTestId("authz-matrix-title")).toContainText("What site visitor can read");
+    await expect(page.getByTestId("eval-scorecard")).toBeVisible();
+    await page.getByRole("link", { name: "Metric Explorer" }).click();
+    await expect(page.getByTestId("metric-explorer")).toBeVisible();
+    await page.goto("/dataset");
+    await expect(page.locator("h1").first()).toBeVisible();
+    await page.goto("/about");
+    await expect(page.locator("h1").first()).toBeVisible();
+  });
+
   test("connect page shows the public demo token disclaimer", async ({ page }) => {
     await page.goto("/connect");
     await expect(page.getByRole("heading", { name: /connect via mcp/i })).toBeVisible();

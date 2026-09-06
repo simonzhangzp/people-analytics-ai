@@ -22,7 +22,7 @@ select * from people_v2.people_llm_usage_30d;
 
 改 `limit_value` 即生效。账本 INSERT 失败 → `allowed:false`，不调 LLM。
 
-`people_consume_ai_quota` **保留**（QuantReview 登录用户日配额）。`people_try_consume_llm` 是站点 IP + `site_rolling_30d` 硬顶。Lab `/api/workbench/ai` 与 `/api/strategy/analyze` 先走站点账本。
+`people_consume_ai_quota` **保留**（QuantReview 登录用户日配额；本仓库已停止调用，不得 ALTER/DROP）。`people_try_consume_llm` 是站点 IP + `site_rolling_30d` 硬顶，**仅服务 `/api/people/ask`**。早期文件分析实验已下线。
 
 实测（`test_llm_budget.py`）：同一 ip_hash 第 4 次 `blocked_by=per_ip_daily`；`site_rolling_30d=0` 时全员回落；并发 10 次同 IP → **3 allowed / 7 blocked**，无超发。
 

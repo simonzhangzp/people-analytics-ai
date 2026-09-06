@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "vitest run src/lib/people/platform-facts.test.ts src/lib/people/demo-payload.test.ts src/lib/people/case3-view.test.ts && next build",
+    "build": "vitest run src/lib/people/platform-facts.test.ts src/lib/people/demo-payload.test.ts src/lib/people/case3-view.test.ts && node scripts/clean-next-dev.mjs && next build && node scripts/assert-no-anon-in-client.mjs",
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",

@@ -19,6 +19,7 @@ export const plannerOutputSchema = z.object({
 export type PlannerOutput = {
   tools?: PeopleToolCall[];
   hypotheses?: string[];
+  usage?: { prompt_tokens: number; completion_tokens: number };
 };
 
 function readHypotheses(raw: unknown): string[] | undefined {
@@ -79,6 +80,27 @@ export function plannerMessages(input: {
   };
 }
 
+export function resolveDeepSeekCompletionsUrl(raw?: string | null): string {
+  const fallback = "https://api.deepseek.com";
+  let candidate = (raw ?? "").trim().replace(/^["']+|["']+$/g, "").trim();
+  if (!candidate) return `${fallback}/chat/completions`;
+  if (!/^https?:\/\//i.test(candidate)) candidate = `https://${candidate}`;
+  try {
+    const url = new URL(candidate);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return `${fallback}/chat/completions`;
+    }
+    if (!url.hostname || /["'\s]/.test(url.hostname) || url.hostname.includes("%22")) {
+      return `${fallback}/chat/completions`;
+    }
+    const path = url.pathname.replace(/\/+$/, "");
+    const basePath = !path || path === "/" ? "" : path;
+    return `${url.origin}${basePath}/chat/completions`;
+  } catch {
+    return `${fallback}/chat/completions`;
+  }
+}
+
 export async function deepSeekPlanner(input: {
   question: string;
   registry: readonly string[];
@@ -105,7 +127,7 @@ export async function deepSeekPlanner(input: {
   const fetchImpl = input.fetchImplementation ?? fetch;
   try {
     const response = await fetchImpl(
-      `${(input.baseUrl ?? process.env.DEEPSEEK_BASE_URL ?? "https://api.deepseek.com").replace(/\/+$/, "")}/chat/completions`,
+      resolveDeepSeekCompletionsUrl(input.baseUrl ?? process.env.DEEPSEEK_BASE_URL),
       {
         method: "POST",
         headers: {
@@ -144,11 +166,24 @@ export async function deepSeekPlanner(input: {
     }
     const planned = parsePlannerJson(parsed);
     if (!planned) throw new Error("llm_schema");
-    return planned;
+    const promptTokens = Number(payload.usage?.prompt_tokens);
+    const completionTokens = Number(payload.usage?.completion_tokens);
+    return {
+      ...planned,
+      usage: {
+        prompt_tokens: Number.isFinite(promptTokens) ? promptTokens : 0,
+        completion_tokens: Number.isFinite(completionTokens) ? completionTokens : 0,
+      },
+    };
   } catch (error) {
     if (error instanceof Error && error.message.startsWith("llm_")) throw error;
     if (error instanceof Error && error.name === "AbortError") throw new Error("llm_timeout");
-    throw new Error("llm_network");
+    const name = error instanceof Error ? error.name : "unknown";
+    const cause =
+      error instanceof Error && error.cause instanceof Error
+        ? `${error.cause.name}:${error.cause.message}`
+        : "";
+    throw new Error(`llm_network:${name}${cause ? `:${cause}` : ""}`.slice(0, 180));
   } finally {
     clearTimeout(timeout);
   }

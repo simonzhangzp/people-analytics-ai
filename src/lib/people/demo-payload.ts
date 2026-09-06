@@ -30,6 +30,8 @@ import {
   peopleGetReplayValues,
   peopleGetServingRun,
   peopleGetSkillCoverage,
+  peopleLatestEvalScorecard,
+  type PeopleEvalScorecard,
 } from "./v2-client";
 
 export { headcountLineageSteps } from "./headcount-lineage";
@@ -37,7 +39,7 @@ export { groupQualityTestsByLayer } from "./quality-catalog";
 export type { QualityCatalogRow } from "./quality-catalog";
 
 export async function loadTrustCase(identityId = DEFAULT_IDENTITY) {
-  const [company, engineering, definition, lineage, health, run, quality, certified, ...authzRows] = await Promise.all([
+  const [company, engineering, definition, lineage, health, run, quality, certified, evalScorecard, ...authzRows] = await Promise.all([
     peopleGetMetricFor(identityId, "headcount", { grain: "month" }),
     peopleGetMetricFor(identityId, "headcount", { grain: "month", jobFamily: "Engineering" }),
     peopleGetMetricRow("headcount"),
@@ -46,6 +48,7 @@ export async function loadTrustCase(identityId = DEFAULT_IDENTITY) {
     peopleGetServingRun("data-v1"),
     peopleGetQualityCatalog("data-v1"),
     peopleGetPointer("current_certified"),
+    peopleLatestEvalScorecard().catch((): PeopleEvalScorecard => ({ present: false })),
     ...AUTHZ_SCOPES.flatMap((scope) =>
       AUTHZ_CLASSES.map((sensitivityClass) =>
         peopleGetMetricFor(identityId, authzMetricId(sensitivityClass), {
@@ -124,6 +127,7 @@ export async function loadTrustCase(identityId = DEFAULT_IDENTITY) {
     qualityCounts: qualityLayerCounts(tests),
     health,
     run,
+    evalScorecard,
     authz: authzRows,
   };
 }

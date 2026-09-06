@@ -67,9 +67,6 @@ export function SiteFooter() {
           <Link href="/dataset" className="hover:text-[#2f4fa9]">
             Dataset
           </Link>
-          <Link href="/lab" className="hover:text-[#2f4fa9]">
-            Lab
-          </Link>
         </div>
       </div>
     </footer>

@@ -5,11 +5,28 @@ const NO_STORE = {
   value: "private, no-cache, no-store, max-age=0, must-revalidate",
 } as const;
 
+const RETIRED = [
+  "/lab",
+  "/ask",
+  "/workbench",
+  "/demo",
+  "/strategy",
+  "/app",
+  "/workspace",
+  "/api/workbench/ai",
+  "/api/strategy/analyze",
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   allowedDevOrigins: ["127.0.0.1", "localhost"],
-  transpilePackages: ["@kanaries/graphic-walker"],
   serverExternalPackages: ["pg"],
+  async redirects() {
+    return RETIRED.flatMap((source) => [
+      { source, destination: "/", statusCode: 301 },
+      { source: `${source}/:path*`, destination: "/", statusCode: 301 },
+    ]);
+  },
   async headers() {
     return [
       { source: "/", headers: [NO_STORE] },
@@ -17,6 +34,7 @@ const nextConfig: NextConfig = {
       { source: "/enterprise-demo/:path*", headers: [NO_STORE] },
       { source: "/about", headers: [NO_STORE] },
       { source: "/dataset", headers: [NO_STORE] },
+      { source: "/connect", headers: [NO_STORE] },
     ];
   },
 };

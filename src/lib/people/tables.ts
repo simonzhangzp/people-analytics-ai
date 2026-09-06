@@ -1,19 +1,4 @@
-export const PEOPLE_TABLE = {
-  workspaces: "people_workspaces",
-  datasets: "people_datasets",
-  fieldMappings: "people_field_mappings",
-  datasetRelationships: "people_dataset_relationships",
-  workbenchMetrics: "people_workbench_metrics",
-  analysisQuestions: "people_analysis_questions",
-  insights: "people_insights",
-  executiveStories: "people_executive_stories",
-  aiUsage: "people_ai_usage",
-  metricDefinition: "people_metric_definition",
-  martWorkforceOverview: "people_mart_workforce_overview",
-} as const;
-
 export const PEOPLE_RPC = {
-  consumeAiQuota: "people_consume_ai_quota",
   getMetric: "people_get_metric",
   getMetricTrend: "people_get_metric_trend",
   getMetricBreakdown: "people_get_metric_breakdown",

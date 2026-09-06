@@ -60,6 +60,9 @@ export interface PeopleAskAnswer {
   critic?: { ok: boolean; failures: string[] };
   error_state?: "rpc" | "critic" | null;
   withheld?: boolean;
+  refuse_reason?: string | null;
+  denied?: boolean;
+  deny_reason?: string | null;
   llm_skipped?: string | null;
   llm_invocation?: LlmInvocation;
   failure_reason?: string | null;

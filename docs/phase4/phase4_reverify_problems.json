@@ -1,15 +1,8 @@
 [
   {
     "id": "S3",
-    "status": "closed",
-    "summary": "dataset freshness: The dataset is frozen at data-v1 (as-of 2026-08-31).",
-    "evidence": "docs/phase4/p1-s3-freshness-card.png",
-    "blocking": false
-  },
-  {
-    "id": "S3",
     "status": "open",
-    "summary": "FRESHNESS card still lacks Last serving check / streak=3; wait for 9/6 UTC cron. Do not fake ok=false before that date.",
+    "summary": "streak is not yet 3 consecutive UTC days (9/5 healthcheck row missing; do not backfill). Current copy: The dataset is frozen at data-v1 (as-of 2026-08-31).",
     "evidence": "docs/phase4/p1-s3-freshness-card.png",
     "blocking": true
   },
@@ -73,7 +66,7 @@
     "id": "S1",
     "status": "closed",
     "summary": "tenure hidden fact: –5y: 14.6%.\nTenure 5–10y: 11.6%.\nTenure 10y+: 8.1%.\nNo cells hidden at this grain (min_cell 50).\nTenure differences are associations after suppression. They are not a causal claim.",
-    "evidence": "390b85a3-e429-4d9f-b121-19ce6bb3a35f",
+    "evidence": "66954d19-4e5e-4bce-99c4-12c782c474ad",
     "blocking": true
   },
   {
@@ -101,7 +94,7 @@
     "id": "D3-trace",
     "status": "closed",
     "summary": "metric_min_cell 10 · identity_min_cell 20 · effective_min_cell 20 (identity)",
-    "evidence": "28b19175-060d-453d-a481-48edd1b1879a",
+    "evidence": "745c8c51-41aa-4758-af03-61ac46c668bd",
     "blocking": true
   },
   {
@@ -136,28 +129,28 @@
     "id": "N2-org-scope",
     "status": "closed",
     "summary": "leader Sales compensation: Compensation positioning is not available to Engineering leader. No substitute number is shown.",
-    "evidence": "6807ab66-a4c7-4313-8b20-e4fadda5b353",
+    "evidence": "83c1aecf-0aec-4924-89ec-3327bcbed221",
     "blocking": true
   },
   {
     "id": "D1-hrbp-sales",
     "status": "closed",
     "summary": "HRBP Sales compensation: Compensation positioning is not available to HRBP. No substitute number is shown.",
-    "evidence": "04e064bb-ec91-4fd8-a5d2-696ab9a9c4bc",
+    "evidence": "38622cb8-c6e7-4873-a2e1-d00ad185530d",
     "blocking": true
   },
   {
     "id": "C2",
     "status": "closed",
     "summary": "leader company compensation: Compensation positioning is not available to Engineering leader. No substitute number is shown. as_of=2026-08-31",
-    "evidence": "2543a517-7c32-4cd9-aa31-bb0387aba112",
+    "evidence": "554afc36-ca68-42ab-bf87-d8dc0a365521",
     "blocking": true
   },
   {
     "id": "D1-hrbp-company",
     "status": "closed",
     "summary": "HRBP company compensation: compa ratio median is 0.98.",
-    "evidence": "be20d342-9d86-4cfa-9cb1-13b747e97896",
+    "evidence": "e176dd3f-375d-49a7-8acd-631b6db180f6",
     "blocking": true
   },
   {
@@ -191,8 +184,15 @@
   {
     "id": "quality-summary",
     "status": "closed",
-    "summary": "74 tests · bronze 3 / silver 35 / gold 36 · all passed · last run 2026-09-04",
+    "summary": "74 tests · bronze 3 / silver 35 / gold 36 · all passed · last run against data-v1 (frozen snapshot)",
     "evidence": "docs/phase4/p1-quality-collapsed.png",
+    "blocking": true
+  },
+  {
+    "id": "known-limitations",
+    "status": "closed",
+    "summary": "KNOWN LIMITATIONS  Governance maturity for this demo — not a legal disclaimer.  Graded aggregate access has an inference path: an HRBP who can read company-level and own-org confidential aggregates can, for mean-type metrics, infer other-org values. Medians are weaker but not zer",
+    "evidence": "docs/phase4/p1-known-limitations.png",
     "blocking": true
   },
   {
@@ -243,5 +243,26 @@
     "summary": "chip-04 uses identity_label; leader/HRBP/analyst Engineering median allowed; leader Sales deny recorded.",
     "evidence": "docs/phase4/phase4_n2_leader_org_scope.json",
     "blocking": true
+  },
+  {
+    "id": "F1",
+    "status": "open",
+    "summary": "Only llm_used=true trace is f5b05693-b5ad-4751-b7e5-8f8a93043a95 (2026-09-05T19:45:32Z, 972ms, tokens null). 2026-09-06 latest failure ef7a9c06-da1c-45bb-b38f-0fa3b6aeaeda is llm_network Invalid URL on DEEPSEEK_BASE_URL.",
+    "evidence": "docs/phase4/phase4_f1_llm_trace.json",
+    "blocking": true
+  },
+  {
+    "id": "F3",
+    "status": "open",
+    "summary": "NEXT_PUBLIC_SUPABASE_* points at QuantReview staging; enterprise serving uses PEOPLE_DB_URL. Anon probe CAN read staging people_mart_workforce_overview, people_dim_worker, people_metric_definition, people_serving_snapshot, panorama_daily. Staging DDL forbidden. Delete the two Production env vars after 30-day retention.",
+    "evidence": "docs/phase4/phase4_f3_anon_key.md",
+    "blocking": false
+  },
+  {
+    "id": "E1",
+    "status": "open",
+    "summary": "Golden set list_only: 101 cases (+27 vs R5 74). Families session 6, chip_diff 6, suppression 11, refuse 10, adversarial 5. Runner not executed.",
+    "evidence": "docs/phase4/e1-golden-set.md",
+    "blocking": false
   }
 ]

@@ -21,7 +21,7 @@ Do not ship this to the live homepage or nav in this phase. Bind it on the datas
 **Freshness card (eyebrow FRESHNESS, after External sources):**
 
 - Until healthcheck streak ≥ 3: The dataset is frozen at data-v1 (as-of 2026-08-31).
-- After streak ≥ 3, from `people_serving_run`: The dataset is frozen at data-v1 (as-of 2026-08-31); a daily job verifies the serving layer. Last serving check: YYYY-MM-DD.
+- After streak ≥ 3, from `people_healthcheck_status()` (not a local file): The dataset is frozen at data-v1 (as-of 2026-08-31); a daily job verifies the serving layer. Serving check streak: N. Last serving check: YYYY-MM-DD.
 
 Do not claim a daily serving job while the Vercel Cron healthcheck streak is below 3 consecutive UTC days. Do not place freshness under External sources.
 

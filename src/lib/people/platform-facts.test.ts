@@ -91,6 +91,9 @@ describe("homepage platform facts vs data-v1 parity", () => {
     expect(datasetFreshnessCopy({ consecutiveDays: 3, lastRunDate: "2026-09-06" })).toMatch(
       /Last serving check: 2026-09-06/,
     );
+    expect(datasetFreshnessCopy({ consecutiveDays: 3, lastRunDate: "2026-09-06" })).toMatch(
+      /Serving check streak: 3/,
+    );
     const datasetPage = readFileSync(path.join(ROOT, "src/app/dataset/page.tsx"), "utf8");
     expect(datasetPage).toMatch(/eyebrow">FRESHNESS</);
     expect(datasetPage.indexOf("External sources")).toBeLessThan(datasetPage.indexOf("FRESHNESS"));

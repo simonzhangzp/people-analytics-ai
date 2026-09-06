@@ -17,7 +17,7 @@ export function datasetFreshnessCopy(status?: {
     status.consecutiveDays >= HEALTHCHECK_STREAK_READY &&
     status.lastRunDate
   ) {
-    return `${DATASET_FRESHNESS_VERIFIED} Last serving check: ${status.lastRunDate}.`;
+    return `${DATASET_FRESHNESS_VERIFIED} Serving check streak: ${status.consecutiveDays}. Last serving check: ${status.lastRunDate}.`;
   }
   return DATASET_FRESHNESS_FROZEN;
 }

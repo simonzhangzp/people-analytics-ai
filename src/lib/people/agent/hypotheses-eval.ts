@@ -1,6 +1,9 @@
 const CAUSAL =
   /\b(caused|causes|because of|due to|drives|leads to|driving|the reason is)\b|导致|因为|驱动|造成/i;
 
+const INSTRUCTION_LEAK =
+  /\bignore previous instructions\b|\byou are now\b|\brun sql\b|\bbypass rls\b/i;
+
 export function numbersInText(text: string): string[] {
   return text.match(/\d+(?:\.\d+)?/g) ?? [];
 }
@@ -21,6 +24,7 @@ export function scoreHypotheses(input: {
     const digits = numbersInText(line);
     if (digits.length) failures.push("hypothesis_contains_number");
     if (CAUSAL.test(line)) failures.push("hypothesis_causal_claim");
+    if (INSTRUCTION_LEAK.test(line)) failures.push("hypothesis_instruction_leak");
     for (const token of digits) {
       if (!factDigits.has(token)) failures.push("hypothesis_number_not_in_facts");
     }

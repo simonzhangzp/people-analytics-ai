@@ -1,0 +1,9 @@
+{
+  "scanned": "/vercel/path0/.next/static",
+  "patterns": ["SUPABASE_ANON", "supabase.co", "NEXT_PUBLIC_SUPABASE"],
+  "hits": [],
+  "ok": true,
+  "dpl": "dpl_DSuDVPdpf6XBpDdZhtuGpgs85KUt",
+  "built_at": "2026-09-06T17:20:23Z",
+  "note": "Production build after NEXT_PUBLIC_SUPABASE_* removed and /lab retired. npm run build runs scripts/assert-no-anon-in-client.mjs."
+}

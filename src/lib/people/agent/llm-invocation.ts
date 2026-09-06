@@ -22,6 +22,8 @@ export const LLM_BUDGET_NOTICE =
 
 const BUDGET_REASONS = new Set([
   "per_ip_daily",
+  "per_ip_daily_attempts",
+  "per_ip_rolling_30d",
   "site_rolling_30d",
   "per_route_daily",
   "ledger_write_failed",

@@ -85,7 +85,7 @@ export default async function HomePage() {
     <div className="min-h-screen bg-[#f7f8fa] text-[#111827]">
       <SiteHeader active="/" />
       <main className="mx-auto max-w-[1100px] px-5 py-12 sm:px-8">
-        <p className="eyebrow">People Data & AI Lab</p>
+        <p className="eyebrow">People Data & AI</p>
         <h1 className="mt-4 max-w-4xl text-[36px] font-bold leading-[1.1] tracking-[-0.04em] text-[#13203a] sm:text-[44px]">
           Trusted People data. Governed metrics. AI-ready workforce intelligence.
         </h1>

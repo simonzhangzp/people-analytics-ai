@@ -106,8 +106,7 @@ export function ServingUnavailable() {
         </h1>
         <p className="mt-4 text-[15px] leading-7 text-[#536177]">
           Set server-only PEOPLE_DB_URL (transaction pooler 6543, role people_app) and
-          PEOPLE_SERVING_REF=zapmigfrtnwnkmezjefx. The v2 path does not use
-          NEXT_PUBLIC_SUPABASE_*.
+          PEOPLE_SERVING_REF=zapmigfrtnwnkmezjefx.
         </p>
       </main>
       <SiteFooter />

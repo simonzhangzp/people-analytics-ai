@@ -506,6 +506,22 @@ export async function peopleListMetrics(identityId: string): Promise<Record<stri
   );
 }
 
+export type PeopleEvalScorecard = {
+  present: boolean;
+  status?: string;
+  git_tag?: string;
+  dpl?: string;
+  run_id?: string;
+  finished_at?: string;
+  scorecard?: Record<string, unknown>;
+};
+
+export async function peopleLatestEvalScorecard(): Promise<PeopleEvalScorecard> {
+  const payload = await peopleRpcJson(`select people_v2.people_latest_eval_scorecard() as payload`);
+  if (payload.present !== true) return { present: false };
+  return { ...payload, present: true };
+}
+
 export async function peopleGetGlossaryTerm(
   identityId: string,
   term: string,

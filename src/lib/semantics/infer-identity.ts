@@ -1,1 +1,0 @@
-export { inferIdentityBinding } from "./contracts";

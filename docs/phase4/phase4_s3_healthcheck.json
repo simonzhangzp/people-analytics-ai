@@ -1,0 +1,41 @@
+{
+  "queried_at_utc": "2026-09-06T15:50:00Z",
+  "sql": "select run_id, run_date, notes from people_v2.people_serving_run where kind='healthcheck' order by run_date",
+  "rows": [
+    {
+      "run_id": "healthcheck-2026-09-04",
+      "run_date": "2026-09-04",
+      "ok": true,
+      "started_at": "2026-09-04T19:09:02.226703+00",
+      "notes_shape": "json_gate3",
+      "source": "GATE 3 / people_run write at 19:09 UTC, not the 10:00 cron"
+    },
+    {
+      "run_id": "healthcheck-2026-09-06",
+      "run_date": "2026-09-06",
+      "ok": true,
+      "started_at": "2026-09-06T10:00:00.660071+00",
+      "notes": "frozen_data_v1",
+      "source": "Vercel Cron 0 10 * * * UTC"
+    }
+  ],
+  "missing": ["2026-09-05"],
+  "people_healthcheck_status": {
+    "consecutive_days": 1,
+    "last_run_date": "2026-09-06",
+    "last_ok": true,
+    "frozen_as_of": "2026-08-31"
+  },
+  "backfill": "forbidden",
+  "cron": {
+    "path": "/api/cron/people-healthcheck",
+    "schedule": "0 10 * * *",
+    "secret": "CRON_SECRET is set on Production (vercel env ls; created ~20h before this query)",
+    "unauthorized_without_bearer": {
+      "url": "https://peopleanalyticsai.net/api/cron/people-healthcheck",
+      "status": 401,
+      "body": "Cron secret missing or invalid."
+    },
+    "nine_six_row": "started_at 10:00:00.660Z matches vercel.json 0 10 * * *"
+  }
+}

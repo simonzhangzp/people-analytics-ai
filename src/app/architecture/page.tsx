@@ -148,11 +148,7 @@ export default function ArchitecturePage() {
           <Link href="/connect" className="font-semibold text-[#3157c9]">
             MCP endpoint
           </Link>
-          . Earlier file-upload experiments live in the{" "}
-          <Link href="/lab" className="font-semibold text-[#3157c9]">
-            Lab
-          </Link>
-          . They are not the enterprise platform.
+          . The early file-analysis experiment is retired.
         </p>
       </main>
       <SiteFooter />

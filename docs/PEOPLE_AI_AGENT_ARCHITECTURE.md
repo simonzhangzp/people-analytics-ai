@@ -318,7 +318,7 @@ skills/
 | Context Assembly | 渐进式披露：默认只给紧凑 catalog（metric 名 + 一句定义），按需加载 metric YAML / skill / glossary；token 预算硬上限 |
 | Memory | session；用户 profile（role、org scope——来自身份与 policy，绝不来自用户自述）；analysis-of-record（保存的 brief） |
 | Critic / Verifier | 生成后校验：数字与工具结果一致、因果措辞门控、小单元抑制、PII 泄露、引用完整 |
-| Guardrails | 输入分类（in-scope / out-of-scope / 个人层面请求 → 拒绝）；外部内容隔离（检索内容只作数据，不触发工具）；配额（沿用 `people_consume_ai_quota`） |
+| Guardrails | 输入分类（in-scope / out-of-scope / 个人层面请求 → 拒绝）；外部内容隔离（检索内容只作数据，不触发工具）；配额（`people_try_consume_llm`，仅 `/api/people/ask`） |
 | Model Gateway | provider-agnostic；小模型做路由 / 分类，大模型做综合；每条 trace 记录 model + version |
 | Trace Store | `people_agent_trace` / `people_agent_tool_call` |
 
@@ -375,7 +375,7 @@ Scopes：`metrics:read`、`semantic:read`、`lineage:read`、`quality:read`、`s
 
 ### 4.5 L5 Experience
 
-**保留：** 单栏 case-study 站点；三个旗舰 case；不做通用 dashboard；`/lab` 继续 noindex。
+**保留：** 单栏 case-study 站点；三个旗舰 case；不做通用 dashboard。早期文件分析实验（`/lab`）已下线。
 
 **新增页面（每层一个证据）**
 
@@ -391,7 +391,7 @@ Scopes：`metrics:read`、`semantic:read`、`lineage:read`、`quality:read`、`s
 
 **Case 路线：** Case 1–3 保留；治理 demo 与 signal demo 作为 case 内的交互，不新增 case；Case 4 "Why is hiring slowing down?" 在 TA source model 切流后再做。
 
-**开源工具：** 公开站保持 Next.js，不引入第二个 BI 产品。若需要 BI-as-code 页面（SQL + markdown），可评估 Evidence；Superset / Metabase 只考虑用于 `/lab`。
+**开源工具：** 公开站保持 Next.js，不引入第二个 BI 产品。若需要 BI-as-code 页面（SQL + markdown），可评估 Evidence。早期文件分析实验已下线，不再把 Superset / Metabase 挂在公开站上。
 
 **Perspective 页：** 增加 "Human-AI Collaboration in People Analytics" 一节，讲清人审点的设计（mapping 审批、事故定性、行动决策）。
 

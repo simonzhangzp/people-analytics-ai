@@ -1,0 +1,112 @@
+{
+  "supabase_host": "kgxbomcmgkwlmzyevqjw.supabase.co",
+  "project_ref": "kgxbomcmgkwlmzyevqjw",
+  "is_staging_ref": true,
+  "is_people_ref": false,
+  "is_quantreview_prod_ref": false,
+  "anon_key_present": true,
+  "deepseek_model_pulled": false,
+  "deepseek_base_pulled": false,
+  "deepseek_key_pulled": false,
+  "cron_secret_pulled": false,
+  "rest": [
+    {
+      "table": "people_mart_workforce_overview",
+      "status": 200,
+      "leaked_rows": true,
+      "pgrst": null,
+      "empty_array": false
+    },
+    {
+      "table": "people_snap_worker_month",
+      "status": 404,
+      "leaked_rows": false,
+      "pgrst": "PGRST205",
+      "empty_array": false
+    },
+    {
+      "table": "people_dim_worker",
+      "status": 200,
+      "leaked_rows": true,
+      "pgrst": null,
+      "empty_array": false
+    },
+    {
+      "table": "people_serving_run",
+      "status": 404,
+      "leaked_rows": false,
+      "pgrst": "PGRST205",
+      "empty_array": false
+    },
+    {
+      "table": "people_serving_snapshot",
+      "status": 200,
+      "leaked_rows": true,
+      "pgrst": null,
+      "empty_array": false
+    },
+    {
+      "table": "people_agent_trace",
+      "status": 404,
+      "leaked_rows": false,
+      "pgrst": "PGRST205",
+      "empty_array": false
+    },
+    {
+      "table": "people_ai_usage",
+      "status": 401,
+      "leaked_rows": false,
+      "pgrst": null,
+      "empty_array": false
+    },
+    {
+      "table": "people_workspaces",
+      "status": 401,
+      "leaked_rows": false,
+      "pgrst": null,
+      "empty_array": false
+    },
+    {
+      "table": "people_datasets",
+      "status": 401,
+      "leaked_rows": false,
+      "pgrst": null,
+      "empty_array": false
+    },
+    {
+      "table": "people_metric_definition",
+      "status": 200,
+      "leaked_rows": true,
+      "pgrst": null,
+      "empty_array": false
+    },
+    {
+      "table": "workspaces",
+      "status": 404,
+      "leaked_rows": false,
+      "pgrst": "PGRST205",
+      "empty_array": false
+    },
+    {
+      "table": "datasets",
+      "status": 404,
+      "leaked_rows": false,
+      "pgrst": "PGRST205",
+      "empty_array": false
+    },
+    {
+      "table": "panorama_daily",
+      "status": 200,
+      "leaked_rows": true,
+      "pgrst": null,
+      "empty_array": false
+    },
+    {
+      "table": "metric_definitions",
+      "status": 404,
+      "leaked_rows": false,
+      "pgrst": "PGRST205",
+      "empty_array": false
+    }
+  ]
+}

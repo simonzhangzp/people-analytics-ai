@@ -5,11 +5,11 @@ import { peopleWriteAgentToolCall, peopleWriteAgentTrace } from "../v2-client";
 import { clientIpFromHeaders, completeLlmBudget, hashClientIp, tryConsumeLlmBudget } from "./budget";
 import { applyCritic, criticCheck } from "./critic";
 import { composeAnswerContract } from "./compose";
-import { deepSeekPlanner, type PeoplePlanner } from "./planner";
+import { deepSeekPlanner, resolveDeepSeekCompletionsUrl, type PeoplePlanner } from "./planner";
 import { executeRegistryTool } from "./registry";
 import { routePeopleQuestion } from "./router";
 import { PEOPLE_TOOL_NAMES, type PeopleAnswerContract, type PeopleToolCall } from "./types";
-import { resolveLlmInvocation, classifyPlannerFailure } from "./llm-invocation";
+import { classifyPlannerFailure, LLM_BUDGET_NOTICE, resolveLlmInvocation } from "./llm-invocation";
 import { wrapUntrustedToolData } from "./wrap-data";
 
 const ALLOWED_IDENTITIES = new Set<string>(DEMO_IDENTITIES.map((row) => row.identity_id));
@@ -170,14 +170,39 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
       } catch (error) {
         planned = null;
         const classified = classifyPlannerFailure(error);
-        llmSkipped = classified.llm_skipped;
         plannerInternal = classified.internal;
+        const raw = error instanceof Error ? error.message : "unknown";
+        llmSkipped =
+          classified.llm_skipped === "upstream_error" && raw.startsWith("llm_network")
+            ? raw.slice(0, 180)
+            : classified.llm_skipped;
+        let host = "unparsed";
+        try {
+          host = new URL(resolveDeepSeekCompletionsUrl(process.env.DEEPSEEK_BASE_URL)).host;
+        } catch {
+          host = "invalid_base_url";
+        }
+        console.error("people_planner_fail", {
+          msg: raw,
+          host,
+          model: process.env.DEEPSEEK_MODEL || "deepseek-chat",
+        });
       }
       const latency = Date.now() - plannerStarted;
+      const tokensIn = planned?.usage?.prompt_tokens;
+      const tokensOut = planned?.usage?.completion_tokens;
       if (!planned) {
         llmSkipped = llmSkipped ?? "upstream_error";
         if (callId) {
-          await completeLlmBudget({ callId, traceId, ok: false, latencyMs: latency, model: "deepseek-chat" });
+          await completeLlmBudget({
+            callId,
+            traceId,
+            ok: false,
+            latencyMs: latency,
+            model: "deepseek-chat",
+            tokensIn,
+            tokensOut,
+          });
         }
       } else {
         llmCalls = 1;
@@ -189,6 +214,8 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
             ok: true,
             latencyMs: latency,
             model: "deepseek-chat",
+            tokensIn,
+            tokensOut,
           });
         }
       }
@@ -325,11 +352,15 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
 }
 
 export function toAskAnswer(answer: PeopleAnswerContract): PeopleAskAnswer {
+  const facts =
+    answer.llm_invocation === "skipped_by_budget" && !answer.facts.includes(LLM_BUDGET_NOTICE)
+      ? [LLM_BUDGET_NOTICE, ...answer.facts]
+      : answer.facts;
   return {
     question: answer.question,
     supported: answer.supported,
     headline: answer.headline,
-    facts: answer.facts,
+    facts,
     interpretation: answer.interpretation,
     quality_status: answer.quality_status,
     freshness: answer.freshness,
@@ -348,6 +379,9 @@ export function toAskAnswer(answer: PeopleAnswerContract): PeopleAskAnswer {
     critic: answer.critic,
     error_state: answer.error_state,
     withheld: answer.withheld,
+    refuse_reason: answer.refuse_reason ?? null,
+    denied: answer.denied === true,
+    deny_reason: answer.deny_reason ?? null,
     llm_skipped: answer.llm_skipped,
     llm_invocation: answer.llm_invocation,
     failure_reason: answer.failure_reason,

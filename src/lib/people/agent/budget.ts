@@ -110,6 +110,6 @@ export async function completeLlmBudget(input: {
       latencyMs: input.latencyMs,
     });
   } catch {
-    /* complete is best-effort; the placeholder already occupies quota */
+    /* complete is best-effort; ok stays false until this write, so failed calls do not occupy success quota */
   }
 }

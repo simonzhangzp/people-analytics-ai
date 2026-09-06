@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Confidence, WorkflowStatus } from "@/types/domain";
 
 export function BrandMark({ compact = false }: { compact?: boolean }) {
   return (
@@ -139,7 +138,7 @@ export function PageHeader({
   );
 }
 
-export function StatusBadge({ status }: { status: WorkflowStatus | string }) {
+export function StatusBadge({ status }: { status: string }) {
   const style =
     status === "Approved" || status === "Confirmed"
       ? "bg-[#eaf5ef] text-[#2f7659] border-[#d2e8dc]"
@@ -164,7 +163,7 @@ export function StatusBadge({ status }: { status: WorkflowStatus | string }) {
   );
 }
 
-export function ConfidenceBadge({ level }: { level: Confidence }) {
+export function ConfidenceBadge({ level }: { level: string }) {
   const dot =
     level === "High"
       ? "bg-[#3f8265]"

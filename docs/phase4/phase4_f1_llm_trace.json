@@ -1,0 +1,38 @@
+{
+  "dpl_refund": "dpl_4kRShpa4RZ7MqTrSjUUyMM7xTc6n",
+  "dpl_latest": "dpl_DSuDVPdpf6XBpDdZhtuGpgs85KUt",
+  "refund_row": {
+    "trace_id": "e9060418-cb6e-451c-8273-f2e7ebd1ef18",
+    "asked_at": "2026-09-06T17:07:33.797427+00:00",
+    "question": "Why is Engineering voluntary attrition increasing?",
+    "identity_id": "demo-external-viewer",
+    "llm_invocation": "attempted_failed",
+    "failure_reason": "upstream_error",
+    "llm_used": false,
+    "ledger": {
+      "call_id": 44,
+      "ok": false,
+      "skipped_reason": null,
+      "tokens_in": null,
+      "tokens_out": null,
+      "model": "deepseek-chat",
+      "latency_ms": 353,
+      "route": "people_ask"
+    }
+  },
+  "after_attempts_exhausted": {
+    "trace_id": "41cffab5-a14b-41dd-9caa-3bc5fa760832",
+    "llm_invocation": "skipped_by_budget",
+    "llm_used": false,
+    "tokens_in": null,
+    "tokens_out": null
+  },
+  "utc_day_2026_09_06": {
+    "ok_true": 0,
+    "attempts_skipped_reason_null": 13,
+    "with_tokens": 0,
+    "per_ip_daily": 3,
+    "per_ip_daily_attempts": 10
+  },
+  "note": "Failures are ok=false and do not occupy per_ip_daily (ok_true=0). Attempts still count; 13 attempt rows exceeded per_ip_daily_attempts=10, so later free-form asks are skipped_by_budget. No llm_used=true / tokens_in/out row exists yet: DeepSeek returned upstream_error on the refund probe, then attempts were exhausted. Owner: set DEEPSEEK_BASE_URL to https://api.deepseek.com or delete the Secret; after UTC day cut use a new IP to capture tokens."
+}

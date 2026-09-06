@@ -107,6 +107,9 @@ export interface PeopleAnswerContract {
   critic: PeopleCriticResult;
   error_state: PeopleErrorState;
   withheld: boolean;
+  refuse_reason?: string | null;
+  denied?: boolean;
+  deny_reason?: string | null;
   llm_skipped: string | null;
   llm_invocation: LlmInvocation;
   failure_reason: string | null;

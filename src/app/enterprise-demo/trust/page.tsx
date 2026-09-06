@@ -36,7 +36,6 @@ export default async function TrustCasePage({
   const lineageSteps = headcountLineageSteps(data.lineage.lineage as Record<string, unknown>[]);
   const lineageQuality = String(data.lineage.quality_status ?? "healthy");
   const publishStatus = String(data.lineage.publish_status ?? "published");
-  const lastRunAt = data.tests.find((row) => row.last_run_at)?.last_run_at;
 
   return (
     <DemoShell
@@ -149,7 +148,7 @@ export default async function TrustCasePage({
                 {data.qualityCounts.total} tests · bronze {data.qualityCounts.bronze} / silver{" "}
                 {data.qualityCounts.silver} / gold {data.qualityCounts.gold}
                 {data.qualityCounts.allPassed ? " · all passed" : " · has failures"}
-                {lastRunAt ? ` · last run ${lastRunAt.slice(0, 10)}` : ""}
+                {" · last run against data-v1 (frozen snapshot)"}
               </summary>
               <div className="mt-3 grid gap-3 md:grid-cols-2">
                 {data.testsByLayerAndType.map((group) => (
@@ -183,7 +182,7 @@ export default async function TrustCasePage({
 
         <section className="surface mt-8 p-4" data-testid="authz-matrix">
           <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]" data-testid="authz-matrix-title">
-            What {identityLabel(identity)} can read
+            {`What ${identityLabel(identity)} can read`}
           </p>
           <p className="mt-2 text-[12px] leading-5 text-[#667085]">
             Six cells: own org (Engineering), other org (Sales), company-level × internal Headcount vs
@@ -213,6 +212,66 @@ export default async function TrustCasePage({
               ))}
             </tbody>
           </table>
+        </section>
+
+        <section className="surface mt-8 p-4" data-testid="eval-scorecard">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
+            Golden-set scorecard
+          </p>
+          {data.evalScorecard.present ? (
+            <>
+              <p className="mt-2 text-[13px] leading-6 text-[#3e4c61]" data-testid="eval-scorecard-summary">
+                {data.evalScorecard.status === "pass" ? "Pass" : "Fail"} · tag{" "}
+                {String(data.evalScorecard.git_tag ?? "—")} ·{" "}
+                {String((data.evalScorecard.scorecard?.cases as number | undefined) ?? "—")} cases
+              </p>
+              <dl className="mt-3 grid gap-2 text-[12px] text-[#546277] sm:grid-cols-2">
+                {Object.entries(
+                  (data.evalScorecard.scorecard?.rates as Record<string, unknown> | undefined) ?? {},
+                ).map(([key, value]) => (
+                  <div key={key}>
+                    <dt className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#738097]">
+                      {key.replaceAll("_", " ")}
+                    </dt>
+                    <dd className="mt-1 text-[#1c2b44]">{String(value)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </>
+          ) : (
+            <p className="mt-2 text-[13px] leading-6 text-[#546277]">
+              No eval run is published yet.
+            </p>
+          )}
+          <p className="mt-3 text-[13px]">
+            <Link href="/enterprise-demo/metrics" className="font-semibold text-[#3157c9]">
+              Metric Explorer
+            </Link>
+          </p>
+        </section>
+
+        <section className="surface mt-8 p-4" data-testid="known-limitations">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
+            Known limitations
+          </p>
+          <p className="mt-2 text-[12px] leading-5 text-[#667085]">
+            Governance maturity for this demo — not a legal disclaimer.
+          </p>
+          <ul className="mt-3 space-y-2 text-[13px] leading-6 text-[#3e4c61]">
+            <li>
+              Graded aggregate access has an inference path: an HRBP who can read company-level and
+              own-org confidential aggregates can, for mean-type metrics, infer other-org values.
+              Medians are weaker but not zero. Cross-query differential protection is not implemented
+              (architecture §9.4 v1.1).
+            </li>
+            <li>
+              Suppression uses as-of month n as the denominator. Rates on this page are trailing-12m.
+            </li>
+            <li>
+              The dataset is frozen at data-v1. Quality tests run against that snapshot, not against
+              a live daily rebuild.
+            </li>
+          </ul>
         </section>
       </article>
     </DemoShell>

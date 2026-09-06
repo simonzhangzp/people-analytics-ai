@@ -7,7 +7,7 @@ Before implementing any UI, determine which workflow stage the screen supports: 
 
 The UI must prioritize the business decision and evidence over decoration.
 
-Use a three-column desktop pattern: workflow rail, main work area, optional AI Co-Designer panel.
+Public pages are single-column case studies plus Architecture / Perspective / About. Do not revive a three-column workbench unless the owner reopens a file-analysis product.
 
 Do not introduce new colors, radii, font sizes, shadows, or visual patterns outside the design system without an explicit reason.
 
@@ -15,6 +15,6 @@ Do not build generic dashboard pages. Every analytical view must have a clear bu
 
 AI recommendations must visibly distinguish proposals, assumptions, approved definitions, and missing evidence.
 
-Privacy messaging must remain visible wherever files are added or analyzed. The primary Analyze path stores uploaded files on the Formulator analysis server workspace; the `/workbench` fallback remains browser-local.
+The early file-analysis experiment (`/lab`, `/workbench`, Formulator `/app`) is retired. Do not add file-upload surfaces on the public site.
 
 All People data objects start with `people` (`people_mart_*`, `people_workspaces`, lake folders `people_bronze` / `people_silver` / `people_gold`). See `.cursor/rules/people-naming.mdc`.
