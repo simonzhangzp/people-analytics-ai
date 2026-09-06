@@ -1,0 +1,9 @@
+{
+  "total": 74,
+  "by_layer": {
+    "bronze": 3,
+    "gold": 36,
+    "silver": 35
+  },
+  "sql": "select layer, count(*) from people_v2.people_quality_test group by layer"
+}

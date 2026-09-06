@@ -1,4 +1,4 @@
-import { identityMinCell } from "./demo-identities";
+import { boundJobFamily, deniesCompanyConfidential, identityMinCell } from "./demo-identities";
 
 export const AUTHZ_SCOPES = ["own_org", "other_org", "company_level"] as const;
 export const AUTHZ_CLASSES = ["non_confidential", "confidential"] as const;
@@ -26,11 +26,12 @@ export function expectedAuthz(
   if (identityId === "demo-external-viewer" && confidential) {
     return { denied: true, reason: "sensitivity" };
   }
-  if (identityId === "demo-leader-engineering" && confidential && scope === "company_level") {
-    return { denied: true, reason: "company_scope_confidential" };
-  }
-  if (identityId === "demo-leader-engineering" && confidential && scope === "other_org") {
+  const bound = boundJobFamily(identityId);
+  if (bound && confidential && scope === "other_org") {
     return { denied: true, reason: "org_scope" };
+  }
+  if (deniesCompanyConfidential(identityId) && confidential && scope === "company_level") {
+    return { denied: true, reason: "company_scope_confidential" };
   }
   return { denied: false, reason: null };
 }

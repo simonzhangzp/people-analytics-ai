@@ -32,7 +32,7 @@ These rules exist because P1 R1/R2 failed when cover copy, screenshots, and self
 - **F1**: annotated tag is on the remote, and the cover states tag ↔ `dpl_`.
 - **S2 chart ticks**: mid-tick is `[yMin, mid, yMax]` from the full series min/max plus pad. Screenshot compression is not a second scale. Record in this file, not in copy audit.
 - **S3 / cron**: wait for the 9/6 UTC run; do not fake `ok=false` on production before that date.
-- **C2**: leader + company-level confidential (`job_family` null) returns `denied` / `company_scope_confidential`; leader + company headcount is allowed. Leader + Sales headcount is allowed; leader + Sales confidential is `org_scope`.
+- **C2**: leader + company-level confidential (`job_family` null) returns `denied` / `company_scope_confidential`; leader + company headcount is allowed. Leader + Sales headcount is allowed; leader + Sales confidential is `org_scope`. HRBP is Engineering-bound: Sales confidential is `org_scope`; company-level confidential is allowed.
 
 ## After any DDL migration
 

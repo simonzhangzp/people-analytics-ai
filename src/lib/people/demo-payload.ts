@@ -15,7 +15,7 @@ import {
   VOL_MONTH_WINDOW,
   VOL_T12M_WINDOW,
 } from "./metric-grain";
-import { groupQualityTestsByLayer, type QualityCatalogRow } from "./quality-catalog";
+import { groupQualityTestsByLayer, groupQualityTestsByLayerAndType, qualityLayerCounts, type QualityCatalogRow } from "./quality-catalog";
 import {
   peopleGetCase3Signals,
   peopleGetHealth,
@@ -120,6 +120,8 @@ export async function loadTrustCase(identityId = DEFAULT_IDENTITY) {
     sourceHealth: { sources: [] },
     tests,
     testsByLayer: groupQualityTestsByLayer(tests),
+    testsByLayerAndType: groupQualityTestsByLayerAndType(tests),
+    qualityCounts: qualityLayerCounts(tests),
     health,
     run,
     authz: authzRows,

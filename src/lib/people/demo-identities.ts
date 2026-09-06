@@ -35,6 +35,17 @@ export function identityLabel(identityId: string): string {
   );
 }
 
+/** Engineering-bound demo identities. Visitor and analyst have no org floor. */
+export function boundJobFamily(identityId: string): "Engineering" | null {
+  if (identityId === "demo-leader-engineering" || identityId === "demo-hrbp") return "Engineering";
+  return null;
+}
+
+/** Leader cannot read company-level confidential; HRBP can (cross-department benchmarking). */
+export function deniesCompanyConfidential(identityId: string): boolean {
+  return identityId === "demo-leader-engineering";
+}
+
 /** Identity-level suppression floor. Distinct from YAML metric_min_cell. */
 export function identityMinCell(identityId: string): number {
   switch (identityId) {

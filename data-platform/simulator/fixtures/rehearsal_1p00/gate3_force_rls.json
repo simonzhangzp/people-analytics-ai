@@ -132,14 +132,14 @@
       "table": "people_agent_tool_call",
       "rls": true,
       "force_rls": true,
-      "owner": "postgres",
+      "owner": "people_publisher",
       "class": "deny"
     },
     {
       "table": "people_agent_trace",
       "rls": true,
       "force_rls": true,
-      "owner": "postgres",
+      "owner": "people_publisher",
       "class": "deny"
     },
     {
@@ -391,14 +391,14 @@
       "table": "people_llm_budget",
       "rls": true,
       "force_rls": true,
-      "owner": "postgres",
+      "owner": "people_publisher",
       "class": "deny"
     },
     {
       "table": "people_llm_call",
       "rls": true,
       "force_rls": true,
-      "owner": "postgres",
+      "owner": "people_publisher",
       "class": "deny"
     },
     {

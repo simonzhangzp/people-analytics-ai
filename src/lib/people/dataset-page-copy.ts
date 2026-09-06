@@ -43,7 +43,7 @@ export const PEOPLE_DATASET_PAGE_COPY = {
     {
       id: "hiring_slowdown_hm_latency",
       body:
-        "hiring_slowdown_hm_latency. Sales Onsite dwell ×1.6 and offer acceptance −8 points from 2026-05-01. Case 4 is present in the dataset but has no demo page in this release.",
+        "Sales Onsite dwell ×1.6 and offer acceptance −8 points from 2026-05-01. Scorecard and interview latency concentrated on hiring managers 101–103. Case 4 is present in the dataset but has no demo page in this release.",
     },
   ],
   synthetic:

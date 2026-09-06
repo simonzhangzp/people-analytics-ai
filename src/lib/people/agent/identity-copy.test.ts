@@ -214,6 +214,59 @@ describe("compose identity_label", () => {
       min_cell_source: "identity",
     });
   });
+
+  it("denies HRBP Sales confidential with org_scope and allows company-level confidential", () => {
+    const sales = routePeopleQuestion("What is Sales compensation?");
+    const salesAnswer = composeAnswerContract({
+      question: "What is Sales compensation?",
+      identityId: "demo-hrbp",
+      traceId: "55555555-5555-4555-8555-555555555555",
+      plan: sales,
+      tools: sales.tools,
+      results: [
+        {
+          call: sales.tools[0],
+          ok: true,
+          result: {
+            denied: true,
+            reason: "org_scope",
+            metric_id: "compa_ratio_median",
+            job_family: "Sales",
+            as_of: "2026-08-31",
+            identity_min_cell: 10,
+            metric_min_cell: 10,
+          },
+        },
+      ],
+    });
+    expect(salesAnswer.headline).toMatch(/HRBP/);
+    expect(salesAnswer.facts.join(" ")).toMatch(/org_scope/);
+    const company = routePeopleQuestion("What is company compensation?");
+    const companyAnswer = composeAnswerContract({
+      question: "What is company compensation?",
+      identityId: "demo-hrbp",
+      traceId: "66666666-6666-4666-8666-666666666666",
+      plan: company,
+      tools: company.tools,
+      results: [
+        {
+          call: company.tools[0],
+          ok: true,
+          result: {
+            denied: false,
+            value: 1.01,
+            n: 49823,
+            metric_id: "compa_ratio_median",
+            as_of: "2026-08-31",
+            identity_min_cell: 10,
+            metric_min_cell: 10,
+          },
+        },
+      ],
+    });
+    expect(companyAnswer.headline).not.toMatch(/not available/);
+    expect(companyAnswer.facts.join(" ")).not.toMatch(/org_scope|company_scope_confidential/);
+  });
 });
 
 describe("classifyPlannerFailure", () => {

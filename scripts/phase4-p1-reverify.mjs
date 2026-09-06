@@ -85,6 +85,9 @@ const COVER_IDS = new Set([
   "D3-trace",
   "D4",
   "D5",
+  "D1-hrbp-sales",
+  "D1-hrbp-company",
+  "quality-summary",
   "case4",
 ]);
 
@@ -327,6 +330,18 @@ await writeFile(
   )}\n`,
 );
 
+const hrbpSales = await askApi("demo-hrbp", SALES_COMPA);
+const hrbpSalesPayload = hrbpSales.payload;
+const hrbpSalesDenied = (hrbpSalesPayload?.evidence ?? []).some(
+  (row) => row?.denied === true && row?.reason === "org_scope",
+);
+note(
+  Boolean(hrbpSales.ok && hrbpSalesDenied && /HRBP/.test(String(hrbpSalesPayload.headline ?? ""))),
+  "D1-hrbp-sales",
+  `HRBP Sales compensation: ${hrbpSalesPayload.headline}`,
+  hrbpSalesPayload.trace_id,
+);
+
 const COMPANY_COMPA = "What is company compensation?";
 const companyAsk = await askApi("demo-leader-engineering", COMPANY_COMPA);
 const companyPayload = companyAsk.payload;
@@ -357,6 +372,16 @@ await writeFile(
     null,
     2,
   )}\n`,
+);
+
+const hrbpCompany = await askApi("demo-hrbp", COMPANY_COMPA);
+const hrbpCompanyPayload = hrbpCompany.payload;
+const hrbpCompanyDenied = (hrbpCompanyPayload?.evidence ?? []).some((row) => row?.denied === true);
+note(
+  Boolean(hrbpCompany.ok && !hrbpCompanyDenied && !/not available/.test(String(hrbpCompanyPayload.headline ?? ""))),
+  "D1-hrbp-company",
+  `HRBP company compensation: ${hrbpCompanyPayload.headline}`,
+  hrbpCompanyPayload.trace_id,
 );
 
 await page.goto(`${BASE}/enterprise-demo/attrition`, { waitUntil: "domcontentloaded" });
@@ -463,15 +488,24 @@ note(
   authzText.replaceAll("\n", " ").slice(0, 280),
   "docs/phase4/p1-authz-matrix.png",
 );
+const qualitySummary = await page.getByTestId("quality-tests-summary").innerText();
+note(
+  /\d+ tests · bronze \d+ \/ silver \d+ \/ gold \d+/.test(qualitySummary),
+  "quality-summary",
+  qualitySummary,
+  "docs/phase4/p1-quality-collapsed.png",
+);
+await shotLocator(page.getByTestId("quality-tests"), "p1-quality-collapsed.png");
 await shotPage(page, "p1-authz-matrix.png");
 
 await page.goto(`${BASE}/dataset`, { waitUntil: "domcontentloaded" });
 const datasetBody = await page.locator("main").innerText();
 note(
   /Case 4 is present in the dataset but has no demo page in this release/.test(datasetBody) &&
-    /hiring_slowdown_hm_latency/.test(datasetBody),
+    /hiring_slowdown_hm_latency/.test(datasetBody) &&
+    !/hiring_slowdown_hm_latency — hiring_slowdown_hm_latency/.test(datasetBody),
   "case4",
-  "Dataset Case 4 disclaimer present",
+  "Dataset Case 4 disclaimer present without duplicated scenario id",
   "docs/phase4/p1-case4-copy.png",
   false,
 );

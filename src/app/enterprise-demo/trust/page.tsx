@@ -36,26 +36,6 @@ export default async function TrustCasePage({
   const lineageSteps = headcountLineageSteps(data.lineage.lineage as Record<string, unknown>[]);
   const lineageQuality = String(data.lineage.quality_status ?? "healthy");
   const publishStatus = String(data.lineage.publish_status ?? "published");
-  const testsByLayer =
-    data.testsByLayer.length > 0
-      ? data.testsByLayer
-      : [
-          {
-            layer: "gold",
-            tests: [
-              {
-                test_name: "serving_run.certified",
-                test_id: "serving_run.certified",
-                layer: "gold",
-                object_name: "people_serving_run",
-                test_type: "certified",
-                blocking: true,
-                status: data.run.certified ? "passed" : "failed",
-                last_run_at: null,
-              },
-            ],
-          },
-        ];
   const lastRunAt = data.tests.find((row) => row.last_run_at)?.last_run_at;
 
   return (
@@ -161,27 +141,40 @@ export default async function TrustCasePage({
           </section>
           <section className="surface p-4" data-testid="quality-tests">
             <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">Quality</p>
-            <p className="mt-2 text-[12px] text-[#667085]">
-              {data.tests.length} tests in the serving registry
-              {lastRunAt ? ` · last run ${lastRunAt.slice(0, 10)}` : ""}
-            </p>
-            <div className="mt-3 space-y-4">
-              {testsByLayer.map((group) => (
-                <div key={group.layer} data-testid={`quality-layer-${group.layer}`}>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
-                    {group.layer} · {group.tests.length}
-                  </p>
-                  <ul className="mt-1 space-y-1 text-[13px] text-[#546277]">
-                    {group.tests.map((row) => (
-                      <li key={row.test_id || row.test_name}>
-                        {row.status === "passed" ? "Pass" : "Fail"} · {row.test_id || row.test_name}
-                        {row.test_type ? ` · ${row.test_type}` : ""}
-                      </li>
+            <details className="mt-2" data-testid="quality-tests-details">
+              <summary
+                className="cursor-pointer text-[13px] leading-6 text-[#3e4c61]"
+                data-testid="quality-tests-summary"
+              >
+                {data.qualityCounts.total} tests · bronze {data.qualityCounts.bronze} / silver{" "}
+                {data.qualityCounts.silver} / gold {data.qualityCounts.gold}
+                {data.qualityCounts.allPassed ? " · all passed" : " · has failures"}
+                {lastRunAt ? ` · last run ${lastRunAt.slice(0, 10)}` : ""}
+              </summary>
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                {data.testsByLayerAndType.map((group) => (
+                  <div key={group.layer} data-testid={`quality-layer-${group.layer}`}>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
+                      {group.layer} · {group.byType.reduce((sum, row) => sum + row.tests.length, 0)}
+                    </p>
+                    {group.byType.map((bucket) => (
+                      <div key={bucket.test_type} className="mt-2">
+                        <p className="text-[11px] font-semibold text-[#667085]">
+                          {bucket.test_type} · {bucket.tests.length}
+                        </p>
+                        <ul className="mt-1 space-y-1 text-[13px] text-[#546277]">
+                          {bucket.tests.map((row) => (
+                            <li key={row.test_id || row.test_name}>
+                              {row.status === "passed" ? "Pass" : "Fail"} · {row.test_id || row.test_name}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
+            </details>
             {data.tests.some((row) => row.status !== "passed") ? null : (
               <p className="mt-2 text-[12px] text-[#2f7659]">All tests in this trusted snapshot passed.</p>
             )}
@@ -189,13 +182,14 @@ export default async function TrustCasePage({
         </div>
 
         <section className="surface mt-8 p-4" data-testid="authz-matrix">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]" data-testid="authz-matrix-title">
             What {identityLabel(identity)} can read
           </p>
           <p className="mt-2 text-[12px] leading-5 text-[#667085]">
             Six cells: own org (Engineering), other org (Sales), company-level × internal Headcount vs
-            confidential median compa-ratio. Cross-org Headcount is allowed. Company-level confidential
-            is company_scope_confidential for an Engineering leader, not org_scope.
+            confidential median compa-ratio. Engineering leader and HRBP are bound to Engineering:
+            Sales confidential is org_scope. Company-level confidential is denied for the leader
+            (company_scope_confidential) and allowed for HRBP. Visitor confidential is sensitivity.
           </p>
           <table className="mt-3 w-full text-left text-[12px] text-[#3e4c61]">
             <thead>

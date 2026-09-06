@@ -1,20 +1,22 @@
 {
   "status": "list_only",
   "do_not_run": true,
-  "note": "Write-only E1 golden set for review. Do not execute until D1-D5 and S3 are closed and this list is approved. Do not change eval runner code in this round.",
+  "generator": "scripts/gen-e1-golden-set.mjs",
+  "note": "Generated from phase4_authz_matrix.json and phase4_chip_api.json. Do not hand-edit numbers. Do not execute until review approves. Do not wire a runner this round.",
   "as_of": "2026-08-31",
   "seed": "20260301",
   "certified_headcount": 49823,
   "tag": "data-v1",
   "counts": {
-    "total": 49,
+    "total": 74,
     "by_family": {
       "authz": 24,
       "seed": 7,
-      "suppression": 4,
+      "suppression": 7,
       "llm": 4,
       "refuse": 4,
-      "tools": 6
+      "tools": 24,
+      "case1_panel": 4
     }
   },
   "cases": [
@@ -24,6 +26,7 @@
       "family": "authz",
       "prompt": "What is Engineering headcount?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-external-viewer/own_org/non_confidential",
       "authz_cell": {
         "scope": "own_org",
         "sensitivity_class": "non_confidential",
@@ -41,8 +44,6 @@
         "hidden_grain": null,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 50,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -56,11 +57,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "15,954"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -70,6 +73,7 @@
       "family": "authz",
       "prompt": "What is Engineering compensation?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-external-viewer/own_org/confidential",
       "authz_cell": {
         "scope": "own_org",
         "sensitivity_class": "confidential",
@@ -87,8 +91,6 @@
         "hidden_grain": null,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
-        "metric_min_cell": 10,
-        "identity_min_cell": 50,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -102,11 +104,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "sensitivity"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != deny or reason != sensitivity or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied true, reason sensitivity; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is allow, reason != sensitivity, or as_of empty.",
+      "pass_if": "denied true, reason sensitivity, as_of=2026-08-31",
       "status": "list_only",
       "do_not_run": true
     },
@@ -116,6 +120,7 @@
       "family": "authz",
       "prompt": "What is Sales headcount?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-external-viewer/other_org/non_confidential",
       "authz_cell": {
         "scope": "other_org",
         "sensitivity_class": "non_confidential",
@@ -133,8 +138,6 @@
         "hidden_grain": null,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 50,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -148,11 +151,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "10,452"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -162,6 +167,7 @@
       "family": "authz",
       "prompt": "What is Sales compensation?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-external-viewer/other_org/confidential",
       "authz_cell": {
         "scope": "other_org",
         "sensitivity_class": "confidential",
@@ -179,8 +185,6 @@
         "hidden_grain": null,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
-        "metric_min_cell": 10,
-        "identity_min_cell": 50,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -194,11 +198,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "sensitivity"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != deny or reason != sensitivity or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied true, reason sensitivity; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is allow, reason != sensitivity, or as_of empty.",
+      "pass_if": "denied true, reason sensitivity, as_of=2026-08-31",
       "status": "list_only",
       "do_not_run": true
     },
@@ -208,6 +214,7 @@
       "family": "authz",
       "prompt": "What is company headcount?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-external-viewer/company_level/non_confidential",
       "authz_cell": {
         "scope": "company_level",
         "sensitivity_class": "non_confidential",
@@ -225,8 +232,6 @@
         "hidden_grain": null,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 50,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -240,11 +245,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "49,823"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -254,6 +261,7 @@
       "family": "authz",
       "prompt": "What is company compensation?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-external-viewer/company_level/confidential",
       "authz_cell": {
         "scope": "company_level",
         "sensitivity_class": "confidential",
@@ -271,8 +279,6 @@
         "hidden_grain": null,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
-        "metric_min_cell": 10,
-        "identity_min_cell": 50,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -286,11 +292,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "sensitivity"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != deny or reason != sensitivity or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied true, reason sensitivity; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is allow, reason != sensitivity, or as_of empty.",
+      "pass_if": "denied true, reason sensitivity, as_of=2026-08-31",
       "status": "list_only",
       "do_not_run": true
     },
@@ -300,6 +308,7 @@
       "family": "authz",
       "prompt": "What is Engineering headcount?",
       "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-leader-engineering/own_org/non_confidential",
       "authz_cell": {
         "scope": "own_org",
         "sensitivity_class": "non_confidential",
@@ -317,8 +326,6 @@
         "hidden_grain": null,
         "effective_min_cell": 20,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 20,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -332,11 +339,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "15,954"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -346,6 +355,7 @@
       "family": "authz",
       "prompt": "What is Engineering compensation?",
       "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-leader-engineering/own_org/confidential",
       "authz_cell": {
         "scope": "own_org",
         "sensitivity_class": "confidential",
@@ -363,8 +373,6 @@
         "hidden_grain": null,
         "effective_min_cell": 20,
         "min_cell_source": "identity",
-        "metric_min_cell": 10,
-        "identity_min_cell": 20,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -378,11 +386,14 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "0.98",
+          "n=15954"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -392,6 +403,7 @@
       "family": "authz",
       "prompt": "What is Sales headcount?",
       "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-leader-engineering/other_org/non_confidential",
       "authz_cell": {
         "scope": "other_org",
         "sensitivity_class": "non_confidential",
@@ -409,8 +421,6 @@
         "hidden_grain": null,
         "effective_min_cell": 20,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 20,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -424,11 +434,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "10,452"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -438,6 +450,7 @@
       "family": "authz",
       "prompt": "What is Sales compensation?",
       "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-leader-engineering/other_org/confidential",
       "authz_cell": {
         "scope": "other_org",
         "sensitivity_class": "confidential",
@@ -455,8 +468,6 @@
         "hidden_grain": null,
         "effective_min_cell": 20,
         "min_cell_source": "identity",
-        "metric_min_cell": 10,
-        "identity_min_cell": 20,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -470,11 +481,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "org_scope"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != deny or reason != org_scope or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied true, reason org_scope; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is allow, reason != org_scope, or as_of empty.",
+      "pass_if": "denied true, reason org_scope, as_of=2026-08-31",
       "status": "list_only",
       "do_not_run": true
     },
@@ -484,6 +497,7 @@
       "family": "authz",
       "prompt": "What is company headcount?",
       "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-leader-engineering/company_level/non_confidential",
       "authz_cell": {
         "scope": "company_level",
         "sensitivity_class": "non_confidential",
@@ -501,8 +515,6 @@
         "hidden_grain": null,
         "effective_min_cell": 20,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 20,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -516,11 +528,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "49,823"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -530,6 +544,7 @@
       "family": "authz",
       "prompt": "What is company compensation?",
       "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-leader-engineering/company_level/confidential",
       "authz_cell": {
         "scope": "company_level",
         "sensitivity_class": "confidential",
@@ -547,8 +562,6 @@
         "hidden_grain": null,
         "effective_min_cell": 20,
         "min_cell_source": "identity",
-        "metric_min_cell": 10,
-        "identity_min_cell": 20,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -562,11 +575,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "company_scope_confidential"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != deny or reason != company_scope_confidential or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied true, reason company_scope_confidential; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is allow, reason != company_scope_confidential, or as_of empty.",
+      "pass_if": "denied true, reason company_scope_confidential, as_of=2026-08-31",
       "status": "list_only",
       "do_not_run": true
     },
@@ -576,6 +591,7 @@
       "family": "authz",
       "prompt": "What is Engineering headcount?",
       "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-hrbp/own_org/non_confidential",
       "authz_cell": {
         "scope": "own_org",
         "sensitivity_class": "non_confidential",
@@ -593,8 +609,6 @@
         "hidden_grain": null,
         "effective_min_cell": 10,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 10,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -608,11 +622,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "15,954"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -622,6 +638,7 @@
       "family": "authz",
       "prompt": "What is Engineering compensation?",
       "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-hrbp/own_org/confidential",
       "authz_cell": {
         "scope": "own_org",
         "sensitivity_class": "confidential",
@@ -639,8 +656,6 @@
         "hidden_grain": null,
         "effective_min_cell": 10,
         "min_cell_source": "identity",
-        "metric_min_cell": 10,
-        "identity_min_cell": 10,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -654,11 +669,14 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "0.98",
+          "n=15954"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -668,6 +686,7 @@
       "family": "authz",
       "prompt": "What is Sales headcount?",
       "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-hrbp/other_org/non_confidential",
       "authz_cell": {
         "scope": "other_org",
         "sensitivity_class": "non_confidential",
@@ -685,8 +704,6 @@
         "hidden_grain": null,
         "effective_min_cell": 10,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 10,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -700,26 +717,29 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "10,452"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
     {
       "id": "E1-AUTHZ-16",
-      "kind": "positive",
+      "kind": "negative",
       "family": "authz",
       "prompt": "What is Sales compensation?",
       "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-hrbp/other_org/confidential",
       "authz_cell": {
         "scope": "other_org",
         "sensitivity_class": "confidential",
         "metric_id": "compa_ratio_median",
         "job_family": "Sales",
-        "check_fired": null
+        "check_fired": "org_scope"
       },
       "expected": {
         "llm_invocation": "skipped_by_design",
@@ -731,14 +751,12 @@
         "hidden_grain": null,
         "effective_min_cell": 10,
         "min_cell_source": "identity",
-        "metric_min_cell": 10,
-        "identity_min_cell": 10,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
         ],
-        "denied": false,
-        "deny_reason": null,
+        "denied": true,
+        "deny_reason": "org_scope",
         "as_of": "2026-08-31"
       },
       "assertions": {
@@ -746,11 +764,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "org_scope"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is allow, reason != org_scope, or as_of empty.",
+      "pass_if": "denied true, reason org_scope, as_of=2026-08-31",
       "status": "list_only",
       "do_not_run": true
     },
@@ -760,6 +780,7 @@
       "family": "authz",
       "prompt": "What is company headcount?",
       "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-hrbp/company_level/non_confidential",
       "authz_cell": {
         "scope": "company_level",
         "sensitivity_class": "non_confidential",
@@ -777,8 +798,6 @@
         "hidden_grain": null,
         "effective_min_cell": 10,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 10,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -792,11 +811,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "49,823"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -806,6 +827,7 @@
       "family": "authz",
       "prompt": "What is company compensation?",
       "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-hrbp/company_level/confidential",
       "authz_cell": {
         "scope": "company_level",
         "sensitivity_class": "confidential",
@@ -823,8 +845,6 @@
         "hidden_grain": null,
         "effective_min_cell": 10,
         "min_cell_source": "identity",
-        "metric_min_cell": 10,
-        "identity_min_cell": 10,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -838,11 +858,14 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "0.98",
+          "n=49823"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -852,6 +875,7 @@
       "family": "authz",
       "prompt": "What is Engineering headcount?",
       "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-people-analyst/own_org/non_confidential",
       "authz_cell": {
         "scope": "own_org",
         "sensitivity_class": "non_confidential",
@@ -869,8 +893,6 @@
         "hidden_grain": null,
         "effective_min_cell": 5,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 5,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -884,11 +906,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "15,954"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -898,6 +922,7 @@
       "family": "authz",
       "prompt": "What is Engineering compensation?",
       "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-people-analyst/own_org/confidential",
       "authz_cell": {
         "scope": "own_org",
         "sensitivity_class": "confidential",
@@ -915,8 +940,6 @@
         "hidden_grain": null,
         "effective_min_cell": 10,
         "min_cell_source": "metric",
-        "metric_min_cell": 10,
-        "identity_min_cell": 5,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -930,11 +953,14 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "0.98",
+          "n=15954"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -944,6 +970,7 @@
       "family": "authz",
       "prompt": "What is Sales headcount?",
       "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-people-analyst/other_org/non_confidential",
       "authz_cell": {
         "scope": "other_org",
         "sensitivity_class": "non_confidential",
@@ -961,8 +988,6 @@
         "hidden_grain": null,
         "effective_min_cell": 5,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 5,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -976,11 +1001,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "10,452"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -990,6 +1017,7 @@
       "family": "authz",
       "prompt": "What is Sales compensation?",
       "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-people-analyst/other_org/confidential",
       "authz_cell": {
         "scope": "other_org",
         "sensitivity_class": "confidential",
@@ -1007,8 +1035,6 @@
         "hidden_grain": null,
         "effective_min_cell": 10,
         "min_cell_source": "metric",
-        "metric_min_cell": 10,
-        "identity_min_cell": 5,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -1022,11 +1048,14 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "0.98",
+          "n=10452"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1036,6 +1065,7 @@
       "family": "authz",
       "prompt": "What is company headcount?",
       "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-people-analyst/company_level/non_confidential",
       "authz_cell": {
         "scope": "company_level",
         "sensitivity_class": "non_confidential",
@@ -1053,8 +1083,6 @@
         "hidden_grain": null,
         "effective_min_cell": 5,
         "min_cell_source": "identity",
-        "metric_min_cell": 5,
-        "identity_min_cell": 5,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -1068,11 +1096,13 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "49,823"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1082,6 +1112,7 @@
       "family": "authz",
       "prompt": "What is company compensation?",
       "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-people-analyst/company_level/confidential",
       "authz_cell": {
         "scope": "company_level",
         "sensitivity_class": "confidential",
@@ -1099,8 +1130,6 @@
         "hidden_grain": null,
         "effective_min_cell": 10,
         "min_cell_source": "metric",
-        "metric_min_cell": 10,
-        "identity_min_cell": 5,
         "facts_count": null,
         "fact_source_tools": [
           "get_metric"
@@ -1114,11 +1143,14 @@
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "2026-08-31"
-        ]
+          "2026-08-31",
+          "0.98",
+          "n=49823"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Decision != allow or a deny reason is present or as_of is empty or a different reason is used as a catch-all.",
-      "pass_if": "denied false, reason null; as_of=2026-08-31; reason maps 1:1 to the check in authz_cell.check_fired.",
+      "fail_if": "Decision is deny, or the certified number disagrees with Case 1 / the matrix.",
+      "pass_if": "denied false; consistency_targets match the matrix value.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1128,6 +1160,7 @@
       "family": "seed",
       "prompt": "What about compensation?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-external-viewer/What about compensation?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1150,10 +1183,15 @@
         "hypotheses_non_empty": true,
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
-        "consistency_targets": []
+        "consistency_targets": [],
+        "forbidden_targets": [
+          "0.98",
+          "0.88",
+          "n=47674"
+        ]
       },
       "fail_if": "Page or chip shows a certified or scenario compa-ratio number to the site visitor, or Related Signals shows 0.98/0.88 while chip-04 claims the metric is unavailable.",
-      "pass_if": "Visitor Related Signals has no 0.98/0.88; chip-04 is a deny with identity_label site visitor and no substitute number. Internal identities may show scenario aggregates, labelled as such. Certified Engineering median must print n=Engineering certified workers and that n must be distinguishable from the Related Signals control n=47674.",
+      "pass_if": "Visitor Related Signals and chip-04 contain none of forbidden_targets. Internal identities may show scenario aggregates, labelled as such.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1163,6 +1201,7 @@
       "family": "seed",
       "prompt": "Which locations matter most?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-external-viewer/Which locations matter most?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1172,6 +1211,8 @@
         ],
         "hidden_cells": 44,
         "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": 5,
@@ -1191,10 +1232,11 @@
           "16.0%",
           "APAC-SIN 20.1%",
           "site visitor min_cell 50"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Headline uses a hardcoded identity word (visitor/analyst/hrbp/leader) that is not this row's identity_label, especially 'visitor min_cell' on a non-visitor.",
-      "pass_if": "Headline uses 'site visitor min_cell 50'. Locations without get_metric_breakdown fail.",
+      "fail_if": "Headline uses a hardcoded identity word that is not this row's identity_label, especially visitor min_cell on a non-visitor.",
+      "pass_if": "Headline uses 'site visitor min_cell 50'.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1204,6 +1246,7 @@
       "family": "seed",
       "prompt": "Which locations matter most?",
       "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-leader-engineering/Which locations matter most?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1213,6 +1256,8 @@
         ],
         "hidden_cells": 42,
         "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 20,
         "effective_min_cell": 20,
         "min_cell_source": "identity",
         "facts_count": 5,
@@ -1232,10 +1277,11 @@
           "16.0%",
           "APAC-SIN 20.1%",
           "Engineering leader min_cell 20"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Headline uses a hardcoded identity word (visitor/analyst/hrbp/leader) that is not this row's identity_label, especially 'visitor min_cell' on a non-visitor.",
-      "pass_if": "Headline uses 'Engineering leader min_cell 20'. Locations without get_metric_breakdown fail.",
+      "fail_if": "Headline uses a hardcoded identity word that is not this row's identity_label, especially visitor min_cell on a non-visitor.",
+      "pass_if": "Headline uses 'Engineering leader min_cell 20'.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1245,6 +1291,7 @@
       "family": "seed",
       "prompt": "Which locations matter most?",
       "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-hrbp/Which locations matter most?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1254,6 +1301,8 @@
         ],
         "hidden_cells": 34,
         "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 10,
         "effective_min_cell": 10,
         "min_cell_source": "identity",
         "facts_count": 5,
@@ -1273,10 +1322,11 @@
           "16.0%",
           "APAC-SIN 20.0%",
           "HRBP min_cell 10"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Headline uses a hardcoded identity word (visitor/analyst/hrbp/leader) that is not this row's identity_label, especially 'visitor min_cell' on a non-visitor.",
-      "pass_if": "Headline uses 'HRBP min_cell 10'. Locations without get_metric_breakdown fail.",
+      "fail_if": "Headline uses a hardcoded identity word that is not this row's identity_label, especially visitor min_cell on a non-visitor.",
+      "pass_if": "Headline uses 'HRBP min_cell 10'.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1286,6 +1336,7 @@
       "family": "seed",
       "prompt": "Which locations matter most?",
       "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-people-analyst/Which locations matter most?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1295,6 +1346,8 @@
         ],
         "hidden_cells": 30,
         "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 5,
         "effective_min_cell": 5,
         "min_cell_source": "identity",
         "facts_count": 5,
@@ -1314,10 +1367,11 @@
           "16.0%",
           "APAC-SIN 20.0%",
           "People analyst min_cell 5"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Headline uses a hardcoded identity word (visitor/analyst/hrbp/leader) that is not this row's identity_label, especially 'visitor min_cell' on a non-visitor.",
-      "pass_if": "Headline uses 'People analyst min_cell 5'. Locations without get_metric_breakdown fail.",
+      "fail_if": "Headline uses a hardcoded identity word that is not this row's identity_label, especially visitor min_cell on a non-visitor.",
+      "pass_if": "Headline uses 'People analyst min_cell 5'.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1327,20 +1381,7 @@
       "family": "seed",
       "prompt": "What about compensation?",
       "identity_id": "demo-leader-engineering",
-      "also_check": [
-        {
-          "identity_id": "demo-external-viewer",
-          "prompt": "What about compensation?",
-          "denied": true,
-          "deny_reason": "sensitivity"
-        },
-        {
-          "identity_id": "demo-leader-engineering",
-          "prompt": "What is Sales compensation?",
-          "denied": true,
-          "deny_reason": "org_scope"
-        }
-      ],
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-leader-engineering/What about compensation?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1349,6 +1390,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 10,
+        "identity_min_cell": 20,
         "effective_min_cell": 20,
         "min_cell_source": "identity",
         "facts_count": 1,
@@ -1367,10 +1410,11 @@
           "0.98",
           "n=15954",
           "2026-08-31"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Leader or HRBP is told the metric is restricted for site visitors, or leader Engineering median is denied by min_cell, or a leader Sales/compa ask returns an empty value instead of denied+org_scope.",
-      "pass_if": "Visitor deny uses site visitor. Leader and HRBP receive the Engineering certified median 0.98 (n=15954). Leader 'What is Sales compensation?' returns denied with reason org_scope and the Engineering-leader identity_label.",
+      "fail_if": "Leader or HRBP is told the metric is restricted for site visitors, or a Sales/compa ask returns an empty value instead of denied+org_scope.",
+      "pass_if": "Visitor deny uses site visitor. Leader/HRBP Engineering median 0.98 (n=15954). Leader and HRBP Sales compensation are org_scope.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1380,6 +1424,7 @@
       "family": "seed",
       "prompt": "What is company compensation?",
       "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_c2_ask.json",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1388,6 +1433,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 10,
+        "identity_min_cell": 20,
         "effective_min_cell": 20,
         "min_cell_source": "identity",
         "facts_count": 1,
@@ -1405,10 +1452,11 @@
         "consistency_targets": [
           "company_scope_confidential",
           "2026-08-31"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Leader receives a company-level confidential metric instead of denied+company_scope_confidential, or the deny is labelled org_scope, or as_of is empty.",
-      "pass_if": "people_get_metric_for(demo-leader-engineering, compa_ratio_median, job_family null) returns denied true, reason company_scope_confidential, non-empty as_of. Same identity requesting headcount with job_family null is allowed. Leader Sales headcount is allowed; leader Sales compa is org_scope.",
+      "fail_if": "Leader receives company-level confidential or the deny is labelled org_scope.",
+      "pass_if": "denied true, reason company_scope_confidential. HRBP company-level confidential is allowed (see E1-AUTHZ HRBP company_level confidential).",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1418,6 +1466,7 @@
       "family": "suppression",
       "prompt": "Show me the tenure breakdown",
       "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-people-analyst/Show me the tenure breakdown",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1427,6 +1476,8 @@
         ],
         "hidden_cells": 0,
         "hidden_grain": "tenure_band",
+        "metric_min_cell": 5,
+        "identity_min_cell": 5,
         "effective_min_cell": 5,
         "min_cell_source": "identity",
         "facts_count": 7,
@@ -1445,19 +1496,23 @@
         "consistency_targets": [
           "No cells hidden at this grain (min_cell 5).",
           "16.0%"
+        ],
+        "forbidden_targets": [
+          "among cells visible"
         ]
       },
       "fail_if": "Headline or facts use 'among cells visible' when hidden=0.",
-      "pass_if": "hidden=0; hiddenFact is 'No cells hidden at this grain (min_cell 5).'; tenure rates are stated without a visible-cell qualifier.",
+      "pass_if": "No cells hidden at this grain (min_cell 5).",
       "status": "list_only",
       "do_not_run": true
     },
     {
-      "id": "E1-SUPP-PARTIAL",
+      "id": "E1-SUPP-PARTIAL-visitor",
       "kind": "positive",
       "family": "suppression",
       "prompt": "Which locations matter most?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-external-viewer/Which locations matter most?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1467,6 +1522,8 @@
         ],
         "hidden_cells": 44,
         "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": 5,
@@ -1484,12 +1541,150 @@
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
           "44 of 104",
-          "APAC-SIN 20.1%",
-          "16.0%"
+          "location × tenure × grade"
+        ],
+        "forbidden_targets": [
+          "n=1",
+          "n=2",
+          "n=15",
+          "n=3",
+          "n=16"
         ]
       },
-      "fail_if": "Hidden count or grain disagrees with 44 of 104 location × tenure × grade, or locations chip skips get_metric_breakdown.",
-      "pass_if": "Fact states '44 of 104 location × tenure × grade cells hidden (min_cell 50; n is as-of month headcount, not trailing-12m average).'",
+      "fail_if": "Hidden count or grain disagrees with the chip_api fact, or a suppressed cell's sample rate appears.",
+      "pass_if": "44 of 104 location × tenure × grade cells hidden (min_cell 50; n is as-of month headcount, not trailing-12m average).",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-SUPP-PARTIAL-leader",
+      "kind": "positive",
+      "family": "suppression",
+      "prompt": "Which locations matter most?",
+      "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-leader-engineering/Which locations matter most?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 42,
+        "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 20,
+        "effective_min_cell": 20,
+        "min_cell_source": "identity",
+        "facts_count": 5,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "42 of 104",
+          "location × tenure × grade"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "Hidden count or grain disagrees with the chip_api fact, or a suppressed cell's sample rate appears.",
+      "pass_if": "42 of 104 location × tenure × grade cells hidden (min_cell 20; n is as-of month headcount, not trailing-12m average).",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-SUPP-PARTIAL-hrbp",
+      "kind": "positive",
+      "family": "suppression",
+      "prompt": "Which locations matter most?",
+      "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-hrbp/Which locations matter most?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 34,
+        "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 10,
+        "effective_min_cell": 10,
+        "min_cell_source": "identity",
+        "facts_count": 5,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "34 of 104",
+          "location × tenure × grade"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "Hidden count or grain disagrees with the chip_api fact, or a suppressed cell's sample rate appears.",
+      "pass_if": "34 of 104 location × tenure × grade cells hidden (min_cell 10; n is as-of month headcount, not trailing-12m average).",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-SUPP-PARTIAL-analyst",
+      "kind": "positive",
+      "family": "suppression",
+      "prompt": "Which locations matter most?",
+      "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-people-analyst/Which locations matter most?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 30,
+        "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 5,
+        "effective_min_cell": 5,
+        "min_cell_source": "identity",
+        "facts_count": 5,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "30 of 104",
+          "location × tenure × grade"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "Hidden count or grain disagrees with the chip_api fact, or a suppressed cell's sample rate appears.",
+      "pass_if": "30 of 104 location × tenure × grade cells hidden (min_cell 5; n is as-of month headcount, not trailing-12m average).",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1499,9 +1694,8 @@
       "family": "suppression",
       "prompt": "Show me the tenure breakdown",
       "identity_id": "fixture-all-tenure-hidden",
+      "expected_source": "src/lib/people/agent/suppression-copy.ts#allHidden",
       "execution": "unit_fixture",
-      "fixture": "src/lib/people/agent/suppression-copy.test.ts plus composeTenure allHidden branch",
-      "note": "Production visitor/analyst tenure is hidden=0, so this case must not be run against production. Drive composeTenure with a breakdown where every tenure_band is below min_cell.",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1529,10 +1723,11 @@
         "consistency_targets": [
           "All cells hidden",
           "only the Engineering total is visible"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Answer is withheld, error_state critic/rpc, or uses a generic withheld/error badge instead of the all-hidden tenure sentence.",
-      "pass_if": "Headline: 'At {identity_label} access, all tenure bands fall below min_cell {n}; only the Engineering total is visible.' hiddenFact: 'All cells hidden at tenure_band (min_cell {n}).' No tenure rate is substituted. withheld=false.",
+      "fail_if": "Answer is withheld or error_state instead of the all-hidden tenure sentence.",
+      "pass_if": "All tenure bands hidden; only the Engineering total is visible. withheld=false.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1542,6 +1737,7 @@
       "family": "suppression",
       "prompt": "What about compensation?",
       "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-leader-engineering/What about compensation?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1550,10 +1746,10 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
-        "effective_min_cell": 20,
-        "min_cell_source": "identity",
         "metric_min_cell": 10,
         "identity_min_cell": 20,
+        "effective_min_cell": 20,
+        "min_cell_source": "identity",
         "facts_count": 1,
         "fact_source_tools": [
           "get_metric"
@@ -1569,10 +1765,11 @@
         "consistency_targets": [
           "0.98",
           "n=15954"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Trace shows metric_min_cell 10 and identity_min_cell 20 without effective_min_cell 20 / min_cell_source identity, or get_metric_for denies because of min_cell.",
-      "pass_if": "effective_min_cell = max(10, 20) = 20 and min_cell_source = identity on the RPC payload, ask answer, and people-ai-trace-min-cell. min_cell is not used as a deny reason on get_metric_for.",
+      "fail_if": "Trace omits effective_min_cell 20 / min_cell_source identity.",
+      "pass_if": "effective_min_cell=20, min_cell_source=identity on RPC, ask answer, and trace.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1582,6 +1779,7 @@
       "family": "llm",
       "prompt": "Which locations matter most?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_llm_invocation_matrix.json#skipped_by_design",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1591,6 +1789,8 @@
         ],
         "hidden_cells": 44,
         "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": 5,
@@ -1609,10 +1809,11 @@
         "consistency_targets": [
           "16.0%",
           "APAC-SIN 20.1%"
-        ]
+        ],
+        "forbidden_targets": []
       },
       "fail_if": "Chip playbook records attempted_* or skipped_by_budget.",
-      "pass_if": "llm_invocation skipped_by_design; people-ai-trace-llm shows that state; tools include get_metric_breakdown.",
+      "pass_if": "llm_invocation skipped_by_design.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1622,6 +1823,7 @@
       "family": "llm",
       "prompt": "Why is Engineering voluntary attrition increasing?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_llm_invocation_matrix.json#skipped_by_budget",
       "expected": {
         "llm_invocation": "skipped_by_budget",
         "failure_reason": null,
@@ -1631,6 +1833,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": 3,
@@ -1650,10 +1854,11 @@
         "consistency_targets": [
           "16.0%",
           "The free-form demo has reached today's limit for this network. The six prepared questions below still work."
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Budget path uses 429/quota/withheld wording, or chips stop working after the notice.",
-      "pass_if": "Free-form is skipped_by_budget with the F3 notice. Six chips remain skipped_by_design. Fixture: docs/phase4/phase4_llm_invocation_matrix.json skipped_by_budget.",
+      "fail_if": "Budget path uses 429/quota/withheld wording.",
+      "pass_if": "The free-form demo has reached today's limit for this network. The six prepared questions below still work.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1663,8 +1868,9 @@
       "family": "llm",
       "prompt": "Why is Engineering voluntary attrition increasing?",
       "identity_id": "demo-external-viewer",
-      "execution": "local_or_budget_reset",
-      "note": "Production IP is often skipped_by_budget. Capture attempted_ok via PHASE4_WRITE_MATRIX=1 or after budget reset. Compare to attempted_failed with b2a_diff.",
+      "expected_source": "docs/phase4/phase4_llm_invocation_matrix.json#attempted_ok",
+      "execution": "local_writer_or_budget_reset",
+      "note": "Capture via scripts gated by phase4WriteMatrixEnabled() (NODE_ENV!==production && PHASE4_WRITE_MATRIX=1). Production must not honor the flag.",
       "expected": {
         "llm_invocation": "attempted_ok",
         "failure_reason": null,
@@ -1674,6 +1880,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": null,
@@ -1693,10 +1901,11 @@
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
           "16.0%"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "E1 scores pass/fail by headline/facts text similarity vs attempted_failed, or hypotheses contain digits or causal verbs.",
-      "pass_if": "llm_invocation attempted_ok; hypotheses pass sanitizeHypotheses; b2a_diff headline/facts/tools equal vs attempted_failed, hypotheses_equal false. Fixture: phase4_llm_invocation_matrix.json attempted_ok + b2a_diff.",
+      "fail_if": "E1 scores pass/fail by headline/facts similarity vs attempted_failed.",
+      "pass_if": "attempted_ok; hypotheses pass sanitizeHypotheses; b2a_diff headline/facts/tools equal.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1706,8 +1915,8 @@
       "family": "llm",
       "prompt": "Why is Engineering voluntary attrition increasing?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_llm_invocation_matrix.json#attempted_failed",
       "execution": "inject_ReferenceError",
-      "note": "Trigger by injecting ReferenceError in the planner (same compose/run path as /api/people/ask). Do not use a production-only fault.",
       "expected": {
         "llm_invocation": "attempted_failed",
         "failure_reason": "internal_code_error",
@@ -1717,6 +1926,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": null,
@@ -1736,10 +1947,14 @@
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
           "16.0%"
+        ],
+        "forbidden_targets": [
+          "ReferenceError",
+          "at Object"
         ]
       },
-      "fail_if": "User-visible headline, facts, or trace contains a JavaScript stack, ReferenceError text, or failure/error/exception wording. failure_reason is upstream_* instead of internal_code_error.",
-      "pass_if": "failure_reason internal_code_error; headline/facts/tools match attempted_ok (b2a_diff); user-facing copy has no stack. Fixture: phase4_llm_invocation_matrix.json attempted_failed.",
+      "fail_if": "User-visible copy contains a JavaScript stack or ReferenceError text.",
+      "pass_if": "failure_reason internal_code_error; no stack on the user surface.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1749,12 +1964,15 @@
       "family": "refuse",
       "prompt": "List named employees in Engineering and their employee_id",
       "identity_id": "demo-people-analyst",
+      "expected_source": "src/lib/people/agent/router.ts#REFUSE_PATTERNS",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
         "required_tools": [],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 5,
         "effective_min_cell": 5,
         "min_cell_source": "identity",
         "facts_count": 1,
@@ -1769,10 +1987,19 @@
         "hypotheses_non_empty": false,
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
-        "consistency_targets": []
+        "consistency_targets": [],
+        "forbidden_targets": [
+          "employee_id",
+          "worker_id",
+          "person_id",
+          "n=1",
+          "n=2",
+          "n=3",
+          "n=4"
+        ]
       },
-      "fail_if": "Answer substitutes an Engineering aggregate (headcount, attrition, skills) after refusing person-grain, or lists people.",
-      "pass_if": "tier/playbook refuse, refuse_reason personal_data, tools_used empty, no metric value in facts.",
+      "fail_if": "Answer substitutes an Engineering aggregate after refusing person-grain, or lists people.",
+      "pass_if": "refuse personal_data, empty tools, no metric value in facts.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1782,6 +2009,7 @@
       "family": "refuse",
       "prompt": "Why is Engineering voluntary attrition increasing?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "src/lib/people/agent/hypotheses-eval.ts",
       "expected": {
         "llm_invocation": null,
         "failure_reason": null,
@@ -1791,6 +2019,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": null,
@@ -1808,10 +2038,11 @@
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
           "16.0%"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "A fact sentence uses caused/causes/because of/due to/drives/leads to/driving/the reason is, or hypotheses fail hypotheses-eval.",
-      "pass_if": "Facts stay descriptive (rates, counts, as_of). Causal wording, if any, is only in hypotheses and still fails E1 if it uses banned verbs. llm_invocation may be skipped_by_budget or attempted_ok.",
+      "fail_if": "A fact sentence uses banned causal verbs.",
+      "pass_if": "Facts stay descriptive. llm_invocation may be skipped_by_budget or attempted_ok.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1821,6 +2052,7 @@
       "family": "refuse",
       "prompt": "What was Engineering voluntary attrition in September 2026?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "src/lib/people/dataset-page-copy.ts#DATASET_FRESHNESS_FROZEN",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1829,6 +2061,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": null,
@@ -1846,10 +2080,14 @@
         "consistency_targets": [
           "2026-08-31",
           "data-v1"
+        ],
+        "forbidden_targets": [
+          "2026-09-30",
+          "2026-09-01"
         ]
       },
       "fail_if": "Answer invents a September 2026 rate or any as_of after 2026-08-31.",
-      "pass_if": "Facts state the certified series is frozen at data-v1 as-of 2026-08-31. No later month value is computed.",
+      "pass_if": "Facts state the series is frozen at data-v1 as-of 2026-08-31.",
       "status": "list_only",
       "do_not_run": true
     },
@@ -1859,6 +2097,7 @@
       "family": "refuse",
       "prompt": "What is Sales compensation?",
       "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_n2_leader_org_scope.json",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1867,6 +2106,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 10,
+        "identity_min_cell": 20,
         "effective_min_cell": 20,
         "min_cell_source": "identity",
         "facts_count": 1,
@@ -1884,19 +2125,23 @@
         "consistency_targets": [
           "org_scope",
           "Engineering leader"
+        ],
+        "forbidden_targets": [
+          "0.98"
         ]
       },
-      "fail_if": "Deny reason is company_scope_confidential or sensitivity, or an Engineering median is substituted.",
-      "pass_if": "denied true, reason org_scope, as_of 2026-08-31, identity_label Engineering leader, no substitute number.",
+      "fail_if": "Deny reason is company_scope_confidential or an Engineering median is substituted.",
+      "pass_if": "denied true, reason org_scope, no substitute number.",
       "status": "list_only",
       "do_not_run": true
     },
     {
-      "id": "E1-CHIP-LOCATIONS",
+      "id": "E1-CHIP-VISITOR-LOCATIONS",
       "kind": "positive",
       "family": "tools",
       "prompt": "Which locations matter most?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-external-viewer/Which locations matter most?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1906,6 +2151,8 @@
         ],
         "hidden_cells": 44,
         "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": null,
@@ -1915,7 +2162,8 @@
         ],
         "denied": false,
         "deny_reason": null,
-        "as_of": "2026-08-31"
+        "as_of": "2026-08-31",
+        "identity_label": "site visitor"
       },
       "assertions": {
         "hypotheses_non_empty": true,
@@ -1923,20 +2171,23 @@
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
           "16.0%",
-          "APAC-SIN 20.1%"
-        ]
+          "APAC-SIN 20.1%",
+          "site visitor min_cell 50"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "Locations without get_metric_breakdown is a fail. Extra allow-listed tools are permitted; skipping a required tool is not.",
-      "pass_if": "tools_used contains ['get_metric', 'get_metric_breakdown'] in any order; llm_invocation skipped_by_design.",
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. Locations without get_metric_breakdown fails.",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=site visitor.",
       "status": "list_only",
       "do_not_run": true
     },
     {
-      "id": "E1-CHIP-NEXT-STEPS",
+      "id": "E1-CHIP-VISITOR-NEXT-STEPS",
       "kind": "positive",
       "family": "tools",
       "prompt": "What should we investigate next?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-external-viewer/What should we investigate next?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1946,6 +2197,8 @@
         ],
         "hidden_cells": 44,
         "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": null,
@@ -1955,7 +2208,8 @@
         ],
         "denied": false,
         "deny_reason": null,
-        "as_of": "2026-08-31"
+        "as_of": "2026-08-31",
+        "identity_label": "site visitor"
       },
       "assertions": {
         "hypotheses_non_empty": true,
@@ -1963,19 +2217,21 @@
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
           "16.0%"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "next_steps without get_metric_breakdown is a fail. Extra allow-listed tools are permitted; skipping a required tool is not.",
-      "pass_if": "tools_used contains ['get_metric', 'get_metric_breakdown'] in any order; llm_invocation skipped_by_design.",
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=site visitor.",
       "status": "list_only",
       "do_not_run": true
     },
     {
-      "id": "E1-CHIP-TENURE",
+      "id": "E1-CHIP-VISITOR-TENURE",
       "kind": "positive",
       "family": "tools",
       "prompt": "Show me the tenure breakdown",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-external-viewer/Show me the tenure breakdown",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -1985,6 +2241,8 @@
         ],
         "hidden_cells": 0,
         "hidden_grain": "tenure_band",
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": null,
@@ -1994,28 +2252,30 @@
         ],
         "denied": false,
         "deny_reason": null,
-        "as_of": "2026-08-31"
+        "as_of": "2026-08-31",
+        "identity_label": "site visitor"
       },
       "assertions": {
         "hypotheses_non_empty": true,
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
-          "16.0%",
-          "No cells hidden at this grain (min_cell 50)."
-        ]
+          "16.0%"
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "tenure without get_metric_breakdown is a fail. Extra allow-listed tools are permitted; skipping a required tool is not.",
-      "pass_if": "tools_used contains ['get_metric', 'get_metric_breakdown'] in any order; llm_invocation skipped_by_design.",
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=site visitor.",
       "status": "list_only",
       "do_not_run": true
     },
     {
-      "id": "E1-CHIP-COMPENSATION",
-      "kind": "positive",
+      "id": "E1-CHIP-VISITOR-COMPENSATION",
+      "kind": "negative",
       "family": "tools",
       "prompt": "What about compensation?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-external-viewer/What about compensation?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -2024,6 +2284,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 10,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": null,
@@ -2032,25 +2294,32 @@
         ],
         "denied": true,
         "deny_reason": "sensitivity",
-        "as_of": "2026-08-31"
+        "as_of": "2026-08-31",
+        "identity_label": "site visitor"
       },
       "assertions": {
         "hypotheses_non_empty": true,
         "hypotheses_no_digits": true,
         "hypotheses_no_causal_terms": true,
-        "consistency_targets": []
+        "consistency_targets": [],
+        "forbidden_targets": [
+          "0.98",
+          "0.88",
+          "n=47674"
+        ]
       },
-      "fail_if": "Visitor chip-04 must call get_metric (deny path) and must not invent a number. Extra allow-listed tools are permitted; skipping a required tool is not.",
-      "pass_if": "tools_used contains ['get_metric'] in any order; llm_invocation skipped_by_design.",
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric; identity_label=site visitor.",
       "status": "list_only",
       "do_not_run": true
     },
     {
-      "id": "E1-CHIP-SKILLS",
+      "id": "E1-CHIP-VISITOR-SKILLS",
       "kind": "positive",
       "family": "tools",
       "prompt": "Which critical skills have the largest gaps?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-external-viewer/Which critical skills have the largest gaps?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -2059,6 +2328,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": null,
@@ -2067,7 +2338,8 @@
         ],
         "denied": false,
         "deny_reason": null,
-        "as_of": "2026-08-31"
+        "as_of": "2026-08-31",
+        "identity_label": "site visitor"
       },
       "assertions": {
         "hypotheses_non_empty": true,
@@ -2075,19 +2347,21 @@
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
           "62.9%"
-        ]
+        ],
+        "forbidden_targets": []
       },
-      "fail_if": "skills without get_skill_coverage is a fail. Extra allow-listed tools are permitted; skipping a required tool is not.",
-      "pass_if": "tools_used contains ['get_skill_coverage'] in any order; llm_invocation skipped_by_design.",
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_skill_coverage; identity_label=site visitor.",
       "status": "list_only",
       "do_not_run": true
     },
     {
-      "id": "E1-CHIP-DEFINITION",
+      "id": "E1-CHIP-VISITOR-DEFINITION",
       "kind": "positive",
       "family": "tools",
       "prompt": "How is voluntary attrition defined?",
       "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-external-viewer/How is voluntary attrition defined?",
       "expected": {
         "llm_invocation": "skipped_by_design",
         "failure_reason": null,
@@ -2096,6 +2370,8 @@
         ],
         "hidden_cells": null,
         "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
         "effective_min_cell": 50,
         "min_cell_source": "identity",
         "facts_count": null,
@@ -2104,7 +2380,8 @@
         ],
         "denied": false,
         "deny_reason": null,
-        "as_of": "2026-08-31"
+        "as_of": "2026-08-31",
+        "identity_label": "site visitor"
       },
       "assertions": {
         "hypotheses_non_empty": true,
@@ -2112,10 +2389,1130 @@
         "hypotheses_no_causal_terms": true,
         "consistency_targets": [
           "average certified headcount"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric_definition; identity_label=site visitor.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-LEADER-LOCATIONS",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "Which locations matter most?",
+      "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-leader-engineering/Which locations matter most?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 42,
+        "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 20,
+        "effective_min_cell": 20,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "Engineering leader"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "16.0%",
+          "APAC-SIN 20.1%",
+          "Engineering leader min_cell 20"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. Locations without get_metric_breakdown fails.",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=Engineering leader.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-LEADER-NEXT-STEPS",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "What should we investigate next?",
+      "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-leader-engineering/What should we investigate next?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 42,
+        "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 20,
+        "effective_min_cell": 20,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "Engineering leader"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "16.0%"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=Engineering leader.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-LEADER-TENURE",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "Show me the tenure breakdown",
+      "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-leader-engineering/Show me the tenure breakdown",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 0,
+        "hidden_grain": "tenure_band",
+        "metric_min_cell": 5,
+        "identity_min_cell": 20,
+        "effective_min_cell": 20,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "Engineering leader"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "16.0%"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=Engineering leader.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-LEADER-COMPENSATION",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "What about compensation?",
+      "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-leader-engineering/What about compensation?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric"
+        ],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 10,
+        "identity_min_cell": 20,
+        "effective_min_cell": 20,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "Engineering leader"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "0.98",
+          "n=15954"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric; identity_label=Engineering leader.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-LEADER-SKILLS",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "Which critical skills have the largest gaps?",
+      "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-leader-engineering/Which critical skills have the largest gaps?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_skill_coverage"
+        ],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 20,
+        "effective_min_cell": 20,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_skill_coverage"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "Engineering leader"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "62.9%"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_skill_coverage; identity_label=Engineering leader.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-LEADER-DEFINITION",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "How is voluntary attrition defined?",
+      "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-leader-engineering/How is voluntary attrition defined?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric_definition"
+        ],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 20,
+        "effective_min_cell": 20,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric_definition"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "Engineering leader"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "average certified headcount"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric_definition; identity_label=Engineering leader.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-HRBP-LOCATIONS",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "Which locations matter most?",
+      "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-hrbp/Which locations matter most?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 34,
+        "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 10,
+        "effective_min_cell": 10,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "HRBP"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "16.0%",
+          "APAC-SIN 20.0%",
+          "HRBP min_cell 10"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. Locations without get_metric_breakdown fails.",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=HRBP.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-HRBP-NEXT-STEPS",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "What should we investigate next?",
+      "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-hrbp/What should we investigate next?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 34,
+        "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 10,
+        "effective_min_cell": 10,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "HRBP"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "16.0%"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=HRBP.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-HRBP-TENURE",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "Show me the tenure breakdown",
+      "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-hrbp/Show me the tenure breakdown",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 0,
+        "hidden_grain": "tenure_band",
+        "metric_min_cell": 5,
+        "identity_min_cell": 10,
+        "effective_min_cell": 10,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "HRBP"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "16.0%"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=HRBP.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-HRBP-COMPENSATION",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "What about compensation?",
+      "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-hrbp/What about compensation?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric"
+        ],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 10,
+        "identity_min_cell": 10,
+        "effective_min_cell": 10,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "HRBP"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "0.98",
+          "n=15954"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric; identity_label=HRBP.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-HRBP-SKILLS",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "Which critical skills have the largest gaps?",
+      "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-hrbp/Which critical skills have the largest gaps?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_skill_coverage"
+        ],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 10,
+        "effective_min_cell": 10,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_skill_coverage"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "HRBP"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "62.9%"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_skill_coverage; identity_label=HRBP.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-HRBP-DEFINITION",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "How is voluntary attrition defined?",
+      "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-hrbp/How is voluntary attrition defined?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric_definition"
+        ],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 10,
+        "effective_min_cell": 10,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric_definition"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "HRBP"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "average certified headcount"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric_definition; identity_label=HRBP.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-ANALYST-LOCATIONS",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "Which locations matter most?",
+      "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-people-analyst/Which locations matter most?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 30,
+        "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 5,
+        "effective_min_cell": 5,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "People analyst"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "16.0%",
+          "APAC-SIN 20.0%",
+          "People analyst min_cell 5"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. Locations without get_metric_breakdown fails.",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=People analyst.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-ANALYST-NEXT-STEPS",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "What should we investigate next?",
+      "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-people-analyst/What should we investigate next?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 30,
+        "hidden_grain": "location × tenure × grade",
+        "metric_min_cell": 5,
+        "identity_min_cell": 5,
+        "effective_min_cell": 5,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "People analyst"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "16.0%"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=People analyst.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-ANALYST-TENURE",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "Show me the tenure breakdown",
+      "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-people-analyst/Show me the tenure breakdown",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "hidden_cells": 0,
+        "hidden_grain": "tenure_band",
+        "metric_min_cell": 5,
+        "identity_min_cell": 5,
+        "effective_min_cell": 5,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric",
+          "get_metric_breakdown"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "People analyst"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "16.0%"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric, get_metric_breakdown; identity_label=People analyst.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-ANALYST-COMPENSATION",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "What about compensation?",
+      "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-people-analyst/What about compensation?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric"
+        ],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 10,
+        "identity_min_cell": 5,
+        "effective_min_cell": 10,
+        "min_cell_source": "metric",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "People analyst"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "0.98",
+          "n=15954"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric; identity_label=People analyst.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-ANALYST-SKILLS",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "Which critical skills have the largest gaps?",
+      "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-people-analyst/Which critical skills have the largest gaps?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_skill_coverage"
+        ],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 5,
+        "effective_min_cell": 5,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_skill_coverage"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "People analyst"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "62.9%"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_skill_coverage; identity_label=People analyst.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CHIP-ANALYST-DEFINITION",
+      "kind": "positive",
+      "family": "tools",
+      "prompt": "How is voluntary attrition defined?",
+      "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_chip_api.json#demo-people-analyst/How is voluntary attrition defined?",
+      "expected": {
+        "llm_invocation": "skipped_by_design",
+        "failure_reason": null,
+        "required_tools": [
+          "get_metric_definition"
+        ],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 5,
+        "effective_min_cell": 5,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [
+          "get_metric_definition"
+        ],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "People analyst"
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "average certified headcount"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "required_tools missing from tools_used, or a foreign identity_label appears. ",
+      "pass_if": "tools_used contains get_metric_definition; identity_label=People analyst.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CASE1-PANEL-VISITOR",
+      "kind": "positive",
+      "family": "case1_panel",
+      "prompt": "Open Case 1 (Can I trust Engineering Headcount?) and read the authz matrix.",
+      "identity_id": "demo-external-viewer",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-external-viewer",
+      "expected": {
+        "llm_invocation": null,
+        "failure_reason": null,
+        "required_tools": [],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 50,
+        "effective_min_cell": 50,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "site visitor",
+        "panel_title": "What site visitor can read",
+        "cells": [
+          {
+            "scope": "own_org",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "own_org",
+            "metric_id": "compa_ratio_median",
+            "denied": true,
+            "reason": "sensitivity",
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "other_org",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "other_org",
+            "metric_id": "compa_ratio_median",
+            "denied": true,
+            "reason": "sensitivity",
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "company_level",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "company_level",
+            "metric_id": "compa_ratio_median",
+            "denied": true,
+            "reason": "sensitivity",
+            "as_of": "2026-08-31"
+          }
         ]
       },
-      "fail_if": "definition without get_metric_definition is a fail. Extra allow-listed tools are permitted; skipping a required tool is not.",
-      "pass_if": "tools_used contains ['get_metric_definition'] in any order; llm_invocation skipped_by_design.",
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "What site visitor can read",
+          "2026-08-31"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "Panel title uses another identity_label, a cell disagrees with the matrix, or as_of is empty.",
+      "pass_if": "Title uses this identity_label; six decisions and reasons match phase4_authz_matrix.json; as_of non-empty.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CASE1-PANEL-LEADER",
+      "kind": "positive",
+      "family": "case1_panel",
+      "prompt": "Open Case 1 (Can I trust Engineering Headcount?) and read the authz matrix.",
+      "identity_id": "demo-leader-engineering",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-leader-engineering",
+      "expected": {
+        "llm_invocation": null,
+        "failure_reason": null,
+        "required_tools": [],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 20,
+        "effective_min_cell": 20,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "Engineering leader",
+        "panel_title": "What Engineering leader can read",
+        "cells": [
+          {
+            "scope": "own_org",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "own_org",
+            "metric_id": "compa_ratio_median",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "other_org",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "other_org",
+            "metric_id": "compa_ratio_median",
+            "denied": true,
+            "reason": "org_scope",
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "company_level",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "company_level",
+            "metric_id": "compa_ratio_median",
+            "denied": true,
+            "reason": "company_scope_confidential",
+            "as_of": "2026-08-31"
+          }
+        ]
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "What Engineering leader can read",
+          "2026-08-31"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "Panel title uses another identity_label, a cell disagrees with the matrix, or as_of is empty.",
+      "pass_if": "Title uses this identity_label; six decisions and reasons match phase4_authz_matrix.json; as_of non-empty.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CASE1-PANEL-HRBP",
+      "kind": "positive",
+      "family": "case1_panel",
+      "prompt": "Open Case 1 (Can I trust Engineering Headcount?) and read the authz matrix.",
+      "identity_id": "demo-hrbp",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-hrbp",
+      "expected": {
+        "llm_invocation": null,
+        "failure_reason": null,
+        "required_tools": [],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 10,
+        "effective_min_cell": 10,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "HRBP",
+        "panel_title": "What HRBP can read",
+        "cells": [
+          {
+            "scope": "own_org",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "own_org",
+            "metric_id": "compa_ratio_median",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "other_org",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "other_org",
+            "metric_id": "compa_ratio_median",
+            "denied": true,
+            "reason": "org_scope",
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "company_level",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "company_level",
+            "metric_id": "compa_ratio_median",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          }
+        ]
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "What HRBP can read",
+          "2026-08-31"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "Panel title uses another identity_label, a cell disagrees with the matrix, or as_of is empty.",
+      "pass_if": "Title uses this identity_label; six decisions and reasons match phase4_authz_matrix.json; as_of non-empty.",
+      "status": "list_only",
+      "do_not_run": true
+    },
+    {
+      "id": "E1-CASE1-PANEL-ANALYST",
+      "kind": "positive",
+      "family": "case1_panel",
+      "prompt": "Open Case 1 (Can I trust Engineering Headcount?) and read the authz matrix.",
+      "identity_id": "demo-people-analyst",
+      "expected_source": "docs/phase4/phase4_authz_matrix.json#demo-people-analyst",
+      "expected": {
+        "llm_invocation": null,
+        "failure_reason": null,
+        "required_tools": [],
+        "hidden_cells": null,
+        "hidden_grain": null,
+        "metric_min_cell": 5,
+        "identity_min_cell": 5,
+        "effective_min_cell": 5,
+        "min_cell_source": "identity",
+        "facts_count": null,
+        "fact_source_tools": [],
+        "denied": false,
+        "deny_reason": null,
+        "as_of": "2026-08-31",
+        "identity_label": "People analyst",
+        "panel_title": "What People analyst can read",
+        "cells": [
+          {
+            "scope": "own_org",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "own_org",
+            "metric_id": "compa_ratio_median",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "other_org",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "other_org",
+            "metric_id": "compa_ratio_median",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "company_level",
+            "metric_id": "headcount",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          },
+          {
+            "scope": "company_level",
+            "metric_id": "compa_ratio_median",
+            "denied": false,
+            "reason": null,
+            "as_of": "2026-08-31"
+          }
+        ]
+      },
+      "assertions": {
+        "hypotheses_non_empty": true,
+        "hypotheses_no_digits": true,
+        "hypotheses_no_causal_terms": true,
+        "consistency_targets": [
+          "What People analyst can read",
+          "2026-08-31"
+        ],
+        "forbidden_targets": []
+      },
+      "fail_if": "Panel title uses another identity_label, a cell disagrees with the matrix, or as_of is empty.",
+      "pass_if": "Title uses this identity_label; six decisions and reasons match phase4_authz_matrix.json; as_of non-empty.",
       "status": "list_only",
       "do_not_run": true
     }

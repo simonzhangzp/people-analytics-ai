@@ -15,6 +15,7 @@ identities:
   - identity_id: demo-hrbp
     role: hrbp
     org_scope: [GlobalTech]
+    # Bound to Engineering for confidential slices (P1 R5). Company-level confidential is allowed.
     sensitivity_max: confidential
     grain_max: aggregate
     label: HRBP

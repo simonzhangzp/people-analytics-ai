@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { runPeopleAgent } from "./run";
 import { routePeopleQuestion } from "./router";
+import { phase4WriteMatrixEnabled } from "./phase4-write-matrix";
 
 const OUT = path.resolve("docs/phase4/phase4_llm_invocation_matrix.json");
 
@@ -34,7 +35,7 @@ function snapshot(
   };
 }
 
-describe.skipIf(process.env.PHASE4_WRITE_MATRIX !== "1")("phase4 llm_invocation matrix writer", () => {
+describe.skipIf(!phase4WriteMatrixEnabled())("phase4 llm_invocation matrix writer", () => {
   it("writes attempted_ok vs attempted_failed with a full response diff", async () => {
     process.env.PEOPLE_IP_HASH_SECRET = process.env.PEOPLE_IP_HASH_SECRET || "unit-test-secret";
     const plan = routePeopleQuestion("Why is Engineering voluntary attrition increasing?", "attrition");

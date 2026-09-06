@@ -20,6 +20,18 @@ describe("authz policy", () => {
       denied: true,
       reason: "sensitivity",
     });
+    expect(expectedAuthz("demo-hrbp", "other_org", "confidential")).toEqual({
+      denied: true,
+      reason: "org_scope",
+    });
+    expect(expectedAuthz("demo-hrbp", "company_level", "confidential")).toEqual({
+      denied: false,
+      reason: null,
+    });
+    expect(expectedAuthz("demo-people-analyst", "other_org", "confidential")).toEqual({
+      denied: false,
+      reason: null,
+    });
   });
 
   it("emits 6 cells per identity", () => {

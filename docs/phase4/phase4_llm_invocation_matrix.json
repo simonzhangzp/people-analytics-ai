@@ -8,7 +8,7 @@
     "llm_invocation": "skipped_by_design",
     "question": "Which locations matter most?",
     "identity_id": "demo-external-viewer",
-    "trace_id": "9a06463e-d8d7-4bc0-b661-fa8cbce41f41",
+    "trace_id": "1db09f28-1c26-415e-ae74-22b6c0e478a9",
     "failure_reason": null,
     "source": "https://peopleanalyticsai.net/api/people/ask",
     "headline": "Among cells visible at site visitor min_cell 50, Engineering trailing-12m voluntary attrition concentrates in APAC-SIN (20.1%).",
@@ -32,8 +32,8 @@
     "llm_invocation": "skipped_by_budget",
     "question": "Why is Engineering voluntary attrition increasing?",
     "identity_id": "demo-external-viewer",
-    "trace_id": "908647bc-2713-416e-8482-0f31bf87aaec",
-    "failure_reason": "upstream_error",
+    "trace_id": "5bf338ab-6639-400d-ae4e-8461d7f43da4",
+    "failure_reason": null,
     "source": "https://peopleanalyticsai.net/api/people/ask",
     "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in APAC-SIN among cells visible at this access level.",
     "facts": [
@@ -59,7 +59,7 @@
     "failure_reason": "internal_code_error",
     "question": "Why is Engineering voluntary attrition increasing?",
     "identity_id": "demo-external-viewer",
-    "trace_id": "a727ad48-47ec-4a9f-92d7-6328ddbb9b4d",
+    "trace_id": "2860edcc-1c5f-4ce6-8097-0bb6d127f3f1",
     "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in a small set of locations among cells visible at this access level.",
     "facts": [
       "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31.",
@@ -83,7 +83,7 @@
     "failure_reason": null,
     "question": "Why is Engineering voluntary attrition increasing?",
     "identity_id": "demo-external-viewer",
-    "trace_id": "c944b570-27ff-415f-8f51-89927d00d268",
+    "trace_id": "15f9c960-1717-4633-a8e6-d8b3d3df7a02",
     "headline": "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31). Concentrated in a small set of locations among cells visible at this access level.",
     "facts": [
       "Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31.",

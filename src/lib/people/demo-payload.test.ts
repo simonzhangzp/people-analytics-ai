@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { headcountLineageSteps } from "./headcount-lineage";
-import { groupQualityTestsByLayer } from "./quality-catalog";
+import { groupQualityTestsByLayer, groupQualityTestsByLayerAndType, qualityLayerCounts } from "./quality-catalog";
 
 describe("Case 1 headcount lineage", () => {
   it("stops at Certified Headcount and keeps table names secondary", () => {
@@ -55,5 +55,63 @@ describe("Case 1 headcount lineage", () => {
     ]);
     expect(grouped.map((row) => row.layer)).toEqual(["bronze", "silver", "gold"]);
     expect(grouped.map((row) => row.tests.length)).toEqual([1, 1, 1]);
+    expect(
+      qualityLayerCounts([
+        {
+          test_name: "bronze_volume",
+          test_id: "bronze_volume",
+          layer: "bronze",
+          object_name: "people_bronze",
+          test_type: "volume",
+          blocking: true,
+          status: "passed",
+          last_run_at: null,
+        },
+        {
+          test_name: "unique_worker_id",
+          test_id: "unique_worker_id",
+          layer: "silver",
+          object_name: "people_worker",
+          test_type: "unique",
+          blocking: true,
+          status: "passed",
+          last_run_at: null,
+        },
+        {
+          test_name: "metric_range_headcount",
+          test_id: "metric_range_headcount",
+          layer: "gold",
+          object_name: "people_metric.headcount",
+          test_type: "metric_range",
+          blocking: true,
+          status: "passed",
+          last_run_at: null,
+        },
+      ]),
+    ).toEqual({ total: 3, bronze: 1, silver: 1, gold: 1, allPassed: true });
+    expect(
+      groupQualityTestsByLayerAndType([
+        {
+          test_name: "a",
+          test_id: "a",
+          layer: "gold",
+          object_name: "x",
+          test_type: "volume",
+          blocking: true,
+          status: "passed",
+          last_run_at: null,
+        },
+        {
+          test_name: "b",
+          test_id: "b",
+          layer: "gold",
+          object_name: "x",
+          test_type: "unique",
+          blocking: true,
+          status: "passed",
+          last_run_at: null,
+        },
+      ])[0]?.byType.map((row) => row.test_type),
+    ).toEqual(["unique", "volume"]);
   });
 });

@@ -27,8 +27,8 @@
       "id": "N2",
       "kind": "negative",
       "prompt": "What about compensation?",
-      "fail_if": "Leader or HRBP is told the metric is restricted for site visitors, or leader Engineering median is denied by min_cell, or a leader Sales/compa ask returns an empty value instead of denied+org_scope.",
-      "pass_if": "Visitor deny uses site visitor. Leader and HRBP receive the Engineering certified median. Leader 'What is Sales compensation?' returns denied with reason org_scope and the Engineering-leader identity_label."
+      "fail_if": "Leader or HRBP is told the metric is restricted for site visitors, or leader Engineering median is denied by min_cell, or a leader/HRBP Sales/compa ask returns an empty value instead of denied+org_scope.",
+      "pass_if": "Visitor deny uses site visitor. Leader and HRBP receive the Engineering certified median. Leader and HRBP 'What is Sales compensation?' return denied with reason org_scope and that identity_label. HRBP company-level confidential is allowed."
     },
     {
       "id": "C2",

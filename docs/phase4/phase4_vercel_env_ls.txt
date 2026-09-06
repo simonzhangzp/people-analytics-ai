@@ -1,0 +1,23 @@
+# Vercel Production env names (P1 R5 / E1-7)
+
+Command: `npx vercel env ls` against `quant-review/people-analytics-ai`.
+
+`PHASE4_WRITE_MATRIX` is **not present** in Production (or any listed environment).
+
+Names present:
+
+- CRON_SECRET
+- PEOPLE_IP_HASH_SECRET
+- NEXT_PUBLIC_MCP_DEMO_TOKEN
+- PEOPLE_MCP_DEMO_TOKEN
+- NEXT_PUBLIC_BUILDER_LINKEDIN
+- NODE_OPTIONS
+- PEOPLE_SERVING_REF
+- PEOPLE_DB_URL
+- DEEPSEEK_API_KEY
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
+- NEXT_PUBLIC_SUPABASE_URL
+- DEEPSEEK_MODEL
+- DEEPSEEK_BASE_URL
+
+The write-matrix flag is a local vitest gate (`phase4WriteMatrixEnabled`). Production `NODE_ENV=production` forces it off even if someone later adds the variable.

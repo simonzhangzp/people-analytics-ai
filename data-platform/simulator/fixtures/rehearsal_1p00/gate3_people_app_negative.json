@@ -180,14 +180,14 @@
       "class": "deny",
       "rls": true,
       "force_rls": true,
-      "owner": "postgres"
+      "owner": "people_publisher"
     },
     {
       "table": "people_agent_trace",
       "class": "deny",
       "rls": true,
       "force_rls": true,
-      "owner": "postgres"
+      "owner": "people_publisher"
     },
     {
       "table": "people_contract",
@@ -320,14 +320,14 @@
       "class": "deny",
       "rls": true,
       "force_rls": true,
-      "owner": "postgres"
+      "owner": "people_publisher"
     },
     {
       "table": "people_llm_call",
       "class": "deny",
       "rls": true,
       "force_rls": true,
-      "owner": "postgres"
+      "owner": "people_publisher"
     },
     {
       "table": "people_meta_attribute",

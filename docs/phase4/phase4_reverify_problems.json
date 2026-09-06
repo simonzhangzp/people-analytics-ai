@@ -73,7 +73,7 @@
     "id": "S1",
     "status": "closed",
     "summary": "tenure hidden fact: –5y: 14.6%.\nTenure 5–10y: 11.6%.\nTenure 10y+: 8.1%.\nNo cells hidden at this grain (min_cell 50).\nTenure differences are associations after suppression. They are not a causal claim.",
-    "evidence": "49f386a9-ad5f-458b-b39f-756262542b6b",
+    "evidence": "390b85a3-e429-4d9f-b121-19ce6bb3a35f",
     "blocking": true
   },
   {
@@ -101,7 +101,7 @@
     "id": "D3-trace",
     "status": "closed",
     "summary": "metric_min_cell 10 · identity_min_cell 20 · effective_min_cell 20 (identity)",
-    "evidence": "37cb9bf0-071a-4d4a-be15-6e7b9c2b054d",
+    "evidence": "28b19175-060d-453d-a481-48edd1b1879a",
     "blocking": true
   },
   {
@@ -136,14 +136,28 @@
     "id": "N2-org-scope",
     "status": "closed",
     "summary": "leader Sales compensation: Compensation positioning is not available to Engineering leader. No substitute number is shown.",
-    "evidence": "56354e14-28af-4b55-ac1f-255fac8ed145",
+    "evidence": "6807ab66-a4c7-4313-8b20-e4fadda5b353",
+    "blocking": true
+  },
+  {
+    "id": "D1-hrbp-sales",
+    "status": "closed",
+    "summary": "HRBP Sales compensation: Compensation positioning is not available to HRBP. No substitute number is shown.",
+    "evidence": "04e064bb-ec91-4fd8-a5d2-696ab9a9c4bc",
     "blocking": true
   },
   {
     "id": "C2",
     "status": "closed",
     "summary": "leader company compensation: Compensation positioning is not available to Engineering leader. No substitute number is shown. as_of=2026-08-31",
-    "evidence": "38ccb76c-40c2-4a95-9d00-b871f4307f51",
+    "evidence": "2543a517-7c32-4cd9-aa31-bb0387aba112",
+    "blocking": true
+  },
+  {
+    "id": "D1-hrbp-company",
+    "status": "closed",
+    "summary": "HRBP company compensation: compa ratio median is 0.98.",
+    "evidence": "be20d342-9d86-4cfa-9cb1-13b747e97896",
     "blocking": true
   },
   {
@@ -170,14 +184,21 @@
   {
     "id": "D1",
     "status": "closed",
-    "summary": "WHAT ENGINEERING LEADER CAN READ  Six cells: own org (Engineering), other org (Sales), company-level × internal Headcount vs confidential median compa-ratio. Cross-org Headcount is allowed. Company-level confidential is company_scope_confidential for an Engineering leader, not or",
+    "summary": "WHAT ENGINEERING LEADER CAN READ  Six cells: own org (Engineering), other org (Sales), company-level × internal Headcount vs confidential median compa-ratio. Engineering leader and HRBP are bound to Engineering: Sales confidential is org_scope. Company-level confidential is denie",
     "evidence": "docs/phase4/p1-authz-matrix.png",
+    "blocking": true
+  },
+  {
+    "id": "quality-summary",
+    "status": "closed",
+    "summary": "74 tests · bronze 3 / silver 35 / gold 36 · all passed · last run 2026-09-04",
+    "evidence": "docs/phase4/p1-quality-collapsed.png",
     "blocking": true
   },
   {
     "id": "case4",
     "status": "closed",
-    "summary": "Dataset Case 4 disclaimer present",
+    "summary": "Dataset Case 4 disclaimer present without duplicated scenario id",
     "evidence": "docs/phase4/p1-case4-copy.png",
     "blocking": false
   },
