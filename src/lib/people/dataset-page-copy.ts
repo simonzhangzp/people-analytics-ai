@@ -43,7 +43,7 @@ export const PEOPLE_DATASET_PAGE_COPY = {
     {
       id: "hiring_slowdown_hm_latency",
       body:
-        "Case 4. Sales Onsite dwell ×1.6 and offer acceptance −8 points from 2026-05-01.",
+        "hiring_slowdown_hm_latency. Sales Onsite dwell ×1.6 and offer acceptance −8 points from 2026-05-01. Case 4 is present in the dataset but has no demo page in this release.",
     },
   ],
   synthetic:

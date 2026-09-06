@@ -1,9 +1,35 @@
 import { chromium } from "@playwright/test";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 
 const BASE = process.env.PHASE4_BASE ?? "https://peopleanalyticsai.net";
 const OUT = path.resolve("docs/phase4");
+
+async function saveShot(buffer, file) {
+  const dest = path.join(OUT, file);
+  const tmp = path.join(tmpdir(), `phase4-${process.pid}-${file.replaceAll(/[\\/]/g, "-")}`);
+  await writeFile(tmp, buffer);
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    try {
+      await copyFile(tmp, dest);
+      return;
+    } catch (error) {
+      await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)));
+      if (attempt === 7) {
+        console.warn("screenshot_copy_failed", dest, error.code || String(error));
+      }
+    }
+  }
+}
+
+async function shotPage(page, file) {
+  await saveShot(await page.screenshot({ type: "png", fullPage: true }), file);
+}
+
+async function shotLocator(locator, file) {
+  await saveShot(await locator.screenshot({ type: "png" }), file);
+}
 const CHIPS = [
   "Which locations matter most?",
   "What should we investigate next?",
@@ -54,6 +80,12 @@ const COVER_IDS = new Set([
   "C2",
   "static-six-person",
   "small-july",
+  "D1",
+  "D3",
+  "D3-trace",
+  "D4",
+  "D5",
+  "case4",
 ]);
 
 function problem(id, status, summary, evidence, blocking = true) {
@@ -94,8 +126,8 @@ await freshnessCard.waitFor({ timeout: 30_000 });
 const freshness = await page.getByTestId("dataset-freshness").innerText();
 note(/frozen at data-v1/i.test(freshness), "S3", `dataset freshness: ${freshness}`, "docs/phase4/p1-s3-freshness-card.png", false);
 note(!(await freshnessCard.locator("p.eyebrow").filter({ hasText: "External sources" }).count()), "S3-card", "freshness is its own card", "docs/phase4/p1-s3-freshness-card.png", false);
-await page.screenshot({ path: path.join(OUT, "p0-dataset-freshness.png"), fullPage: true });
-await freshnessCard.screenshot({ path: path.join(OUT, "p1-s3-freshness-card.png") });
+await shotPage(page, "p0-dataset-freshness.png");
+await shotLocator(freshnessCard, "p1-s3-freshness-card.png");
 if (!/Last serving check/i.test(freshness)) {
   problem(
     "S3",
@@ -117,8 +149,8 @@ note(
 );
 const priorLine = (await page.getByTestId("case3-prior-month").innerText().catch(() => "")) || "";
 note(/2026-07:\s*16\.0%/.test(priorLine), "small-july", `July month line: ${priorLine}`, "docs/phase4/p1-b3-headline.png");
-await page.getByTestId("case3-headline").screenshot({ path: path.join(OUT, "p1-b3-headline.png") });
-await page.getByTestId("attrition-trend").screenshot({ path: path.join(OUT, "p1-s2-chart.png") });
+await shotLocator(page.getByTestId("case3-headline"), "p1-b3-headline.png");
+await shotLocator(page.getByTestId("attrition-trend"), "p1-s2-chart.png");
 const axisNote = await page.getByTestId("attrition-trend-axis-note").innerText().catch(() => "");
 note(/Y-axis starts at/.test(axisNote) && /not 0/.test(axisNote), "S2", `axis note: ${axisNote}`, "docs/phase4/p1-s2-chart.png");
 const ticks = (await page.getByTestId("attrition-trend-ticks").innerText().catch(() => "")) || "";
@@ -218,6 +250,17 @@ for (const identity of IDENTITIES) {
     const traceText = await page.getByTestId("people-ai-trace").innerText();
     const llmLine = await page.getByTestId("people-ai-trace-llm").innerText();
     note(/llm_invocation skipped_by_design/.test(llmLine), "F2", `${identity.slug} ${chip} ${llmLine}`, body.trace_id);
+    if (identity.id === "demo-leader-engineering" && chip === "What about compensation?") {
+      const minLine = await page.getByTestId("people-ai-trace-min-cell").innerText();
+      note(
+        /metric_min_cell 10/.test(minLine) &&
+          /identity_min_cell 20/.test(minLine) &&
+          /effective_min_cell 20/.test(minLine),
+        "D3-trace",
+        minLine,
+        body.trace_id,
+      );
+    }
     if (identity.id === "demo-external-viewer") {
       note(!TRACE_FORBIDDEN.test(traceText), "F2-words", `visitor trace has no failure/error/exception: ${chip}`, body.trace_id);
     }
@@ -226,15 +269,12 @@ for (const identity of IDENTITIES) {
       identity.slug === "visitor"
         ? `p1-chip-${slug}.png`
         : `p1-${identity.slug}-chip-${slug}.png`;
-    await page.screenshot({ path: path.join(OUT, file), fullPage: true });
+    await shotPage(page, file);
     if (identity.slug === "visitor") {
-      await page.screenshot({ path: path.join(OUT, `p1-chip-${slug}-trace.png`), fullPage: true });
+      await shotPage(page, `p1-chip-${slug}-trace.png`);
     }
     if (chip === "What about compensation?") {
-      await page.screenshot({
-        path: path.join(OUT, `p1-b1-${identity.slug}-chip04-signals.png`),
-        fullPage: true,
-      });
+      await shotPage(page, `p1-b1-${identity.slug}-chip04-signals.png`);
     }
   }
 }
@@ -291,7 +331,10 @@ const COMPANY_COMPA = "What is company compensation?";
 const companyAsk = await askApi("demo-leader-engineering", COMPANY_COMPA);
 const companyPayload = companyAsk.payload;
 const companyDeny = (companyPayload?.evidence ?? []).some(
-  (row) => row?.denied === true && row?.reason === "org_scope" && String(row?.as_of ?? "").length >= 10,
+  (row) =>
+    row?.denied === true &&
+    row?.reason === "company_scope_confidential" &&
+    String(row?.as_of ?? "").length >= 10,
 );
 note(
   Boolean(companyAsk.ok && companyDeny && !VISITOR_WORD.test(textBlob(companyPayload))),
@@ -351,7 +394,7 @@ if (freeform.payload?.llm_invocation === "skipped_by_budget" || /skipped_by_budg
   const notice = (await page.getByTestId("people-ai-budget").innerText().catch(() => "")) || "";
   note(notice === BUDGET_NOTICE, "F3", `budget copy: ${notice}`, "docs/phase4/p1-f3-budget.png");
   note(!/429|quota|rate limit|withheld/i.test(await page.getByTestId("people-ai-answer").innerText()), "F3-words", "no tech words", "people-ai-answer");
-  await page.screenshot({ path: path.join(OUT, "p1-f3-budget.png"), fullPage: true });
+  await shotPage(page, "p1-f3-budget.png");
   record("skipped_by_budget", {
     llm_invocation: "skipped_by_budget",
     question: FREEFORM,
@@ -372,7 +415,7 @@ if (freeform.payload?.llm_invocation === "skipped_by_budget" || /skipped_by_budg
   const chipAfter = await (await pendingChip).json();
   note(chipAfter.llm_invocation === "skipped_by_design" && !chipAfter.withheld, "F3-chip", "chip still works after budget", chipAfter.trace_id);
   await page.getByTestId("people-ai-headline").waitFor();
-  await page.screenshot({ path: path.join(OUT, "p1-f3-chip-after-budget.png"), fullPage: true });
+  await shotPage(page, "p1-f3-chip-after-budget.png");
 } else if (freeform.payload?.llm_invocation === "attempted_ok") {
   record("attempted_ok", {
     llm_invocation: "attempted_ok",
@@ -385,14 +428,68 @@ if (freeform.payload?.llm_invocation === "skipped_by_budget" || /skipped_by_budg
     hypotheses: freeform.payload.hypotheses,
     tools_used: freeform.payload.tools_used,
   });
-  await page.screenshot({ path: path.join(OUT, "p1-freeform-attempted-ok.png"), fullPage: true });
+  await shotPage(page, "p1-freeform-attempted-ok.png");
 }
 
 await page.goto(`${BASE}/architecture`, { waitUntil: "domcontentloaded" });
 await page.getByTestId("b2a-facts-deterministic").waitFor({ timeout: 45_000 });
-await page.screenshot({ path: path.join(OUT, "p1-architecture-b2a.png"), fullPage: true });
+await page.getByTestId("min-cell-max-rule").waitFor();
+const b2a = await page.getByTestId("b2a-facts-deterministic").innerText();
+note(
+  /The model chooses which tools to call/.test(b2a) &&
+    /The only model-authored text is hypotheses/.test(b2a) &&
+    /If the planner fails/.test(b2a),
+  "D4",
+  b2a.replaceAll("\n", " ").slice(0, 280),
+  "docs/phase4/p1-architecture-b2a.png",
+);
+const minRule = await page.getByTestId("min-cell-max-rule").innerText();
+note(
+  /effective_min_cell = max/.test(minRule) && /min_cell_source/.test(minRule),
+  "D3",
+  minRule.replaceAll("\n", " ").slice(0, 240),
+  "docs/phase4/p1-architecture-b2a.png",
+);
+await shotPage(page, "p1-architecture-b2a.png");
+
+await page.goto(`${BASE}/enterprise-demo/trust?identity=demo-leader-engineering`, {
+  waitUntil: "domcontentloaded",
+});
+await page.getByTestId("authz-matrix").waitFor({ timeout: 45_000 });
+const authzText = await page.getByTestId("authz-matrix").innerText();
+note(
+  /company_scope_confidential/.test(authzText) && /allow/.test(authzText) && /other org/.test(authzText),
+  "D1",
+  authzText.replaceAll("\n", " ").slice(0, 280),
+  "docs/phase4/p1-authz-matrix.png",
+);
+await shotPage(page, "p1-authz-matrix.png");
+
+await page.goto(`${BASE}/dataset`, { waitUntil: "domcontentloaded" });
+const datasetBody = await page.locator("main").innerText();
+note(
+  /Case 4 is present in the dataset but has no demo page in this release/.test(datasetBody) &&
+    /hiring_slowdown_hm_latency/.test(datasetBody),
+  "case4",
+  "Dataset Case 4 disclaimer present",
+  "docs/phase4/p1-case4-copy.png",
+  false,
+);
+await shotPage(page, "p1-case4-copy.png");
 
 await browser.close();
+
+try {
+  const d5 = JSON.parse(await readFile(path.join(OUT, "phase4_d5_rls_summary.json"), "utf8"));
+  note(
+    d5.unforced_count === 0 && d5.force_missing_count === 0 && d5.table_count >= 77,
+    "D5",
+    `FORCE RLS tables=${d5.table_count} unforced=${d5.unforced_count} deny_forced=${d5.deny_forced_count} force_missing=${d5.force_missing_count}`,
+    "docs/phase4/phase4_d5_rls_summary.json",
+  );
+} catch (error) {
+  note(false, "D5", `missing D5 summary: ${error}`, "docs/phase4/phase4_d5_rls_summary.json");
+}
 
 problem(
   "N3",

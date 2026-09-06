@@ -1,0 +1,26 @@
+{
+  "project": "zapmigfrtnwnkmezjefx",
+  "migration": "031_people_v2_p1_r4.sql",
+  "scripts": [
+    "data-platform/serving/apply_force_rls.py",
+    "data-platform/serving/test_people_app_negative.py"
+  ],
+  "table_count": 81,
+  "unforced": [],
+  "unforced_count": 0,
+  "verify_errors": [],
+  "deny_unforced": [],
+  "deny_forced_count": 33,
+  "force_missing": [],
+  "force_missing_count": 0,
+  "people_app_negative": {
+    "denied_select": 33,
+    "person_grain": 11,
+    "restricted": 10,
+    "governance": 2
+  },
+  "people_app_failed": 0,
+  "note": "GATE 3 baseline was 77 people_v2.people_* tables and 29 deny tables. Current 81/33 after agent and llm tables were added and FORCE RLS applied. unforced=0, force_missing=[].",
+  "full_force_rls": "docs/phase4/phase4_gate3_force_rls.json",
+  "full_people_app_negative": "docs/phase4/phase4_gate3_people_app_negative.json"
+}

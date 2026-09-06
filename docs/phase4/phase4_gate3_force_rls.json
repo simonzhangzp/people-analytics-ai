@@ -1,0 +1,692 @@
+{
+  "applied": [
+    "people_access_log",
+    "people_agent_tool_call",
+    "people_agent_trace",
+    "people_business_rule",
+    "people_contract",
+    "people_dim_appraisal_cycle",
+    "people_dim_candidate",
+    "people_dim_date",
+    "people_dim_grade",
+    "people_dim_job",
+    "people_dim_learning_resource",
+    "people_dim_location",
+    "people_dim_org",
+    "people_dim_person",
+    "people_dim_person_restricted",
+    "people_dim_recruiter",
+    "people_dim_rejection_reason",
+    "people_dim_requisition",
+    "people_dim_skill",
+    "people_dim_source",
+    "people_dim_stage",
+    "people_dim_survey_item",
+    "people_dim_survey_wave",
+    "people_dim_worker",
+    "people_evt_application_stage",
+    "people_evt_worker",
+    "people_evt_worker_change",
+    "people_fact_application",
+    "people_fact_appraisal",
+    "people_fact_comp_assignment_restricted",
+    "people_fact_interview",
+    "people_fact_offer",
+    "people_fact_scorecard",
+    "people_fact_survey_score_restricted",
+    "people_fact_training_participation",
+    "people_fact_worker_skill",
+    "people_hist_worker_attr",
+    "people_lineage",
+    "people_llm_budget",
+    "people_llm_call",
+    "people_mart_applicant_flow",
+    "people_mart_comp_monthly",
+    "people_mart_engagement_wave",
+    "people_mart_funnel_monthly",
+    "people_mart_learning_monthly",
+    "people_mart_mobility_monthly",
+    "people_mart_recruiter_load_monthly",
+    "people_mart_recruiting_monthly",
+    "people_mart_skill_coverage_monthly",
+    "people_mart_source_health_daily",
+    "people_mart_stage_aging_monthly",
+    "people_mart_workforce_monthly",
+    "people_mart_workforce_monthly_2d",
+    "people_meta_attribute",
+    "people_meta_entity",
+    "people_meta_join_path",
+    "people_metric",
+    "people_metric_breakdown_cache",
+    "people_metric_health",
+    "people_metric_trend_cache",
+    "people_metric_version",
+    "people_policy_demo_identity",
+    "people_quality_incident",
+    "people_quality_result",
+    "people_quality_test",
+    "people_ref_city",
+    "people_ref_comp_band",
+    "people_ref_job_skill_target",
+    "people_ref_separation_reason_map",
+    "people_replay_metric_value",
+    "people_serving_pointer",
+    "people_serving_run",
+    "people_snap_recruiter_month",
+    "people_snap_requisition_month",
+    "people_snap_worker_month",
+    "people_suppression_log",
+    "people_xw_identity",
+    "people_xw_job",
+    "people_xw_location",
+    "people_xw_org",
+    "people_xw_skill"
+  ],
+  "verify_errors": [],
+  "unforced": [],
+  "deny_unforced": [],
+  "deny_forced": [
+    "people_access_log",
+    "people_agent_tool_call",
+    "people_agent_trace",
+    "people_contract",
+    "people_dim_candidate",
+    "people_dim_person",
+    "people_dim_person_restricted",
+    "people_dim_worker",
+    "people_evt_application_stage",
+    "people_evt_worker",
+    "people_evt_worker_change",
+    "people_fact_application",
+    "people_fact_appraisal",
+    "people_fact_comp_assignment_restricted",
+    "people_fact_interview",
+    "people_fact_offer",
+    "people_fact_scorecard",
+    "people_fact_survey_score_restricted",
+    "people_fact_training_participation",
+    "people_fact_worker_skill",
+    "people_hist_worker_attr",
+    "people_llm_budget",
+    "people_llm_call",
+    "people_meta_attribute",
+    "people_meta_entity",
+    "people_meta_join_path",
+    "people_metric_breakdown_cache",
+    "people_metric_trend_cache",
+    "people_snap_recruiter_month",
+    "people_snap_requisition_month",
+    "people_snap_worker_month",
+    "people_suppression_log",
+    "people_xw_identity"
+  ],
+  "tables": [
+    {
+      "table": "people_access_log",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_agent_tool_call",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "class": "deny"
+    },
+    {
+      "table": "people_agent_trace",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "class": "deny"
+    },
+    {
+      "table": "people_business_rule",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_contract",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_dim_appraisal_cycle",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_candidate",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_dim_date",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_grade",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_job",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_learning_resource",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_location",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_org",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_person",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_dim_person_restricted",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_dim_recruiter",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_rejection_reason",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_requisition",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_skill",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_source",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_stage",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_survey_item",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_survey_wave",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_dim_worker",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_evt_application_stage",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_evt_worker",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_evt_worker_change",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_fact_application",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_fact_appraisal",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_fact_comp_assignment_restricted",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_fact_interview",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_fact_offer",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_fact_scorecard",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_fact_survey_score_restricted",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_fact_training_participation",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_fact_worker_skill",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_hist_worker_attr",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_lineage",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_llm_budget",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "class": "deny"
+    },
+    {
+      "table": "people_llm_call",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "class": "deny"
+    },
+    {
+      "table": "people_mart_applicant_flow",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_comp_monthly",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_engagement_wave",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_funnel_monthly",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_learning_monthly",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_mobility_monthly",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_recruiter_load_monthly",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_recruiting_monthly",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_skill_coverage_monthly",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_source_health_daily",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_stage_aging_monthly",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_workforce_monthly",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_mart_workforce_monthly_2d",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_meta_attribute",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_meta_entity",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_meta_join_path",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_metric",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_metric_breakdown_cache",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_metric_health",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_metric_trend_cache",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_metric_version",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_policy_demo_identity",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_quality_incident",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_quality_result",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_quality_test",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_ref_city",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_ref_comp_band",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_ref_job_skill_target",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_ref_separation_reason_map",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_replay_metric_value",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_serving_pointer",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_serving_run",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_snap_recruiter_month",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_snap_requisition_month",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_snap_worker_month",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_suppression_log",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_xw_identity",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "deny"
+    },
+    {
+      "table": "people_xw_job",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_xw_location",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_xw_org",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    },
+    {
+      "table": "people_xw_skill",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher",
+      "class": "select"
+    }
+  ]
+}

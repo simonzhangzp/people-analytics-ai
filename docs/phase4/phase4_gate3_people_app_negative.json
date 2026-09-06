@@ -1,0 +1,410 @@
+{
+  "denied_select": [
+    {
+      "table": "people_access_log",
+      "bucket": "governance",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_agent_tool_call",
+      "bucket": "deny_other",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_agent_trace",
+      "bucket": "deny_other",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_contract",
+      "bucket": "governance",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_dim_candidate",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_dim_person",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_dim_person_restricted",
+      "bucket": "restricted",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_dim_worker",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_evt_application_stage",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_evt_worker",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_evt_worker_change",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_fact_application",
+      "bucket": "restricted",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_fact_appraisal",
+      "bucket": "restricted",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_fact_comp_assignment_restricted",
+      "bucket": "restricted",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_fact_interview",
+      "bucket": "restricted",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_fact_offer",
+      "bucket": "restricted",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_fact_scorecard",
+      "bucket": "restricted",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_fact_survey_score_restricted",
+      "bucket": "restricted",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_fact_training_participation",
+      "bucket": "restricted",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_fact_worker_skill",
+      "bucket": "restricted",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_hist_worker_attr",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_llm_budget",
+      "bucket": "deny_other",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_llm_call",
+      "bucket": "deny_other",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_meta_attribute",
+      "bucket": "deny_other",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_meta_entity",
+      "bucket": "deny_other",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_meta_join_path",
+      "bucket": "deny_other",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_metric_breakdown_cache",
+      "bucket": "deny_other",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_metric_trend_cache",
+      "bucket": "deny_other",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_snap_recruiter_month",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_snap_requisition_month",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_snap_worker_month",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_suppression_log",
+      "bucket": "deny_other",
+      "error": "permission_denied"
+    },
+    {
+      "table": "people_xw_identity",
+      "bucket": "person_grain",
+      "error": "permission_denied"
+    }
+  ],
+  "failed": [],
+  "force_rls_deny_tables": [
+    {
+      "table": "people_access_log",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_agent_tool_call",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres"
+    },
+    {
+      "table": "people_agent_trace",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres"
+    },
+    {
+      "table": "people_contract",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_dim_candidate",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_dim_person",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_dim_person_restricted",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_dim_worker",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_evt_application_stage",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_evt_worker",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_evt_worker_change",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_fact_application",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_fact_appraisal",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_fact_comp_assignment_restricted",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_fact_interview",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_fact_offer",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_fact_scorecard",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_fact_survey_score_restricted",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_fact_training_participation",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_fact_worker_skill",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_hist_worker_attr",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_llm_budget",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres"
+    },
+    {
+      "table": "people_llm_call",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres"
+    },
+    {
+      "table": "people_meta_attribute",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_meta_entity",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_meta_join_path",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_metric_breakdown_cache",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_metric_trend_cache",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_snap_recruiter_month",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_snap_requisition_month",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_snap_worker_month",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_suppression_log",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    },
+    {
+      "table": "people_xw_identity",
+      "class": "deny",
+      "rls": true,
+      "force_rls": true,
+      "owner": "people_publisher"
+    }
+  ],
+  "force_missing": [],
+  "counts": {
+    "denied_select": 33,
+    "person_grain": 11,
+    "restricted": 10,
+    "governance": 2
+  }
+}

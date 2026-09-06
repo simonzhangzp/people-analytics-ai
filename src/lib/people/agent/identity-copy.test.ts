@@ -5,6 +5,7 @@ import { composeAnswerContract } from "./compose";
 import { scoreHypotheses } from "./hypotheses-eval";
 import { classifyPlannerFailure, resolveLlmInvocation } from "./llm-invocation";
 import { routePeopleQuestion } from "./router";
+import { toAskAnswer } from "./run";
 
 const ENG = {
   metric_id: "voluntary_attrition_rate",
@@ -173,7 +174,7 @@ describe("compose identity_label", () => {
     );
   });
 
-  it("denies leader company-level confidential with org_scope and a dated as_of", () => {
+  it("denies leader company-level confidential with company_scope_confidential and a dated as_of", () => {
     const plan = routePeopleQuestion("What is company compensation?");
     expect(plan.playbook).toBe("metric_value");
     expect(plan.job_family).toBeNull();
@@ -190,7 +191,7 @@ describe("compose identity_label", () => {
           ok: true,
           result: {
             denied: true,
-            reason: "org_scope",
+            reason: "company_scope_confidential",
             metric_id: "compa_ratio_median",
             as_of: "2026-08-31",
             identity_min_cell: 20,
@@ -200,10 +201,18 @@ describe("compose identity_label", () => {
       ],
     });
     expect(answer.headline).toMatch(/Engineering leader/);
-    expect(answer.facts.join(" ")).toMatch(/org_scope/);
+    expect(answer.facts.join(" ")).toMatch(/company_scope_confidential/);
     expect(answer.observed.facts[0]?.as_of).toBe("2026-08-31");
     expect(JSON.stringify(answer.observed.facts).includes('"asOf"')).toBe(false);
     expect(answer.observed.facts[0]?.filters).toMatchObject({ identity_min_cell: 20 });
+    expect(answer.effective_min_cell).toBe(20);
+    expect(answer.min_cell_source).toBe("identity");
+    expect(toAskAnswer({ ...answer, critic: { ok: true, failures: [] } })).toMatchObject({
+      metric_min_cell: 10,
+      identity_min_cell: 20,
+      effective_min_cell: 20,
+      min_cell_source: "identity",
+    });
   });
 });
 

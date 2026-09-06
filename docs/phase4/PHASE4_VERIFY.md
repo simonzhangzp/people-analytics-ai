@@ -27,11 +27,17 @@ These rules exist because P1 R1/R2 failed when cover copy, screenshots, and self
 
 - **N1**: 24-grid locations headlines use that identity’s `identity_label` and the matching `min_cell`.
 - **N2**: visitor chip-04 denied with `{identity_label}`; leader/HRBP/analyst Engineering median allowed; one leader non-Engineering deny with `reason: org_scope`.
-- **B2-a**: full response diff (headline / facts / hypotheses / tools) in `phase4_llm_invocation_matrix.json` `b2a_diff`. Architecture first screen must state that facts are deterministic and the model only rewrites hypotheses. E1 scores hypotheses (non-empty, no digits, no causal verbs, no contradiction with facts) and does not score headline/facts by text similarity.
+- **B2-a**: full response diff (headline / facts / hypotheses / tools) in `phase4_llm_invocation_matrix.json` `b2a_diff`. Architecture first screen states: the model chooses tools; SQL/templates generate values and fact sentences; hypotheses are the only model-authored text; planner failure leaves headline/facts/tools unchanged. E1 scores hypotheses and required tools, not headline/facts similarity.
 - **B2-b**: `failure_reason` is one of `upstream_timeout | upstream_error | upstream_refusal | internal_code_error | schema_violation`. A thrown `ReferenceError` is `internal_code_error`.
 - **F1**: annotated tag is on the remote, and the cover states tag ↔ `dpl_`.
 - **S2 chart ticks**: mid-tick is `[yMin, mid, yMax]` from the full series min/max plus pad. Screenshot compression is not a second scale. Record in this file, not in copy audit.
 - **S3 / cron**: wait for the 9/6 UTC run; do not fake `ok=false` on production before that date.
-- **C2**: leader + company-level confidential (`job_family` null) returns `denied` / `org_scope`; leader + company headcount is allowed.
+- **C2**: leader + company-level confidential (`job_family` null) returns `denied` / `company_scope_confidential`; leader + company headcount is allowed. Leader + Sales headcount is allowed; leader + Sales confidential is `org_scope`.
 
-E1 golden set stays paused except the negative seeds in `docs/phase4/e1-negative-seed.json` (B1, N1, N2, C2). Hypotheses assertions: `docs/phase4/e1-hypotheses-assertions.md`.
+## After any DDL migration
+
+Re-run the FORCE RLS verification and the people_app negative SELECT check
+before the deploy is considered verified. Record the table count and
+unforced/force_missing in the round's problems file.
+
+E1 golden set is list-only until this file's D1–D5 items and S3 are closed. Do not run the set before review.

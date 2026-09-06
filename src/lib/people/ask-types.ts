@@ -80,4 +80,8 @@ export interface PeopleAskAnswer {
     llm_invocation?: LlmInvocation;
     failure_reason?: string | null;
   };
+  metric_min_cell?: number;
+  identity_min_cell?: number;
+  effective_min_cell?: number;
+  min_cell_source?: "metric" | "identity";
 }

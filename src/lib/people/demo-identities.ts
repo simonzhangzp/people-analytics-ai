@@ -49,6 +49,16 @@ export function identityMinCell(identityId: string): number {
   }
 }
 
+export function minCellFields(metricMin: number, identityMin: number) {
+  const effective = Math.max(metricMin, identityMin);
+  return {
+    metric_min_cell: metricMin,
+    identity_min_cell: identityMin,
+    effective_min_cell: effective,
+    min_cell_source: (identityMin >= metricMin ? "identity" : "metric") as "identity" | "metric",
+  };
+}
+
 export function identityShowsCompaRatio(identityId: string): boolean {
   return identityId !== "demo-external-viewer";
 }

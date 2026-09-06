@@ -1,4 +1,12 @@
-import { CASE3_TREND_MONTHS, TOP_BREAKDOWN_ROWS, attritionHeadline, concentrationLocationFromVisible, previousMonthEnd, rankVisibleCells } from "./case3-view";
+import { AUTHZ_CLASSES, AUTHZ_SCOPES, authzJobFamily, authzMetricId, expectedAuthz } from "./authz-policy";
+import {
+  attritionHeadline,
+  CASE3_TREND_MONTHS,
+  concentrationLocationFromVisible,
+  previousMonthEnd,
+  rankVisibleCells,
+  TOP_BREAKDOWN_ROWS,
+} from "./case3-view";
 import { DEFAULT_IDENTITY, identityShowsCompaRatio } from "./demo-identities";
 import { asList, asRecord, isoDate } from "./format";
 import {
@@ -29,7 +37,7 @@ export { groupQualityTestsByLayer } from "./quality-catalog";
 export type { QualityCatalogRow } from "./quality-catalog";
 
 export async function loadTrustCase(identityId = DEFAULT_IDENTITY) {
-  const [company, engineering, definition, lineage, health, run, quality, certified] = await Promise.all([
+  const [company, engineering, definition, lineage, health, run, quality, certified, ...authzRows] = await Promise.all([
     peopleGetMetricFor(identityId, "headcount", { grain: "month" }),
     peopleGetMetricFor(identityId, "headcount", { grain: "month", jobFamily: "Engineering" }),
     peopleGetMetricRow("headcount"),
@@ -38,6 +46,27 @@ export async function loadTrustCase(identityId = DEFAULT_IDENTITY) {
     peopleGetServingRun("data-v1"),
     peopleGetQualityCatalog("data-v1"),
     peopleGetPointer("current_certified"),
+    ...AUTHZ_SCOPES.flatMap((scope) =>
+      AUTHZ_CLASSES.map((sensitivityClass) =>
+        peopleGetMetricFor(identityId, authzMetricId(sensitivityClass), {
+          grain: "month",
+          jobFamily: authzJobFamily(scope),
+        }).then((payload) => {
+          const expected = expectedAuthz(identityId, scope, sensitivityClass);
+          return {
+            scope,
+            sensitivity_class: sensitivityClass,
+            metric_id: authzMetricId(sensitivityClass),
+            job_family: authzJobFamily(scope),
+            denied: payload.denied === true,
+            reason: payload.reason ? String(payload.reason) : null,
+            as_of: isoDate(payload.as_of),
+            expected_denied: expected.denied,
+            expected_reason: expected.reason,
+          };
+        }),
+      ),
+    ),
   ]);
   const asOf = isoDate(certified.as_of) || isoDate(company.as_of) || isoDate(engineering.as_of);
   const tests: QualityCatalogRow[] = quality.map((row) => ({
@@ -93,6 +122,7 @@ export async function loadTrustCase(identityId = DEFAULT_IDENTITY) {
     testsByLayer: groupQualityTestsByLayer(tests),
     health,
     run,
+    authz: authzRows,
   };
 }
 
@@ -175,7 +205,7 @@ export async function loadIncidentCase() {
   };
 }
 
-export { attritionHeadline } from "./case3-view";
+export { attritionHeadline };
 
 export async function loadAttritionCase(identityId = DEFAULT_IDENTITY) {
   const [metric, monthMetric, company, trend, breakdown, signals, definition, skills, certified] = await Promise.all([

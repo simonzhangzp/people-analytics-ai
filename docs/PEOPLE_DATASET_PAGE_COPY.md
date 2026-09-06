@@ -12,7 +12,7 @@ Do not ship this to the live homepage or nav in this phase. Bind it on the datas
 
 1. `engineering_apac_attrition_rise` — Case 3. Voluntary attrition hazard raised for APAC engineers with 0–3 years tenure from 2026-03-01. Correlated (not causal): APAC Eng 0–3y compa-ratio lag and clustered manager changes from 2025Q4.
 2. `apac_hris_feed_incomplete` — Case 2. One-day extract fault on 2026-08-14: APAC Employee rows_received = 35% of control_total. Not a workforce change.
-3. `hiring_slowdown_hm_latency` — Case 4. Sales Onsite dwell ×1.6 and offer acceptance −8 points from 2026-05-01. Scorecard and interview latency concentrated on hiring managers 101–103.
+3. `hiring_slowdown_hm_latency` — Sales Onsite dwell ×1.6 and offer acceptance −8 points from 2026-05-01. Scorecard and interview latency concentrated on hiring managers 101–103. Case 4 is present in the dataset but has no demo page in this release.
 
 **SYNTHETIC_EXTENSION (E1–E7 plus E9):** compensation bands, grade rank, city geography, recruiter attributes, engagement instrument, separation-reason map, GlobalTech org names, and silver classification of month-end tree-repair manager changes (`rebalance_synthetic`). See `people_mappings/synthetic_extensions.yml`.
 

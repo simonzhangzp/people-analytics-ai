@@ -25,7 +25,7 @@ import {
   pickNamed,
   tracedFacts,
 } from "./compose-playbooks";
-import { identityLabel, identityMinCell } from "../demo-identities";
+import { identityLabel, identityMinCell, minCellFields } from "../demo-identities";
 import { resolveLlmInvocation } from "./llm-invocation";
 import { scoreHypotheses } from "./hypotheses-eval";
 
@@ -312,7 +312,9 @@ export function composeAnswerContract(input: {
       hypotheses = [
         metric.reason === "org_scope"
           ? `${who} can read Engineering pay positioning only. A different org is not substituted.`
-          : "Related Signals control/slice medians, if shown, are scenario aggregates and are not this certified metric.",
+          : metric.reason === "company_scope_confidential"
+            ? `${who} can read Engineering pay positioning only. Company-wide confidential metrics are not substituted.`
+            : "Related Signals control/slice medians, if shown, are scenario aggregates and are not this certified metric.",
       ];
     } else {
       headline = `${label}${metricId.replaceAll("_", " ")} is ${formatMetricValue(metric)}.`;
@@ -364,6 +366,14 @@ export function composeAnswerContract(input: {
     llmCalls: input.llmCalls ?? 0,
     llmSkipped: input.llmSkipped ?? null,
   });
+  const minCells = minCellFields(
+    num(pickNamed(results, "get_metric_breakdown").metric_min_cell)
+      ?? num(pickNamed(results, "get_metric").metric_min_cell)
+      ?? 5,
+    num(pickNamed(results, "get_metric_breakdown").identity_min_cell)
+      ?? num(pickNamed(results, "get_metric").identity_min_cell)
+      ?? identityMinCell(identityId),
+  );
 
   return {
     question,
@@ -403,6 +413,7 @@ export function composeAnswerContract(input: {
       llm_invocation: llm.llm_invocation,
       failure_reason: llm.failure_reason,
     },
+    ...minCells,
   };
 }
 

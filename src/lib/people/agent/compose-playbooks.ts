@@ -386,7 +386,9 @@ export function composeCompensation(
       hypotheses: [
         row.reason === "org_scope"
           ? `${who} can read Engineering pay positioning only. A different org is not substituted.`
-          : "Related Signals control/slice medians, if shown, are scenario aggregates and are not this certified metric.",
+          : row.reason === "company_scope_confidential"
+            ? `${who} can read Engineering pay positioning only. Company-wide confidential metrics are not substituted.`
+            : "Related Signals control/slice medians, if shown, are scenario aggregates and are not this certified metric.",
       ],
       suppressed: [],
       skillsUsed: [],

@@ -351,6 +351,10 @@ export function toAskAnswer(answer: PeopleAnswerContract): PeopleAskAnswer {
     llm_skipped: answer.llm_skipped,
     llm_invocation: answer.llm_invocation,
     failure_reason: answer.failure_reason,
+    metric_min_cell: answer.metric_min_cell,
+    identity_min_cell: answer.identity_min_cell,
+    effective_min_cell: answer.effective_min_cell,
+    min_cell_source: answer.min_cell_source,
     trace: {
       ...answer.trace,
       llm_used: answer.llm_invocation === "attempted_ok",

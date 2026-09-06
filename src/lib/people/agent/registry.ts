@@ -1,7 +1,7 @@
 import "server-only";
 
 import { asList, asRecord, isoDate } from "../format";
-import { identityMinCell } from "../demo-identities";
+import { identityMinCell, minCellFields } from "../demo-identities";
 import { metricMinCell } from "../metric-catalog";
 import { MICROSOFT_LEARN_CATALOG } from "../learn-catalog";
 import {
@@ -137,14 +137,15 @@ export async function executeRegistryTool(input: {
         });
         const health = await peopleGetHealth(metricId);
         const asOf = isoDate(payload.as_of) || isoDate(payload.asOf) || "2026-08-31";
+        const identMin = Number(payload.identity_min_cell) || identityMinCell(identityId);
+        const yamlMin = Number(payload.metric_min_cell) || metricMinCell(metricId);
         const merged: Record<string, unknown> = {
           ...payload,
           metric_version: 1,
           quality_status: String(health.status ?? "unknown"),
           health_reason: health.reason ?? null,
           as_of: asOf,
-          identity_min_cell: Number(payload.identity_min_cell) || identityMinCell(identityId),
-          metric_min_cell: Number(payload.metric_min_cell) || metricMinCell(metricId),
+          ...minCellFields(yamlMin, identMin),
         };
         delete merged.asOf;
         delete merged.min_cell;
@@ -163,10 +164,11 @@ export async function executeRegistryTool(input: {
         const payload = await peopleGetMetricBreakdown(identityId, metricId, dimension ?? "tenure_band", {
           jobFamily,
         });
+        const identMin = Number(payload.identity_min_cell) || identityMinCell(identityId);
+        const yamlMin = Number(payload.metric_min_cell) || metricMinCell(metricId);
         const mapped: Record<string, unknown> = {
           ...payload,
-          identity_min_cell: Number(payload.identity_min_cell) || identityMinCell(identityId),
-          metric_min_cell: Number(payload.metric_min_cell) || metricMinCell(metricId),
+          ...minCellFields(yamlMin, identMin),
           as_of: isoDate(payload.as_of) || isoDate(payload.asOf) || "2026-08-31",
         };
         delete mapped.asOf;

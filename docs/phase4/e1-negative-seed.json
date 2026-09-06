@@ -35,8 +35,8 @@
       "kind": "negative",
       "prompt": "What is company compensation?",
       "identity_id": "demo-leader-engineering",
-      "fail_if": "Leader receives a company-level confidential metric (compa_ratio_median with job_family null) instead of denied+org_scope, or the deny omits as_of.",
-      "pass_if": "people_get_metric_for(demo-leader-engineering, compa_ratio_median, job_family null) returns denied true, reason org_scope, non-empty as_of. The same identity requesting headcount with job_family null is allowed."
+      "fail_if": "Leader receives a company-level confidential metric (compa_ratio_median with job_family null) instead of denied+company_scope_confidential, or the deny omits as_of.",
+      "pass_if": "people_get_metric_for(demo-leader-engineering, compa_ratio_median, job_family null) returns denied true, reason company_scope_confidential, non-empty as_of. The same identity requesting headcount with job_family null is allowed. Leader Sales headcount is allowed; leader Sales compa is org_scope."
     }
   ]
 }

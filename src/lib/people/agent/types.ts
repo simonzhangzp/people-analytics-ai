@@ -111,6 +111,10 @@ export interface PeopleAnswerContract {
   llm_invocation: LlmInvocation;
   failure_reason: string | null;
   trace: PeopleAskTrace;
+  metric_min_cell?: number;
+  identity_min_cell?: number;
+  effective_min_cell?: number;
+  min_cell_source?: "metric" | "identity";
 }
 
 export const METRIC_ALIASES: Record<string, string> = {

@@ -3,22 +3,24 @@
   "identity_id": "demo-leader-engineering",
   "headline": "Compensation positioning is not available to Engineering leader. No substitute number is shown.",
   "facts": [
-    "As of 2026-08-31, certified median compa-ratio is not available to Engineering leader (org_scope). Grain: month snapshot. min_cell does not create a fallback value."
+    "As of 2026-08-31, certified median compa-ratio is not available to Engineering leader (company_scope_confidential). Grain: month snapshot. min_cell does not create a fallback value."
   ],
   "hypotheses": [
-    "Engineering leader can read Engineering pay positioning only. A different org is not substituted."
+    "Engineering leader can read Engineering pay positioning only. Company-wide confidential metrics are not substituted."
   ],
   "evidence": [
     {
       "as_of": "2026-08-31",
       "value": null,
       "denied": true,
-      "reason": "org_scope",
+      "reason": "company_scope_confidential",
       "metric_id": "compa_ratio_median",
       "job_family": null,
       "identity_id": "demo-leader-engineering",
       "metric_min_cell": 10,
+      "min_cell_source": "identity",
       "identity_min_cell": 20,
+      "effective_min_cell": 20,
       "metric_version": 1,
       "quality_status": "healthy",
       "health_reason": "v1 published"
@@ -43,5 +45,5 @@
       "quality_status": "healthy"
     }
   ],
-  "trace_id": "7b76ce1c-ed49-4f47-b0e7-a02349cac9ca"
+  "trace_id": "38ccb76c-40c2-4a95-9d00-b871f4307f51"
 }

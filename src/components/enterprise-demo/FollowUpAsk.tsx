@@ -168,9 +168,10 @@ export function FollowUpAsk({
           {answer.trace_id ? (
             <div className="mt-4 border-t border-[#eef0f4] pt-3">
               <p className="text-[12px] leading-5 text-[#546277]" data-testid="people-ai-trace-b2a">
-                Facts stay on the SQL path. The model only rewrites hypotheses.
-                attempted_ok and attempted_failed share headline, facts, and tools —
-                see Architecture (b2a_diff).
+                The model chooses which tools to call. Values and fact sentences come from SQL and
+                deterministic templates; the model does not rewrite them. The only model-authored
+                text is hypotheses. If the planner fails, headline, facts, and the tool sequence
+                stay the same — see Architecture (b2a_diff).
               </p>
               <button
                 type="button"
@@ -186,6 +187,11 @@ export function FollowUpAsk({
                   <div>tier {String(answer.tier)}</div>
                   <div>identity {answer.identity_id}</div>
                   <div>snapshot {answer.snapshot?.pointer_id} · {answer.snapshot?.as_of}</div>
+                  <div data-testid="people-ai-trace-min-cell">
+                    metric_min_cell {answer.metric_min_cell ?? "—"} · identity_min_cell{" "}
+                    {answer.identity_min_cell ?? "—"} · effective_min_cell {answer.effective_min_cell ?? "—"}{" "}
+                    ({answer.min_cell_source ?? "—"})
+                  </div>
                   <div data-testid="people-ai-trace-llm">
                     llm_invocation {answer.llm_invocation ?? answer.trace?.llm_invocation ?? "skipped_by_design"}
                   </div>

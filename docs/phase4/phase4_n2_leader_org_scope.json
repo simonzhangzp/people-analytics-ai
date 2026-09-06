@@ -18,7 +18,9 @@
       "job_family": "Sales",
       "identity_id": "demo-leader-engineering",
       "metric_min_cell": 10,
+      "min_cell_source": "identity",
       "identity_min_cell": 20,
+      "effective_min_cell": 20,
       "metric_version": 1,
       "quality_status": "healthy",
       "health_reason": "v1 published"
@@ -43,5 +45,5 @@
       "quality_status": "healthy"
     }
   ],
-  "trace_id": "2e757d4c-680f-4541-a21d-69f90f9dcd88"
+  "trace_id": "56354e14-28af-4b55-ac1f-255fac8ed145"
 }

@@ -6,7 +6,7 @@ import { MetricDefinitionButton } from "@/components/enterprise-demo/MetricDefin
 import { RoleSwitcher } from "@/components/enterprise-demo/RoleSwitcher";
 import { TrustIndicators } from "@/components/enterprise-demo/format";
 import { asRecord, formatCount } from "@/lib/people/format";
-import { DEFAULT_IDENTITY } from "@/lib/people/demo-identities";
+import { DEFAULT_IDENTITY, identityLabel } from "@/lib/people/demo-identities";
 import { headcountLineageSteps, loadTrustCase } from "@/lib/people/demo-payload";
 import { pageMetadata } from "@/lib/site-metadata";
 import { peopleV2Configured } from "@/lib/people/v2-config";
@@ -187,6 +187,39 @@ export default async function TrustCasePage({
             )}
           </section>
         </div>
+
+        <section className="surface mt-8 p-4" data-testid="authz-matrix">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
+            What {identityLabel(identity)} can read
+          </p>
+          <p className="mt-2 text-[12px] leading-5 text-[#667085]">
+            Six cells: own org (Engineering), other org (Sales), company-level × internal Headcount vs
+            confidential median compa-ratio. Cross-org Headcount is allowed. Company-level confidential
+            is company_scope_confidential for an Engineering leader, not org_scope.
+          </p>
+          <table className="mt-3 w-full text-left text-[12px] text-[#3e4c61]">
+            <thead>
+              <tr className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#738097]">
+                <th className="py-1 pr-2">Scope</th>
+                <th className="py-1 pr-2">Metric</th>
+                <th className="py-1 pr-2">Decision</th>
+                <th className="py-1">as_of</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.authz.map((row) => (
+                <tr key={`${row.scope}-${row.metric_id}`}>
+                  <td className="py-1 pr-2">{row.scope.replaceAll("_", " ")}</td>
+                  <td className="py-1 pr-2">{row.metric_id}</td>
+                  <td className="py-1 pr-2">
+                    {row.denied ? `deny · ${row.reason ?? "—"}` : "allow"}
+                  </td>
+                  <td className="py-1">{row.as_of || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
       </article>
     </DemoShell>
   );
