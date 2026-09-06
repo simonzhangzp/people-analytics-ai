@@ -19,6 +19,8 @@
 | LLM usage rate | 0 |
 | p50 / p95 | 412ms / 1070ms |
 
+**LLM usage rate 0 — this run validates the deterministic skeleton path; the LLM-assisted path is covered by E1-LLM-* and the stub test, pending a successful upstream call.**
+
 ## Families
 
 | family | pass / n | blocking |
@@ -36,4 +38,4 @@
 
 ## Failed (not relaxed)
 
-- **E1-LLM-ATTEMPTED-OK** — `llm_invocation:skipped_by_budget`. UTC-day `per_ip_daily_attempts` already exhausted (13 attempt rows, limit 10); DeepSeek had `upstream_error` earlier so `ok=true` and tokens are still 0. Re-run after UTC day cut + `DEEPSEEK_BASE_URL` fix.
+- **E1-LLM-ATTEMPTED-OK** — `llm_invocation:skipped_by_budget`. UTC-day `per_ip_daily_attempts` exhausted on 2026-09-06. C2: after UTC day cut + new IP (and Production `DEEPSEEK_BASE_URL` deleted), capture tokens then rerun only the llm family. Do not rerun all 101 cases.

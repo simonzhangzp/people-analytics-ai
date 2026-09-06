@@ -14,6 +14,9 @@ test.describe("Phase 4 agent + connect", () => {
     await expect(page.locator("footer")).not.toContainText("Lab");
     await expect(page.getByTestId("authz-matrix-title")).toContainText("What site visitor can read");
     await expect(page.getByTestId("eval-scorecard")).toBeVisible();
+    await expect(page.getByTestId("eval-scorecard-llm-note")).toContainText(
+      "LLM usage rate 0 — this run validates the deterministic skeleton path",
+    );
     await page.getByRole("link", { name: "Metric Explorer" }).click();
     await expect(page.getByTestId("metric-explorer")).toBeVisible();
     await page.goto("/dataset");

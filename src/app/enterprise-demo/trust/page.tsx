@@ -7,6 +7,7 @@ import { RoleSwitcher } from "@/components/enterprise-demo/RoleSwitcher";
 import { TrustIndicators } from "@/components/enterprise-demo/format";
 import { asRecord, formatCount } from "@/lib/people/format";
 import { DEFAULT_IDENTITY, identityLabel } from "@/lib/people/demo-identities";
+import { E1_LLM_USAGE_RATE_ZERO_NOTE } from "@/lib/people/eval-copy";
 import { headcountLineageSteps, loadTrustCase } from "@/lib/people/demo-payload";
 import { pageMetadata } from "@/lib/site-metadata";
 import { peopleV2Configured } from "@/lib/people/v2-config";
@@ -237,6 +238,13 @@ export default async function TrustCasePage({
                   </div>
                 ))}
               </dl>
+              {Number(
+                (data.evalScorecard.scorecard?.rates as Record<string, unknown> | undefined)?.llm_usage_rate,
+              ) === 0 ? (
+                <p className="mt-3 text-[12px] leading-5 text-[#546277]" data-testid="eval-scorecard-llm-note">
+                  {E1_LLM_USAGE_RATE_ZERO_NOTE}
+                </p>
+              ) : null}
             </>
           ) : (
             <p className="mt-2 text-[13px] leading-6 text-[#546277]">

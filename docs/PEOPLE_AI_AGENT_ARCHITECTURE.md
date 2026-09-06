@@ -367,9 +367,9 @@ Scopes：`metrics:read`、`semantic:read`、`lineage:read`、`quality:read`、`s
 }
 ```
 
-**现状：** RPC 工具已存在；ask 为剧本匹配；无 trace、无 critic、无 MCP。
+**现状（phase4-p1-r6）：** `/api/people/ask` 已是有边界的 tool-using agent（Tier 1 确定性 / Tier 2 可规划 / refuse）；15 个 registry 工具经 MCP 与 ask 共用；Critic、trace、`people_try_consume_llm` 限额已落地。LLM 只改 hypotheses / 工具选择，不得写 observed 数字。Tier 3 未做。站点证据见 §11。
 
-**站点证据：** Analyst Chat（可展开 trace：plan → tool calls → evidence）；"Connect via MCP" 页（配置示例 + 可用 tools + scope 说明）。
+**站点证据：** Case 页 Follow-up Ask（可展开 trace）；Connect via MCP；Trust 页 golden-set scorecard。
 
 ---
 
@@ -567,3 +567,19 @@ Phase 0 期间允许并行的唯一 L2 工作：定义 metric YAML schema（不�
 ## 10. 一句话项目原则 v2
 
 > PeopleAnalyticsAI emulates real enterprise HR systems through authoritative source contracts, maps them explicitly into a governed canonical People Data Model and semantic layer, encodes analytical methods as versioned and evaluated skills, enforces People-data policy deterministically at the data layer, and only then lets agents — build-time, run-time, and ops — plan, interpret, and narrate. Every number is traceable, every answer separates evidence from hypothesis, every sensitive decision keeps a human in the loop, and the website exposes a few strong case studies plus one clickable proof per layer.
+
+---
+
+## 11. 实施状态（截至 `phase4-p1-r6`）
+
+下一阶段从本表未做列起步。面试时用本表说明边界，而不是用 §6 的远期 Phase 表冒充已交付范围。暂不开工：skills registry / `SKILL.md`、Signal Agent、`people_get_metric_sandbox`、Tier 3、data-v2 解冻。Owner 优先对外发布。
+
+| 层 / pillar | 已落地范围 | 未做 |
+|---|---|---|
+| **L1 Data Foundation** | Frozen `data-v1` serving（certified Engineering + company Headcount，as-of **2026-08-31**，certified HC **49,823**）。Architecture 页一条 contract → mapping → canonical → metric 链。Quality tests / incidents / lineage。Vercel Cron serving healthcheck（streak 满 3 天后 Dataset FRESHNESS 才翻转）。 | Source-contract 切流 DoD（UNJUSTIFIED 字段清理、generator 改为 business-event simulator、destructive migration）。**data-v2 解冻。** |
+| **L2 Knowledge & Semantic** | Certified metric registry（YAML → RPC）。Metric Explorer。MCP：`list_metrics` / `get_metric_definition` / `list_entities` / `describe_entity` / `get_join_paths` / `get_glossary_term`。Case 1 定义抽屉。 | 全量 ontology YAML 与 ontology 图 UI。L3 程序化 skills 作为分析框架。 |
+| **Pillar A Governance** | 四身份（visitor / Engineering leader / HRBP / People analyst）。SQL policy 表 + FORCE RLS。`effective_min_cell = max(metric_min_cell, identity_min_cell)`。6 格 authz 矩阵（own / other / company × Headcount / compa-ratio）。`sensitivity` / `org_scope` / `company_scope_confidential`。 | 跨查询差分防护（§4.6.3 / §9.4）。`people_access_log` 产品面。个人层面输出（公开站永不做）。 |
+| **Pillar B Observability & Eval** | Serving quality tests + incidents。E1 golden set **101** → `people_eval_run` / `people_eval_result`。Trust scorecard。Healthcheck streak RPC。 | 夜间自动跑 E1。Model / skill eval 监测（属 L3）。 |
+| **L4 Agent Runtime** | **15 tools**（`list_metrics` … `get_skill_coverage`；无 `list_skills` / `run_skill` / `explain_access_decision`）。**Tier 1** 确定性 metric 问句；**Tier 2** 探索问句可调 LLM 规划；**refuse**（个人数据 / 注入 / 抑制绕过 / SQL）。**Critic**（数字与工具结果、因果措辞、抑制）。**trace**（`trace_id`、tools、latency、llm_invocation）。**限额** `people_try_consume_llm`：`per_ip_daily` 只计 `ok=true`；`per_ip_daily_attempts` 失败也计；`site_rolling_30d` 仅 `/api/people/ask`。`/api/mcp` 公开 demo token → `demo-external-viewer`。 | **Tier 3** multi-agent。LLM-assisted 路径的成功上游调用（E1 本 run 的 `llm_usage_rate` 仍为 0，见 Trust 标注）。 |
+| **L3 / L5** | Case 3 展示 job-family skill coverage + 公开 Microsoft Learn 路径。单栏 case study；Follow-up Ask 挂在 case 上。`/lab` 已下线。 | **Skills registry `SKILL.md`。Signal Agent / brief / 订阅。sandbox 重算（`people_get_metric_sandbox`）。** Signals 页、Case 4 页面。 |
+

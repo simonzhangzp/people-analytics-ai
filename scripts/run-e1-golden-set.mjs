@@ -14,6 +14,14 @@ const GOLDEN = JSON.parse(readFileSync(path.join(ROOT, "docs/phase4/e1-golden-se
 const CAUSAL = /\b(caused|causes|because of|due to|drives|leads to|driving|the reason is)\b|导致|因为|驱动|造成/i;
 const BLOCKING_FAMILIES = new Set(["refuse", "adversarial", "session", "chip_diff"]);
 const UNIT_EXEC = new Set(["unit_fixture", "inject_ReferenceError"]);
+const ONLY_FAMILIES = new Set(
+  String(process.env.E1_ONLY_FAMILIES ?? "")
+    .split(",")
+    .map((row) => row.trim())
+    .filter(Boolean),
+);
+const MERGE_PRIOR = process.env.E1_MERGE_PRIOR === "1";
+const E1_JSON = path.join(ROOT, "docs/phase4/e1-run.json");
 
 function norm(text) {
   return String(text ?? "")
@@ -337,13 +345,42 @@ async function main() {
     for (const row of unitCases) unitMap.set(row.id, false);
   }
 
-  const ordered = [...GOLDEN.cases].sort((a, b) => rankCase(a) - rankCase(b) || String(a.id).localeCompare(b.id));
-  const results = [];
+  if (ONLY_FAMILIES.has("llm")) {
+    const garbage = spawnSync(
+      "npx",
+      [
+        "vitest",
+        "run",
+        "src/lib/people/agent/agent.test.ts",
+        "-t",
+        "keeps observed byte-identical when the LLM stub returns garbage",
+      ],
+      { cwd: ROOT, encoding: "utf8", shell: true },
+    );
+    if (garbage.status !== 0) {
+      console.error(garbage.stdout || garbage.stderr || "garbage stub test failed");
+      process.exit(garbage.status || 1);
+    }
+  }
+
+  const selected = GOLDEN.cases.filter((row) => !ONLY_FAMILIES.size || ONLY_FAMILIES.has(row.family));
+  const ordered = [...selected].sort((a, b) => rankCase(a) - rankCase(b) || String(a.id).localeCompare(b.id));
+  const fresh = [];
   for (const row of ordered) {
     process.stdout.write(`${row.id} ${row.family}\n`);
-    results.push(await runCase(row, unitMap));
+    fresh.push(await runCase(row, unitMap));
   }
-  results.sort((a, b) => String(a.case_id).localeCompare(b.case_id));
+
+  const prior =
+    MERGE_PRIOR || ONLY_FAMILIES.size
+      ? JSON.parse(readFileSync(E1_JSON, "utf8"))
+      : null;
+  if ((MERGE_PRIOR || ONLY_FAMILIES.size) && !prior?.results?.length) {
+    throw new Error("E1_ONLY_FAMILIES/E1_MERGE_PRIOR requires docs/phase4/e1-run.json");
+  }
+  const byId = new Map((prior?.results ?? []).map((row) => [row.case_id, row]));
+  for (const row of fresh) byId.set(row.case_id, row);
+  const results = [...byId.values()].sort((a, b) => String(a.case_id).localeCompare(b.case_id));
 
   const live = results.filter((row) => row.latency_ms > 0 || !UNIT_EXEC.has(GOLDEN.cases.find((c) => c.id === row.case_id)?.execution));
   const latencies = results.map((row) => row.latency_ms).filter((n) => Number.isFinite(n) && n > 0);
@@ -393,6 +430,10 @@ async function main() {
     blocking_failed: blockingFailed.map((row) => row.case_id),
     failed: failed.map((row) => ({ case_id: row.case_id, family: row.family, failures: row.failures })),
     unit_ok: unit.status === 0,
+    llm_path_note:
+      rate(live, (row) => row.answer_summary?.llm_invocation === "attempted_ok") === 0
+        ? "LLM usage rate 0 — this run validates the deterministic skeleton path; the LLM-assisted path is covered by E1-LLM-* and the stub test, pending a successful upstream call."
+        : null,
   };
 
   const status = blockingFailed.length || failed.length ? "fail" : "pass";
@@ -403,7 +444,9 @@ async function main() {
     status,
     scorecard,
     results,
-    note: "e1 golden 101",
+    note: ONLY_FAMILIES.size
+      ? `e1 golden 101; reran families ${[...ONLY_FAMILIES].join(",")}`
+      : "e1 golden 101",
   };
   writeFileSync(path.join(ROOT, "docs/phase4/e1-run.json"), `${JSON.stringify(payload, null, 2)}\n`);
 
