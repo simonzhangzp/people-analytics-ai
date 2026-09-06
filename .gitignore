@@ -25,6 +25,9 @@
 # Local VDM extracts: large UTF-32 snapshots and roster PII stay on disk only
 sample_data/vdm_*.csv
 
+# AIGP exam study materials (local only)
+/AIGP/
+
 # editor
 .cursor/*
 !.cursor/rules/

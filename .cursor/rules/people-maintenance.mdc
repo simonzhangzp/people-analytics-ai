@@ -1,0 +1,12 @@
+---
+description: People Analytics is in maintenance until the owner restarts development.
+alwaysApply: true
+---
+
+The public site is in maintenance. Do not start product work unless the owner explicitly asks.
+
+Allowed: C2 (llm-family rerun after UTC day cut + new IP) and C3 (FRESHNESS screenshot after 9/7 and 9/8 cron). Nothing else, including skills registry / SKILL.md, Signal Agent, people_get_metric_sandbox, Tier 3, and data-v2 thaw.
+
+If the owner later restarts development, the first task is nightly automatic E1 (`people_eval_run` / `people_eval_result`), not new layers.
+
+Do not commit `AIGP/`. Do not ALTER/DROP QuantReview objects.
