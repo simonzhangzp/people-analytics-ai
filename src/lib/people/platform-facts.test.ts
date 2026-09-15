@@ -66,7 +66,10 @@ describe("homepage platform facts vs data-v1 parity", () => {
     expect(catalog).toMatch(/layer: bronze/);
     expect(catalog).toMatch(/layer: silver/);
     expect(catalog).toMatch(/layer: gold/);
-    const page = readFileSync(path.join(ROOT, "src/app/page.tsx"), "utf8");
+    // Homepage facts render through EnvironmentOverview since the 2026-09 redesign.
+    const page =
+      readFileSync(path.join(ROOT, "src/app/page.tsx"), "utf8") +
+      readFileSync(path.join(ROOT, "src/components/home/EnvironmentOverview.tsx"), "utf8");
     expect(page).not.toMatch(/qualityTests \?\? 30/);
     expect(page).toContain("facts.qualityTests");
   });

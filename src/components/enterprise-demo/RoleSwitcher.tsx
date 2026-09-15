@@ -7,12 +7,12 @@ export function RoleSwitcher({ value }: { value: string }) {
   const router = useRouter();
   const pathname = usePathname();
   return (
-    <label className="block text-[13px] text-[#546277]">
-      <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
+    <label className="block text-[13px] text-body-2">
+      <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
         Demo identity
       </span>
       <select
-        className="mt-2 w-full rounded-[6px] border border-[#e3e7ed] bg-white px-3 py-2 text-[13px] text-[#1c2b44]"
+        className="mt-2 w-full rounded-[8px] border border-edge bg-white px-3 py-2 text-[13px] text-ink"
         data-testid="demo-identity"
         value={value}
         onChange={(event) => {

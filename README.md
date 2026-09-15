@@ -12,6 +12,9 @@ Footer: Enterprise Demo, Architecture, Connect via MCP, Dataset.
 The early file-analysis experiment (`/lab`, `/workbench`, `/app`, Formulator)
 is retired. Those URLs 301 to `/`.
 
+New agents: start with `docs/AGENT_BRIEFING.md` (live scope, recruiter walk,
+paste-ready prompt). Do not treat architecture §6 as shipped; use §11.
+
 ## Local
 
 ```bash

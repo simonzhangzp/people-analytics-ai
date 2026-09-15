@@ -204,7 +204,7 @@ export async function loadIncidentCase() {
     },
     extractGrain: {
       metric_id: "apac_hris_volume",
-      scope: "APAC Employee extract",
+      scope: "Employee full extract · all regions; only APAC rows are short",
       window: "extract day",
       as_of: isoDate(incident.extract_date ?? replayPointer.as_of),
     },

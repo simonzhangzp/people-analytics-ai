@@ -12,8 +12,8 @@
   "rest": [
     {
       "table": "people_mart_workforce_overview",
-      "status": 200,
-      "leaked_rows": true,
+      "status": 401,
+      "leaked_rows": false,
       "pgrst": null,
       "empty_array": false
     },
@@ -26,8 +26,8 @@
     },
     {
       "table": "people_dim_worker",
-      "status": 200,
-      "leaked_rows": true,
+      "status": 401,
+      "leaked_rows": false,
       "pgrst": null,
       "empty_array": false
     },
@@ -40,8 +40,8 @@
     },
     {
       "table": "people_serving_snapshot",
-      "status": 200,
-      "leaked_rows": true,
+      "status": 401,
+      "leaked_rows": false,
       "pgrst": null,
       "empty_array": false
     },
@@ -75,8 +75,8 @@
     },
     {
       "table": "people_metric_definition",
-      "status": 200,
-      "leaked_rows": true,
+      "status": 401,
+      "leaked_rows": false,
       "pgrst": null,
       "empty_array": false
     },

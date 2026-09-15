@@ -9,7 +9,7 @@ export function TrendSparkline({
   if (model.status === "error") {
     return (
       <div
-        className="flex min-h-40 items-center border border-[#efd4d4] bg-[#fbeeee] px-4 py-6 text-[13px] leading-6 text-[#934646]"
+        className="flex min-h-40 items-center border border-danger-line bg-danger-soft px-4 py-6 text-[13px] leading-6 text-danger"
         data-testid="attrition-trend"
         data-empty="true"
         role="alert"
@@ -45,7 +45,7 @@ export function TrendSparkline({
 
   return (
     <div data-testid="attrition-trend" data-empty="false">
-      <p className="text-[12px] text-[#546277]">
+      <p className="text-[12px] text-body-2">
         Engineering voluntary attrition · trailing-12m annualized · {model.points.length} months
       </p>
       <svg
@@ -61,14 +61,14 @@ export function TrendSparkline({
               x2={left + plotW}
               y1={yAt(tick)}
               y2={yAt(tick)}
-              stroke="#e3e7ed"
+              stroke="#e4e8f0"
               strokeWidth="1"
             />
             <text
               x={left - 6}
               y={yAt(tick) + 3}
               textAnchor="end"
-              className="fill-[#667085]"
+              className="fill-muted"
               fontSize="11"
             >
               {(tick * 100).toFixed(1)}%
@@ -85,14 +85,14 @@ export function TrendSparkline({
               x2={xAt(scenarioIndex)}
               y1={top}
               y2={top + plotH}
-              stroke="#8a571c"
+              stroke="#b8730e"
               strokeDasharray="3 3"
               strokeWidth="1.5"
             />
             <text
               x={Math.min(xAt(scenarioIndex) + 4, left + plotW - 8)}
               y={top + 11}
-              className="fill-[#8a571c]"
+              className="fill-gold-dark"
               fontSize="11"
               fontWeight="600"
             >
@@ -112,7 +112,7 @@ export function TrendSparkline({
               width={barWidth}
               height={Math.max(1, top + plotH - y)}
               rx="2"
-              fill={isScenario ? "#8a571c" : "#3559c7"}
+              fill={isScenario ? "#b8730e" : "#2456f6"}
               data-testid="attrition-trend-point"
               data-as-of={point.as_of}
               data-scenario={isScenario ? "true" : "false"}
@@ -121,26 +121,26 @@ export function TrendSparkline({
             </rect>
           );
         })}
-        <text x={left} y={height - 6} className="fill-[#667085]" fontSize="11">
+        <text x={left} y={height - 6} className="fill-muted" fontSize="11">
           {first?.as_of?.slice(0, 7)}
         </text>
-        <text x={left + plotW} y={height - 6} textAnchor="end" className="fill-[#667085]" fontSize="11">
+        <text x={left + plotW} y={height - 6} textAnchor="end" className="fill-muted" fontSize="11">
           {last?.as_of?.slice(0, 7)}
         </text>
       </svg>
       {truncated ? (
-        <p className="mt-1 text-[11px] text-[#667085]" data-testid="attrition-trend-axis-note">
+        <p className="mt-1 text-[11px] text-muted" data-testid="attrition-trend-axis-note">
           Y-axis starts at {(yMin * 100).toFixed(1)}%, not 0. Unit: trailing-12m annualized rate.
         </p>
       ) : (
-        <p className="mt-1 text-[11px] text-[#667085]">Unit: trailing-12m annualized rate.</p>
+        <p className="mt-1 text-[11px] text-muted">Unit: trailing-12m annualized rate.</p>
       )}
       {!model.scenarioAsOf ? (
-        <p data-testid="attrition-trend-scenario" className="mt-1 text-[11px] text-[#934646]">
+        <p data-testid="attrition-trend-scenario" className="mt-1 text-[11px] text-danger">
           {CASE3_SCENARIO_START} scenario start is not in this series
         </p>
       ) : (
-        <p data-testid="attrition-trend-scenario" className="mt-1 text-[11px] font-semibold text-[#8a571c]">
+        <p data-testid="attrition-trend-scenario" className="mt-1 text-[11px] font-semibold text-gold-dark">
           Vertical marker: {CASE3_SCENARIO_START} scenario start
         </p>
       )}

@@ -27,12 +27,68 @@ test.describe("Phase 4 agent + connect", () => {
 
   test("connect page shows the public demo token disclaimer", async ({ page }) => {
     await page.goto("/connect");
-    await expect(page.getByRole("heading", { name: /connect via mcp/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /connect your ai via mcp/i })).toBeVisible();
     await expect(page.getByTestId("mcp-token-disclaimer")).toContainText(
       "public demo token · aggregate only · min_cell 50",
     );
     await expect(page.getByText("get_skill_coverage")).toBeVisible();
     await page.screenshot({ path: `${SHOTS}/connect.png`, fullPage: true });
+  });
+
+  test("try page: trace reveals every layer, permissions differ by identity, runner labels template hypotheses", async ({
+    page,
+  }) => {
+    await page.goto("/try");
+    if (await page.getByRole("heading", { name: /people serving is not configured/i }).isVisible()) {
+      test.skip(true, "People serving env is not configured");
+    }
+    for (const id of ["trace-number", "governance-card", "permissions-lab", "analysis-runner", "roadmap-skills"]) {
+      await expect(page.getByTestId(id)).toBeVisible();
+    }
+
+    // Module 3: the number only becomes "breakable" after every layer is open.
+    const reveal = page.getByTestId("trace-reveal-next");
+    for (let i = 0; i < 8 && (await reveal.isVisible()); i += 1) {
+      await reveal.click();
+    }
+    await expect(page.getByTestId("trace-incident-bridge")).toBeVisible();
+
+    // Module 1: same question, two identities, live serving. Decisions render for both.
+    await page.getByTestId("permissions-run").click();
+    await expect(page.getByTestId("permissions-decision")).toHaveCount(2, { timeout: 30000 });
+    const decisions = await page.getByTestId("permissions-decision").allInnerTexts();
+    expect(decisions.every((d) => /Allowed|Denied|Refused|Withheld/.test(d))).toBe(true);
+
+    // Module 5: stub the agent so the test never spends LLM budget; label must say the model was not used.
+    await page.route("**/api/people/ask", async (route) => {
+      const posted = route.request().postDataJSON() as { question?: string };
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          question: String(posted.question ?? ""),
+          supported: true,
+          headline: "Engineering trailing-12m annualized voluntary attrition is 16.0% (as-of 2026-08-31).",
+          facts: ["Engineering trailing-12m voluntary attrition: 16.0% as of 2026-08-31."],
+          interpretation: ["Location concentrations are observed associations."],
+          quality_status: "healthy",
+          error_state: null,
+          withheld: false,
+          llm_skipped: "skipped_by_budget",
+          critic: { ok: true, failures: [] },
+          tools_used: ["get_metric", "get_metric_breakdown"],
+          evidence: [],
+          freshness: null,
+          trace_id: "00000000-0000-4000-8000-000000000042",
+          tier: 2,
+          trace: { tools: [], latency_ms: 20, llm_skipped: "skipped_by_budget", llm_calls: 0 },
+        }),
+      });
+    });
+    await page.getByTestId("analysis-run").click();
+    await expect(page.getByTestId("analysis-headline")).toContainText("16.0%");
+    await expect(page.getByTestId("analysis-hypotheses-source")).toContainText("Deterministic template");
+    await expect(page.getByTestId("analysis-hypotheses-source")).not.toContainText("Model-authored");
   });
 
   test("three degrade states render distinct copy", async ({ page }) => {

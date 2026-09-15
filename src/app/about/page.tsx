@@ -16,37 +16,37 @@ export const metadata = pageMetadata({
 export default function AboutPage() {
   const email = BUILDER_EMAIL;
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-[#111827]">
+    <div className="flex min-h-screen flex-col bg-canvas text-ink">
       <SiteHeader active="/about" />
-      <main className="mx-auto max-w-[800px] px-5 py-12 sm:px-8">
+      <main className="w-full flex-1 mx-auto max-w-[800px] px-5 py-12 sm:px-8">
         <p className="eyebrow">About</p>
-        <h1 className="mt-4 text-[32px] font-bold tracking-[-0.04em] text-[#13203a]">
+        <h1 className="mt-4 text-[36px] font-bold leading-[1.08] tracking-[-0.035em] text-ink sm:text-[44px]">
           {BUILDER_NAME}
         </h1>
-        <p className="mt-5 text-[16px] leading-7 text-[#546277]">{BUILDER_HEADLINE}</p>
-        <ul className="mt-6 flex flex-col gap-2 text-[15px] leading-7 text-[#3e4c61]" data-testid="about-contact">
+        <p className="mt-5 text-[18px] leading-8 text-body">{BUILDER_HEADLINE}</p>
+        <ul className="mt-6 flex flex-col gap-2 text-[15px] leading-7 text-body" data-testid="about-contact">
           <li>
             LinkedIn:{" "}
-            <a className="font-semibold text-[#3157c9]" href={BUILDER_LINKEDIN} rel="noreferrer" target="_blank">
+            <a className="font-semibold text-primary" href={BUILDER_LINKEDIN} rel="noreferrer" target="_blank">
               {BUILDER_LINKEDIN.replace(/^https:\/\/(www\.)?/, "")}
             </a>
           </li>
           {email ? (
             <li>
               Email:{" "}
-              <a className="font-semibold text-[#3157c9]" href={`mailto:${email}`}>
+              <a className="font-semibold text-primary" href={`mailto:${email}`}>
                 {email}
               </a>
             </li>
           ) : null}
         </ul>
 
-        <section className="mt-10" data-testid="what-i-built-here">
+        <section className="surface mt-10 p-6 sm:p-8" data-testid="what-i-built-here">
           <p className="eyebrow">This site</p>
-          <h2 className="mt-3 text-[22px] font-bold tracking-[-0.03em] text-[#13203a]">
-            What I built here
+          <h2 className="mt-3 text-[24px] font-bold tracking-[-0.03em] text-ink">
+            What I <span className="hl hl-ai">built</span> here
           </h2>
-          <p className="mt-4 text-[15px] leading-7 text-[#546277]">
+          <p className="mt-4 text-[15px] leading-7 text-body-2">
             PeopleAnalyticsAI is a working People Data & AI environment, not a slide deck.
             Source contracts come first. Governance is code: roles, RLS, and demo identities.
             The serving layer runs automated data-quality tests and a 21-metric certified
@@ -54,10 +54,10 @@ export default function AboutPage() {
             identity isolation change which cells — and which conclusion — each role can see.
           </p>
         </section>
-        <p className="mt-8 text-[15px] leading-7 text-[#546277]">
-          The public site is a recruiter portfolio over a working synthetic enterprise
+        <p className="mt-8 text-[15px] leading-7 text-body-2">
+          The public site is a portfolio project over a working synthetic enterprise
           dataset (GlobalTech). Start with the{" "}
-          <Link href="/enterprise-demo" className="font-semibold text-[#3157c9]">
+          <Link href="/enterprise-demo" className="font-semibold text-primary">
             Enterprise Demo
           </Link>
           .

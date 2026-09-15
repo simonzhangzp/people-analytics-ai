@@ -5,18 +5,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-10 items-center justify-center gap-2 rounded-[6px] border px-4 text-[13px] font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3157d5]/25 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex min-h-10 items-center justify-center gap-2 rounded-[8px] border px-4 text-[13px] font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         primary:
-          "border-transparent bg-[#3157d5] text-white hover:bg-[#2848aa]",
+          "border-transparent bg-primary text-white hover:bg-primary-dark",
         secondary:
-          "border-[#d1d5db] bg-white text-[#24324b] hover:bg-[#f7f8fa]",
+          "border-edge bg-white text-ink hover:bg-canvas-2",
         ghost:
-          "border-transparent bg-transparent text-[#526078] hover:bg-[#eef1f5] hover:text-[#1a2740]",
+          "border-transparent bg-transparent text-body hover:bg-edge hover:text-ink",
         danger:
-          "border-[#efd4d4] bg-[#fdf7f7] text-[#934646] hover:bg-[#fbeeee]",
+          "border-danger-line bg-danger-soft text-danger hover:bg-danger-soft",
       },
       size: {
         default: "h-10 px-4",

@@ -8,20 +8,20 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
     <div className="flex items-center gap-3">
       <div
         aria-hidden="true"
-        className="relative grid size-8 shrink-0 place-items-center overflow-hidden rounded-[7px] bg-[#203d91]"
+        className="relative grid size-8 shrink-0 place-items-center overflow-hidden rounded-[8px] bg-ink"
       >
         <span className="absolute left-[8px] top-[7px] size-[5px] rounded-full bg-white" />
-        <span className="absolute right-[7px] top-[13px] size-[5px] rounded-full bg-[#aebeff]" />
+        <span className="absolute right-[7px] top-[13px] size-[5px] rounded-full bg-primary-ring" />
         <span className="absolute bottom-[6px] left-[12px] size-[5px] rounded-full bg-white" />
         <span className="absolute left-[10px] top-[10px] h-px w-[12px] rotate-[25deg] bg-white/70" />
         <span className="absolute bottom-[10px] left-[10px] h-px w-[11px] -rotate-[42deg] bg-white/70" />
       </div>
       {!compact && (
         <div>
-          <div className="text-[14px] font-[680] leading-none tracking-[-0.01em] text-[#15213b]">
+          <div className="display text-[15px] font-bold leading-none tracking-[-0.02em] text-ink">
             PeopleAnalyticsAI
           </div>
-          <div className="mt-1 text-[10px] font-semibold uppercase leading-none tracking-[0.14em] text-[#718096]">
+          <div className="mt-1 text-[10px] font-semibold uppercase leading-none tracking-[0.14em] text-muted">
             Enterprise People Data & AI
           </div>
         </div>
@@ -46,7 +46,7 @@ export function PrimaryLink({
       href={href}
       data-testid={testId}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-[6px] bg-[#3157c9] px-5 text-[14px] font-semibold text-white transition-colors duration-200 hover:bg-[#2848aa]",
+        "inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] bg-primary px-5 text-[14px] font-semibold text-white shadow-[0_8px_20px_-10px_rgba(36,86,246,0.7)] transition-colors duration-200 hover:bg-primary-dark",
         className,
       )}
     >
@@ -72,7 +72,7 @@ export function SecondaryLink({
       href={href}
       data-testid={testId}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-[6px] border border-[#d6dce5] bg-white px-5 text-[14px] font-semibold text-[#24324b] transition-colors duration-200 hover:border-[#b8c2d2] hover:bg-[#f8f9fb]",
+        "inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border border-edge-strong bg-white px-5 text-[14px] font-semibold text-ink transition-colors duration-200 hover:border-edge-strong hover:bg-canvas-2",
         className,
       )}
     >
@@ -90,18 +90,18 @@ export function Button({
   variant?: "primary" | "secondary" | "ghost";
 }) {
   const variants = {
-    primary: "bg-[#3157c9] text-white hover:bg-[#2848aa] border-transparent",
+    primary: "bg-primary text-white hover:bg-primary-dark border-transparent",
     secondary:
-      "border-[#d6dce5] bg-white text-[#24324b] hover:border-[#b8c2d2] hover:bg-[#f8f9fb]",
+      "border-edge-strong bg-white text-ink hover:border-edge-strong hover:bg-canvas-2",
     ghost:
-      "border-transparent bg-transparent text-[#526078] hover:bg-[#eef1f5] hover:text-[#1a2740]",
+      "border-transparent bg-transparent text-body hover:bg-edge hover:text-ink",
   };
 
   return (
     <button
       {...props}
       className={cn(
-        "inline-flex min-h-10 items-center justify-center gap-2 rounded-[6px] border px-4 text-[13px] font-semibold transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-55",
+        "inline-flex min-h-10 items-center justify-center gap-2 rounded-[8px] border px-4 text-[13px] font-semibold transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-55",
         variants[variant],
         className,
       )}
@@ -123,13 +123,13 @@ export function PageHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <header className="flex flex-col gap-5 border-b border-[#e5e8ed] pb-7 sm:flex-row sm:items-end sm:justify-between">
+    <header className="flex flex-col gap-5 border-b border-edge pb-7 sm:flex-row sm:items-end sm:justify-between">
       <div className="max-w-3xl">
         {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
-        <h1 className="balanced text-[28px] font-[680] leading-[1.18] tracking-[-0.035em] text-[#121d35] sm:text-[32px]">
+        <h1 className="balanced text-[28px] font-[680] leading-[1.18] tracking-[-0.035em] text-ink sm:text-[32px]">
           {title}
         </h1>
-        <p className="mt-3 max-w-2xl text-[14px] leading-6 text-[#59667a]">
+        <p className="mt-3 max-w-2xl text-[14px] leading-6 text-body-2">
           {description}
         </p>
       </div>
@@ -141,12 +141,12 @@ export function PageHeader({
 export function StatusBadge({ status }: { status: string }) {
   const style =
     status === "Approved" || status === "Confirmed"
-      ? "bg-[#eaf5ef] text-[#2f7659] border-[#d2e8dc]"
+      ? "bg-certified-soft text-certified-dark border-certified-line"
       : status === "Ready" || status === "Mapped"
-        ? "bg-[#edf2ff] text-[#3657af] border-[#dae3fb]"
+        ? "bg-primary-soft text-primary-deep border-primary-ring"
         : status === "Needs input" || status === "Needs Review" || status === "Review"
-          ? "bg-[#fbf2e5] text-[#9a5c17] border-[#f1dfc4]"
-          : "bg-[#f1f3f6] text-[#697386] border-[#e3e6eb]";
+          ? "bg-gold-soft text-gold-dark border-gold-line"
+          : "bg-canvas-2 text-muted border-edge";
 
   return (
     <span
@@ -166,12 +166,12 @@ export function StatusBadge({ status }: { status: string }) {
 export function ConfidenceBadge({ level }: { level: string }) {
   const dot =
     level === "High"
-      ? "bg-[#3f8265]"
+      ? "bg-certified"
       : level === "Medium"
-        ? "bg-[#b2762b]"
-        : "bg-[#b65353]";
+        ? "bg-gold"
+        : "bg-danger";
   return (
-    <span className="inline-flex items-center gap-2 text-[12px] font-medium text-[#566277]">
+    <span className="inline-flex items-center gap-2 text-[12px] font-medium text-body">
       <span aria-hidden="true" className={cn("size-1.5 rounded-full", dot)} />
       Confidence: {level}
     </span>
@@ -187,14 +187,14 @@ export function ProgressBar({
 }) {
   const bar =
     tone === "success"
-      ? "bg-[#4b8c6d]"
+      ? "bg-certified"
       : tone === "warning"
-        ? "bg-[#bd8241]"
-        : "bg-[#4868c9]";
+        ? "bg-gold"
+        : "bg-primary";
 
   return (
     <div
-      className="h-1.5 overflow-hidden rounded-full bg-[#e9edf2]"
+      className="h-1.5 overflow-hidden rounded-full bg-edge"
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}
@@ -207,7 +207,7 @@ export function ProgressBar({
 
 export function AILabel({ children = "AI suggestion" }: { children?: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.09em] text-[#425da9]">
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.09em] text-primary">
       <Sparkles aria-hidden="true" className="size-3.5" />
       {children}
     </span>
@@ -222,7 +222,7 @@ export function IconTile({
   label: string;
 }) {
   return (
-    <div className="flex size-9 items-center justify-center rounded-[7px] border border-[#dfe5f2] bg-[#f4f6fc] text-[#3a5ab4]">
+    <div className="flex size-9 items-center justify-center rounded-[8px] border border-edge-strong bg-canvas-2 text-primary">
       <Icon aria-label={label} className="size-4.5" />
     </div>
   );

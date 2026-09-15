@@ -9,7 +9,7 @@ The UI must prioritize the business decision and evidence over decoration.
 
 Public pages are single-column case studies plus Architecture / Perspective / About. Do not revive a three-column workbench unless the owner reopens a file-analysis product.
 
-Do not introduce new colors, radii, font sizes, shadows, or visual patterns outside the design system without an explicit reason.
+Do not introduce new colors, radii, font sizes, shadows, or visual patterns outside the design system without an explicit reason. The design system is `DESIGN.md` (tokens in `src/app/globals.css` `@theme`, layer colours in `src/lib/people/layer-tones.ts`). Use semantic classes (`text-ink`, `text-body-2`, `bg-canvas-2`, `border-edge`, `text-primary`, `bg-layer-4-soft`), never raw hex in `className`.
 
 Do not build generic dashboard pages. Every analytical view must have a clear business question, takeaway headline, evidence, and next action.
 

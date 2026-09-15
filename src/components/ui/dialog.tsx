@@ -16,11 +16,11 @@ export const DialogContent = React.forwardRef<
   }
 >(({ className, children, side = "center", ...props }, ref) => (
   <DialogPrimitive.Portal>
-    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-[#101828]/35 data-[state=closed]:animate-out data-[state=open]:animate-in" />
+    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-ink/35 data-[state=closed]:animate-out data-[state=open]:animate-in" />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed z-50 border border-[#dfe3e9] bg-white shadow-[0_4px_16px_rgba(15,23,42,0.08)] outline-none",
+        "fixed z-50 border border-edge bg-white shadow-[0_4px_16px_rgba(15,23,42,0.08)] outline-none",
         side === "center" &&
           "left-1/2 top-1/2 max-h-[90vh] w-[calc(100%-2rem)] max-w-[760px] -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-[10px] p-6",
         side === "right" &&
@@ -34,7 +34,7 @@ export const DialogContent = React.forwardRef<
       {children}
       <DialogPrimitive.Close
         aria-label="Close"
-        className="absolute right-4 top-4 grid size-9 place-items-center rounded-[6px] text-[#667085] hover:bg-[#f1f3f6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3157d5]/25"
+        className="absolute right-4 top-4 grid size-9 place-items-center rounded-[8px] text-muted hover:bg-canvas-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
       >
         <X aria-hidden="true" className="size-4" />
       </DialogPrimitive.Close>
@@ -56,7 +56,7 @@ export const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn("text-[20px] font-semibold tracking-[-0.02em] text-[#17243f]", className)}
+    className={cn("text-[20px] font-semibold tracking-[-0.02em] text-ink", className)}
     {...props}
   />
 ));
@@ -68,7 +68,7 @@ export const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-[13px] leading-5 text-[#5d697c]", className)}
+    className={cn("text-[13px] leading-5 text-body-2", className)}
     {...props}
   />
 ));

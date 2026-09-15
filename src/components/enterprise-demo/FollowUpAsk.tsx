@@ -58,10 +58,10 @@ export function FollowUpAsk({
   const rpcError = answer?.error_state === "rpc";
 
   return (
-    <section className="mt-10 border-t border-[#e3e7ed] pt-8">
+    <section className="mt-10 border-t border-edge pt-8">
       <p className="eyebrow">Follow-up</p>
-      <h2 className="mt-2 text-[18px] font-semibold text-[#1c2b44]">Ask a follow-up</h2>
-      <p className="mt-2 max-w-2xl text-[13px] leading-6 text-[#546277]">
+      <h2 className="mt-2 text-[18px] font-semibold text-ink">Ask a follow-up</h2>
+      <p className="mt-2 max-w-2xl text-[13px] leading-6 text-body-2">
         Answers come from governed People serving tools. Arithmetic stays in the
         database; this is not an unconstrained “ask anything” assistant.
       </p>
@@ -76,13 +76,13 @@ export function FollowUpAsk({
           value={question}
           onChange={(event) => setQuestion(event.target.value)}
           placeholder="Ask about this case…"
-          className="min-h-11 flex-1 rounded-[6px] border border-[#d6dce5] bg-white px-3 text-[14px] text-[#24324b]"
+          className="min-h-11 flex-1 rounded-[8px] border border-edge-strong bg-white px-3 text-[14px] text-ink"
           aria-label="Follow-up question"
         />
         <button
           type="submit"
           disabled={busy}
-          className="inline-flex min-h-11 items-center justify-center rounded-[6px] bg-[#3157c9] px-4 text-[14px] font-semibold text-white disabled:opacity-60"
+          className="inline-flex min-h-11 items-center justify-center rounded-[8px] bg-primary px-4 text-[14px] font-semibold text-white disabled:opacity-60"
         >
           {busy ? "Looking up…" : "Ask"}
         </button>
@@ -93,13 +93,13 @@ export function FollowUpAsk({
             key={chip}
             type="button"
             onClick={() => void ask(chip)}
-            className="rounded-full border border-[#e3e7ed] bg-white px-3 py-1.5 text-[12px] text-[#546277] hover:border-[#c5cdd8]"
+            className="rounded-full border border-edge bg-white px-3 py-1.5 text-[12px] text-body-2 hover:border-edge-strong"
           >
             {chip}
           </button>
         ))}
       </div>
-      {error ? <p className="mt-4 text-[13px] text-[#934646]">{error}</p> : null}
+      {error ? <p className="mt-4 text-[13px] text-danger">{error}</p> : null}
       {answer ? (
         <div
           className="surface mt-5 p-4"
@@ -111,18 +111,18 @@ export function FollowUpAsk({
             <QualityBadge status={withheld ? "withheld" : rpcError ? "error" : answer.quality_status} />
           </div>
           <h3
-            className="mt-2 text-[15px] font-semibold text-[#1c2b44]"
+            className="mt-2 text-[15px] font-semibold text-ink"
             data-testid="people-ai-headline"
           >
             {answer.headline}
           </h3>
           {answer.llm_invocation === "skipped_by_budget" ? (
-            <p className="mt-3 text-[13px] leading-6 text-[#546277]" data-testid="people-ai-budget">
+            <p className="mt-3 text-[13px] leading-6 text-body-2" data-testid="people-ai-budget">
               {LLM_BUDGET_NOTICE}
             </p>
           ) : null}
           {rpcError ? (
-            <p className="mt-3 text-[13px] leading-6 text-[#934646]" data-testid="people-ai-rpc-error">
+            <p className="mt-3 text-[13px] leading-6 text-danger" data-testid="people-ai-rpc-error">
               Serving lookup failed. No substitute numbers were generated.
             </p>
           ) : null}
@@ -130,13 +130,13 @@ export function FollowUpAsk({
             <div className="mt-3" data-testid="people-ai-critic">
               <button
                 type="button"
-                className="text-[12px] font-semibold text-[#3157c9]"
+                className="text-[12px] font-semibold text-primary"
                 onClick={() => setShowCritic((value) => !value)}
               >
                 {showCritic ? "Hide critic failures" : "Show critic failures"}
               </button>
               {showCritic && answer.critic?.failures?.length ? (
-                <ul className="mt-2 space-y-1 text-[13px] leading-6 text-[#934646]">
+                <ul className="mt-2 space-y-1 text-[13px] leading-6 text-danger">
                   {answer.critic.failures.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
@@ -145,18 +145,18 @@ export function FollowUpAsk({
             </div>
           ) : (
             <>
-              <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[#738097]">Facts</p>
-              <ul className="mt-1 space-y-1 text-[13px] leading-6 text-[#3e4c61]">
+              <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Facts</p>
+              <ul className="mt-1 space-y-1 text-[13px] leading-6 text-body">
                 {answer.facts.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
               {answer.interpretation.length ? (
                 <>
-                  <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[#738097]">
+                  <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-muted">
                     Hypotheses
                   </p>
-                  <ul className="mt-1 space-y-1 text-[13px] leading-6 text-[#546277]">
+                  <ul className="mt-1 space-y-1 text-[13px] leading-6 text-body-2">
                     {answer.interpretation.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
@@ -166,8 +166,8 @@ export function FollowUpAsk({
             </>
           )}
           {answer.trace_id ? (
-            <div className="mt-4 border-t border-[#eef0f4] pt-3">
-              <p className="text-[12px] leading-5 text-[#546277]" data-testid="people-ai-trace-b2a">
+            <div className="mt-4 border-t border-edge pt-3">
+              <p className="text-[12px] leading-5 text-body-2" data-testid="people-ai-trace-b2a">
                 The model chooses which tools to call. Values and fact sentences come from SQL and
                 deterministic templates; the model does not rewrite them. The only model-authored
                 text is hypotheses. If the planner fails, headline, facts, and the tool sequence
@@ -175,14 +175,14 @@ export function FollowUpAsk({
               </p>
               <button
                 type="button"
-                className="text-[12px] font-semibold text-[#3157c9]"
+                className="text-[12px] font-semibold text-primary"
                 data-testid="people-ai-trace-toggle"
                 onClick={() => setShowTrace((value) => !value)}
               >
                 {showTrace ? "Hide trace" : "Show trace"}
               </button>
               {showTrace ? (
-                <dl className="mt-2 space-y-1 text-[12px] leading-5 text-[#546277]" data-testid="people-ai-trace">
+                <dl className="mt-2 space-y-1 text-[12px] leading-5 text-body-2" data-testid="people-ai-trace">
                   <div>trace_id {answer.trace_id}</div>
                   <div>tier {String(answer.tier)}</div>
                   <div>identity {answer.identity_id}</div>

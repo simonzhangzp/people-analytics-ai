@@ -1,11 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Bricolage_Grotesque, Geist } from "next/font/google";
 import "./globals.css";
 
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist",
   display: "swap",
+});
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-bricolage",
+  display: "swap",
+  axes: ["opsz", "wdth"],
 });
 
 export const metadata: Metadata = {
@@ -33,7 +40,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f8fa",
+  themeColor: "#ffffff",
   colorScheme: "light",
 };
 
@@ -44,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body className={geist.variable}>{children}</body>
+      <body className={`${geist.variable} ${bricolage.variable}`}>{children}</body>
     </html>
   );
 }

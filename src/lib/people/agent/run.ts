@@ -102,7 +102,7 @@ export async function runPeopleAgent(options: RunPeopleAgentOptions): Promise<Pe
     }
   }
 
-  let tools = plan.tools;
+  const tools = plan.tools;
   let llmSkipped: string | null = null;
   let llmCalls = 0;
   let plannerHypotheses: string[] | undefined;

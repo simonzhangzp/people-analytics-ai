@@ -35,6 +35,7 @@ const nextConfig: NextConfig = {
       { source: "/about", headers: [NO_STORE] },
       { source: "/dataset", headers: [NO_STORE] },
       { source: "/connect", headers: [NO_STORE] },
+      { source: "/try", headers: [NO_STORE] },
     ];
   },
 };

@@ -1,7 +1,11 @@
 import Link from "next/link";
+import { ArchitectureExplorer } from "@/components/home/ArchitectureExplorer";
+import { ComparisonRail } from "@/components/home/ComparisonRail";
+import { EnvironmentOverview } from "@/components/home/EnvironmentOverview";
+import { ProofPoints } from "@/components/home/ProofPoints";
+import { ProvenanceCard } from "@/components/home/ProvenanceCard";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
-import { CASES } from "@/lib/people/demo-cases";
-import { formatCount } from "@/lib/people/format";
+import { SYNTHETIC_DISCLAIMER } from "@/lib/people/environment-facts";
 import {
   emptyHomePlatformFacts,
   loadHomePlatformFacts,
@@ -13,25 +17,13 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata = pageMetadata({
-  title: "Trusted People data. Governed metrics.",
+  title: "AI-ready People Analytics starts with trusted facts",
   description:
-    "A working enterprise People Data & AI environment: certified headcount, governed metrics, and identity-aware case studies on a frozen data-v1 snapshot.",
+    "Why AI-era People Analytics needs a governed architecture, not a smarter chatbot. A working demo on a synthetic 49,823-person enterprise: certified metrics, identity-aware access, traceable quality, 15 governed MCP tools.",
   path: "/",
 });
 
-const STACK = [
-  ["HR Domain", "Understand the workforce decision and operating context."],
-  ["Data Science / ML", "Model workforce patterns, risk and planning scenarios."],
-  ["Data Foundation & Governance", "Create trusted data, definitions, metadata, quality and lineage."],
-  ["Workforce Intelligence", "Turn governed data into reusable evidence and decisions."],
-  ["AI", "Use agents as a reasoning layer over trusted enterprise context."],
-];
-
-const CASE_CTAS = {
-  trust: "Explore trusted Headcount",
-  incident: "Replay the incident",
-  attrition: "Explore the analysis",
-} as const;
+const CONTAINER = "mx-auto max-w-[1100px] px-5 sm:px-8";
 
 export default async function HomePage() {
   let facts = emptyHomePlatformFacts();
@@ -42,155 +34,147 @@ export default async function HomePage() {
       facts = emptyHomePlatformFacts();
     }
   }
-  const factRow = [
-    {
-      testId: "fact-certified-headcount",
-      value: formatCount(facts.headcount),
-      raw: facts.headcount,
-      label: "Certified Headcount",
-    },
-    {
-      testId: "fact-history-years",
-      value: String(facts.years),
-      raw: facts.years,
-      label: "Years of Workforce History",
-    },
-    {
-      testId: "fact-certified-metrics",
-      value: facts.certifiedMetrics == null ? "—" : String(facts.certifiedMetrics),
-      raw: facts.certifiedMetrics,
-      label: "Certified Metrics",
-    },
-    {
-      testId: "fact-quality-tests",
-      value: facts.qualityTests == null ? "—" : String(facts.qualityTests),
-      raw: facts.qualityTests,
-      label: "Automated Quality Tests",
-    },
-    {
-      testId: "fact-data-domains",
-      value: `${facts.domains}+`,
-      raw: facts.domains,
-      label: "People Data Domains",
-    },
-    {
-      testId: "fact-serving-freshness",
-      value: facts.freshness,
-      raw: facts.freshness,
-      label: "Certified snapshot",
-    },
-  ];
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-[#111827]">
+    <div className="flex min-h-screen flex-col bg-canvas text-ink">
       <SiteHeader active="/" />
-      <main className="mx-auto max-w-[1100px] px-5 py-12 sm:px-8">
-        <p className="eyebrow">People Data & AI</p>
-        <h1 className="mt-4 max-w-4xl text-[36px] font-bold leading-[1.1] tracking-[-0.04em] text-[#13203a] sm:text-[44px]">
-          Trusted People data. Governed metrics. AI-ready workforce intelligence.
-        </h1>
-        <p className="mt-5 max-w-3xl text-[17px] leading-7 text-[#536177]">
-          A working enterprise People Data & AI environment showing how data
-          foundations, governance, workforce analytics, and AI come together to
-          support trusted workforce decisions.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href="/enterprise-demo"
-            data-testid="cta-enterprise-demo"
-            className="inline-flex min-h-11 items-center rounded-[6px] bg-[#3157c9] px-5 text-[14px] font-semibold text-white"
-          >
-            Explore the Enterprise Demo
-          </Link>
-          <Link
-            href="/architecture"
-            className="inline-flex min-h-11 items-center rounded-[6px] border border-[#d6dce5] bg-white px-5 text-[14px] font-semibold text-[#314361]"
-          >
-            View Architecture
-          </Link>
-          <Link href="/about" className="inline-flex min-h-11 items-center text-[14px] font-semibold text-[#3157c9]">
-            About the builder
-          </Link>
-        </div>
-        <p className="mt-4 text-[12px] text-[#667085]" data-testid="synthetic-label">
-          Synthetic Enterprise Dataset · GlobalTech is not a real company
-        </p>
-
-        <section className="mt-12" data-testid="home-cases">
-          <p className="eyebrow">Flagship stories</p>
-          <div className="mt-4 grid gap-4">
-            {CASES.map((item, index) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                data-testid={`case-card-${item.id}`}
-                className="surface block p-5 transition-colors hover:border-[#c5cdd8]"
-              >
-                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#738097]">
-                  Case {index + 1} · {item.subtitle}
-                </p>
-                <h2 className="mt-2 text-[22px] font-bold tracking-[-0.03em] text-[#13203a]">
-                  {item.question}
-                </h2>
-                <p className="mt-2 text-[14px] leading-6 text-[#546277]">{item.description}</p>
-                <span className="mt-3 inline-block text-[13px] font-semibold text-[#3157c9]">
-                  {CASE_CTAS[item.id]}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-14">
-          <h2 className="text-[22px] font-bold tracking-[-0.03em] text-[#13203a]">
-            People Analytics requires more than a model.
-          </h2>
-          <ol className="mt-6 space-y-3">
-            {STACK.map(([title, copy], index) => (
-              <li key={title} className="flex gap-3">
-                <span className="mt-1 text-[11px] font-bold text-[#9aa7b8]">{index + 1}</span>
-                <div>
-                  <p className="text-[14px] font-semibold text-[#1c2b44]">{title}</p>
-                  <p className="mt-1 text-[13px] leading-6 text-[#546277]">{copy}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <p className="mt-4 text-[13px] font-semibold text-[#546277]">
-            HR Domain → Data Science / ML → Data Foundation & Governance → Workforce Intelligence → AI
-          </p>
-        </section>
-
-        <section className="mt-14" data-testid="platform-facts">
-          <p className="eyebrow">Platform facts</p>
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {factRow.map((item) => (
-              <div
-                key={item.label}
-                className="surface p-3"
-                data-testid={item.testId}
-                data-value={item.raw == null ? "" : String(item.raw)}
-              >
-                <div className="text-[18px] font-bold leading-6 text-[#13203a]">{item.value}</div>
-                <div className="mt-1 text-[11px] leading-4 text-[#667085]">{item.label}</div>
+      <main className="flex-1">
+        {/* Hero */}
+        <section aria-labelledby="hero-title" data-testid="home-hero" className="relative overflow-hidden">
+          <div aria-hidden="true" className="blueprint pointer-events-none absolute inset-0" />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-40 -top-40 size-[560px] rounded-full bg-primary-soft blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-48 top-64 size-[420px] rounded-full bg-certified-soft blur-3xl"
+          />
+          <div className={`${CONTAINER} relative grid items-center gap-12 pb-20 pt-14 sm:pt-20 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:pb-24`}>
+            <div>
+              <p className="eyebrow">People Analytics for the AI era</p>
+              <h1 id="hero-title" className="hero-title mt-5">
+                AI-ready People Analytics starts with{" "}
+                <span className="hl hl-certified">trusted facts</span>, not a{" "}
+                <span className="text-muted">smarter chatbot</span>.
+              </h1>
+              <p className="lede mt-7 max-w-xl">
+                Not an LLM on top of HR data. A <strong className="font-semibold text-ink">governed architecture</strong>{" "}
+                where AI reasons over certified metrics, explicit business rules, traceable data quality,
+                identity-aware access and reusable analytical capabilities.
+              </p>
+              <div className="mt-9 flex flex-wrap gap-3">
+                <Link href="/architecture" data-testid="cta-architecture" className="btn-primary">
+                  Explore the Architecture
+                </Link>
+                <Link href="/try" data-testid="cta-try" className="btn-secondary">
+                  Try It Yourself
+                </Link>
               </div>
-            ))}
+              <p className="mt-6 text-[12.5px] leading-5 text-muted" data-testid="synthetic-label">
+                {SYNTHETIC_DISCLAIMER} Frozen data-v1 snapshot as of {facts.asOf}.
+              </p>
+            </div>
+            <ProvenanceCard facts={facts} />
           </div>
         </section>
 
-        <section className="mt-14" data-testid="why-i-built-this">
-          <p className="eyebrow">Why this matters</p>
-          <h2 className="mt-3 text-[22px] font-bold tracking-[-0.03em] text-[#13203a]">Why I built this</h2>
-          <p className="mt-4 max-w-3xl text-[15px] leading-7 text-[#546277]">
-            Building enterprise People Analytics taught me that trusted decisions start long
-            before the dashboard. Strong models do not fix inconsistent metrics, broken source
-            data, unclear ownership or missing lineage. AI makes this foundation more important,
-            not less.
-          </p>
-          <p className="mt-3 max-w-3xl text-[15px] leading-7 text-[#546277]">
-            PeopleAnalyticsAI explores what an AI-ready People Analytics stack looks like when
-            governed data, advanced analytics and AI are designed together.
-          </p>
+        <div className={CONTAINER}>
+          <ComparisonRail />
+        </div>
+
+        {/* Architecture */}
+        <section className="band-tint mt-28 py-24" aria-labelledby="architecture-title" data-testid="home-architecture">
+          <div className={CONTAINER}>
+            <p className="eyebrow">How it works</p>
+            <h2 id="architecture-title" className="section-title mt-3 max-w-3xl">
+              <span className="hl hl-ai">Five layers.</span> Two pillars that cut across all of them.
+            </h2>
+            <p className="lede mt-4 max-w-3xl">
+              Governance and observability are not a layer you add at the end. They run through the
+              data foundation, the semantic layer, the skills, the agent runtime and every page.
+            </p>
+            <ArchitectureExplorer mode="compact" />
+          </div>
+        </section>
+
+        <div className={CONTAINER}>
+          <ProofPoints />
+          <EnvironmentOverview facts={facts} />
+        </div>
+
+        {/* Closing */}
+        <section className="band-ink mt-28 py-24" aria-labelledby="closing-title">
+          <div className={`${CONTAINER} grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]`}>
+            <div>
+              <p className="eyebrow">The boundary</p>
+              <h2 id="closing-title" className="section-title mt-3">
+                Where AI <span className="hl hl-certified">adds value</span>, and where it is{" "}
+                <span className="hl hl-gold">deliberately constrained</span>.
+              </h2>
+              <p className="lede mt-5 max-w-xl">
+                The model&apos;s entire remit fits in one short list. Everything else is SQL, policy
+                and tests.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href="/try" className="btn-primary">
+                  Try It Yourself
+                </Link>
+                <Link href="/architecture" className="btn-secondary">
+                  Explore the Architecture
+                </Link>
+              </div>
+              <p className="mt-8 text-[13px] text-on-ink-3">
+                Deeper technical detail and the builder story:{" "}
+                <Link href="/perspective" className="font-semibold text-on-ink-link hover:text-white">
+                  Perspective
+                </Link>
+                {", "}
+                <Link href="/about" className="font-semibold text-on-ink-link hover:text-white">
+                  About
+                </Link>
+                {" and "}
+                <Link href="/enterprise-demo" className="font-semibold text-on-ink-link hover:text-white">
+                  all case studies
+                </Link>
+                .
+              </p>
+            </div>
+            <div className="grid gap-4 self-start sm:grid-cols-2">
+              <div className="surface p-6">
+                <p className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-on-ink-certified">The model may</p>
+                <ul className="mt-3 space-y-2.5 text-[14px] leading-6 text-white">
+                  {[
+                    "Select which governed tool to call",
+                    "Interpret certified results",
+                    "Propose hypotheses, labelled as hypotheses",
+                    "Suggest the next question",
+                  ].map((line) => (
+                    <li key={line} className="flex gap-2.5">
+                      <span aria-hidden="true" className="mt-[9px] size-1.5 shrink-0 rounded-full bg-on-ink-certified" />
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="surface p-6">
+                <p className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-on-ink-gold">The model never</p>
+                <ul className="mt-3 space-y-2.5 text-[14px] leading-6 text-white">
+                  {[
+                    "Produces a number",
+                    "Rewrites a fact sentence",
+                    "Writes its own SQL",
+                    "Becomes an authorization layer",
+                  ].map((line) => (
+                    <li key={line} className="flex gap-2.5">
+                      <span aria-hidden="true" className="mt-[9px] size-1.5 shrink-0 rounded-full bg-on-ink-gold" />
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
       <SiteFooter />

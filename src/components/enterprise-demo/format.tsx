@@ -44,8 +44,8 @@ export function TrustIndicators({
           key={label}
           className={`rounded-full border px-3 py-1 text-[12px] font-semibold ${
             ok
-              ? "border-[#d2e8dc] bg-[#eaf5ef] text-[#2f7659]"
-              : "border-[#efd4d4] bg-[#fbeeee] text-[#934646]"
+              ? "border-certified-line bg-certified-soft text-certified-dark"
+              : "border-danger-line bg-danger-soft text-danger"
           }`}
         >
           {label}

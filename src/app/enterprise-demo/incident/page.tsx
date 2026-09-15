@@ -49,13 +49,13 @@ export default async function IncidentCasePage() {
     <DemoShell active="incident" ai={<FollowUpAsk demoCase="incident" identityId={DEFAULT_IDENTITY} />}>
       <article data-testid="apac-incident">
         <p className="eyebrow">Case 2 · Incident replay</p>
-        <h1 className="mt-3 max-w-3xl text-[32px] font-bold tracking-[-0.04em] text-[#13203a]">
+        <h1 className="mt-3 max-w-3xl text-[32px] font-bold tracking-[-0.04em] text-ink">
           Why did APAC Headcount drop overnight?
         </h1>
-        <p className="mt-4 text-[20px] font-semibold text-[#934646]" data-testid="incident-data-issue">
+        <p className="mt-4 text-[20px] font-semibold text-danger" data-testid="incident-data-issue">
           This is a data issue — not a workforce change.
         </p>
-        <p className="mt-3 max-w-2xl text-[15px] leading-7 text-[#546277]">
+        <p className="mt-3 max-w-2xl text-[15px] leading-7 text-body-2">
           You are viewing a historical replay. Current trusted Headcount remains the
           published GlobalTech snapshot from {String(data.current.as_of_date ?? "the latest month")}.
         </p>
@@ -64,7 +64,7 @@ export default async function IncidentCasePage() {
           window={data.currentGrain.window}
           asOf={data.currentGrain.as_of}
         />
-        <p className="mt-2 text-[12px] text-[#667085]">
+        <p className="mt-2 text-[12px] text-muted">
           serving_pointer(incident_replay) extract {String(data.snapshot.extract_id ?? "n/a")} ·
           moved={String(data.snapshot.moved)} · replay Headcount bad {formatCount(replay.value_bad)} vs
           expected {formatCount(replay.value_expected)}
@@ -84,11 +84,11 @@ export default async function IncidentCasePage() {
           ].map(([label, value]) => (
             <div
               key={label}
-              className="rounded-[8px] border border-[#efd4d4] bg-[#fbeeee] p-4"
+              className="rounded-[8px] border border-danger-line bg-danger-soft p-4"
               data-testid={label === "Pipeline status" ? "pipeline-status" : undefined}
             >
-              <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#934646]">{label}</div>
-              <div className="mt-2 text-[22px] font-semibold text-[#1c2b44]">{value}</div>
+              <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-danger">{label}</div>
+              <div className="mt-2 text-[22px] font-semibold text-ink">{value}</div>
               {label !== "Pipeline status" ? (
                 <MetricCaption
                   scope={data.extractGrain.scope}
@@ -100,7 +100,7 @@ export default async function IncidentCasePage() {
           ))}
         </div>
 
-        <p className="surface mt-6 p-5 text-[15px] font-medium leading-7 text-[#1c2b44]">
+        <p className="surface mt-6 p-5 text-[15px] font-medium leading-7 text-ink">
           The platform prevented incomplete source data from being published as a workforce change.
         </p>
 
@@ -108,9 +108,9 @@ export default async function IncidentCasePage() {
           <p className="eyebrow">Downstream blocked in this replay</p>
           <ol className="mt-4 flex flex-col gap-2" data-testid="replay-lineage">
             {steps.map((step, index) => (
-              <li key={step.label} className="flex items-center gap-2 text-[13px] font-semibold text-[#934646]">
-                {index > 0 ? <span className="text-[#c9a0a0]">→</span> : null}
-                <span className="rounded-[6px] border border-[#efd4d4] bg-[#fbeeee] px-3 py-2">
+              <li key={step.label} className="flex items-center gap-2 text-[13px] font-semibold text-danger">
+                {index > 0 ? <span className="text-danger">→</span> : null}
+                <span className="rounded-[8px] border border-danger-line bg-danger-soft px-3 py-2">
                   {step.label}
                   <span className="mt-1 block text-[10px] font-bold tracking-[0.08em]">{step.status}</span>
                 </span>
@@ -121,25 +121,25 @@ export default async function IncidentCasePage() {
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           <section className="surface p-4" data-testid="replay-quality-tests">
-            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
               Failed quality test
             </p>
-            <ul className="mt-3 space-y-2 text-[13px] text-[#546277]">
+            <ul className="mt-3 space-y-2 text-[13px] text-body-2">
               {(failedTests.length
                 ? failedTests
                 : [{ test_name: "apac_hris_volume", observed_value: String(actual), expected_value: String(expected) }]
               ).map((row) => (
                 <li key={row.test_name}>
-                  Fail · {row.test_name}: observed {String(row.observed_value)}, expected {String(row.expected_value)}
+                  Fail · {row.test_name}: observed {formatCount(row.observed_value)} rows, expected {formatCount(row.expected_value)}
                 </li>
               ))}
             </ul>
           </section>
           <section className="surface p-4">
-            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#738097]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
               Source freshness
             </p>
-            <ul className="mt-3 space-y-1 text-[13px] text-[#546277]">
+            <ul className="mt-3 space-y-1 text-[13px] text-body-2">
               {sources.map((source) => {
                 const row = source as Record<string, unknown>;
                 return (
@@ -153,7 +153,7 @@ export default async function IncidentCasePage() {
           </section>
         </div>
 
-        <p className="mt-6 text-[13px] text-[#546277]">
+        <p className="mt-6 text-[13px] text-body-2">
           Affected metrics: headcount — blocked in replay only. Lineage impact{" "}
           {Array.isArray(data.lineage.impact) ? data.lineage.impact.length : 0} objects.
         </p>

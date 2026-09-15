@@ -1,23 +1,100 @@
 @import "tailwindcss";
 
+/*
+ * PeopleAnalyticsAI design tokens — "Certified Ink" (see DESIGN.md at repo root).
+ * Paper-white canvas, deep-navy ink, one signal blue for actions, one certified green
+ * for governed facts, one gold for roadmap / hypotheses, and a five-hue spectrum that
+ * follows the architecture layers wherever they are referenced.
+ */
+@theme {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-bricolage), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: #ffffff;
+  --color-canvas-2: #f3f6fc;
+  --color-canvas-3: #e9eff9;
+
+  --color-ink: #0b1730;
+  --color-ink-2: #142547;
+  --color-ink-3: #1f3466;
+  --color-ink-line: rgba(255, 255, 255, 0.12);
+  --color-ink-surface: rgba(255, 255, 255, 0.06);
+
+  /* Text on ink bands (.band-ink / .band-ink-deep) */
+  --color-on-ink: #e6ebf5;
+  --color-on-ink-2: #c3ccdf;
+  --color-on-ink-3: #aab6cc;
+  --color-on-ink-muted: #8e9bb5;
+  --color-on-ink-link: #9db4ff;
+  --color-on-ink-eyebrow: #a9bdff;
+  --color-on-ink-certified: #5fd0a5;
+  --color-on-ink-gold: #f0c36a;
+
+  --color-body: #2a3650;
+  --color-body-2: #47546c;
+  --color-muted: #5f6b82;
+  --color-faint: #8a94a8;
+
+  --color-edge: #e4e8f0;
+  --color-edge-strong: #cbd3e1;
+
+  --color-primary: #2456f6;
+  --color-primary-dark: #1b43c9;
+  --color-primary-deep: #10307f;
+  --color-primary-soft: #e8eeff;
+  --color-primary-ring: #a9bdff;
+
+  --color-certified: #0e8a5f;
+  --color-certified-dark: #0a6b4a;
+  --color-certified-soft: #e3f5ec;
+  --color-certified-line: #b9e3ce;
+
+  --color-gold: #b8730e;
+  --color-gold-dark: #8f5a0b;
+  --color-gold-soft: #fbf1de;
+  --color-gold-line: #ebd3a6;
+
+  --color-danger: #b3403f;
+  --color-danger-soft: #fbecec;
+  --color-danger-line: #f0caca;
+
+  --color-layer-1: #0f8b9e;
+  --color-layer-1-soft: #e0f4f7;
+  --color-layer-2: #0e8a5f;
+  --color-layer-2-soft: #e3f5ec;
+  --color-layer-3: #b8730e;
+  --color-layer-3-soft: #fbf1de;
+  --color-layer-4: #6a48d7;
+  --color-layer-4-soft: #eee9fc;
+  --color-layer-5: #2456f6;
+  --color-layer-5-soft: #e8eeff;
+
+  --radius-card: 12px;
+  --radius-control: 8px;
+
+  --shadow-card: 0 1px 2px rgba(11, 23, 48, 0.04), 0 10px 30px -18px rgba(11, 23, 48, 0.18);
+  --shadow-lift: 0 1px 2px rgba(11, 23, 48, 0.05), 0 18px 44px -20px rgba(11, 23, 48, 0.28);
+  --shadow-focus: 0 0 0 4px rgba(36, 86, 246, 0.18);
+}
+
 :root {
-  --background: #f7f8fa;
-  --foreground: #111827;
+  --background: #ffffff;
+  --foreground: #0b1730;
   --card: #ffffff;
-  --muted: #f3f4f6;
-  --muted-foreground: #647084;
-  --border: #e3e7ed;
-  --border-strong: #d1d7e0;
-  --primary: #3559c7;
-  --primary-dark: #2846a6;
-  --primary-soft: #eef2ff;
-  --success: #31785a;
-  --success-soft: #eaf6ef;
-  --warning: #a36318;
-  --warning-soft: #fbf3e7;
-  --danger: #b24b4b;
-  --danger-soft: #fbeeee;
-  --ink-blue: #14213d;
+  --muted: #f3f6fc;
+  --muted-foreground: #5f6b82;
+  --border: #e4e8f0;
+  --border-strong: #cbd3e1;
+  --primary: #2456f6;
+  --primary-dark: #1b43c9;
+  --primary-soft: #e8eeff;
+  --success: #0e8a5f;
+  --success-soft: #e3f5ec;
+  --warning: #b8730e;
+  --warning-soft: #fbf1de;
+  --danger: #b3403f;
+  --danger-soft: #fbecec;
+  --ink-blue: #0b1730;
   --radius: 0.5rem;
   color-scheme: light;
 }
@@ -40,6 +117,14 @@ body {
   font-size: 14px;
   line-height: 1.5;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+.display {
+  font-family: var(--font-bricolage), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  font-optical-sizing: auto;
 }
 
 button,
@@ -60,56 +145,264 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 3px solid rgba(53, 89, 199, 0.2);
+  outline: 3px solid rgba(36, 86, 246, 0.28);
   outline-offset: 2px;
 }
 
 ::selection {
-  background: #dfe6ff;
-  color: #142a70;
+  background: #dce5ff;
+  color: #10307f;
 }
+
+/* ---------- Surfaces ---------- */
 
 .surface {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: 0 1px 2px rgba(11, 23, 48, 0.04), 0 10px 30px -18px rgba(11, 23, 48, 0.18);
+}
+
+.surface-flat {
+  border: 1px solid var(--border);
+  border-radius: 12px;
   background: var(--card);
 }
 
-.eyebrow {
-  color: #667085;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.11em;
-  line-height: 1.2;
-  text-transform: uppercase;
+.surface-inset {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f3f6fc;
 }
 
-.metric-number {
-  color: var(--ink-blue);
-  font-size: clamp(1.75rem, 2.4vw, 2.15rem);
-  font-variant-numeric: tabular-nums;
-  font-weight: 680;
-  letter-spacing: -0.035em;
-  line-height: 1.05;
+/* Deep-navy band used for the hero artifact, the closing section and the footer. */
+.band-ink {
+  background:
+    radial-gradient(1200px 480px at 85% -10%, rgba(36, 86, 246, 0.28), transparent 60%),
+    radial-gradient(900px 420px at 0% 110%, rgba(14, 138, 95, 0.22), transparent 60%),
+    #0b1730;
+  color: #e6ebf5;
+}
+
+/* Footer: flat, one step darker than the band so a dark closing section still ends visibly. */
+.band-ink-deep {
+  background: #07101f;
+  color: #e6ebf5;
+}
+
+.band-ink .surface,
+.band-ink .surface-flat {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: none;
+  color: inherit;
+}
+
+.band-tint {
+  background: #f3f6fc;
+}
+
+/* Blueprint grid behind the hero; fades out so it never competes with the copy. */
+.blueprint {
+  background-image:
+    linear-gradient(rgba(11, 23, 48, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11, 23, 48, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, black 30%, transparent 85%);
 }
 
 .marketing-grid {
   background-image:
-    linear-gradient(rgba(49, 67, 104, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(49, 67, 104, 0.055) 1px, transparent 1px);
+    linear-gradient(rgba(11, 23, 48, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11, 23, 48, 0.055) 1px, transparent 1px);
   background-size: 40px 40px;
   mask-image: linear-gradient(to bottom, black 18%, transparent 92%);
 }
 
 .fine-grid {
   background-image:
-    linear-gradient(rgba(53, 89, 199, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(53, 89, 199, 0.045) 1px, transparent 1px);
+    linear-gradient(rgba(36, 86, 246, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(36, 86, 246, 0.045) 1px, transparent 1px);
   background-size: 24px 24px;
+}
+
+/* ---------- Typography ---------- */
+
+.eyebrow {
+  color: #2456f6;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.band-ink .eyebrow {
+  color: #a9bdff;
+}
+
+.metric-number {
+  color: var(--ink-blue);
+  font-family: var(--font-bricolage), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.9rem, 2.6vw, 2.4rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
 }
 
 .balanced {
   text-wrap: balance;
+}
+
+/* Hero 52–72px, section 32–40px. Display face carries the personality. */
+.hero-title {
+  color: var(--ink-blue);
+  font-family: var(--font-bricolage), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.75rem, 5.2vw, 4.25rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.0;
+  text-wrap: balance;
+}
+
+.section-title {
+  color: var(--ink-blue);
+  font-family: var(--font-bricolage), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.band-ink .hero-title,
+.band-ink .section-title,
+.band-ink .metric-number {
+  color: #ffffff;
+}
+
+.lede {
+  color: #47546c;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.band-ink .lede {
+  color: #c3ccdf;
+}
+
+/*
+ * Keyword highlight: coloured text plus a thick, offset underline. Colour carries meaning —
+ * certified = governed facts, ai = model / agent, gold = roadmap or hypothesis.
+ */
+.hl {
+  text-decoration-line: underline;
+  text-decoration-thickness: 0.09em;
+  text-underline-offset: 0.14em;
+  text-decoration-skip-ink: none;
+}
+
+.hl-certified {
+  color: #0e8a5f;
+  text-decoration-color: rgba(14, 138, 95, 0.45);
+}
+
+.hl-ai {
+  color: #2456f6;
+  text-decoration-color: rgba(36, 86, 246, 0.42);
+}
+
+.hl-gold {
+  color: #b8730e;
+  text-decoration-color: rgba(184, 115, 14, 0.45);
+}
+
+.hl-ink {
+  color: #0b1730;
+  text-decoration-color: rgba(11, 23, 48, 0.35);
+}
+
+.band-ink .hl-certified {
+  color: #5fd0a5;
+  text-decoration-color: rgba(95, 208, 165, 0.5);
+}
+
+.band-ink .hl-ai {
+  color: #9db4ff;
+  text-decoration-color: rgba(157, 180, 255, 0.5);
+}
+
+.band-ink .hl-gold {
+  color: #f0c36a;
+  text-decoration-color: rgba(240, 195, 106, 0.5);
+}
+
+/* ---------- Controls ---------- */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.5rem;
+  border-radius: 8px;
+  background: #2456f6;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset, 0 8px 20px -10px rgba(36, 86, 246, 0.7);
+  transition: background-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+
+.btn-primary:hover {
+  background: #1b43c9;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset, 0 12px 26px -10px rgba(36, 86, 246, 0.75);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #cbd3e1;
+  background: #ffffff;
+  color: #0b1730;
+  font-size: 15px;
+  font-weight: 600;
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+
+.btn-secondary:hover {
+  border-color: #a9bdff;
+  background: #f3f6fc;
+}
+
+.band-ink .btn-secondary {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.band-ink .btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes flow-drift {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.flow-line {
+  animation: flow-drift 2.4s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

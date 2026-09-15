@@ -18,22 +18,22 @@ export default async function DatasetPage() {
   const freshness = datasetFreshnessCopy(health);
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-[#111827]">
+    <div className="flex min-h-screen flex-col bg-canvas text-ink">
       <SiteHeader active="/dataset" />
-      <main className="mx-auto max-w-[1100px] space-y-8 px-5 py-12 sm:px-8">
+      <main className="w-full flex-1 mx-auto max-w-[1100px] space-y-8 px-5 py-12 sm:px-8">
         <p className="eyebrow">{COPY.eyebrow}</p>
-        <h1 className="mt-4 max-w-3xl text-[36px] font-bold leading-[1.1] tracking-[-0.04em] text-[#13203a]">
+        <h1 className="mt-4 max-w-3xl text-[36px] font-bold leading-[1.1] tracking-[-0.04em] text-ink">
           {COPY.title}
         </h1>
-        <p className="mt-5 max-w-3xl text-[16px] leading-7 text-[#536177]">{COPY.lead}</p>
-        <p className="text-[13px] font-medium text-[#3657af]">{COPY.privacy}</p>
+        <p className="mt-5 max-w-3xl text-[16px] leading-7 text-body">{COPY.lead}</p>
+        <p className="text-[13px] font-medium text-primary-deep">{COPY.privacy}</p>
 
         <section className="surface p-6">
           <p className="eyebrow">Active scenarios</p>
-          <ol className="mt-4 space-y-3 text-[14px] leading-6 text-[#546277]">
+          <ol className="mt-4 space-y-3 text-[14px] leading-6 text-body-2">
             {COPY.scenarios.map((row) => (
               <li key={row.id}>
-                <span className="font-semibold text-[#1c2b44]">{row.id}</span> — {row.body}
+                <span className="font-semibold text-ink">{row.id}</span> — {row.body}
               </li>
             ))}
           </ol>
@@ -41,17 +41,17 @@ export default async function DatasetPage() {
 
         <section className="surface p-6">
           <p className="eyebrow">SYNTHETIC_EXTENSION</p>
-          <p className="mt-3 text-[14px] leading-6 text-[#546277]">{COPY.synthetic}</p>
+          <p className="mt-3 text-[14px] leading-6 text-body-2">{COPY.synthetic}</p>
         </section>
 
         <section className="surface p-6">
           <p className="eyebrow">External sources</p>
-          <p className="mt-3 text-[14px] leading-6 text-[#546277]">{COPY.external}</p>
+          <p className="mt-3 text-[14px] leading-6 text-body-2">{COPY.external}</p>
         </section>
 
         <section className="surface p-6">
           <p className="eyebrow">FRESHNESS</p>
-          <p className="mt-3 text-[14px] leading-6 text-[#546277]" data-testid="dataset-freshness">
+          <p className="mt-3 text-[14px] leading-6 text-body-2" data-testid="dataset-freshness">
             {freshness}
           </p>
         </section>
